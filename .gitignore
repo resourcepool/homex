@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Node / frontend build deps
+node_modules/
+frontend/dist/
+
+# Home Assistant runtime state (the dev instance) — keep config sources only
+config/.storage/
+config/.cloud/
+config/.cache/
+config/deps/
+config/tts/
+config/*.log
+config/*.log.*
+config/*.db
+config/*.db-*
+config/.HA_VERSION
+config/.uuid
+config/.ha_run.lock
+config/home-assistant.log*
+
+# HA default blueprints (shipped by HA at first run, not part of Homex)
+config/blueprints/
+
+# OS / editor
+.DS_Store

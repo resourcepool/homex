@@ -1,0 +1,52 @@
+- id: homex_bedroom_buro_turn_on
+  name: homex_bedroom_buro_turn_on
+  entities:
+    input_boolean.lamp_bedroom_1:
+      state: 'on'
+    input_boolean.lamp_living_1:
+      state: 'on'
+- id: homex_bedroom_buro_turn_off
+  name: homex_bedroom_buro_turn_off
+  entities:
+    input_boolean.lamp_bedroom_1:
+      state: 'off'
+    input_boolean.lamp_living_1:
+      state: 'off'
+- id: homex_chambre_turn_on
+  name: HX - Chambre - on
+  entities:
+    input_boolean.lamp_bedroom_1:
+      state: 'on'
+    input_boolean.lamp_living_1:
+      state: 'on'
+- id: homex_chambre_turn_off
+  name: HX - Chambre - off
+  entities:
+    input_boolean.lamp_bedroom_1:
+      state: 'off'
+    input_boolean.lamp_living_1:
+      state: 'off'
+- id: homex_chambre_turn_on_night
+  name: HX - Chambre - on - Night
+  entities:
+    input_boolean.lamp_bedroom_1:
+      state: 'off'
+    input_boolean.lamp_living_1:
+      state: 'off'
+- id: homex_chambre_turn_on_test
+  name: HX - Chambre - on - Test
+  entities:
+    input_boolean.lamp_bedroom_1:
+      state: 'off'
+    input_boolean.lamp_living_1:
+      state: 'off'
+- id: homex_malekoum_turn_on
+  name: HX - Malekoum - on
+  entities:
+    input_boolean.lamp_living_1:
+      state: 'on'
+- id: homex_malekoum_turn_off
+  name: HX - Malekoum - off
+  entities:
+    input_boolean.lamp_living_1:
+      state: 'off'

@@ -1,0 +1,87 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Nouvelle pièce",
+        "description": "Créez une pièce. Homex crée switch.room_lights_<id> qui représente l'état d'allumage de la pièce.",
+        "data": {
+          "name": "Nom de la pièce",
+          "room_id": "Identifiant (minuscules, lettres/chiffres/underscore)"
+        }
+      },
+      "devices": {
+        "title": "Appareils de la pièce",
+        "description": "Choisissez toutes les lampes/interrupteurs de la pièce. Homex crée un groupe de lumières ainsi que deux scènes natives dans scenes.yaml (room_lights_<id>_turn_on = tout allumé, room_lights_<id>_turn_off = tout éteint), modifiables dans Paramètres -> Automatisations et scènes -> Scènes.",
+        "data": {
+          "devices": "Appareils"
+        }
+      },
+      "triggers": {
+        "title": "Déclencheurs",
+        "description": "Choisissez les entités qui doivent ré-appliquer la scène de la pièce quand elles changent. Elles alimentent l'automatisation room_lights_switcher_<id>, qui applique turn_on ou turn_off selon l'état de la pièce.",
+        "data": {
+          "triggers": "Entités déclencheuses"
+        }
+      }
+    },
+    "error": {
+      "invalid_id": "L'identifiant ne doit contenir que des minuscules, des chiffres et des underscores."
+    },
+    "abort": {
+      "already_configured": "Une pièce avec cet identifiant existe déjà."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Pièce Homex",
+        "menu_options": {
+          "room": "Appareils et déclencheurs de la pièce",
+          "add_group": "Ajouter un groupe",
+          "manage_groups": "Modifier / supprimer un groupe"
+        }
+      },
+      "room": {
+        "title": "Appareils et déclencheurs de la pièce",
+        "description": "Modifiez les appareils de la pièce et les déclencheurs. Pour modifier les scènes, allez dans Paramètres -> Automatisations et scènes -> Scènes.",
+        "data": {
+          "devices": "Appareils",
+          "triggers": "Entités déclencheuses"
+        }
+      },
+      "add_group": {
+        "title": "Ajouter un groupe",
+        "description": "Un groupe pilote un sous-ensemble des appareils de la pièce, avec son propre switch, son light group, deux scènes (room_lights_<id>_<groupId>_turn_on / _turn_off) et ses déclencheurs.",
+        "data": {
+          "group_name": "Nom du groupe",
+          "group_id": "Identifiant du groupe (minuscules, lettres/chiffres/underscore)",
+          "devices": "Appareils (sous-ensemble de la pièce)",
+          "triggers": "Entités déclencheuses"
+        }
+      },
+      "manage_groups": {
+        "title": "Modifier / supprimer un groupe",
+        "data": {
+          "group": "Groupe"
+        }
+      },
+      "edit_group": {
+        "title": "Modifier le groupe",
+        "description": "Modifiez le groupe, ou cochez « supprimer » pour le retirer.",
+        "data": {
+          "group_name": "Nom du groupe",
+          "devices": "Appareils (sous-ensemble de la pièce)",
+          "triggers": "Entités déclencheuses",
+          "delete": "Supprimer ce groupe"
+        }
+      }
+    },
+    "error": {
+      "invalid_id": "L'identifiant ne doit contenir que des minuscules, des chiffres et des underscores.",
+      "group_exists": "Un groupe avec cet identifiant existe déjà dans la pièce."
+    },
+    "abort": {
+      "unknown_group": "Ce groupe n'existe plus."
+    }
+  }
+}

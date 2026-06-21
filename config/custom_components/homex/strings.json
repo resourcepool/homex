@@ -1,0 +1,87 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "New room",
+        "description": "Create a room. Homex will create switch.room_lights_<id> to track whether the room is lit.",
+        "data": {
+          "name": "Room name",
+          "room_id": "Room id (lowercase, letters/digits/underscore)"
+        }
+      },
+      "devices": {
+        "title": "Room devices",
+        "description": "Pick every lamp/switch in the room. Homex creates a light group plus two native scenes in scenes.yaml (room_lights_<id>_turn_on = all on, room_lights_<id>_turn_off = all off), editable in Settings -> Automations & scenes -> Scenes.",
+        "data": {
+          "devices": "Devices"
+        }
+      },
+      "triggers": {
+        "title": "Triggers",
+        "description": "Pick entities that should re-apply the room scene when they change. They feed the room_lights_switcher_<id> automation, which applies turn_on or turn_off depending on the room state.",
+        "data": {
+          "triggers": "Trigger entities"
+        }
+      }
+    },
+    "error": {
+      "invalid_id": "The id must only contain lowercase letters, digits and underscores."
+    },
+    "abort": {
+      "already_configured": "A room with this id already exists."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Homex room",
+        "menu_options": {
+          "room": "Room devices & triggers",
+          "add_group": "Add a group",
+          "manage_groups": "Edit / remove a group"
+        }
+      },
+      "room": {
+        "title": "Room devices & triggers",
+        "description": "Edit the room devices and the triggers. To edit the scenes, use Settings -> Automations & scenes -> Scenes.",
+        "data": {
+          "devices": "Devices",
+          "triggers": "Trigger entities"
+        }
+      },
+      "add_group": {
+        "title": "Add a group",
+        "description": "A group controls a subset of the room devices, with its own switch, light group, two scenes (room_lights_<id>_<groupId>_turn_on / _turn_off) and triggers.",
+        "data": {
+          "group_name": "Group name",
+          "group_id": "Group id (lowercase, letters/digits/underscore)",
+          "devices": "Devices (subset of the room)",
+          "triggers": "Trigger entities"
+        }
+      },
+      "manage_groups": {
+        "title": "Edit / remove a group",
+        "data": {
+          "group": "Group"
+        }
+      },
+      "edit_group": {
+        "title": "Edit group",
+        "description": "Change the group, or tick 'delete' to remove it.",
+        "data": {
+          "group_name": "Group name",
+          "devices": "Devices (subset of the room)",
+          "triggers": "Trigger entities",
+          "delete": "Delete this group"
+        }
+      }
+    },
+    "error": {
+      "invalid_id": "The id must only contain lowercase letters, digits and underscores.",
+      "group_exists": "A group with this id already exists in the room."
+    },
+    "abort": {
+      "unknown_group": "This group no longer exists."
+    }
+  }
+}
