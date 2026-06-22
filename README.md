@@ -1,183 +1,100 @@
 # Homex
 
 Intégration Home Assistant pour créer rapidement des **automatisations
-d'éclairage par pièce**. Une pièce se configure en trois volets et devient
-immédiatement active.
+d'éclairage par pièce**. Tout se gère depuis un **panneau dédié** dans la barre
+latérale — pas de YAML à écrire.
 
-## Ce que crée une pièce
+## Modèle
 
-Pour une pièce de nom `Chambre` / id `bedroom`, Homex crée :
+Homex s'installe en **un clic** : une seule entrée de configuration, le *hub*
+« Homex ». Chaque **pièce** est ensuite un **sous-élément (subentry)** du hub,
+créé et géré entièrement depuis le panneau. Les pièces apparaissent imbriquées
+sous Homex dans *Paramètres → Appareils et services*, et leurs entités sont
+rattachées à la pièce.
 
-| Entité | Rôle |
-| --- | --- |
-| `switch.room_lights_bedroom` | État d'allumage de la pièce (allumée / éteinte). Géré par Homex. |
-| `light.room_lights_bedroom_group` | Groupe de tous les appareils de la pièce. Géré par Homex. |
-| `scene.room_lights_bedroom_turn_on` | Scène native « tout allumé » (par défaut), écrite dans `scenes.yaml`. |
-| `scene.room_lights_bedroom_turn_off` | Scène native « tout éteint » (par défaut), écrite dans `scenes.yaml`. |
-| `room_lights_switcher_bedroom` | Automatisation interne : à chaque déclencheur, applique `turn_on` ou `turn_off` selon l'état du switch de la pièce. |
+### Ce que crée une pièce / un groupe
 
-Le `switch` et le `light` group sont **gérés par l'intégration**. Les deux
-**scènes sont natives** : Homex les écrit dans `config/scenes.yaml` (si elles
-n'existent pas encore) et les déclenche via `scene.turn_on`. Elles
-appartiennent ensuite à l'utilisateur, qui les édite dans l'éditeur de scènes
-HA — Homex n'écrase jamais une scène existante.
+Pour une pièce `Chambre` (id `chambre`) — `slug` = `chambre` ; pour un groupe
+`Table de chevet` (id `table_de_chevet`) — `slug` = `chambre_table_de_chevet` :
 
-**Suppression** : supprimer la pièce (l'entrée d'intégration) retire de
-`scenes.yaml` toutes les scènes de la pièce **et de ses groupes**
-(`async_remove_entry`).
+| Entité | Nom affiché | Rôle |
+| --- | --- | --- |
+| `switch.homex_{slug}_lights_toggle` | `HX - {pièce}[ - {groupe}] - toggle lights` | État allumé / éteint (géré par Homex). |
+| `light.homex_{slug}_lights` | `HX - {pièce}[ - {groupe}] - lights` | Groupe de tous les appareils. |
+| `scene.homex_{slug}_turn_on` | `HX - {pièce} - on` | Scène native « tout allumé ». |
+| `scene.homex_{slug}_turn_off` | `HX - {pièce} - off` | Scène native « tout éteint ». |
 
-## Les trois volets
+Les scènes sont **natives** : Homex les écrit dans `config/scenes.yaml` et les
+déclenche via `scene.turn_on`. Elles appartiennent ensuite à l'utilisateur
+(éditables dans l'éditeur de scènes HA) — Homex n'écrase jamais une scène
+existante. On peut ajouter d'autres scènes (`HX - {pièce} - on - {nom}`).
 
-1. **Pièce** — nom + id → crée `switch.room_lights_<id>`.
-2. **Appareils** — sélection des lampes/interrupteurs → crée le groupe de
-   lumières et seed les deux scènes natives dans `scenes.yaml` (`turn_on` =
-   tout allumé, `turn_off` = tout éteint).
-3. **Déclencheurs** — sélection d'entités (interrupteur, capteur de présence…).
-   Quand une d'elles change d'état, l'automatisation lit l'état de la pièce et
-   applique la scène correspondante.
+Un **groupe** pilote un sous-ensemble des appareils de la pièce, avec son propre
+switch, son groupe de lumières, ses scènes et ses déclencheurs.
 
-Une fois les trois volets validés, la pièce est active.
+### Déclencheurs
 
-### Configurer la pièce / les groupes
+Deux types, configurables par pièce et par groupe :
 
-**Paramètres → Appareils et services → Homex → Configurer** ouvre un menu :
+- **toggle** — bascule l'état (allumé ⇄ éteint) ;
+- **changement de scène** — fait défiler les scènes (stratégie *recall first* /
+  *recall last*).
 
-- **Appareils et déclencheurs de la pièce** — modifier la liste.
-- **Ajouter un groupe** — voir ci-dessous.
-- **Modifier / supprimer un groupe** — éditer ou retirer un groupe existant.
+Chaque déclencheur est soit une **entité** (changement d'état), soit un
+**device** (action native, ex. bouton). Les déclenchements provoqués par les
+propres actions de Homex sont ignorés (pas de boucle scène → device → trigger).
 
-### Groupes dans une pièce
+## Installation
 
-Un groupe pilote un **sous-ensemble** des appareils de la pièce (ex. « Table de
-chevet L », id `bedside_l`). On choisit le nom, l'id, les appareils (parmi ceux
-de la pièce) et un ou plusieurs déclencheurs. À la création, Homex crée, en
-miroir de la pièce :
+> Nécessite Home Assistant **≥ 2025.1** (config subentries) et
+> `scene: !include scenes.yaml` dans `configuration.yaml` — **présent par
+> défaut** sur une installation HAOS standard (via `default_config`).
 
-| Entité (groupe `bedside_l` de `bedroom`) | Rôle |
-| --- | --- |
-| `switch.room_lights_bedroom_bedside_l` | État du groupe (allumé / éteint). |
-| `light.room_lights_bedroom_bedside_l_group` | Group HA du sous-ensemble. |
-| `scene.room_lights_bedroom_bedside_l_turn_on` | Scène native « groupe allumé ». |
-| `scene.room_lights_bedroom_bedside_l_turn_off` | Scène native « groupe éteint ». |
+### Via HACS (dépôt personnalisé)
 
-Quand un déclencheur du groupe change d'état, Homex lit l'état du switch du
-groupe et applique la scène `turn_on` ou `turn_off` correspondante (même logique
-que la pièce, scopée au sous-ensemble).
+1. HACS → menu ⋮ → **Dépôts personnalisés**.
+2. Ajouter l'URL du dépôt, catégorie **Integration**.
+3. Installer **Homex**, puis **redémarrer** Home Assistant.
+4. *Paramètres → Appareils et services → Ajouter une intégration → Homex*
+   (installation en un clic, sans champ).
 
-**Éteindre la pièce éteint aussi les groupes** : quand on éteint
-`switch.room_lights_<id>`, Homex éteint également le switch de chaque
-sous-groupe (qui applique sa propre scène `turn_off`).
+### Manuelle (HAOS / Container / Core)
 
-> Supprimer un groupe retire ses entités, mais laisse ses scènes dans
-> `scenes.yaml` (Homex ne touche jamais aux scènes existantes) — supprime-les
-> manuellement dans l'éditeur de scènes si besoin.
+1. Copier le dossier `custom_components/homex/` dans `/config/custom_components/`
+   (via Samba, *File editor*, *Studio Code Server* ou SSH).
+2. Redémarrer Home Assistant.
+3. *Ajouter une intégration → Homex*.
 
-### Éditer les scènes (éditeur natif HA)
+Une fois installé, ouvrir **Homex** dans la barre latérale et cliquer
+**＋ Nouvelle pièce**.
 
-Les scènes sont de vraies scènes Home Assistant. Pour les modifier :
-**Paramètres → Automatisations et scènes → Scènes** →
-`room_lights_<id>_turn_on` / `room_lights_<id>_turn_off`. Tu y règles l'état de
-chaque appareil (allumé/éteint, luminosité, couleur…) avec l'éditeur natif.
-Homex applique ensuite ces scènes telles quelles via `scene.turn_on`.
+## Développement
 
-## Menu latéral (panel custom)
+Environnement de dev jetable (HA dans Docker, intégration montée en direct) :
 
-Homex enregistre une entrée **Homex** dans la barre latérale de Home Assistant
-(un *custom panel*, pas besoin de HACS — HACS ne sert qu'à *distribuer* des
-intégrations/cartes). Le panneau est un **centre de configuration complet**,
-piloté par des **modales** :
+```bash
+docker compose up -d          # HA sur http://localhost:8124
+```
 
-- **Créer une pièce** : bouton « ＋ Nouvelle pièce » dans l'en-tête → modale
-  (nom, id, appareils). Crée le config entry via le config flow (`import`).
-- **Contrôle** : pour chaque pièce et groupe, toggle du switch, boutons des
-  scènes ON/OFF, état du light group (rafraîchi en direct).
-- **Par pièce, des boutons ouvrent une modale** : *Modifier la pièce* (nom, id
-  — renomme scènes + entités —, appareils), *Déclencheurs*, *＋ Groupe*.
-- **Par groupe**, un bouton ⚙︎ ouvre la modale d'édition (nom, appareils du
-  sous-ensemble, déclencheurs) avec suppression.
-- La sélection d'entités utilise `ha-entities-picker` (autocomplétion native,
-  ajout entité par entité).
-
-Implémentation :
-
-- **Backend** (`panel.py`) : commandes WebSocket `homex/rooms` (lecture),
-  `homex/room/update`, `homex/group/add|update|delete` (mutations, admin) qui
-  modifient le config entry via `async_update_entry` ; le renommage d'id migre
-  `scenes.yaml` et les `entity_id` du registre.
-- **Frontend** : écrit en **Lit + TypeScript** (comme le frontend de HA),
-  sources découpées en composants dans `frontend/src/`, **buildé avec Vite**
-  vers le module ESM `config/custom_components/homex/panel/homex-panel.js`
-  servi en statique (`/homex_static/...`) et enregistré via `panel_custom`.
-- **Composants natifs HA** : le panneau utilise `ha-card`, `ha-textfield` et
-  surtout `ha-entities-picker` (sélection multi-entités native, ajout entité par
-  entité). Ces éléments vivent dans le chunk éditeur de HA ; ils sont chargés à
-  la demande via `loadCardHelpers()` (`lib/ha-elements.ts`). Si indisponibles
-  (vieille version HA), `homex-entity-picker` retombe sur un widget maison
-  (puces + autocomplétion).
-- L'enregistrement est **différé à `homeassistant_started`** pour ne jamais
-  bloquer le démarrage. Le panneau apparaît dès qu'au moins une pièce existe.
-
-### Développer / rebuilder le panel
+L'intégration (`./custom_components/homex`) est montée dans
+`/config/custom_components`. Le panneau est un composant **Lit + Vite**
+(`frontend/`), compilé en un bundle ES unique servi par l'intégration :
 
 ```bash
 cd frontend
-npm install        # une fois
-npm run build      # build unique -> ../config/.../panel/homex-panel.js
-npm run watch      # rebuild auto pendant le dev
+npm install
+npm run build                 # -> custom_components/homex/panel/homex-panel.js
 ```
 
-Après un build, recharge la page Homex (Cmd/Ctrl+Shift+R) ; bump
-`PANEL_VERSION` dans `panel.py` pour forcer le cache-busting du module.
+`PANEL_VERSION` (`panel.py`) et `BUILD` (`homex-panel.ts`) sont incrémentés
+ensemble pour casser le cache ; le badge `Homex vN` en haut du panneau confirme
+la version chargée (rechargement dur : Cmd/Ctrl+Shift+R).
 
-## Lancer l'environnement de dev
+> Le dossier `config/` est l'instance HA de dev. `config/scenes.yaml` et
+> `config/.storage/` sont ignorés par git (état runtime).
 
-```bash
-docker compose up
-```
+## Notes mainteneur
 
-Puis ouvrir http://localhost:8123, créer le compte initial, et ajouter
-l'intégration : **Paramètres → Appareils et services → Ajouter une
-intégration → Homex**.
-
-Le fichier `config/configuration.yaml` fournit déjà des appareils factices
-(`input_boolean.lamp_*`, `input_boolean.wall_switch_bedroom`,
-`input_boolean.motion_bedroom`) pour tester sans matériel réel.
-
-### Exemple de test
-
-1. Crée une pièce `Chambre` / `bedroom`.
-2. Appareils : `Bedroom Lamp 1`, `Bedroom Lamp 2`.
-3. Déclencheur : `Bedroom Motion (trigger)`.
-4. Allume `switch.room_lights_bedroom` → les deux lampes s'allument.
-5. Bascule `input_boolean.motion_bedroom` → la scène correspondant à l'état de
-   la pièce est ré-appliquée.
-
-## Structure
-
-```
-docker-compose.yml
-frontend/              # sources du panel (Lit + TS), buildées par Vite
-  package.json vite.config.ts tsconfig.json
-  src/
-    homex-panel.ts     # élément racine <homex-panel> (orchestration)
-    types.ts api.ts    # types partagés + client WebSocket homex/*
-    lib/               # ha-elements (chargement natif), styles, fields, domains
-    components/        # homex-room-card, homex-group-row, homex-unit-controls,
-                       #   homex-entity-picker, homex-dialog + *-dialog (modales)
-config/
-  configuration.yaml   # default_config + scene: !include scenes.yaml
-  scenes.yaml          # scènes natives (seedées par Homex, éditables)
-  custom_components/homex/
-    __init__.py        # setup / unload du config entry
-    config_flow.py     # les 3 volets + options (reconfiguration)
-    room.py            # RoomController + Unit (pièce & groupes) : scènes + auto
-    switch.py          # switch.room_lights_<id>
-    light.py           # light.room_lights_<id>_group
-    panel.py           # WebSocket homex/* + enregistrement du panel
-    panel/homex-panel.js  # module ESM buildé (ne pas éditer à la main)
-    const.py manifest.json strings.json translations/
-```
-
-> Note : `config/configuration.yaml` contient `scene: !include scenes.yaml`,
-> indispensable pour que les scènes natives seedées par Homex soient chargées
-> et éditables.
+Avant publication, renseigner dans `custom_components/homex/manifest.json` les
+champs `documentation`, `issue_tracker` et `codeowners` avec la vraie URL du
+dépôt et le compte GitHub.

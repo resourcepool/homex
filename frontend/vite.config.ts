@@ -8,7 +8,7 @@ export default defineConfig({
       formats: ["es"],
       fileName: () => "homex-panel.js",
     },
-    outDir: "../config/custom_components/homex/panel",
+    outDir: "../custom_components/homex/panel",
     emptyOutDir: false,
     target: "es2021",
     minify: true,

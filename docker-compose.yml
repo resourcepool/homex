@@ -4,6 +4,9 @@ services:
     image: ghcr.io/home-assistant/home-assistant:stable
     volumes:
       - ./config:/config
+      # The integration lives at the repo root (HACS layout); mount it into
+      # the dev config dir so HA loads it from there.
+      - ./custom_components:/config/custom_components
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "8124:8123"
