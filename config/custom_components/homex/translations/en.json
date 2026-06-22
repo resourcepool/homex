@@ -28,7 +28,7 @@
       "invalid_id": "The id must only contain lowercase letters, digits and underscores."
     },
     "abort": {
-      "already_configured": "A room with this id already exists."
+      "already_configured": "Homex is already installed. Add rooms from the Homex panel."
     }
   },
   "options": {
@@ -81,7 +81,8 @@
       "group_exists": "A group with this id already exists in the room."
     },
     "abort": {
-      "unknown_group": "This group no longer exists."
+      "unknown_group": "This group no longer exists.",
+      "managed_in_panel": "Rooms are managed from the Homex panel."
     }
   }
 }

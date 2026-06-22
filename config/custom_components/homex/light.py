@@ -1,4 +1,4 @@
-"""light.room_lights_{slug}_group - the devices of the room or a group."""
+"""light.homex_{slug}_lights - the devices of the room or a group."""
 
 from __future__ import annotations
 
@@ -8,8 +8,8 @@ from homeassistant.core import Event, HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_track_state_change_event
 
-from .const import DOMAIN
-from .room import RoomController, Unit
+from .const import DOMAIN, HUB_DATA
+from .room import HomexHub, Unit
 
 
 async def async_setup_entry(
@@ -17,8 +17,12 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    controller: RoomController = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities([RoomLightGroup(unit) for unit in controller.units])
+    hub: HomexHub = hass.data[DOMAIN][HUB_DATA]
+    for room_id, controller in hub.controllers.items():
+        async_add_entities(
+            [RoomLightGroup(unit) for unit in controller.units],
+            config_subentry_id=hub.subentry_id(room_id),
+        )
 
 
 class RoomLightGroup(LightEntity):
@@ -33,7 +37,7 @@ class RoomLightGroup(LightEntity):
         self._unit = unit
         self._members = unit.devices
         self._attr_unique_id = unit.light_unique_id
-        self._attr_name = f"{unit.name} group"
+        self._attr_name = unit.light_name
         self.entity_id = unit.light_entity_id
         self._attr_is_on = False
 

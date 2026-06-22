@@ -28,7 +28,7 @@
       "invalid_id": "L'identifiant ne doit contenir que des minuscules, des chiffres et des underscores."
     },
     "abort": {
-      "already_configured": "Une pièce avec cet identifiant existe déjà."
+      "already_configured": "Homex est déjà installé. Ajoutez des pièces depuis le panneau Homex."
     }
   },
   "options": {
@@ -81,7 +81,8 @@
       "group_exists": "Un groupe avec cet identifiant existe déjà dans la pièce."
     },
     "abort": {
-      "unknown_group": "Ce groupe n'existe plus."
+      "unknown_group": "Ce groupe n'existe plus.",
+      "managed_in_panel": "Les pièces se gèrent depuis le panneau Homex."
     }
   }
 }

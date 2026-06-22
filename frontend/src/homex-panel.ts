@@ -9,7 +9,7 @@ import "./components/homex-room-dialog";
 
 // Bump together with PANEL_VERSION in panel.py. Shown in the header so you can
 // confirm a full page reload picked up the latest build.
-const BUILD = "29";
+const BUILD = "32";
 
 /** Homex sidebar panel: lists rooms and orchestrates loading / reloading. */
 @customElement("homex-panel")
@@ -168,10 +168,8 @@ export class HomexPanel extends LitElement {
       body = html`<div class="msg">Chargement…</div>`;
     } else if (!this._rooms.length) {
       body = html`<div class="msg">
-        Aucune pièce. Ajoute-en une via
-        <a href="/config/integrations/integration/homex"
-          >Paramètres → Intégrations → Homex</a
-        >.
+        Aucune pièce. Clique sur <strong>＋ Nouvelle pièce</strong> en haut à
+        droite pour en créer une.
       </div>`;
     } else {
       const { ungrouped, floors, byFloor } = this._grouped();

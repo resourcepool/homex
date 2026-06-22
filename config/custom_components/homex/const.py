@@ -3,6 +3,10 @@
 DOMAIN = "homex"
 
 # Config / options keys
+CONF_HUB = "hub"  # marks the single anchor entry (install without a room)
+HUB_UNIQUE_ID = "homex_hub"
+CONF_ROOMS = "rooms"  # list of room config dicts stored in the hub's options
+HUB_DATA = "hub_live"  # hass.data[DOMAIN] key for the live HomexHub instance
 CONF_ROOM_NAME = "name"
 CONF_ROOM_ID = "room_id"
 CONF_AREA_ID = "area_id"  # optional link to a native HA area

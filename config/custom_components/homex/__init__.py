@@ -9,8 +9,8 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EVENT_HOMEASSISTANT_STARTED
 from homeassistant.core import HomeAssistant
 
-from .const import DOMAIN, PLATFORMS, SCENES_LOCK
-from .room import RoomController
+from .const import DOMAIN, HUB_DATA, PLATFORMS, SCENES_LOCK
+from .room import HomexHub
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -34,40 +34,44 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up a Homex room from a config entry."""
+    """Set up the single Homex hub entry that owns every room."""
     domain_data = hass.data.setdefault(DOMAIN, {})
-    # Shared lock so concurrent room setups don't clobber scenes.yaml.
+    # Shared lock so concurrent scene writes don't clobber scenes.yaml.
     domain_data.setdefault(SCENES_LOCK, asyncio.Lock())
-    controller = RoomController(hass, entry)
-    hass.data[DOMAIN][entry.entry_id] = controller
 
-    # Create the switch / light group / scene entities for this room.
+    hub = HomexHub(hass, entry)
+    hub.build()
+    domain_data[HUB_DATA] = hub
+
+    # Create the switch / light group entities for every room and group.
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-    # Activate the room_lights_switcher_{id} automation.
-    await controller.async_start()
+    # Seed scenes and wire each room's trigger automations.
+    await hub.async_start()
 
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Unload a Homex room."""
-    controller: RoomController | None = hass.data[DOMAIN].get(entry.entry_id)
-    if controller is not None:
-        await controller.async_stop()
+    """Unload the Homex hub."""
+    hub: HomexHub | None = hass.data[DOMAIN].get(HUB_DATA)
+    if hub is not None:
+        await hub.async_stop()
 
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:
-        hass.data[DOMAIN].pop(entry.entry_id, None)
+        hass.data[DOMAIN].pop(HUB_DATA, None)
     return unload_ok
 
 
 async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Reload the room when its options change."""
+    """Reload everything when the room list (options) changes."""
     await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Delete the room: also remove its scenes (room + groups) from scenes.yaml."""
-    await RoomController(hass, entry).async_remove_scenes()
+    """Delete Homex: also remove every room/group scene from scenes.yaml."""
+    hub = HomexHub(hass, entry)
+    hub.build()
+    await hub.async_remove_all_scenes()

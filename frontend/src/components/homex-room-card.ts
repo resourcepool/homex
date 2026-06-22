@@ -27,7 +27,7 @@ import "./homex-triggers-dialog";
 import "./homex-group-dialog";
 import "./homex-scene-dialog";
 
-type DialogKind = "" | "room" | "triggers" | "addgroup" | "addscene";
+type DialogKind = "" | "room" | "triggers" | "addgroup" | "addscene" | "delete";
 
 /** One room as an ha-card: status, drag-orderable scenes, groups, menu. */
 @customElement("homex-room-card")
@@ -39,6 +39,8 @@ export class HomexRoomCard extends LitElement {
   @state() private _dialog: DialogKind = "";
   @state() private _menuOpen = false;
   @state() private _renameScene: Scene | null = null;
+  @state() private _deleteScenes = true;
+  @state() private _deleting = false;
 
   static styles = [
     sharedStyles,
@@ -227,6 +229,101 @@ export class HomexRoomCard extends LitElement {
         margin-top: 8px;
         padding-top: 6px;
       }
+      .confirm-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        background: rgba(0, 0, 0, 0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+      .confirm-card {
+        width: 440px;
+        max-width: 100%;
+        background: var(--card-background-color, #fff);
+        color: var(--primary-text-color);
+        border-radius: 14px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        padding: 20px 22px;
+      }
+      .confirm-card h3 {
+        margin: 0 0 8px;
+        font-size: 18px;
+        font-weight: 500;
+      }
+      .confirm-text {
+        margin: 0 0 16px;
+        font-size: 14px;
+        color: var(--secondary-text-color);
+        line-height: 1.45;
+      }
+      .toggle-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        padding: 10px 0;
+      }
+      .toggle-label {
+        font-size: 14px;
+      }
+      .toggle {
+        position: relative;
+        flex: 0 0 auto;
+        width: 42px;
+        height: 24px;
+        border-radius: 12px;
+        background: var(--switch-unchecked-track-color, #bdbdbd);
+        transition: background 0.2s;
+      }
+      .toggle.on {
+        background: var(--switch-checked-track-color, var(--primary-color));
+      }
+      .toggle input {
+        position: absolute;
+        inset: 0;
+        margin: 0;
+        opacity: 0;
+        cursor: pointer;
+      }
+      .toggle .knob {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        transition: transform 0.2s;
+      }
+      .toggle.on .knob {
+        transform: translateX(18px);
+      }
+      .confirm-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 18px;
+      }
+      .confirm-actions button {
+        cursor: pointer;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        background: var(--secondary-background-color, #f0f0f0);
+        color: var(--primary-text-color);
+      }
+      .confirm-actions button.danger {
+        background: var(--error-color, #db4437);
+        color: #fff;
+      }
+      .confirm-actions button:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
     `,
   ];
 
@@ -241,22 +338,24 @@ export class HomexRoomCard extends LitElement {
     return this.hass.states[this.room.switch]?.state === "on";
   }
 
-  private async _delete() {
+  private _delete = () => {
     this._menuOpen = false;
-    const r = this.room;
-    if (
-      !confirm(
-        `Supprimer la pièce "${r.name}" ?\nSes scènes et entités seront supprimées.`
-      )
-    )
-      return;
+    this._deleteScenes = true;
+    this._dialog = "delete";
+  };
+
+  private _confirmDelete = async () => {
+    this._deleting = true;
     try {
-      await deleteRoom(this.hass, r.entry_id);
+      await deleteRoom(this.hass, this.room.entry_id, this._deleteScenes);
+      this._dialog = "";
       fireChanged(this);
     } catch (err) {
       alert("Erreur Homex : " + errorMessage(err));
+    } finally {
+      this._deleting = false;
     }
-  }
+  };
 
   private _openHa(scene: Scene) {
     window.open(`/config/scene/edit/${scene.config_id}`, "_blank", "noopener");
@@ -504,6 +603,52 @@ export class HomexRoomCard extends LitElement {
         .open=${this._renameScene !== null}
         @dialog-closed=${() => (this._renameScene = null)}
       ></homex-scene-dialog>
+      ${this._dialog === "delete" ? this._renderDeleteConfirm(r) : ""}
+    `;
+  }
+
+  private _renderDeleteConfirm(r: Room) {
+    return html`
+      <div
+        class="confirm-backdrop"
+        @click=${(e: Event) => {
+          if (e.target === e.currentTarget && !this._deleting) this._close();
+        }}
+      >
+        <div class="confirm-card" role="dialog" aria-modal="true">
+          <h3>Supprimer la pièce « ${r.name} » ?</h3>
+          <p class="confirm-text">
+            Le switch, le groupe de lumières et les déclencheurs de cette pièce
+            seront supprimés. Cette action est irréversible.
+          </p>
+          <label class="toggle-row">
+            <span class="toggle ${this._deleteScenes ? "on" : ""}">
+              <input
+                type="checkbox"
+                .checked=${this._deleteScenes}
+                @change=${(e: Event) =>
+                  (this._deleteScenes = (e.target as HTMLInputElement).checked)}
+              />
+              <span class="knob"></span>
+            </span>
+            <span class="toggle-label">
+              Supprimer aussi les ${r.scenes.length} scène(s) associée(s)
+            </span>
+          </label>
+          <div class="confirm-actions">
+            <button @click=${this._close} ?disabled=${this._deleting}>
+              Annuler
+            </button>
+            <button
+              class="danger"
+              @click=${this._confirmDelete}
+              ?disabled=${this._deleting}
+            >
+              ${this._deleting ? "Suppression…" : "Supprimer"}
+            </button>
+          </div>
+        </div>
+      </div>
     `;
   }
 }

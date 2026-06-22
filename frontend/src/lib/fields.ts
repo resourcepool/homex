@@ -1,15 +1,15 @@
 import { html } from "lit";
-import { haComponentsLoaded } from "./ha-elements";
 
-// A text field: native Material ha-textfield when available, large styled input
-// otherwise. Both render full width with comfortable sizing.
+// A text field: native Material ha-textfield when it is actually registered,
+// otherwise a large styled input. Gate on ha-textfield specifically so the
+// field is never an undefined (invisible) element.
 export const textField = (
   label: string,
   value: string,
   onInput: (v: string) => void,
   placeholder = ""
 ) => {
-  if (haComponentsLoaded()) {
+  if (customElements.get("ha-textfield")) {
     return html`<ha-textfield
       outlined
       .label=${label}

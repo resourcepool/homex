@@ -1,4 +1,4 @@
-"""switch.room_lights_{slug} - on/off state of the room and each group."""
+"""switch.homex_{slug}_lights_toggle - on/off state of the room and each group."""
 
 from __future__ import annotations
 
@@ -8,8 +8,8 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
 
-from .const import DOMAIN
-from .room import RoomController, Unit
+from .const import DOMAIN, HUB_DATA
+from .room import HomexHub, Unit
 
 
 async def async_setup_entry(
@@ -17,8 +17,12 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    controller: RoomController = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities([RoomSwitch(unit) for unit in controller.units])
+    hub: HomexHub = hass.data[DOMAIN][HUB_DATA]
+    for room_id, controller in hub.controllers.items():
+        async_add_entities(
+            [RoomSwitch(unit) for unit in controller.units],
+            config_subentry_id=hub.subentry_id(room_id),
+        )
 
 
 class RoomSwitch(SwitchEntity, RestoreEntity):
@@ -30,7 +34,7 @@ class RoomSwitch(SwitchEntity, RestoreEntity):
     def __init__(self, unit: Unit) -> None:
         self._unit = unit
         self._attr_unique_id = unit.switch_unique_id
-        self._attr_name = f"{unit.name} lights"
+        self._attr_name = unit.switch_name
         self.entity_id = unit.switch_entity_id
         self._attr_is_on = False
         self._active_scene: str | None = None

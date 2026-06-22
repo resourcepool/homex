@@ -14,8 +14,11 @@ export interface RoomCreate {
 export const createRoom = (hass: HomeAssistant, payload: RoomCreate) =>
   hass.callWS({ type: "homex/room/create", ...payload });
 
-export const deleteRoom = (hass: HomeAssistant, entry_id: string) =>
-  hass.callWS({ type: "homex/room/delete", entry_id });
+export const deleteRoom = (
+  hass: HomeAssistant,
+  entry_id: string,
+  delete_scenes = true
+) => hass.callWS({ type: "homex/room/delete", entry_id, delete_scenes });
 
 export interface RoomUpdate {
   entry_id: string;

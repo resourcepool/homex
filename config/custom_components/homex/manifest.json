@@ -3,6 +3,7 @@
   "name": "Homex",
   "version": "0.1.0",
   "config_flow": true,
+  "single_config_entry": true,
   "documentation": "https://example.com/homex",
   "issue_tracker": "https://example.com/homex/issues",
   "codeowners": [],

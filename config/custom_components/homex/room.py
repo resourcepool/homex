@@ -4,8 +4,8 @@ A RoomController is the runtime "brain" behind one config entry. It exposes a
 list of *units*: the room itself plus one unit per group. Every unit behaves the
 same way:
 
-  * a ``switch.room_lights_{slug}`` holding its on/off state,
-  * a ``light.room_lights_{slug}_group`` aggregating its devices,
+  * a ``switch.homex_{slug}_lights_toggle`` holding its on/off state,
+  * a ``light.homex_{slug}_lights`` aggregating its devices,
   * two native scenes ``room_lights_{slug}_turn_on`` / ``_turn_off`` seeded in
     ``scenes.yaml`` (and edited by the user in the HA scene editor),
   * a small automation: when one of the unit's triggers fires, the matching
@@ -22,13 +22,14 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+from collections import deque
 
 from homeassistant.components.device_automation import (
     DeviceAutomationType,
     async_get_device_automations,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import Context, HomeAssistant, callback
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.trigger import async_initialize_triggers
 from homeassistant.util.yaml import load_yaml, save_yaml
@@ -48,9 +49,25 @@ def normalize_trigger_specs(raw) -> list[dict]:
     return specs
 
 
-def device_action_label(trigger: dict) -> str:
+def device_action_label(trigger) -> str:
     """Human label for a device-automation trigger (its 'action')."""
+    if not isinstance(trigger, dict):
+        return ""
     return str(trigger.get("subtype") or trigger.get("type") or "")
+
+
+def remove_scene_entities(hass: HomeAssistant, scene_ids) -> None:
+    """Remove native scene entities (resolved by scene id) from the registry.
+
+    Native scenes use the ``homeassistant`` platform with the scene id as their
+    unique id. Dropping them from scenes.yaml only makes the entity unavailable;
+    it must be removed from the registry too, or it lingers as a restored entity.
+    """
+    registry = er.async_get(hass)
+    for scene_id in scene_ids:
+        entity_id = registry.async_get_entity_id("scene", "homeassistant", scene_id)
+        if entity_id and registry.async_get(entity_id):
+            registry.async_remove(entity_id)
 
 from .const import (
     CONF_AREA_ID,
@@ -89,7 +106,6 @@ class Unit:
     ) -> None:
         self._controller = controller
         self.hass = controller.hass
-        self.entry_id = controller.entry.entry_id
         self.room_id = controller.room_id
         self.key = key  # "room" or the group_id
         self.is_room = key == ROOM_KEY
@@ -106,11 +122,27 @@ class Unit:
 
     @property
     def switch_entity_id(self) -> str:
-        return f"switch.homex_{self.slug}"
+        return f"switch.homex_{self.slug}_lights_toggle"
+
+    @property
+    def switch_name(self) -> str:
+        """Friendly name: HX - {room} - toggle lights [- via the group name]."""
+        room = self._controller.room_name
+        if self.is_room:
+            return f"HX - {room} - toggle lights"
+        return f"HX - {room} - {self.name} - toggle lights"
 
     @property
     def light_entity_id(self) -> str:
-        return f"light.homex_{self.slug}_group"
+        return f"light.homex_{self.slug}_lights"
+
+    @property
+    def light_name(self) -> str:
+        """Friendly name: HX - {room} - lights [- via the group name]."""
+        room = self._controller.room_name
+        if self.is_room:
+            return f"HX - {room} - lights"
+        return f"HX - {room} - {self.name} - lights"
 
     @property
     def scene_on_entity_id(self) -> str:
@@ -124,16 +156,13 @@ class Unit:
 
     @property
     def switch_unique_id(self) -> str:
-        # The room keeps its historical unique_ids to avoid churning entities.
-        if self.is_room:
-            return f"{self.entry_id}_room_state"
-        return f"{self.entry_id}_{self.key}_state"
+        # Based on the slug (room_id [+ group_id]) so it is unique per room even
+        # though every room now shares the single Homex hub config entry.
+        return f"homex_{self.slug}_lights_toggle"
 
     @property
     def light_unique_id(self) -> str:
-        if self.is_room:
-            return f"{self.entry_id}_group"
-        return f"{self.entry_id}_{self.key}_group"
+        return f"homex_{self.slug}_lights"
 
     def scene_seeds(self) -> list[tuple[str, str, str]]:
         """(scene_id, scene_name, default_state) for each of the two scenes."""
@@ -150,7 +179,11 @@ class Unit:
 
     async def _activate(self, scene_entity_id: str) -> None:
         await self.hass.services.async_call(
-            "scene", "turn_on", {"entity_id": scene_entity_id}, blocking=False
+            "scene",
+            "turn_on",
+            {"entity_id": scene_entity_id},
+            blocking=False,
+            context=self._controller.new_context(),
         )
 
     async def apply_on(self) -> None:
@@ -175,7 +208,11 @@ class Unit:
         children = self.child_switch_ids
         if children:
             await self.hass.services.async_call(
-                "switch", "turn_off", {"entity_id": children}, blocking=False
+                "switch",
+                "turn_off",
+                {"entity_id": children},
+                blocking=False,
+                context=self._controller.new_context(),
             )
 
     # -- Automation ---------------------------------------------------------
@@ -186,8 +223,11 @@ class Unit:
         return normalize_trigger_specs(self.triggers)
 
     @callback
-    def _on_trigger(self, *_args, **_kwargs) -> None:
+    def _on_trigger(self, run_variables=None, context: Context | None = None) -> None:
         """A trigger fired: apply the scene matching the unit's switch state."""
+        # Ignore triggers caused by Homex's own scene/switch actions.
+        if self._controller.is_self_context(context):
+            return
         if self._is_on():
             self.hass.async_create_task(self.apply_on())
         else:
@@ -217,22 +257,44 @@ class Unit:
 class RoomController:
     """Runtime logic for a single Homex room and its groups."""
 
-    def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
+    def __init__(
+        self, hass: HomeAssistant, entry: ConfigEntry, cfg: dict
+    ) -> None:
         self.hass = hass
-        self.entry = entry
+        self.entry = entry  # the single Homex hub entry (for the scenes lock)
+        self._cfg_dict = dict(cfg or {})
         self._units: list[Unit] | None = None
         # Room-level trigger handling (toggle + scene switching).
         self._room_unsubs: list = []
         self._room_switch = None  # bound RoomSwitch entity
         self._last_scene_key: str | None = None  # memorized scene (persists off)
         self._active_scene_key: str | None = None  # current scene while on
+        # Contexts of our own service calls, so triggers fired by the state
+        # changes WE cause are ignored (otherwise scene->device->trigger loops).
+        self._ctx_ids: set[str] = set()
+        self._ctx_order: deque[str] = deque(maxlen=256)
 
-    # -- Config accessors (options override the initial data) ---------------
+    # -- Self-action context tracking (loop prevention) ---------------------
+
+    def new_context(self) -> Context:
+        """A fresh context tagged as Homex-originated (remembered)."""
+        context = Context()
+        if len(self._ctx_order) == self._ctx_order.maxlen and self._ctx_order:
+            self._ctx_ids.discard(self._ctx_order[0])
+        self._ctx_order.append(context.id)
+        self._ctx_ids.add(context.id)
+        return context
+
+    def is_self_context(self, context: Context | None) -> bool:
+        """True if this context (or its parent) came from a Homex action."""
+        if context is None:
+            return False
+        return context.id in self._ctx_ids or context.parent_id in self._ctx_ids
+
+    # -- Config accessors (read from this room's config dict) ---------------
 
     def _cfg(self, key, default=None):
-        if key in self.entry.options:
-            return self.entry.options[key]
-        return self.entry.data.get(key, default)
+        return self._cfg_dict.get(key, default)
 
     @property
     def room_id(self) -> str:
@@ -280,11 +342,14 @@ class RoomController:
                 action = spec.get("action")
                 if not action:
                     continue
-                device_triggers = await async_get_device_automations(
+                # Returns a mapping {device_id: [trigger dicts]} — take this
+                # device's list (iterating the mapping yields its keys).
+                automations = await async_get_device_automations(
                     self.hass,
                     DeviceAutomationType.TRIGGER,
                     [spec["device_id"]],
                 )
+                device_triggers = automations.get(spec["device_id"], [])
                 match = next(
                     (
                         t
@@ -311,7 +376,7 @@ class RoomController:
 
     @property
     def room_switch_entity_id(self) -> str:
-        return f"switch.homex_{self.room_id}"
+        return f"switch.homex_{self.room_id}_lights_toggle"
 
     @property
     def groups(self) -> list[dict]:
@@ -452,7 +517,11 @@ class RoomController:
         self._last_scene_key = keys[index]
         self._update_active(keys[index])
         await self.hass.services.async_call(
-            "scene", "turn_on", {"entity_id": entities[index]}, blocking=False
+            "scene",
+            "turn_on",
+            {"entity_id": entities[index]},
+            blocking=False,
+            context=self.new_context(),
         )
 
     def on_toggled_off(self) -> None:
@@ -493,15 +562,23 @@ class RoomController:
         return ids
 
     @callback
-    def _toggle_action(self, *_args, **_kwargs) -> None:
+    def _toggle_action(self, run_variables=None, context: Context | None = None) -> None:
+        # Ignore toggles caused by Homex's own scene/switch actions.
+        if self.is_self_context(context):
+            return
         self.hass.async_create_task(
             self.hass.services.async_call(
-                "switch", "toggle", {"entity_id": self.room_switch_entity_id}
+                "switch",
+                "toggle",
+                {"entity_id": self.room_switch_entity_id},
+                context=self.new_context(),
             )
         )
 
     @callback
-    def _scene_action(self, *_args, **_kwargs) -> None:
+    def _scene_action(self, run_variables=None, context: Context | None = None) -> None:
+        if self.is_self_context(context):
+            return
         self.hass.async_create_task(self.async_scene_switch())
 
     async def async_scene_switch(self) -> None:
@@ -537,7 +614,11 @@ class RoomController:
         self._update_active(keys[index])
         _LOGGER.debug("[%s] scene switch -> %s", self.room_id, scenes[index])
         await self.hass.services.async_call(
-            "scene", "turn_on", {"entity_id": scenes[index]}, blocking=False
+            "scene",
+            "turn_on",
+            {"entity_id": scenes[index]},
+            blocking=False,
+            context=self.new_context(),
         )
 
     # -- Scenes (native, stored in scenes.yaml) -----------------------------
@@ -653,6 +734,9 @@ class RoomController:
             )
             if changed:
                 await self.hass.services.async_call("scene", "reload", blocking=True)
+        # Also drop the scene entities from the registry, otherwise they linger
+        # in HA as unavailable "restored" entities after the reload.
+        remove_scene_entities(self.hass, scene_ids)
 
     @staticmethod
     def _remove_scenes(path: str, scene_ids: set[str]) -> bool:
@@ -671,3 +755,55 @@ class RoomController:
             return False
         save_yaml(path, kept)
         return True
+
+
+class HomexHub:
+    """Owns every room of the single Homex config entry.
+
+    Each room is a *config subentry* of the hub: ``subentry.data`` holds the
+    room config dict. The hub builds one :class:`RoomController` per subentry,
+    so rooms appear nested under Homex in Settings → Devices & services and
+    their entities are linked to the room subentry.
+    """
+
+    def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
+        self.hass = hass
+        self.entry = entry
+        self.controllers: dict[str, RoomController] = {}
+        self._subentry_by_room: dict[str, str] = {}
+
+    @property
+    def rooms(self) -> list[dict]:
+        return [dict(se.data) for se in self.entry.subentries.values()]
+
+    def build(self) -> None:
+        """(Re)build the per-room controllers from the hub subentries."""
+        self.controllers = {}
+        self._subentry_by_room = {}
+        for sub_id, subentry in self.entry.subentries.items():
+            cfg = dict(subentry.data)
+            room_id = cfg.get(CONF_ROOM_ID)
+            if room_id:
+                self.controllers[room_id] = RoomController(
+                    self.hass, self.entry, cfg
+                )
+                self._subentry_by_room[room_id] = sub_id
+
+    def subentry_id(self, room_id: str) -> str | None:
+        return self._subentry_by_room.get(room_id)
+
+    async def async_start(self) -> None:
+        # Isolate failures: one room's bad trigger must not abort the whole hub.
+        for room_id, controller in self.controllers.items():
+            try:
+                await controller.async_start()
+            except Exception:  # noqa: BLE001
+                _LOGGER.exception("Homex: failed to start room '%s'", room_id)
+
+    async def async_stop(self) -> None:
+        for controller in self.controllers.values():
+            await controller.async_stop()
+
+    async def async_remove_all_scenes(self) -> None:
+        for controller in self.controllers.values():
+            await controller.async_remove_scenes()
