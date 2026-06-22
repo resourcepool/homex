@@ -20,6 +20,8 @@ config/.HA_VERSION
 config/.uuid
 config/.ha_run.lock
 config/home-assistant.log*
+# Scenes are seeded/edited at runtime by the integration + the user
+config/scenes.yaml
 
 # HA default blueprints (shipped by HA at first run, not part of Homex)
 config/blueprints/
