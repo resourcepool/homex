@@ -23,6 +23,11 @@ config/home-assistant.log*
 # Scenes are seeded/edited at runtime by the integration + the user
 config/scenes.yaml
 
+# HACS installed into the dev instance (not part of this project)
+custom_components/hacs/
+# HACS-generated gzip copies of served files (runtime artifact)
+custom_components/homex/panel/*.gz
+
 # HA default blueprints (shipped by HA at first run, not part of Homex)
 config/blueprints/
 

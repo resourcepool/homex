@@ -90,6 +90,18 @@ async def async_register_homex_panel(hass: HomeAssistant) -> None:
         await async_setup_component(hass, "panel_custom", {})
 
     panel_dir = os.path.join(os.path.dirname(__file__), "panel")
+    # The bundle must ship with the integration. If it is missing (e.g. a HACS
+    # download that didn't include panel/), the sidebar page would be blank —
+    # log a clear, actionable error instead of failing silently.
+    if not await hass.async_add_executor_job(
+        os.path.isfile, os.path.join(panel_dir, "homex-panel.js")
+    ):
+        _LOGGER.error(
+            "Homex panel bundle not found at %s/homex-panel.js — the Homex page "
+            "will be blank. Ensure panel/homex-panel.js is shipped (committed "
+            "and included in the HACS download).",
+            panel_dir,
+        )
     await hass.http.async_register_static_paths(
         [StaticPathConfig(STATIC_URL, panel_dir, False)]
     )
