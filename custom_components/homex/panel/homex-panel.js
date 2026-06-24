@@ -1315,7 +1315,10 @@ let R = class extends _ {
     this._emit(this.value.filter((e, s) => s !== t));
   }
   _add(t) {
-    this._menuOpen = !1, this._emit([...this.value, t === "device" ? { device_id: "" } : { platform: "state" }]);
+    this._menuOpen = !1, this._emit([
+      ...this.value,
+      t === "device" ? { platform: "device", device_id: "" } : { platform: "state" }
+    ]);
   }
   _entityOf(t) {
     const e = t?.entity_id;
@@ -1396,7 +1399,7 @@ let R = class extends _ {
       @value-changed=${(s) => {
       s.stopPropagation();
       const r = s.detail.value || "";
-      r && this._ensure(r), this._update(e, { device_id: r });
+      r && this._ensure(r), this._update(e, { platform: "device", device_id: r });
     }}
     ></homex-device-field>`;
   }
@@ -2806,7 +2809,7 @@ var ds = Object.defineProperty, ps = Object.getOwnPropertyDescriptor, L = (t, e,
     (a = t[o]) && (i = (r ? a(e, s, i) : a(i)) || i);
   return r && i && ds(e, s, i), i;
 };
-const hs = "42";
+const hs = "43";
 let w = class extends _ {
   constructor() {
     super(...arguments), this.narrow = !1, this._rooms = null, this._error = null, this._createOpen = !1, this._expanded = localStorage.getItem("homex_expanded") || null, this._loaded = !1, this._onToggleExpand = (t) => {

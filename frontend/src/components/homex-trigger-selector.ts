@@ -190,7 +190,12 @@ export class HomexTriggerSelector extends LitElement {
   }
   private _add(type: "entity" | "device") {
     this._menuOpen = false;
-    this._emit([...this.value, type === "device" ? { device_id: "" } : { platform: "state" }]);
+    // Tag device cards with platform:"device" so an empty (not-yet-picked)
+    // device trigger still renders as a device, not an entity.
+    this._emit([
+      ...this.value,
+      type === "device" ? { platform: "device", device_id: "" } : { platform: "state" },
+    ]);
   }
 
   private _entityOf(cfg: TriggerSpec): string {
@@ -284,7 +289,9 @@ export class HomexTriggerSelector extends LitElement {
         e.stopPropagation();
         const id = e.detail.value || "";
         if (id) this._ensure(id);
-        this._update(i, { device_id: id });
+        // Keep the device marker so clearing the device doesn't flip the card
+        // to an entity, and the action dropdown stays the device's.
+        this._update(i, { platform: "device", device_id: id });
       }}
     ></homex-device-field>`;
   }
