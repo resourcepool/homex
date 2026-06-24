@@ -240,6 +240,42 @@ export class HomexTriggerSelector extends LitElement {
     </select>`;
   }
 
+  private _entityStates(id: string): string[] {
+    const domain = id.split(".")[0];
+    const toggle = [
+      "light", "switch", "input_boolean", "binary_sensor", "fan",
+      "cover", "lock", "automation", "script", "group", "media_player",
+    ];
+    const states = new Set<string>(toggle.includes(domain) ? ["on", "off"] : []);
+    const cur = this.hass.states[id]?.state;
+    if (cur && !["unavailable", "unknown", ""].includes(cur)) states.add(cur);
+    return [...states];
+  }
+
+  private _stateLabel(s: string): string {
+    return { on: "Activé (on)", off: "Désactivé (off)" }[s] || s;
+  }
+
+  private _entityActionField(cfg: TriggerSpec, i: number) {
+    const id = this._entityOf(cfg);
+    const to = typeof cfg.to === "string" ? cfg.to : "";
+    return html`<select
+      class="native"
+      @change=${(e: Event) => {
+        const v = (e.target as HTMLSelectElement).value;
+        this._update(
+          i,
+          v ? { platform: "state", entity_id: id, to: v } : { platform: "state", entity_id: id }
+        );
+      }}
+    >
+      <option value="" ?selected=${!to}>À n'importe quel changement d'état</option>
+      ${this._entityStates(id).map(
+        (s) => html`<option value=${s} ?selected=${s === to}>Passe à : ${this._stateLabel(s)}</option>`
+      )}
+    </select>`;
+  }
+
   private _deviceField(cfg: TriggerSpec, i: number) {
     return html`<homex-device-field
       .hass=${this.hass}
@@ -287,7 +323,10 @@ export class HomexTriggerSelector extends LitElement {
               ${cfg.device_id
                 ? html`<label class="field"><span>Action</span>${this._actionField(cfg, i)}</label>`
                 : ""}`
-          : html`<label class="field"><span>Entité</span>${this._entityField(cfg, i)}</label>`}
+          : html`<label class="field"><span>Entité</span>${this._entityField(cfg, i)}</label>
+              ${this._entityOf(cfg)
+                ? html`<label class="field"><span>Action</span>${this._entityActionField(cfg, i)}</label>`
+                : ""}`}
       </div>
     </div>`;
   }
