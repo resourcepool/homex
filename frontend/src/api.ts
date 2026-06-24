@@ -26,6 +26,7 @@ export interface RoomUpdate {
   room_id?: string;
   area_id?: string | null;
   devices?: string[];
+  // Triggers: {entity_id} (state change) or {device_id} (device action).
   triggers?: TriggerSpec[];
   scene_triggers?: TriggerSpec[];
   scene_strategy?: "recall_first" | "recall_last";

@@ -339,33 +339,37 @@ class RoomController:
                     {"platform": "state", "entity_id": [spec["entity_id"]]}
                 )
             elif spec.get("device_id"):
+                device_id = spec["device_id"]
                 action = spec.get("action")
-                if not action:
-                    continue
                 # Returns a mapping {device_id: [trigger dicts]} — take this
                 # device's list (iterating the mapping yields its keys).
                 automations = await async_get_device_automations(
                     self.hass,
                     DeviceAutomationType.TRIGGER,
-                    [spec["device_id"]],
+                    [device_id],
                 )
-                device_triggers = automations.get(spec["device_id"], [])
-                match = next(
-                    (
-                        t
-                        for t in device_triggers
+                device_triggers = automations.get(device_id, [])
+                if action:
+                    # Legacy spec: a specific device-trigger action.
+                    matched = [
+                        t for t in device_triggers
                         if device_action_label(t) == action
-                    ),
-                    None,
-                )
-                if match is not None:
-                    configs.append({k: v for k, v in match.items() if k != "metadata"})
+                    ]
+                    if not matched:
+                        _LOGGER.warning(
+                            "[%s] device %s has no trigger action '%s'",
+                            self.room_id, device_id, action,
+                        )
                 else:
-                    _LOGGER.warning(
-                        "[%s] device %s has no trigger action '%s'",
-                        self.room_id,
-                        spec["device_id"],
-                        action,
+                    # No action → fire on ANY of the device's native triggers.
+                    matched = device_triggers
+                    if not matched:
+                        _LOGGER.warning(
+                            "[%s] device %s exposes no trigger", self.room_id, device_id
+                        )
+                for trigger in matched:
+                    configs.append(
+                        {k: v for k, v in trigger.items() if k != "metadata"}
                     )
         return configs
 

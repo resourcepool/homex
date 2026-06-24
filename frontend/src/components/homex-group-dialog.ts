@@ -6,9 +6,10 @@ import { addGroup, deleteGroup, errorMessage, updateGroup } from "../api";
 import { sharedStyles } from "../lib/styles";
 import { textField } from "../lib/fields";
 import { slugify } from "../lib/slug";
+import { TRIGGER_DOMAINS } from "../lib/domains";
 import "./homex-dialog";
 import "./homex-entity-picker";
-import "./homex-trigger-list";
+import "./homex-device-triggers";
 
 /** Modal to create a group (group = null) or edit/delete an existing one. */
 @customElement("homex-group-dialog")
@@ -21,7 +22,8 @@ export class HomexGroupDialog extends LitElement {
   @state() private _name = "";
   @state() private _id = "";
   @state() private _devices: string[] = [];
-  @state() private _triggers: TriggerSpec[] = [];
+  @state() private _trigEnt: string[] = [];
+  @state() private _trigDev: TriggerSpec[] = [];
   @state() private _busy = false;
   private _idEdited = false;
 
@@ -32,7 +34,15 @@ export class HomexGroupDialog extends LitElement {
       this._name = this.group?.name ?? "";
       this._id = this.group?.group_id ?? "";
       this._devices = this.group?.devices ?? [];
-      this._triggers = this.group?.triggers ?? [];
+      const trig = this.group?.triggers ?? [];
+      this._trigEnt = trig
+        .map((t) => t.entity_id)
+        .filter((id): id is string => !!id);
+      this._trigDev = trig
+        .filter((t) => t.device_id)
+        .map((t) =>
+          t.action ? { device_id: t.device_id, action: t.action } : { device_id: t.device_id }
+        );
       this._busy = false;
       this._idEdited = !!this.group;
     }
@@ -58,6 +68,10 @@ export class HomexGroupDialog extends LitElement {
       alert("Nom et id du groupe requis.");
       return;
     }
+    const triggers: TriggerSpec[] = [
+      ...this._trigEnt.map((entity_id) => ({ entity_id })),
+      ...this._trigDev,
+    ];
     this._busy = true;
     try {
       if (this.group) {
@@ -66,7 +80,7 @@ export class HomexGroupDialog extends LitElement {
           group_id: this.group.group_id,
           name,
           devices: this._devices,
-          triggers: this._triggers,
+          triggers,
         });
       } else {
         await addGroup(this.hass, {
@@ -74,7 +88,7 @@ export class HomexGroupDialog extends LitElement {
           group_id,
           name,
           devices: this._devices,
-          triggers: this._triggers,
+          triggers,
         });
       }
       fireChanged(this);
@@ -118,12 +132,19 @@ export class HomexGroupDialog extends LitElement {
           .value=${this._devices}
           @value-changed=${(e: CustomEvent) => (this._devices = e.detail.value)}
         ></homex-entity-picker>
-        <div class="section">Déclencheurs</div>
-        <homex-trigger-list
+        <div class="section">Déclencheurs — entités</div>
+        <homex-entity-picker
           .hass=${this.hass}
-          .value=${this._triggers}
-          @value-changed=${(e: CustomEvent) => (this._triggers = e.detail.value)}
-        ></homex-trigger-list>
+          .includeDomains=${TRIGGER_DOMAINS}
+          .value=${this._trigEnt}
+          @value-changed=${(e: CustomEvent) => (this._trigEnt = e.detail.value)}
+        ></homex-entity-picker>
+        <div class="section">Déclencheurs — appareils</div>
+        <homex-device-triggers
+          .hass=${this.hass}
+          .value=${this._trigDev}
+          @value-changed=${(e: CustomEvent) => (this._trigDev = e.detail.value)}
+        ></homex-device-triggers>
 
         <span slot="actions">
           ${editing
