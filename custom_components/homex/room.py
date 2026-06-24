@@ -24,29 +24,23 @@ import logging
 import os
 from collections import deque
 
-from homeassistant.components.device_automation import (
-    DeviceAutomationType,
-    async_get_device_automations,
-)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import Context, HomeAssistant, callback
 from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.trigger import async_initialize_triggers
+from homeassistant.helpers.trigger import (
+    async_initialize_triggers,
+    async_validate_trigger_config,
+)
 from homeassistant.util.yaml import load_yaml, save_yaml
 
 
 def normalize_trigger_specs(raw) -> list[dict]:
-    """Normalize a stored trigger list into specs.
+    """Return the stored triggers as a list of raw HA trigger config dicts.
 
-    Accepts legacy entity-id strings and {entity_id} / {device_id, action} dicts.
+    Triggers are now exactly what the automation editor produces (e.g.
+    ``{"trigger": "state", ...}``). Non-dict entries are dropped.
     """
-    specs: list[dict] = []
-    for item in raw or []:
-        if isinstance(item, str):
-            specs.append({"entity_id": item})
-        elif isinstance(item, dict) and (item.get("entity_id") or item.get("device_id")):
-            specs.append(dict(item))
-    return specs
+    return [dict(item) for item in (raw or []) if isinstance(item, dict)]
 
 
 def device_action_label(trigger) -> str:
@@ -331,47 +325,22 @@ class RoomController:
         return normalize_trigger_specs(self._cfg(CONF_SCENE_TRIGGERS, []))
 
     async def build_trigger_configs(self, specs: list[dict]) -> list[dict]:
-        """Turn specs into native HA trigger configs (state / device)."""
-        configs: list[dict] = []
-        for spec in specs:
-            if spec.get("entity_id"):
-                configs.append(
-                    {"platform": "state", "entity_id": [spec["entity_id"]]}
-                )
-            elif spec.get("device_id"):
-                device_id = spec["device_id"]
-                action = spec.get("action")
-                # Returns a mapping {device_id: [trigger dicts]} — take this
-                # device's list (iterating the mapping yields its keys).
-                automations = await async_get_device_automations(
-                    self.hass,
-                    DeviceAutomationType.TRIGGER,
-                    [device_id],
-                )
-                device_triggers = automations.get(device_id, [])
-                if action:
-                    # Legacy spec: a specific device-trigger action.
-                    matched = [
-                        t for t in device_triggers
-                        if device_action_label(t) == action
-                    ]
-                    if not matched:
-                        _LOGGER.warning(
-                            "[%s] device %s has no trigger action '%s'",
-                            self.room_id, device_id, action,
-                        )
-                else:
-                    # No action → fire on ANY of the device's native triggers.
-                    matched = device_triggers
-                    if not matched:
-                        _LOGGER.warning(
-                            "[%s] device %s exposes no trigger", self.room_id, device_id
-                        )
-                for trigger in matched:
-                    configs.append(
-                        {k: v for k, v in trigger.items() if k != "metadata"}
-                    )
-        return configs
+        """Validate raw HA trigger configs (as produced by the automation editor).
+
+        Triggers are stored exactly like automation triggers, so we just run
+        them through HA's own validator before wiring them.
+        """
+        if not specs:
+            return []
+        try:
+            return await async_validate_trigger_config(self.hass, list(specs))
+        except Exception as err:  # noqa: BLE001 - bad/incomplete trigger config
+            _LOGGER.error(
+                "[%s] invalid trigger configuration, ignoring: %s",
+                self.room_id,
+                err,
+            )
+            return []
 
     @property
     def scene_strategy(self) -> str:

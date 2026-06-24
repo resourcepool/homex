@@ -50,7 +50,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "35"
+PANEL_VERSION = "41"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -71,7 +71,7 @@ async def async_register_homex_panel(hass: HomeAssistant) -> None:
 
     for command in (
         ws_list_rooms,
-        ws_device_actions,
+        ws_device_triggers,
         ws_room_create,
         ws_room_update,
         ws_room_delete,
@@ -134,31 +134,43 @@ def _serialize_unit(unit) -> dict:
     }
 
 
+def _device_trigger_label(trigger: dict) -> str:
+    """Readable label for a device trigger (mirrors the automation editor)."""
+    subtype = trigger.get("subtype")
+    ttype = trigger.get("type")
+    parts = [str(p).replace("_", " ") for p in (subtype, ttype) if p]
+    return " — ".join(parts) or "déclencheur"
+
+
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "homex/device_actions",
+        vol.Required("type"): "homex/device_triggers",
         vol.Required("device_id"): str,
     }
 )
 @websocket_api.async_response
-async def ws_device_actions(hass: HomeAssistant, connection, msg) -> None:
-    """List the action triggers a device exposes (for autocomplete)."""
-    actions: list[str] = []
+async def ws_device_triggers(hass: HomeAssistant, connection, msg) -> None:
+    """List a device's native triggers, each with its full HA trigger config.
+
+    Same source as the automation editor's device-trigger dropdown
+    (async_get_device_automations); we return the config to store verbatim.
+    """
+    device_id = msg["device_id"]
     try:
         automations = await async_get_device_automations(
-            hass, DeviceAutomationType.TRIGGER, [msg["device_id"]]
+            hass, DeviceAutomationType.TRIGGER, [device_id]
         )
-        # Mapping {device_id: [trigger dicts]} — take this device's list.
-        triggers = automations.get(msg["device_id"], [])
+        triggers = automations.get(device_id, [])
     except Exception:  # noqa: BLE001 - unknown device / integration
         triggers = []
-    seen: set[str] = set()
-    for trigger in triggers:
-        label = device_action_label(trigger)
-        if label and label not in seen:
-            seen.add(label)
-            actions.append(label)
-    connection.send_result(msg["id"], {"actions": sorted(actions)})
+    out = [
+        {
+            "label": _device_trigger_label(t),
+            "trigger": {k: v for k, v in t.items() if k != "metadata"},
+        }
+        for t in triggers
+    ]
+    connection.send_result(msg["id"], {"triggers": out})
 
 
 @websocket_api.websocket_command({vol.Required("type"): "homex/rooms"})

@@ -27,12 +27,9 @@ export interface Scene {
 
 export type SceneStrategy = "recall_first" | "recall_last";
 
-// A trigger is either an entity (state change) or a device action.
-export interface TriggerSpec {
-  entity_id?: string;
-  device_id?: string;
-  action?: string;
-}
+// A trigger is a raw Home Assistant trigger config — exactly what the
+// automation editor produces (e.g. {trigger:"state",...}, {trigger:"device",...}).
+export type TriggerSpec = Record<string, any>;
 
 export interface Room extends Unit {
   entry_id: string;

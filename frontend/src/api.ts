@@ -32,11 +32,15 @@ export interface RoomUpdate {
   scene_strategy?: "recall_first" | "recall_last";
 }
 
-export const fetchDeviceActions = async (
+export interface DeviceTrigger {
+  label: string;
+  trigger: TriggerSpec; // full HA device-trigger config, stored verbatim
+}
+export const fetchDeviceTriggers = async (
   hass: HomeAssistant,
   device_id: string
-): Promise<string[]> =>
-  (await hass.callWS({ type: "homex/device_actions", device_id })).actions || [];
+): Promise<DeviceTrigger[]> =>
+  (await hass.callWS({ type: "homex/device_triggers", device_id })).triggers || [];
 export const updateRoom = (hass: HomeAssistant, payload: RoomUpdate) =>
   hass.callWS({ type: "homex/room/update", ...payload });
 

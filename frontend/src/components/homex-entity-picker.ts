@@ -99,6 +99,11 @@ export class HomexEntityPicker extends LitElement {
       cursor: default;
       color: var(--secondary-text-color);
     }
+    ha-entity-picker {
+      display: block;
+      width: 100%;
+      margin-bottom: 8px;
+    }
   `;
 
   private _friendly(id: string): string {
@@ -110,15 +115,38 @@ export class HomexEntityPicker extends LitElement {
     this.dispatchEvent(new CustomEvent("value-changed", { detail: { value } }));
   }
 
+  private _setAt(i: number, id: string) {
+    const next = id
+      ? this.value.map((v, j) => (j === i ? id : v))
+      : this.value.filter((_, j) => j !== i);
+    this._emit([...new Set(next)]);
+  }
+  private _addNew(id: string) {
+    if (id && !this.value.includes(id)) this._emit([...this.value, id]);
+  }
+
+  private _nativePicker(value: string, onChange: (id: string) => void) {
+    return html`<ha-entity-picker
+      .hass=${this.hass}
+      .value=${value}
+      .includeDomains=${this.includeDomains}
+      .includeEntities=${this.includeEntities}
+      @value-changed=${(e: CustomEvent) => {
+        e.stopPropagation();
+        onChange(e.detail.value || "");
+      }}
+    ></ha-entity-picker>`;
+  }
+
   render() {
-    if (haComponentsLoaded()) {
-      return html`<ha-entities-picker
-        .hass=${this.hass}
-        .value=${this.value}
-        .includeDomains=${this.includeDomains}
-        .includeEntities=${this.includeEntities}
-        @value-changed=${(e: CustomEvent) => this._emit(e.detail.value || [])}
-      ></ha-entities-picker>`;
+    // Build a multi-entity picker from the native single ha-entity-picker
+    // (which IS preloaded in panels, unlike ha-entities-picker): one row per
+    // selected entity + a trailing empty row to add another.
+    if (customElements.get("ha-entity-picker")) {
+      return html`
+        ${this.value.map((id, i) => this._nativePicker(id, (v) => this._setAt(i, v)))}
+        ${this._nativePicker("", (v) => this._addNew(v))}
+      `;
     }
     return this._renderFallback();
   }
