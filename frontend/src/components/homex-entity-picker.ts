@@ -125,12 +125,17 @@ export class HomexEntityPicker extends LitElement {
     if (id && !this.value.includes(id)) this._emit([...this.value, id]);
   }
 
-  private _nativePicker(value: string, onChange: (id: string) => void) {
+  private _nativePicker(
+    value: string,
+    exclude: string[],
+    onChange: (id: string) => void
+  ) {
     return html`<ha-entity-picker
       .hass=${this.hass}
       .value=${value}
       .includeDomains=${this.includeDomains}
       .includeEntities=${this.includeEntities}
+      .excludeEntities=${exclude}
       @value-changed=${(e: CustomEvent) => {
         e.stopPropagation();
         onChange(e.detail.value || "");
@@ -141,11 +146,18 @@ export class HomexEntityPicker extends LitElement {
   render() {
     // Build a multi-entity picker from the native single ha-entity-picker
     // (which IS preloaded in panels, unlike ha-entities-picker): one row per
-    // selected entity + a trailing empty row to add another.
+    // selected entity + a trailing empty row to add another. Already-selected
+    // entities are excluded from the other pickers so you can't pick twice.
     if (customElements.get("ha-entity-picker")) {
       return html`
-        ${this.value.map((id, i) => this._nativePicker(id, (v) => this._setAt(i, v)))}
-        ${this._nativePicker("", (v) => this._addNew(v))}
+        ${this.value.map((id, i) =>
+          this._nativePicker(
+            id,
+            this.value.filter((_, j) => j !== i),
+            (v) => this._setAt(i, v)
+          )
+        )}
+        ${this._nativePicker("", this.value, (v) => this._addNew(v))}
       `;
     }
     return this._renderFallback();

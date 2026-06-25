@@ -35,7 +35,7 @@ const We = (t) => new Ue(typeof t == "string" ? t : t + "", void 0, ve), x = (t,
     const i = document.createElement("style"), r = ce.litNonce;
     r !== void 0 && i.setAttribute("nonce", r), i.textContent = s.cssText, t.appendChild(i);
   }
-}, Ee = _e ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((e) => {
+}, ke = _e ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((e) => {
   let s = "";
   for (const i of e.cssRules) s += i.cssText;
   return We(s);
@@ -45,7 +45,7 @@ const We = (t) => new Ue(typeof t == "string" ? t : t + "", void 0, ve), x = (t,
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const { is: Ge, defineProperty: Ke, getOwnPropertyDescriptor: Je, getOwnPropertyNames: Xe, getOwnPropertySymbols: Qe, getPrototypeOf: Ye } = Object, he = globalThis, ke = he.trustedTypes, et = ke ? ke.emptyScript : "", tt = he.reactiveElementPolyfillSupport, X = (t, e) => t, de = { toAttribute(t, e) {
+const { is: Ge, defineProperty: Ke, getOwnPropertyDescriptor: Je, getOwnPropertyNames: Xe, getOwnPropertySymbols: Qe, getPrototypeOf: Ye } = Object, he = globalThis, Ce = he.trustedTypes, et = Ce ? Ce.emptyScript : "", tt = he.reactiveElementPolyfillSupport, X = (t, e) => t, de = { toAttribute(t, e) {
   switch (e) {
     case Boolean:
       t = t ? et : null;
@@ -73,7 +73,7 @@ const { is: Ge, defineProperty: Ke, getOwnPropertyDescriptor: Je, getOwnProperty
       }
   }
   return s;
-} }, fe = (t, e) => !Ge(t, e), Ce = { attribute: !0, type: String, converter: de, reflect: !1, useDefault: !1, hasChanged: fe };
+} }, fe = (t, e) => !Ge(t, e), Ee = { attribute: !0, type: String, converter: de, reflect: !1, useDefault: !1, hasChanged: fe };
 Symbol.metadata ??= Symbol("metadata"), he.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
 let W = class extends HTMLElement {
   static addInitializer(e) {
@@ -82,7 +82,7 @@ let W = class extends HTMLElement {
   static get observedAttributes() {
     return this.finalize(), this._$Eh && [...this._$Eh.keys()];
   }
-  static createProperty(e, s = Ce) {
+  static createProperty(e, s = Ee) {
     if (s.state && (s.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(e) && ((s = Object.create(s)).wrapped = !0), this.elementProperties.set(e, s), !s.noAccessor) {
       const i = Symbol(), r = this.getPropertyDescriptor(e, i, s);
       r !== void 0 && Ke(this.prototype, e, r);
@@ -100,7 +100,7 @@ let W = class extends HTMLElement {
     }, configurable: !0, enumerable: !0 };
   }
   static getPropertyOptions(e) {
-    return this.elementProperties.get(e) ?? Ce;
+    return this.elementProperties.get(e) ?? Ee;
   }
   static _$Ei() {
     if (this.hasOwnProperty(X("elementProperties"))) return;
@@ -129,8 +129,8 @@ let W = class extends HTMLElement {
     const s = [];
     if (Array.isArray(e)) {
       const i = new Set(e.flat(1 / 0).reverse());
-      for (const r of i) s.unshift(Ee(r));
-    } else e !== void 0 && s.push(Ee(e));
+      for (const r of i) s.unshift(ke(r));
+    } else e !== void 0 && s.push(ke(e));
     return s;
   }
   static _$Eu(e, s) {
@@ -263,8 +263,8 @@ W.elementStyles = [], W.shadowRootOptions = { mode: "open" }, W[X("elementProper
  * SPDX-License-Identifier: BSD-3-Clause
  */
 const xe = globalThis, Se = (t) => t, pe = xe.trustedTypes, He = pe ? pe.createPolicy("lit-html", { createHTML: (t) => t }) : void 0, Re = "$lit$", V = `lit$${Math.random().toFixed(9).slice(2)}$`, Ie = "?" + V, st = `<${Ie}>`, j = document, Q = () => j.createComment(""), Y = (t) => t === null || typeof t != "object" && typeof t != "function", be = Array.isArray, it = (t) => be(t) || typeof t?.[Symbol.iterator] == "function", ge = `[ 	
-\f\r]`, J = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Pe = /-->/g, Oe = />/g, T = RegExp(`>|${ge}(?:([^\\s"'>=/]+)(${ge}*=${ge}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g"), Le = /'/g, Me = /"/g, Be = /^(?:script|style|textarea|title)$/i, rt = (t) => (e, ...s) => ({ _$litType$: t, strings: e, values: s }), n = rt(1), Z = Symbol.for("lit-noChange"), m = Symbol.for("lit-nothing"), Ve = /* @__PURE__ */ new WeakMap(), N = j.createTreeWalker(j, 129);
+\f\r]`, J = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Oe = /-->/g, Le = />/g, T = RegExp(`>|${ge}(?:([^\\s"'>=/]+)(${ge}*=${ge}*(?:[^ 	
+\f\r"'\`<>=]|("|')|))|$)`, "g"), Pe = /'/g, Me = /"/g, Be = /^(?:script|style|textarea|title)$/i, rt = (t) => (e, ...s) => ({ _$litType$: t, strings: e, values: s }), n = rt(1), Z = Symbol.for("lit-noChange"), m = Symbol.for("lit-nothing"), Ve = /* @__PURE__ */ new WeakMap(), N = j.createTreeWalker(j, 129);
 function qe(t, e) {
   if (!be(t) || !t.hasOwnProperty("raw")) throw Error("invalid template strings array");
   return He !== void 0 ? He.createHTML(e) : e;
@@ -274,8 +274,8 @@ const ot = (t, e) => {
   let r, o = e === 2 ? "<svg>" : e === 3 ? "<math>" : "", a = J;
   for (let d = 0; d < s; d++) {
     const l = t[d];
-    let g, h, u = -1, C = 0;
-    for (; C < l.length && (a.lastIndex = C, h = a.exec(l), h !== null); ) C = a.lastIndex, a === J ? h[1] === "!--" ? a = Pe : h[1] !== void 0 ? a = Oe : h[2] !== void 0 ? (Be.test(h[2]) && (r = RegExp("</" + h[2], "g")), a = T) : h[3] !== void 0 && (a = T) : a === T ? h[0] === ">" ? (a = r ?? J, u = -1) : h[1] === void 0 ? u = -2 : (u = a.lastIndex - h[2].length, g = h[1], a = h[3] === void 0 ? T : h[3] === '"' ? Me : Le) : a === Me || a === Le ? a = T : a === Pe || a === Oe ? a = J : (a = T, r = void 0);
+    let g, h, u = -1, E = 0;
+    for (; E < l.length && (a.lastIndex = E, h = a.exec(l), h !== null); ) E = a.lastIndex, a === J ? h[1] === "!--" ? a = Oe : h[1] !== void 0 ? a = Le : h[2] !== void 0 ? (Be.test(h[2]) && (r = RegExp("</" + h[2], "g")), a = T) : h[3] !== void 0 && (a = T) : a === T ? h[0] === ">" ? (a = r ?? J, u = -1) : h[1] === void 0 ? u = -2 : (u = a.lastIndex - h[2].length, g = h[1], a = h[3] === void 0 ? T : h[3] === '"' ? Me : Pe) : a === Me || a === Pe ? a = T : a === Oe || a === Le ? a = J : (a = T, r = void 0);
     const M = a === T && t[d + 1].startsWith("/>") ? " " : "";
     o += a === J ? l + st : u >= 0 ? (i.push(g), l.slice(0, u) + Re + l.slice(u) + V + M) : l + V + (u === -2 ? d : M);
   }
@@ -294,15 +294,15 @@ class ee {
     for (; (r = N.nextNode()) !== null && l.length < d; ) {
       if (r.nodeType === 1) {
         if (r.hasAttributes()) for (const u of r.getAttributeNames()) if (u.endsWith(Re)) {
-          const C = h[a++], M = r.getAttribute(u).split(V), ne = /([.?@])?(.*)/.exec(C);
+          const E = h[a++], M = r.getAttribute(u).split(V), ne = /([.?@])?(.*)/.exec(E);
           l.push({ type: 1, index: o, name: ne[2], strings: M, ctor: ne[1] === "." ? nt : ne[1] === "?" ? lt : ne[1] === "@" ? ct : ue }), r.removeAttribute(u);
         } else u.startsWith(V) && (l.push({ type: 6, index: o }), r.removeAttribute(u));
         if (Be.test(r.tagName)) {
-          const u = r.textContent.split(V), C = u.length - 1;
-          if (C > 0) {
+          const u = r.textContent.split(V), E = u.length - 1;
+          if (E > 0) {
             r.textContent = pe ? pe.emptyScript : "";
-            for (let M = 0; M < C; M++) r.append(u[M], Q()), N.nextNode(), l.push({ type: 2, index: ++o });
-            r.append(u[C], Q());
+            for (let M = 0; M < E; M++) r.append(u[M], Q()), N.nextNode(), l.push({ type: 2, index: ++o });
+            r.append(u[E], Q());
           }
         }
       } else if (r.nodeType === 8) if (r.data === Ie) l.push({ type: 2, index: o });
@@ -574,10 +574,10 @@ const me = "homex-changed", z = (t) => t.dispatchEvent(new CustomEvent(me, { bub
   entry_id: e,
   name: s,
   ...i ? { attach: i } : {}
-}), wt = (t, e, s) => t.callWS({ type: "homex/scene/delete", entry_id: e, key: s }), At = (t, e, s) => t.callWS({ type: "homex/scene/reorder", entry_id: e, order: s }), Et = (t, e) => t.callWS({ type: "homex/scene/next", entry_id: e }), kt = (t, e, s, i) => t.callWS({ type: "homex/scene/rename", entry_id: e, key: s, name: i }), A = (t) => t && (t.message || t.code) || String(t);
+}), wt = (t, e, s) => t.callWS({ type: "homex/scene/delete", entry_id: e, key: s }), At = (t, e, s) => t.callWS({ type: "homex/scene/reorder", entry_id: e, order: s }), kt = (t, e) => t.callWS({ type: "homex/scene/next", entry_id: e }), Ct = (t, e, s, i) => t.callWS({ type: "homex/scene/rename", entry_id: e, key: s, name: i }), A = (t) => t && (t.message || t.code) || String(t);
 let le = null;
 const De = () => !!customElements.get("ha-entities-picker");
-function Ct() {
+function Et() {
   return De() ? Promise.resolve(!0) : le || (le = (async () => {
     try {
       const t = await window.loadCardHelpers?.();
@@ -593,7 +593,7 @@ function Ct() {
     return De();
   })(), le);
 }
-var St = "M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z", Ht = "M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z", Pt = "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z", Ot = "M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z", Te = "M3 6H21V4H3C1.9 4 1 4.9 1 6V18C1 19.1 1.9 20 3 20H7V18H3V6M13 12H9V13.78C8.39 14.33 8 15.11 8 16C8 16.89 8.39 17.67 9 18.22V20H13V18.22C13.61 17.67 14 16.88 14 16S13.61 14.33 13 13.78V12M11 17.5C10.17 17.5 9.5 16.83 9.5 16S10.17 14.5 11 14.5 12.5 15.17 12.5 16 11.83 17.5 11 17.5M22 8H16C15.5 8 15 8.5 15 9V19C15 19.5 15.5 20 16 20H22C22.5 20 23 19.5 23 19V9C23 8.5 22.5 8 22 8M21 18H17V10H21V18Z", Lt = "M7,19V17H9V19H7M11,19V17H13V19H11M15,19V17H17V19H15M7,15V13H9V15H7M11,15V13H13V15H11M15,15V13H17V15H15M7,11V9H9V11H7M11,11V9H13V11H11M15,11V9H17V11H15M7,7V5H9V7H7M11,7V5H13V7H11M15,7V5H17V7H15Z", Mt = "M12,2A7,7 0 0,0 5,9C5,11.38 6.19,13.47 8,14.74V17A1,1 0 0,0 9,18H15A1,1 0 0,0 16,17V14.74C17.81,13.47 19,11.38 19,9A7,7 0 0,0 12,2M9,21A1,1 0 0,0 10,22H14A1,1 0 0,0 15,21V20H9V21Z", Vt = "M12,2A7,7 0 0,1 19,9C19,11.38 17.81,13.47 16,14.74V17A1,1 0 0,1 15,18H9A1,1 0 0,1 8,17V14.74C6.19,13.47 5,11.38 5,9A7,7 0 0,1 12,2M9,21V20H15V21A1,1 0 0,1 14,22H10A1,1 0 0,1 9,21M12,4A5,5 0 0,0 7,9C7,11.05 8.23,12.81 10,13.58V16H14V13.58C15.77,12.81 17,11.05 17,9A5,5 0 0,0 12,4Z", zt = "M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z", Dt = "M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z", Tt = "M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z", Nt = "M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z", Ne = "M11,13.5V21.5H3V13.5H11M12,2L17.5,11H6.5L12,2M17.5,13C20,13 22,15 22,17.5C22,20 20,22 17.5,22C15,22 13,20 13,17.5C13,15 15,13 17.5,13Z", jt = "M7.5,2C5.71,3.15 4.5,5.18 4.5,7.5C4.5,9.82 5.71,11.85 7.53,13C4.46,13 2,10.54 2,7.5A5.5,5.5 0 0,1 7.5,2M19.07,3.5L20.5,4.93L4.93,20.5L3.5,19.07L19.07,3.5M12.89,5.93L11.41,5L9.97,6L10.39,4.3L9,3.24L10.75,3.12L11.33,1.47L12,3.1L13.73,3.13L12.38,4.26L12.89,5.93M9.59,9.54L8.43,8.81L7.31,9.59L7.65,8.27L6.56,7.44L7.92,7.35L8.37,6.06L8.88,7.33L10.24,7.36L9.19,8.23L9.59,9.54M19,13.5A5.5,5.5 0 0,1 13.5,19C12.28,19 11.15,18.6 10.24,17.93L17.93,10.24C18.6,11.15 19,12.28 19,13.5M14.6,20.08L17.37,18.93L17.13,22.28L14.6,20.08M18.93,17.38L20.08,14.61L22.28,17.15L18.93,17.38M20.08,12.42L18.94,9.64L22.28,9.88L20.08,12.42M9.63,18.93L12.4,20.08L9.87,22.27L9.63,18.93Z";
+var St = "M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z", Ht = "M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z", Ot = "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z", Lt = "M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z", Te = "M3 6H21V4H3C1.9 4 1 4.9 1 6V18C1 19.1 1.9 20 3 20H7V18H3V6M13 12H9V13.78C8.39 14.33 8 15.11 8 16C8 16.89 8.39 17.67 9 18.22V20H13V18.22C13.61 17.67 14 16.88 14 16S13.61 14.33 13 13.78V12M11 17.5C10.17 17.5 9.5 16.83 9.5 16S10.17 14.5 11 14.5 12.5 15.17 12.5 16 11.83 17.5 11 17.5M22 8H16C15.5 8 15 8.5 15 9V19C15 19.5 15.5 20 16 20H22C22.5 20 23 19.5 23 19V9C23 8.5 22.5 8 22 8M21 18H17V10H21V18Z", Pt = "M7,19V17H9V19H7M11,19V17H13V19H11M15,19V17H17V19H15M7,15V13H9V15H7M11,15V13H13V15H11M15,15V13H17V15H15M7,11V9H9V11H7M11,11V9H13V11H11M15,11V9H17V11H15M7,7V5H9V7H7M11,7V5H13V7H11M15,7V5H17V7H15Z", Mt = "M12,2A7,7 0 0,0 5,9C5,11.38 6.19,13.47 8,14.74V17A1,1 0 0,0 9,18H15A1,1 0 0,0 16,17V14.74C17.81,13.47 19,11.38 19,9A7,7 0 0,0 12,2M9,21A1,1 0 0,0 10,22H14A1,1 0 0,0 15,21V20H9V21Z", Vt = "M12,2C9.76,2 7.78,3.05 6.5,4.68L7.93,6.11C8.84,4.84 10.32,4 12,4A5,5 0 0,1 17,9C17,10.68 16.16,12.16 14.89,13.06L16.31,14.5C17.94,13.21 19,11.24 19,9A7,7 0 0,0 12,2M3.28,4L2,5.27L5.04,8.3C5,8.53 5,8.76 5,9C5,11.38 6.19,13.47 8,14.74V17A1,1 0 0,0 9,18H14.73L18.73,22L20,20.72L3.28,4M7.23,10.5L12.73,16H10V13.58C8.68,13 7.66,11.88 7.23,10.5M9,20V21A1,1 0 0,0 10,22H14A1,1 0 0,0 15,21V20H9Z", zt = "M12,6A6,6 0 0,1 18,12C18,14.22 16.79,16.16 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.21,16.16 6,14.22 6,12A6,6 0 0,1 12,6M14,21V22A1,1 0 0,1 13,23H11A1,1 0 0,1 10,22V21H14M20,11H23V13H20V11M1,11H4V13H1V11M13,1V4H11V1H13M4.92,3.5L7.05,5.64L5.63,7.05L3.5,4.93L4.92,3.5M16.95,5.63L19.07,3.5L20.5,4.93L18.37,7.05L16.95,5.63Z", Dt = "M12,2A7,7 0 0,1 19,9C19,11.38 17.81,13.47 16,14.74V17A1,1 0 0,1 15,18H9A1,1 0 0,1 8,17V14.74C6.19,13.47 5,11.38 5,9A7,7 0 0,1 12,2M9,21V20H15V21A1,1 0 0,1 14,22H10A1,1 0 0,1 9,21M12,4A5,5 0 0,0 7,9C7,11.05 8.23,12.81 10,13.58V16H14V13.58C15.77,12.81 17,11.05 17,9A5,5 0 0,0 12,4Z", Tt = "M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z", Nt = "M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z", jt = "M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z", Ut = "M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z", Ne = "M11,13.5V21.5H3V13.5H11M12,2L17.5,11H6.5L12,2M17.5,13C20,13 22,15 22,17.5C22,20 20,22 17.5,22C15,22 13,20 13,17.5C13,15 15,13 17.5,13Z", Rt = "M7.5,2C5.71,3.15 4.5,5.18 4.5,7.5C4.5,9.82 5.71,11.85 7.53,13C4.46,13 2,10.54 2,7.5A5.5,5.5 0 0,1 7.5,2M19.07,3.5L20.5,4.93L4.93,20.5L3.5,19.07L19.07,3.5M12.89,5.93L11.41,5L9.97,6L10.39,4.3L9,3.24L10.75,3.12L11.33,1.47L12,3.1L13.73,3.13L12.38,4.26L12.89,5.93M9.59,9.54L8.43,8.81L7.31,9.59L7.65,8.27L6.56,7.44L7.92,7.35L8.37,6.06L8.88,7.33L10.24,7.36L9.19,8.23L9.59,9.54M19,13.5A5.5,5.5 0 0,1 13.5,19C12.28,19 11.15,18.6 10.24,17.93L17.93,10.24C18.6,11.15 19,12.28 19,13.5M14.6,20.08L17.37,18.93L17.13,22.28L14.6,20.08M18.93,17.38L20.08,14.61L22.28,17.15L18.93,17.38M20.08,12.42L18.94,9.64L22.28,9.88L20.08,12.42M9.63,18.93L12.4,20.08L9.87,22.27L9.63,18.93Z";
 const B = x`
   button {
     cursor: pointer;
@@ -689,10 +689,10 @@ const B = x`
     margin-bottom: 10px;
   }
 `;
-var Ut = Object.defineProperty, Rt = Object.getOwnPropertyDescriptor, K = (t, e, s, i) => {
-  for (var r = i > 1 ? void 0 : i ? Rt(e, s) : e, o = t.length - 1, a; o >= 0; o--)
+var It = Object.defineProperty, Bt = Object.getOwnPropertyDescriptor, K = (t, e, s, i) => {
+  for (var r = i > 1 ? void 0 : i ? Bt(e, s) : e, o = t.length - 1, a; o >= 0; o--)
     (a = t[o]) && (r = (i ? a(e, s, r) : a(r)) || r);
-  return i && r && Ut(e, s, r), r;
+  return i && r && It(e, s, r), r;
 };
 let D = class extends _ {
   _isOn(t) {
@@ -711,7 +711,7 @@ let D = class extends _ {
           @click=${this._toggle}
         >
           <svg viewBox="0 0 24 24">
-            <path d=${e ? Mt : Vt}></path>
+            <path d=${e ? Mt : Dt}></path>
           </svg>
         </button>
         ${this.areaIcon ? n`<ha-icon class="area-icon" .icon=${this.areaIcon}></ha-icon>` : ""}
@@ -843,11 +843,11 @@ const te = (t, e, s, i = "") => customElements.get("ha-textfield") ? n`<ha-textf
       placeholder=${i}
       @input=${(r) => s(r.target.value)}
     />
-  </div>`, It = /[̀-ͯ]/g, $e = (t) => (t || "").normalize("NFD").replace(It, "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
-var Bt = Object.defineProperty, qt = Object.getOwnPropertyDescriptor, we = (t, e, s, i) => {
-  for (var r = i > 1 ? void 0 : i ? qt(e, s) : e, o = t.length - 1, a; o >= 0; o--)
+  </div>`, qt = /[̀-ͯ]/g, $e = (t) => (t || "").normalize("NFD").replace(qt, "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+var Ft = Object.defineProperty, Wt = Object.getOwnPropertyDescriptor, we = (t, e, s, i) => {
+  for (var r = i > 1 ? void 0 : i ? Wt(e, s) : e, o = t.length - 1, a; o >= 0; o--)
     (a = t[o]) && (r = (i ? a(e, s, r) : a(r)) || r);
-  return i && r && Bt(e, s, r), r;
+  return i && r && Ft(e, s, r), r;
 };
 let se = class extends _ {
   constructor() {
@@ -941,10 +941,10 @@ we([
 se = we([
   b("homex-dialog")
 ], se);
-var Ft = Object.defineProperty, Wt = Object.getOwnPropertyDescriptor, q = (t, e, s, i) => {
-  for (var r = i > 1 ? void 0 : i ? Wt(e, s) : e, o = t.length - 1, a; o >= 0; o--)
+var Zt = Object.defineProperty, Gt = Object.getOwnPropertyDescriptor, q = (t, e, s, i) => {
+  for (var r = i > 1 ? void 0 : i ? Gt(e, s) : e, o = t.length - 1, a; o >= 0; o--)
     (a = t[o]) && (r = (i ? a(e, s, r) : a(r)) || r);
-  return i && r && Ft(e, s, r), r;
+  return i && r && Zt(e, s, r), r;
 };
 let S = class extends _ {
   constructor() {
@@ -963,21 +963,28 @@ let S = class extends _ {
   _addNew(t) {
     t && !this.value.includes(t) && this._emit([...this.value, t]);
   }
-  _nativePicker(t, e) {
+  _nativePicker(t, e, s) {
     return n`<ha-entity-picker
       .hass=${this.hass}
       .value=${t}
       .includeDomains=${this.includeDomains}
       .includeEntities=${this.includeEntities}
-      @value-changed=${(s) => {
-      s.stopPropagation(), e(s.detail.value || "");
+      .excludeEntities=${e}
+      @value-changed=${(i) => {
+      i.stopPropagation(), s(i.detail.value || "");
     }}
     ></ha-entity-picker>`;
   }
   render() {
     return customElements.get("ha-entity-picker") ? n`
-        ${this.value.map((t, e) => this._nativePicker(t, (s) => this._setAt(e, s)))}
-        ${this._nativePicker("", (t) => this._addNew(t))}
+        ${this.value.map(
+      (t, e) => this._nativePicker(
+        t,
+        this.value.filter((s, i) => i !== e),
+        (s) => this._setAt(e, s)
+      )
+    )}
+        ${this._nativePicker("", this.value, (t) => this._addNew(t))}
       ` : this._renderFallback();
   }
   // --- fallback widget ---------------------------------------------------
@@ -1139,17 +1146,17 @@ q([
 S = q([
   b("homex-entity-picker")
 ], S);
-const Zt = ["light", "switch", "input_boolean"], je = [
+const Kt = ["light", "switch", "input_boolean"], je = [
   "binary_sensor",
   "switch",
   "input_boolean",
   "person",
   "device_tracker"
 ];
-var Gt = Object.defineProperty, Kt = Object.getOwnPropertyDescriptor, re = (t, e, s, i) => {
-  for (var r = i > 1 ? void 0 : i ? Kt(e, s) : e, o = t.length - 1, a; o >= 0; o--)
+var Jt = Object.defineProperty, Xt = Object.getOwnPropertyDescriptor, re = (t, e, s, i) => {
+  for (var r = i > 1 ? void 0 : i ? Xt(e, s) : e, o = t.length - 1, a; o >= 0; o--)
     (a = t[o]) && (r = (i ? a(e, s, r) : a(r)) || r);
-  return i && r && Gt(e, s, r), r;
+  return i && r && Jt(e, s, r), r;
 };
 let U = class extends _ {
   constructor() {
@@ -1282,10 +1289,10 @@ re([
 U = re([
   b("homex-device-field")
 ], U);
-var Jt = Object.defineProperty, Xt = Object.getOwnPropertyDescriptor, oe = (t, e, s, i) => {
-  for (var r = i > 1 ? void 0 : i ? Xt(e, s) : e, o = t.length - 1, a; o >= 0; o--)
+var Qt = Object.defineProperty, Yt = Object.getOwnPropertyDescriptor, oe = (t, e, s, i) => {
+  for (var r = i > 1 ? void 0 : i ? Yt(e, s) : e, o = t.length - 1, a; o >= 0; o--)
     (a = t[o]) && (r = (i ? a(e, s, r) : a(r)) || r);
-  return i && r && Jt(e, s, r), r;
+  return i && r && Qt(e, s, r), r;
 };
 let R = class extends _ {
   constructor() {
@@ -1522,7 +1529,7 @@ let R = class extends _ {
         <svg viewBox="0 0 24 24"><path d=${s ? Te : Ne}></path></svg>
         <span class="title">${s ? "Appareil" : "Entité"}</span>
         <button class="icon-btn" title="Supprimer" @click=${() => this._remove(e)}>
-          <svg viewBox="0 0 24 24"><path d=${Pt}></path></svg>
+          <svg viewBox="0 0 24 24"><path d=${Ot}></path></svg>
         </button>
       </div>
       <div class="body">
@@ -1537,7 +1544,7 @@ let R = class extends _ {
       ${this.value.map((t, e) => this._card(t, e))}
       <div class="add-wrap">
         <button class="add-btn" @click=${() => this._menuOpen = !this._menuOpen}>
-          <svg viewBox="0 0 24 24"><path d=${Nt}></path></svg>
+          <svg viewBox="0 0 24 24"><path d=${Ut}></path></svg>
           Ajouter un déclencheur
         </button>
         ${this._menuOpen ? n`
@@ -1737,10 +1744,10 @@ oe([
 R = oe([
   b("homex-trigger-selector")
 ], R);
-var Qt = Object.defineProperty, Yt = Object.getOwnPropertyDescriptor, E = (t, e, s, i) => {
-  for (var r = i > 1 ? void 0 : i ? Yt(e, s) : e, o = t.length - 1, a; o >= 0; o--)
+var es = Object.defineProperty, ts = Object.getOwnPropertyDescriptor, k = (t, e, s, i) => {
+  for (var r = i > 1 ? void 0 : i ? ts(e, s) : e, o = t.length - 1, a; o >= 0; o--)
     (a = t[o]) && (r = (i ? a(e, s, r) : a(r)) || r);
-  return i && r && Qt(e, s, r), r;
+  return i && r && es(e, s, r), r;
 };
 let v = class extends _ {
   constructor() {
@@ -1832,49 +1839,71 @@ let v = class extends _ {
   }
 };
 v.styles = B;
-E([
+k([
   c({ attribute: !1 })
 ], v.prototype, "hass", 2);
-E([
+k([
   c({ type: Boolean })
 ], v.prototype, "open", 2);
-E([
+k([
   c({ attribute: !1 })
 ], v.prototype, "room", 2);
-E([
+k([
   c({ attribute: !1 })
 ], v.prototype, "group", 2);
-E([
+k([
   p()
 ], v.prototype, "_name", 2);
-E([
+k([
   p()
 ], v.prototype, "_id", 2);
-E([
+k([
   p()
 ], v.prototype, "_devices", 2);
-E([
+k([
   p()
 ], v.prototype, "_triggers", 2);
-E([
+k([
   p()
 ], v.prototype, "_busy", 2);
-v = E([
+v = k([
   b("homex-group-dialog")
 ], v);
-var es = Object.defineProperty, ts = Object.getOwnPropertyDescriptor, ae = (t, e, s, i) => {
-  for (var r = i > 1 ? void 0 : i ? ts(e, s) : e, o = t.length - 1, a; o >= 0; o--)
+var ss = Object.defineProperty, is = Object.getOwnPropertyDescriptor, ae = (t, e, s, i) => {
+  for (var r = i > 1 ? void 0 : i ? is(e, s) : e, o = t.length - 1, a; o >= 0; o--)
     (a = t[o]) && (r = (i ? a(e, s, r) : a(r)) || r);
-  return i && r && es(e, s, r), r;
+  return i && r && ss(e, s, r), r;
 };
 let I = class extends _ {
   constructor() {
     super(...arguments), this._open = !1;
   }
+  get _slug() {
+    return `${this.room.room_id}_${this.group.group_id}`;
+  }
   render() {
+    const t = this._slug;
     return n`
       <div class="row">
         <homex-unit-controls .hass=${this.hass} .unit=${this.group}></homex-unit-controls>
+        <a
+          class="scene-link"
+          href="/config/scene/edit/homex_${t}_turn_on"
+          target="_blank"
+          rel="noopener"
+          title="Éditer la scène « allumé » du groupe"
+        >
+          <svg viewBox="0 0 24 24"><path d=${zt}></path></svg>
+        </a>
+        <a
+          class="scene-link"
+          href="/config/scene/edit/homex_${t}_turn_off"
+          target="_blank"
+          rel="noopener"
+          title="Éditer la scène « éteint » du groupe"
+        >
+          <svg viewBox="0 0 24 24"><path d=${Vt}></path></svg>
+        </a>
         <button title="Configurer le groupe" @click=${() => this._open = !0}>
           ⚙︎
         </button>
@@ -1895,10 +1924,29 @@ I.styles = [
       .row {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 4px;
       }
       homex-unit-controls {
         flex: 1;
+      }
+      .scene-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        color: var(--secondary-text-color);
+        text-decoration: none;
+      }
+      .scene-link:hover {
+        background: var(--secondary-background-color, rgba(225, 225, 225, 0.08));
+        color: var(--primary-text-color);
+      }
+      .scene-link svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
       }
     `
 ];
@@ -1917,10 +1965,10 @@ ae([
 I = ae([
   b("homex-group-row")
 ], I);
-var ss = Object.defineProperty, is = Object.getOwnPropertyDescriptor, k = (t, e, s, i) => {
-  for (var r = i > 1 ? void 0 : i ? is(e, s) : e, o = t.length - 1, a; o >= 0; o--)
+var rs = Object.defineProperty, os = Object.getOwnPropertyDescriptor, C = (t, e, s, i) => {
+  for (var r = i > 1 ? void 0 : i ? os(e, s) : e, o = t.length - 1, a; o >= 0; o--)
     (a = t[o]) && (r = (i ? a(e, s, r) : a(r)) || r);
-  return i && r && ss(e, s, r), r;
+  return i && r && rs(e, s, r), r;
 };
 let f = class extends _ {
   constructor() {
@@ -1991,7 +2039,7 @@ let f = class extends _ {
         <div class="section">Appareils de la pièce</div>
         <homex-entity-picker
           .hass=${this.hass}
-          .includeDomains=${Zt}
+          .includeDomains=${Kt}
           .value=${this._devices}
           @value-changed=${(e) => this._devices = e.detail.value}
         ></homex-entity-picker>
@@ -2040,40 +2088,40 @@ f.styles = [
       }
     `
 ];
-k([
+C([
   c({ attribute: !1 })
 ], f.prototype, "hass", 2);
-k([
+C([
   c({ type: Boolean })
 ], f.prototype, "open", 2);
-k([
+C([
   c({ attribute: !1 })
 ], f.prototype, "room", 2);
-k([
+C([
   p()
 ], f.prototype, "_name", 2);
-k([
+C([
   p()
 ], f.prototype, "_id", 2);
-k([
+C([
   p()
 ], f.prototype, "_areaId", 2);
-k([
+C([
   p()
 ], f.prototype, "_devices", 2);
-k([
+C([
   p()
 ], f.prototype, "_strategy", 2);
-k([
+C([
   p()
 ], f.prototype, "_busy", 2);
-f = k([
+f = C([
   b("homex-room-dialog")
 ], f);
-var rs = Object.defineProperty, os = Object.getOwnPropertyDescriptor, F = (t, e, s, i) => {
-  for (var r = i > 1 ? void 0 : i ? os(e, s) : e, o = t.length - 1, a; o >= 0; o--)
+var as = Object.defineProperty, ns = Object.getOwnPropertyDescriptor, F = (t, e, s, i) => {
+  for (var r = i > 1 ? void 0 : i ? ns(e, s) : e, o = t.length - 1, a; o >= 0; o--)
     (a = t[o]) && (r = (i ? a(e, s, r) : a(r)) || r);
-  return i && r && rs(e, s, r), r;
+  return i && r && as(e, s, r), r;
 };
 let H = class extends _ {
   constructor() {
@@ -2177,10 +2225,10 @@ F([
 H = F([
   b("homex-triggers-dialog")
 ], H);
-var as = Object.defineProperty, ns = Object.getOwnPropertyDescriptor, P = (t, e, s, i) => {
-  for (var r = i > 1 ? void 0 : i ? ns(e, s) : e, o = t.length - 1, a; o >= 0; o--)
+var ls = Object.defineProperty, cs = Object.getOwnPropertyDescriptor, O = (t, e, s, i) => {
+  for (var r = i > 1 ? void 0 : i ? cs(e, s) : e, o = t.length - 1, a; o >= 0; o--)
     (a = t[o]) && (r = (i ? a(e, s, r) : a(r)) || r);
-  return i && r && as(e, s, r), r;
+  return i && r && ls(e, s, r), r;
 };
 let y = class extends _ {
   constructor() {
@@ -2224,7 +2272,7 @@ let y = class extends _ {
       }
       this._busy = !0;
       try {
-        this.scene ? await kt(this.hass, this.room.entry_id, this.scene.key, t) : this._mode === "attach" ? await ze(this.hass, this.room.entry_id, t, this._attachId) : await ze(this.hass, this.room.entry_id, t), z(this), this._close();
+        this.scene ? await Ct(this.hass, this.room.entry_id, this.scene.key, t) : this._mode === "attach" ? await ze(this.hass, this.room.entry_id, t, this._attachId) : await ze(this.hass, this.room.entry_id, t), z(this), this._close();
       } catch (e) {
         this._busy = !1, alert("Erreur Homex : " + A(e));
       }
@@ -2318,37 +2366,37 @@ y.styles = [
       }
     `
 ];
-P([
+O([
   c({ attribute: !1 })
 ], y.prototype, "hass", 2);
-P([
+O([
   c({ type: Boolean })
 ], y.prototype, "open", 2);
-P([
+O([
   c({ attribute: !1 })
 ], y.prototype, "room", 2);
-P([
+O([
   c({ attribute: !1 })
 ], y.prototype, "scene", 2);
-P([
+O([
   p()
 ], y.prototype, "_name", 2);
-P([
+O([
   p()
 ], y.prototype, "_mode", 2);
-P([
+O([
   p()
 ], y.prototype, "_attachId", 2);
-P([
+O([
   p()
 ], y.prototype, "_busy", 2);
-y = P([
+y = O([
   b("homex-scene-dialog")
 ], y);
-var ls = Object.defineProperty, cs = Object.getOwnPropertyDescriptor, O = (t, e, s, i) => {
-  for (var r = i > 1 ? void 0 : i ? cs(e, s) : e, o = t.length - 1, a; o >= 0; o--)
+var ds = Object.defineProperty, ps = Object.getOwnPropertyDescriptor, L = (t, e, s, i) => {
+  for (var r = i > 1 ? void 0 : i ? ps(e, s) : e, o = t.length - 1, a; o >= 0; o--)
     (a = t[o]) && (r = (i ? a(e, s, r) : a(r)) || r);
-  return i && r && ls(e, s, r), r;
+  return i && r && ds(e, s, r), r;
 };
 let $ = class extends _ {
   constructor() {
@@ -2366,7 +2414,7 @@ let $ = class extends _ {
     }, this._sceneNext = async (t) => {
       t?.stopPropagation();
       try {
-        await Et(this.hass, this.room.entry_id);
+        await kt(this.hass, this.room.entry_id);
       } catch (e) {
         alert("Erreur Homex : " + A(e));
       }
@@ -2421,21 +2469,21 @@ let $ = class extends _ {
     return n`
       <div class="scene-row">
         ${t.orderable ? n`<span class="handle" title="Glisser pour réordonner">
-              <svg viewBox="0 0 24 24"><path d=${Lt}></path></svg>
+              <svg viewBox="0 0 24 24"><path d=${Pt}></path></svg>
             </span>` : n`<span class="pin" title="Toujours en dernier">
-              <svg viewBox="0 0 24 24"><path d=${Tt}></path></svg>
+              <svg viewBox="0 0 24 24"><path d=${jt}></path></svg>
             </span>`}
         <span class="scene-name">${t.name}</span>
         ${t.key === e ? n`<span class="active-tag">active</span>` : ""}
         <span class="btn-group">
           ${this._iconBtn(
-      zt,
+      Tt,
       "Voir dans Home Assistant",
       () => this._openHa(t)
     )}
-          ${this._iconBtn(Dt, "Renommer", () => this._renameScene = t)}
+          ${this._iconBtn(Nt, "Renommer", () => this._renameScene = t)}
           ${this._iconBtn(
-      Ot,
+      Lt,
       t.removable ? "Supprimer" : "Scène par défaut",
       () => this._deleteScene(t),
       !t.removable
@@ -2465,7 +2513,7 @@ let $ = class extends _ {
               title="Changer de scène"
               @click=${(h) => this._sceneNext(h)}
             >
-              <svg viewBox="0 0 24 24"><path d=${jt}></path></svg>
+              <svg viewBox="0 0 24 24"><path d=${Rt}></path></svg>
             </button>
             <button
               class="kebab"
@@ -2901,39 +2949,39 @@ $.styles = [
       }
     `
 ];
-O([
+L([
   c({ attribute: !1 })
 ], $.prototype, "hass", 2);
-O([
+L([
   c({ attribute: !1 })
 ], $.prototype, "room", 2);
-O([
+L([
   c({ type: Boolean })
 ], $.prototype, "expanded", 2);
-O([
+L([
   p()
 ], $.prototype, "_dialog", 2);
-O([
+L([
   p()
 ], $.prototype, "_menuOpen", 2);
-O([
+L([
   p()
 ], $.prototype, "_renameScene", 2);
-O([
+L([
   p()
 ], $.prototype, "_deleteScenes", 2);
-O([
+L([
   p()
 ], $.prototype, "_deleting", 2);
-$ = O([
+$ = L([
   b("homex-room-card")
 ], $);
-var ds = Object.defineProperty, ps = Object.getOwnPropertyDescriptor, L = (t, e, s, i) => {
-  for (var r = i > 1 ? void 0 : i ? ps(e, s) : e, o = t.length - 1, a; o >= 0; o--)
+var hs = Object.defineProperty, us = Object.getOwnPropertyDescriptor, P = (t, e, s, i) => {
+  for (var r = i > 1 ? void 0 : i ? us(e, s) : e, o = t.length - 1, a; o >= 0; o--)
     (a = t[o]) && (r = (i ? a(e, s, r) : a(r)) || r);
-  return i && r && ds(e, s, r), r;
+  return i && r && hs(e, s, r), r;
 };
-const hs = "45";
+const gs = "47";
 let w = class extends _ {
   constructor() {
     super(...arguments), this.narrow = !1, this._rooms = null, this._error = null, this._createOpen = !1, this._expanded = localStorage.getItem("homex_expanded") || null, this._loaded = !1, this._onToggleExpand = (t) => {
@@ -2954,7 +3002,7 @@ let w = class extends _ {
     this.removeEventListener(me, this._reload), this.removeEventListener("homex-toggle-expand", this._onToggleExpand), super.disconnectedCallback();
   }
   updated(t) {
-    t.has("hass") && this.hass && !this._loaded && (this._loaded = !0, Ct().then(() => this.requestUpdate()), this._reload());
+    t.has("hass") && this.hass && !this._loaded && (this._loaded = !0, Et().then(() => this.requestUpdate()), this._reload());
   }
   _roomCard(t) {
     return n`<homex-room-card
@@ -3006,7 +3054,7 @@ let w = class extends _ {
     return n`
       <div class="wrap">
         <header>
-          <h1>Homex <span class="ver">v${hs}</span></h1>
+          <h1>Homex <span class="ver">v${gs}</span></h1>
           <div class="header-actions">
             <button @click=${this._reload}>Rafraîchir</button>
             <button class="primary" @click=${() => this._createOpen = !0}>
@@ -3091,31 +3139,31 @@ w.styles = x`
       color: var(--primary-color);
     }
   `;
-L([
+P([
   c({ attribute: !1 })
 ], w.prototype, "hass", 2);
-L([
+P([
   c({ attribute: !1 })
 ], w.prototype, "narrow", 2);
-L([
+P([
   c({ attribute: !1 })
 ], w.prototype, "route", 2);
-L([
+P([
   c({ attribute: !1 })
 ], w.prototype, "panel", 2);
-L([
+P([
   p()
 ], w.prototype, "_rooms", 2);
-L([
+P([
   p()
 ], w.prototype, "_error", 2);
-L([
+P([
   p()
 ], w.prototype, "_createOpen", 2);
-L([
+P([
   p()
 ], w.prototype, "_expanded", 2);
-w = L([
+w = P([
   b("homex-panel")
 ], w);
 export {
