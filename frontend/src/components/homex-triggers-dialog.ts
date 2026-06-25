@@ -16,6 +16,8 @@ export class HomexTriggersDialog extends LitElement {
 
   @state() private _toggle: TriggerSpec[] = [];
   @state() private _scene: TriggerSpec[] = [];
+  @state() private _dimUp: TriggerSpec[] = [];
+  @state() private _dimDown: TriggerSpec[] = [];
   @state() private _busy = false;
 
   static styles = [
@@ -39,6 +41,8 @@ export class HomexTriggersDialog extends LitElement {
     if (changed.has("open") && this.open) {
       this._toggle = (this.room?.triggers ?? []).map((t) => ({ ...t }));
       this._scene = (this.room?.scene_triggers ?? []).map((t) => ({ ...t }));
+      this._dimUp = (this.room?.dim_up_triggers ?? []).map((t) => ({ ...t }));
+      this._dimDown = (this.room?.dim_down_triggers ?? []).map((t) => ({ ...t }));
       this._busy = false;
     }
   }
@@ -54,6 +58,8 @@ export class HomexTriggersDialog extends LitElement {
         entry_id: this.room.entry_id,
         triggers: this._toggle,
         scene_triggers: this._scene,
+        dim_up_triggers: this._dimUp,
+        dim_down_triggers: this._dimDown,
       });
       fireChanged(this);
       this._close();
@@ -94,6 +100,30 @@ export class HomexTriggersDialog extends LitElement {
             La stratégie (repart de zéro / dernière utilisée) se règle dans
             « Modifier la pièce ».
           </p>
+        </div>
+
+        <div class="group">
+          <div class="section">Dimmer + (monter la luminosité)</div>
+          <p class="hint">
+            Chaque déclenchement ajoute 20 à la luminosité des lumières de la pièce.
+          </p>
+          <homex-trigger-selector
+            .hass=${this.hass}
+            .value=${this._dimUp}
+            @value-changed=${(e: CustomEvent) => (this._dimUp = e.detail.value)}
+          ></homex-trigger-selector>
+        </div>
+
+        <div class="group">
+          <div class="section">Dimmer − (baisser la luminosité)</div>
+          <p class="hint">
+            Chaque déclenchement retire 20 à la luminosité des lumières de la pièce.
+          </p>
+          <homex-trigger-selector
+            .hass=${this.hass}
+            .value=${this._dimDown}
+            @value-changed=${(e: CustomEvent) => (this._dimDown = e.detail.value)}
+          ></homex-trigger-selector>
         </div>
 
         <span slot="actions">

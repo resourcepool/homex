@@ -1,5 +1,7 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+import { repeat } from "lit/directives/repeat.js";
+import { keyed } from "lit/directives/keyed.js";
 import type { HomeAssistant } from "../types";
 import { haComponentsLoaded } from "../lib/ha-elements";
 
@@ -149,15 +151,24 @@ export class HomexEntityPicker extends LitElement {
     // selected entity + a trailing empty row to add another. Already-selected
     // entities are excluded from the other pickers so you can't pick twice.
     if (customElements.get("ha-entity-picker")) {
+      // Key each row by its entity id, and the trailing "add" picker by the
+      // current count, so Lit creates a FRESH (empty) picker after each add
+      // instead of reusing the one that still shows the just-picked entity.
       return html`
-        ${this.value.map((id, i) =>
-          this._nativePicker(
-            id,
-            this.value.filter((_, j) => j !== i),
-            (v) => this._setAt(i, v)
-          )
+        ${repeat(
+          this.value,
+          (id) => id,
+          (id, i) =>
+            this._nativePicker(
+              id,
+              this.value.filter((_, j) => j !== i),
+              (v) => this._setAt(i, v)
+            )
         )}
-        ${this._nativePicker("", this.value, (v) => this._addNew(v))}
+        ${keyed(
+          this.value.length,
+          this._nativePicker("", this.value, (v) => this._addNew(v))
+        )}
       `;
     }
     return this._renderFallback();

@@ -29,6 +29,8 @@ export interface RoomUpdate {
   // Triggers: {entity_id} (state change) or {device_id} (device action).
   triggers?: TriggerSpec[];
   scene_triggers?: TriggerSpec[];
+  dim_up_triggers?: TriggerSpec[];
+  dim_down_triggers?: TriggerSpec[];
   scene_strategy?: "recall_first" | "recall_last";
 }
 
@@ -50,6 +52,9 @@ export const syncLabels = (
 ): Promise<{ ok: boolean; updated: number }> =>
   hass.callWS({ type: "homex/room/sync_labels", entry_id });
 
+export const dimRoom = (hass: HomeAssistant, entry_id: string, delta: number) =>
+  hass.callWS({ type: "homex/room/dim", entry_id, delta });
+
 export interface GroupPayload {
   entry_id: string;
   group_id: string;
@@ -70,13 +75,15 @@ export const addScene = (
   hass: HomeAssistant,
   entry_id: string,
   name: string,
-  attach?: string
+  attach?: string,
+  triggers?: TriggerSpec[]
 ) =>
   hass.callWS({
     type: "homex/scene/add",
     entry_id,
     name,
     ...(attach ? { attach } : {}),
+    ...(triggers ? { triggers } : {}),
   });
 
 export const deleteScene = (hass: HomeAssistant, entry_id: string, key: string) =>
@@ -92,8 +99,16 @@ export const renameScene = (
   hass: HomeAssistant,
   entry_id: string,
   key: string,
-  name: string
-) => hass.callWS({ type: "homex/scene/rename", entry_id, key, name });
+  name: string,
+  triggers?: TriggerSpec[]
+) =>
+  hass.callWS({
+    type: "homex/scene/rename",
+    entry_id,
+    key,
+    name,
+    ...(triggers ? { triggers } : {}),
+  });
 
 export const errorMessage = (err: any): string =>
   (err && (err.message || err.code)) || String(err);

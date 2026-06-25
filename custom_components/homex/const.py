@@ -33,6 +33,12 @@ CONF_SCENE_STRATEGY = "scene_strategy"
 STRATEGY_RECALL_FIRST = "recall_first"
 STRATEGY_RECALL_LAST = "recall_last"
 
+# Dimmer triggers: brighten / dim the room's member lights by DIM_STEP (0-255)
+# each time they fire (and via the manual +/- buttons on the room card).
+CONF_DIM_UP_TRIGGERS = "dim_up_triggers"
+CONF_DIM_DOWN_TRIGGERS = "dim_down_triggers"
+DIM_STEP = 20
+
 # Triggers can also be devices (any state change of the device's entities).
 CONF_TRIGGER_DEVICES = "trigger_devices"
 CONF_SCENE_TRIGGER_DEVICES = "scene_trigger_devices"

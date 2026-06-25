@@ -1,6 +1,8 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import {
+  mdiMinus,
+  mdiPlus,
   mdiChevronDown,
   mdiChevronUp,
   mdiDelete,
@@ -15,6 +17,7 @@ import { fireChanged } from "../types";
 import {
   deleteRoom,
   deleteScene,
+  dimRoom,
   errorMessage,
   reorderScenes,
   sceneNext,
@@ -385,6 +388,15 @@ export class HomexRoomCard extends LitElement {
     }
   };
 
+  private _dim = async (delta: number, e?: Event) => {
+    e?.stopPropagation();
+    try {
+      await dimRoom(this.hass, this.room.entry_id, delta);
+    } catch (err) {
+      alert("Erreur Homex : " + errorMessage(err));
+    }
+  };
+
   private _toggleExpand = () => {
     this.dispatchEvent(
       new CustomEvent("homex-toggle-expand", {
@@ -480,6 +492,8 @@ export class HomexRoomCard extends LitElement {
     const floorName = floor?.name || undefined;
     const orderable = r.scenes.filter((s) => s.orderable);
     const pinned = r.scenes.filter((s) => !s.orderable);
+    // Scene switching only makes sense with extra scenes beyond turn_on/off.
+    const hasExtraScenes = r.scenes.some((s) => s.removable);
     return html`
       <ha-card>
         <div class="head" @click=${this._toggleExpand} title="Plier / déplier">
@@ -494,13 +508,33 @@ export class HomexRoomCard extends LitElement {
             .activeScene=${activeScene}
           ></homex-unit-controls>
           <div class="head-actions">
-            <button
-              class="round"
-              title="Changer de scène"
-              @click=${(e: Event) => this._sceneNext(e)}
-            >
-              <svg viewBox="0 0 24 24"><path d=${mdiThemeLightDark}></path></svg>
-            </button>
+            ${r.dim_up_triggers?.length || r.dim_down_triggers?.length
+              ? html`
+                  <button
+                    class="round"
+                    title="Baisser la luminosité (−20)"
+                    @click=${(e: Event) => this._dim(-20, e)}
+                  >
+                    <svg viewBox="0 0 24 24"><path d=${mdiMinus}></path></svg>
+                  </button>
+                  <button
+                    class="round"
+                    title="Monter la luminosité (+20)"
+                    @click=${(e: Event) => this._dim(20, e)}
+                  >
+                    <svg viewBox="0 0 24 24"><path d=${mdiPlus}></path></svg>
+                  </button>
+                `
+              : ""}
+            ${hasExtraScenes
+              ? html`<button
+                  class="round"
+                  title="Changer de scène"
+                  @click=${(e: Event) => this._sceneNext(e)}
+                >
+                  <svg viewBox="0 0 24 24"><path d=${mdiThemeLightDark}></path></svg>
+                </button>`
+              : ""}
             <button
               class="kebab"
               title="Actions"

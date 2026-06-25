@@ -23,6 +23,7 @@ export interface Scene {
   config_id: string; // id in scenes.yaml, used for the HA editor link
   removable: boolean;
   orderable: boolean; // all scenes except the pinned "off" scene
+  triggers: TriggerSpec[]; // triggers that activate this scene
 }
 
 export type SceneStrategy = "recall_first" | "recall_last";
@@ -37,6 +38,8 @@ export interface Room extends Unit {
   area_id: string | null;
   triggers: TriggerSpec[];
   scene_triggers: TriggerSpec[];
+  dim_up_triggers: TriggerSpec[];
+  dim_down_triggers: TriggerSpec[];
   scene_strategy: SceneStrategy;
   scenes: Scene[];
   groups: Group[];

@@ -73,8 +73,11 @@ from .const import (
     CONF_ROOM_NAME,
     CONF_SCENE_STRATEGY,
     CONF_SCENE_TRIGGERS,
+    CONF_DIM_DOWN_TRIGGERS,
+    CONF_DIM_UP_TRIGGERS,
     CONF_SCENES,
     CONF_TRIGGERS,
+    DIM_STEP,
     DOMAIN,
     HOMEX_LABEL,
     SCENES_FILE,
@@ -334,6 +337,14 @@ class RoomController:
     def scene_trigger_specs(self) -> list[dict]:
         return normalize_trigger_specs(self._cfg(CONF_SCENE_TRIGGERS, []))
 
+    @property
+    def dim_up_trigger_specs(self) -> list[dict]:
+        return normalize_trigger_specs(self._cfg(CONF_DIM_UP_TRIGGERS, []))
+
+    @property
+    def dim_down_trigger_specs(self) -> list[dict]:
+        return normalize_trigger_specs(self._cfg(CONF_DIM_DOWN_TRIGGERS, []))
+
     async def build_trigger_configs(self, specs: list[dict]) -> list[dict]:
         """Validate raw HA trigger configs (as produced by the automation editor).
 
@@ -397,6 +408,13 @@ class RoomController:
     def extra_scene_id(self, key: str) -> str:
         return f"homex_{self.room_id}_turn_on_{key}"
 
+    def scene_trigger_specs_for(self, key: str) -> list[dict]:
+        """Per-scene triggers (raw HA trigger configs) for a scene key."""
+        for scene in self._cfg(CONF_SCENES, []) or []:
+            if isinstance(scene, dict) and scene.get("key") == key:
+                return normalize_trigger_specs(scene.get("triggers"))
+        return []
+
     @property
     def units(self) -> list[Unit]:
         if self._units is None:
@@ -452,6 +470,10 @@ class RoomController:
             )
             if unsub:
                 self._room_unsubs.append(unsub)
+        # Per-scene triggers: a trigger wired to a specific scene activates it.
+        await self._start_scene_triggers()
+        # Dimmer triggers: brighten / dim the room's member lights.
+        await self._start_dim_triggers()
         # Keep entities tied to the room's HA area + labels (re-applied on every
         # reload, so changing the area or its labels propagates automatically).
         try:
@@ -671,6 +693,125 @@ class RoomController:
             blocking=False,
             context=self.new_context(),
         )
+
+    # -- Per-scene triggers (a trigger that activates one specific scene) ----
+
+    def _make_scene_activator(self, key: str):
+        """A trigger callback that activates the scene identified by ``key``."""
+
+        @callback
+        def handler(run_variables=None, context: Context | None = None) -> None:
+            if self.is_self_context(context):
+                return
+            self.hass.async_create_task(self.async_activate_scene_key(key))
+
+        return handler
+
+    async def async_activate_scene_key(self, key: str) -> None:
+        """Activate a specific scene by key (turn_on / turn_off / an extra).
+
+        turn_off behaves like turning the room off (via its switch). Any other
+        scene turns the room on and applies that scene, updating the active /
+        last-used memory just like a manual scene switch.
+        """
+        if key == "turn_off":
+            await self.hass.services.async_call(
+                "switch",
+                "turn_off",
+                {"entity_id": self.room_switch_entity_id},
+                blocking=False,
+                context=self.new_context(),
+            )
+            return
+        keys = [scene["key"] for scene in self.scene_order]
+        if key not in keys:
+            return
+        entity_id = self.scene_entities()[keys.index(key)]
+        self._last_scene_key = key
+        if self._room_switch is not None:
+            self._room_switch.set_is_on(True)
+        self._update_active(key)
+        _LOGGER.debug("[%s] scene trigger -> %s", self.room_id, entity_id)
+        await self.hass.services.async_call(
+            "scene",
+            "turn_on",
+            {"entity_id": entity_id},
+            blocking=False,
+            context=self.new_context(),
+        )
+
+    async def _start_scene_triggers(self) -> None:
+        """Wire each scene's own triggers: firing one activates that scene."""
+        for scene in self._cfg(CONF_SCENES, []) or []:
+            if not isinstance(scene, dict):
+                continue
+            specs = normalize_trigger_specs(scene.get("triggers"))
+            configs = await self.build_trigger_configs(specs)
+            if not configs:
+                continue
+            unsub = await async_initialize_triggers(
+                self.hass,
+                configs,
+                self._make_scene_activator(scene["key"]),
+                DOMAIN,
+                f"homex {self.room_id} scene:{scene['key']}",
+                _LOGGER.log,
+            )
+            if unsub:
+                self._room_unsubs.append(unsub)
+
+    # -- Dimmer (brighten / dim the room's member lights) -------------------
+
+    @property
+    def dim_light_ids(self) -> list[str]:
+        """The room's real member lights (excludes Homex's own ONOFF groups)."""
+        return [
+            e
+            for e in self.devices
+            if e.startswith("light.") and not e.startswith("light.homex_")
+        ]
+
+    async def async_dim(self, delta: int) -> None:
+        """Step the brightness of the room's member lights by ``delta`` (0-255)."""
+        lights = self.dim_light_ids
+        if not lights:
+            return
+        await self.hass.services.async_call(
+            "light",
+            "turn_on",
+            {"entity_id": lights, "brightness_step": delta},
+            blocking=False,
+            context=self.new_context(),
+        )
+
+    def _make_dim_handler(self, delta: int):
+        @callback
+        def handler(run_variables=None, context: Context | None = None) -> None:
+            if self.is_self_context(context):
+                return
+            self.hass.async_create_task(self.async_dim(delta))
+
+        return handler
+
+    async def _start_dim_triggers(self) -> None:
+        """Wire the dim+ / dim- triggers to brighten / dim the member lights."""
+        for specs, delta in (
+            (self.dim_up_trigger_specs, DIM_STEP),
+            (self.dim_down_trigger_specs, -DIM_STEP),
+        ):
+            configs = await self.build_trigger_configs(specs)
+            if not configs:
+                continue
+            unsub = await async_initialize_triggers(
+                self.hass,
+                configs,
+                self._make_dim_handler(delta),
+                DOMAIN,
+                f"homex {self.room_id} dim:{'up' if delta > 0 else 'down'}",
+                _LOGGER.log,
+            )
+            if unsub:
+                self._room_unsubs.append(unsub)
 
     # -- Scenes (native, stored in scenes.yaml) -----------------------------
 

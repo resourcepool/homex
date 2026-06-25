@@ -1,12 +1,13 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import type { HomeAssistant, Room, Scene } from "../types";
+import type { HomeAssistant, Room, Scene, TriggerSpec } from "../types";
 import { fireChanged } from "../types";
 import { addScene, errorMessage, renameScene } from "../api";
 import { sharedStyles } from "../lib/styles";
 import { textField } from "../lib/fields";
 import { slugify } from "../lib/slug";
 import "./homex-dialog";
+import "./homex-trigger-selector";
 
 type Mode = "new" | "attach";
 
@@ -26,6 +27,7 @@ export class HomexSceneDialog extends LitElement {
   @state() private _name = "";
   @state() private _mode: Mode = "new";
   @state() private _attachId = "";
+  @state() private _triggers: TriggerSpec[] = [];
   @state() private _busy = false;
 
   static styles = [
@@ -67,6 +69,7 @@ export class HomexSceneDialog extends LitElement {
       this._name = this.scene?.name ?? "";
       this._mode = "new";
       this._attachId = "";
+      this._triggers = (this.scene?.triggers ?? []).map((t) => ({ ...t }));
       this._busy = false;
     }
   }
@@ -119,11 +122,17 @@ export class HomexSceneDialog extends LitElement {
     this._busy = true;
     try {
       if (this.scene) {
-        await renameScene(this.hass, this.room.entry_id, this.scene.key, name);
+        await renameScene(
+          this.hass, this.room.entry_id, this.scene.key, name, this._triggers
+        );
       } else if (this._mode === "attach") {
-        await addScene(this.hass, this.room.entry_id, name, this._attachId);
+        await addScene(
+          this.hass, this.room.entry_id, name, this._attachId, this._triggers
+        );
       } else {
-        await addScene(this.hass, this.room.entry_id, name);
+        await addScene(
+          this.hass, this.room.entry_id, name, undefined, this._triggers
+        );
       }
       fireChanged(this);
       this._close();
@@ -146,6 +155,12 @@ export class HomexSceneDialog extends LitElement {
         ${textField("Nom de la scène", this._name, (v) => (this._name = v), "Nuit")}
         ${taken ? html`<div class="err">Ce nom de scène existe déjà.</div>` : ""}
         ${editing ? "" : this._renderModePicker()}
+        <div class="section">Déclencheurs (activent cette scène)</div>
+        <homex-trigger-selector
+          .hass=${this.hass}
+          .value=${this._triggers}
+          @value-changed=${(e: CustomEvent) => (this._triggers = e.detail.value)}
+        ></homex-trigger-selector>
         <span slot="actions">
           <button @click=${this._close}>Annuler</button>
           <button class="primary" ?disabled=${this._busy || !valid} @click=${this._save}>

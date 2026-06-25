@@ -23,6 +23,8 @@ from homeassistant.util.yaml import load_yaml, save_yaml
 from .const import (
     CONF_AREA_ID,
     CONF_DEVICES,
+    CONF_DIM_DOWN_TRIGGERS,
+    CONF_DIM_UP_TRIGGERS,
     CONF_GROUP_ID,
     CONF_GROUP_NAME,
     CONF_GROUPS,
@@ -50,7 +52,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "48"
+PANEL_VERSION = "52"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -76,6 +78,7 @@ async def async_register_homex_panel(hass: HomeAssistant) -> None:
         ws_room_update,
         ws_room_delete,
         ws_room_sync_labels,
+        ws_room_dim,
         ws_group_add,
         ws_group_update,
         ws_group_delete,
@@ -196,6 +199,8 @@ def ws_list_rooms(hass: HomeAssistant, connection, msg) -> None:
                 **_serialize_unit(units[0]),
                 "triggers": controller.trigger_specs,
                 "scene_triggers": controller.scene_trigger_specs,
+                "dim_up_triggers": controller.dim_up_trigger_specs,
+                "dim_down_triggers": controller.dim_down_trigger_specs,
                 "scene_strategy": controller.scene_strategy,
                 "scenes": _room_scenes(controller),
                 "groups": [
@@ -257,6 +262,7 @@ def _room_scenes(controller: RoomController) -> list[dict]:
                     "config_id": f"homex_{slug}_turn_on",
                     "removable": False,
                     "orderable": True,
+                    "triggers": controller.scene_trigger_specs_for("turn_on"),
                 }
             )
         else:
@@ -267,6 +273,7 @@ def _room_scenes(controller: RoomController) -> list[dict]:
                     "config_id": controller.extra_scene_id(key),
                     "removable": True,
                     "orderable": True,
+                    "triggers": controller.scene_trigger_specs_for(key),
                 }
             )
     scenes.append(
@@ -276,6 +283,7 @@ def _room_scenes(controller: RoomController) -> list[dict]:
             "config_id": f"homex_{slug}_turn_off",
             "removable": False,
             "orderable": False,
+            "triggers": controller.scene_trigger_specs_for("turn_off"),
         }
     )
     return scenes
@@ -285,12 +293,21 @@ def _scenes_value(
     controller: RoomController,
     ordered: list[dict],
     off_name: str | None = None,
+    off_triggers: list | None = None,
 ) -> list[dict]:
-    """Build the stored scenes list: ordered non-off + the (renamable) off."""
+    """Build the stored scenes list: ordered non-off + the (renamable) off.
+
+    The off scene is persisted when it has a custom name OR its own triggers
+    (otherwise it stays implicit with the default 'Éteint' label).
+    """
     off = controller.off_name if off_name is None else off_name
+    if off_triggers is None:
+        off_triggers = controller.scene_trigger_specs_for("turn_off")
     scenes = [dict(s) for s in ordered]
-    if off and off != "Éteint":
-        scenes.append({"key": "turn_off", "name": off})
+    if (off and off != "Éteint") or off_triggers:
+        scenes.append(
+            {"key": "turn_off", "name": off, "triggers": list(off_triggers or [])}
+        )
     return scenes
 
 
@@ -522,6 +539,8 @@ def _remove_room_entities(hass: HomeAssistant, controller: RoomController) -> No
         vol.Optional("devices"): [str],
         vol.Optional("triggers"): list,
         vol.Optional("scene_triggers"): list,
+        vol.Optional("dim_up_triggers"): list,
+        vol.Optional("dim_down_triggers"): list,
         vol.Optional("scene_strategy"): vol.In(
             [STRATEGY_RECALL_FIRST, STRATEGY_RECALL_LAST]
         ),
@@ -560,6 +579,10 @@ async def ws_room_update(hass: HomeAssistant, connection, msg) -> None:
         room[CONF_TRIGGERS] = msg["triggers"]
     if "scene_triggers" in msg:
         room[CONF_SCENE_TRIGGERS] = msg["scene_triggers"]
+    if "dim_up_triggers" in msg:
+        room[CONF_DIM_UP_TRIGGERS] = msg["dim_up_triggers"]
+    if "dim_down_triggers" in msg:
+        room[CONF_DIM_DOWN_TRIGGERS] = msg["dim_down_triggers"]
     if "scene_strategy" in msg:
         room[CONF_SCENE_STRATEGY] = msg["scene_strategy"]
 
@@ -589,6 +612,30 @@ async def ws_room_sync_labels(hass: HomeAssistant, connection, msg) -> None:
     ) or _controller(hass, hub, dict(sub.data))
     updated = controller.async_sync_labels()
     connection.send_result(msg["id"], {"ok": True, "updated": updated})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/room/dim",
+        vol.Required("entry_id"): str,
+        vol.Required("delta"): int,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_room_dim(hass: HomeAssistant, connection, msg) -> None:
+    """Step the brightness of the room's member lights by ``delta`` (0-255)."""
+    hub = _hub_entry(hass)
+    sub = _find_subentry(hub, msg["entry_id"]) if hub else None
+    if hub is None or sub is None:
+        connection.send_error(msg["id"], "not_found", "Unknown room")
+        return
+    live = hass.data.get(DOMAIN, {}).get(HUB_DATA)
+    controller = (
+        live.controllers.get(msg["entry_id"]) if live else None
+    ) or _controller(hass, hub, dict(sub.data))
+    await controller.async_dim(msg["delta"])
+    connection.send_result(msg["id"], {"ok": True})
 
 
 @websocket_api.websocket_command(
@@ -718,6 +765,7 @@ async def ws_group_delete(hass: HomeAssistant, connection, msg) -> None:
         vol.Required("entry_id"): str,
         vol.Required("name"): str,
         vol.Optional("attach"): str,  # config id of an existing scene to adopt
+        vol.Optional("triggers"): list,  # per-scene triggers that activate it
     }
 )
 @websocket_api.require_admin
@@ -752,7 +800,7 @@ async def ws_scene_add(hass: HomeAssistant, connection, msg) -> None:
             connection.send_error(msg["id"], "scene_not_found", "Scene not found")
             return
 
-    order.append({"key": key, "name": name})
+    order.append({"key": key, "name": name, "triggers": msg.get("triggers", [])})
     room[CONF_SCENES] = _scenes_value(controller, order)
     _save_room(hass, hub, sub, room)
     connection.send_result(msg["id"], {"ok": True})
@@ -850,6 +898,7 @@ async def ws_scene_next(hass: HomeAssistant, connection, msg) -> None:
         vol.Required("entry_id"): str,
         vol.Required("key"): str,
         vol.Required("name"): str,
+        vol.Optional("triggers"): list,  # per-scene triggers (when editing)
     }
 )
 @websocket_api.require_admin
@@ -868,9 +917,12 @@ async def ws_scene_rename(hass: HomeAssistant, connection, msg) -> None:
         connection.send_error(msg["id"], "invalid_name", "Name required")
         return
 
+    triggers = msg.get("triggers")  # None = leave unchanged
     controller = _controller(hass, hub, room)
     if key == "turn_off":
-        room[CONF_SCENES] = _scenes_value(controller, controller.scene_order, name)
+        room[CONF_SCENES] = _scenes_value(
+            controller, controller.scene_order, name, triggers
+        )
         _save_room(hass, hub, sub, room)
         connection.send_result(msg["id"], {"ok": True})
         return
@@ -882,6 +934,8 @@ async def ws_scene_rename(hass: HomeAssistant, connection, msg) -> None:
     for scene in order:
         if scene["key"] == key:
             scene["name"] = name
+            if triggers is not None:
+                scene["triggers"] = triggers
     room[CONF_SCENES] = _scenes_value(controller, order)
     _save_room(hass, hub, sub, room)
     # turn_on keeps the fixed "HX - room - on" label; extras embed their name.
