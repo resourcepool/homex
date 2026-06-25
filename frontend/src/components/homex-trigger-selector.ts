@@ -30,7 +30,8 @@ export class HomexTriggerSelector extends LitElement {
       border: 1px solid var(--divider-color, rgba(225, 225, 225, 0.12));
       border-radius: 12px;
       margin-bottom: 12px;
-      overflow: hidden;
+      /* No overflow:hidden — it would clip the device search dropdown. */
+      position: relative;
     }
     .head {
       display: flex;
@@ -87,7 +88,8 @@ export class HomexTriggerSelector extends LitElement {
       display: block;
       width: 100%;
     }
-    select.native {
+    select.native,
+    input.native {
       width: 100%;
       box-sizing: border-box;
       padding: 14px 12px;
@@ -97,6 +99,31 @@ export class HomexTriggerSelector extends LitElement {
       border-bottom: 1px solid var(--secondary-text-color, #888);
       background: var(--input-fill-color, rgba(225, 225, 225, 0.06));
       color: var(--primary-text-color);
+    }
+    input.native:focus,
+    select.native:focus {
+      outline: none;
+      border-bottom: 2px solid var(--primary-color, #009ac7);
+    }
+    .dur-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dur-row input {
+      width: 64px;
+      box-sizing: border-box;
+      padding: 12px 8px;
+      font-size: 15px;
+      text-align: center;
+      border: none;
+      border-radius: 4px 4px 0 0;
+      border-bottom: 1px solid var(--secondary-text-color, #888);
+      background: var(--input-fill-color, rgba(225, 225, 225, 0.06));
+      color: var(--primary-text-color);
+    }
+    .dur-row span {
+      color: var(--secondary-text-color);
     }
     .add-wrap {
       position: relative;
@@ -216,10 +243,50 @@ export class HomexTriggerSelector extends LitElement {
     return d?.name_by_user || d?.name || id;
   }
 
+  // -- Entity (state / numeric_state) trigger, like the automation editor ---
+
+  private _entityType(cfg: TriggerSpec): "state" | "numeric" {
+    return cfg?.platform === "numeric_state" ? "numeric" : "state";
+  }
+
+  private _entityStates(id: string): string[] {
+    const domain = id.split(".")[0];
+    const toggle = [
+      "light", "switch", "input_boolean", "binary_sensor", "fan",
+      "cover", "lock", "automation", "script", "group", "media_player",
+    ];
+    const states = new Set<string>(toggle.includes(domain) ? ["on", "off"] : []);
+    const cur = this.hass.states[id]?.state;
+    if (cur && !["unavailable", "unknown", ""].includes(cur)) states.add(cur);
+    return [...states];
+  }
+
+  private _setKey(i: number, cfg: TriggerSpec, key: string, val: any) {
+    const next: TriggerSpec = { ...cfg };
+    if (val === "" || val === null || val === undefined) delete next[key];
+    else next[key] = val;
+    this._update(i, next);
+  }
+
+  private _setEntity(i: number, cfg: TriggerSpec, id: string) {
+    // Changing the entity keeps the sub-type but drops its specific fields.
+    const platform = cfg?.platform === "numeric_state" ? "numeric_state" : "state";
+    this._update(i, id ? { platform, entity_id: id } : { platform });
+  }
+
+  private _setEntityType(i: number, cfg: TriggerSpec, type: "state" | "numeric") {
+    const next: TriggerSpec = {
+      platform: type === "numeric" ? "numeric_state" : "state",
+      entity_id: this._entityOf(cfg),
+    };
+    if (cfg.attribute) next.attribute = cfg.attribute;
+    if (cfg.for) next.for = cfg.for;
+    this._update(i, next);
+  }
+
   private _entityField(cfg: TriggerSpec, i: number) {
     const value = this._entityOf(cfg);
-    const onChange = (id: string) =>
-      this._update(i, id ? { platform: "state", entity_id: id } : { platform: "state" });
+    const onChange = (id: string) => this._setEntity(i, cfg, id);
     if (customElements.get("ha-entity-picker")) {
       return html`<ha-entity-picker
         .hass=${this.hass}
@@ -245,40 +312,125 @@ export class HomexTriggerSelector extends LitElement {
     </select>`;
   }
 
-  private _entityStates(id: string): string[] {
-    const domain = id.split(".")[0];
-    const toggle = [
-      "light", "switch", "input_boolean", "binary_sensor", "fan",
-      "cover", "lock", "automation", "script", "group", "media_player",
-    ];
-    const states = new Set<string>(toggle.includes(domain) ? ["on", "off"] : []);
-    const cur = this.hass.states[id]?.state;
-    if (cur && !["unavailable", "unknown", ""].includes(cur)) states.add(cur);
-    return [...states];
+  private _entityTypeField(cfg: TriggerSpec, i: number) {
+    const t = this._entityType(cfg);
+    return html`<label class="field"><span>Type</span>
+      <select
+        class="native"
+        @change=${(e: Event) =>
+          this._setEntityType(i, cfg, (e.target as HTMLSelectElement).value as "state" | "numeric")}
+      >
+        <option value="state" ?selected=${t === "state"}>État</option>
+        <option value="numeric" ?selected=${t === "numeric"}>État numérique</option>
+      </select>
+    </label>`;
   }
 
-  private _stateLabel(s: string): string {
-    return { on: "Activé (on)", off: "Désactivé (off)" }[s] || s;
-  }
-
-  private _entityActionField(cfg: TriggerSpec, i: number) {
+  private _attrField(cfg: TriggerSpec, i: number) {
     const id = this._entityOf(cfg);
-    const to = typeof cfg.to === "string" ? cfg.to : "";
-    return html`<select
-      class="native"
-      @change=${(e: Event) => {
-        const v = (e.target as HTMLSelectElement).value;
-        this._update(
-          i,
-          v ? { platform: "state", entity_id: id, to: v } : { platform: "state", entity_id: id }
-        );
-      }}
-    >
-      <option value="" ?selected=${!to}>À n'importe quel changement d'état</option>
-      ${this._entityStates(id).map(
-        (s) => html`<option value=${s} ?selected=${s === to}>Passe à : ${this._stateLabel(s)}</option>`
-      )}
-    </select>`;
+    const attrs = Object.keys(this.hass.states[id]?.attributes || {});
+    const cur = cfg.attribute || "";
+    return html`<label class="field"><span>Attribut (facultatif)</span>
+      <select
+        class="native"
+        @change=${(e: Event) =>
+          this._setKey(i, cfg, "attribute", (e.target as HTMLSelectElement).value)}
+      >
+        <option value="" ?selected=${!cur}>(état de l'entité)</option>
+        ${attrs.map((a) => html`<option value=${a} ?selected=${a === cur}>${a}</option>`)}
+      </select>
+    </label>`;
+  }
+
+  private _stateValueField(
+    cfg: TriggerSpec, i: number, key: "from" | "to", label: string
+  ) {
+    const id = this._entityOf(cfg);
+    const cur = cfg[key] != null ? String(cfg[key]) : "";
+    const listId = `st-${i}-${key}`;
+    return html`<label class="field"><span>${label}</span>
+      <input
+        class="native"
+        list=${listId}
+        .value=${cur}
+        @change=${(e: Event) =>
+          this._setKey(i, cfg, key, (e.target as HTMLInputElement).value)}
+      />
+      <datalist id=${listId}>
+        ${this._entityStates(id).map((s) => html`<option value=${s}></option>`)}
+      </datalist>
+    </label>`;
+  }
+
+  private _numField(
+    cfg: TriggerSpec, i: number, key: "above" | "below", label: string
+  ) {
+    const cur = cfg[key] != null ? String(cfg[key]) : "";
+    return html`<label class="field"><span>${label}</span>
+      <input
+        class="native"
+        type="number"
+        .value=${cur}
+        @change=${(e: Event) => {
+          const v = (e.target as HTMLInputElement).value;
+          this._setKey(i, cfg, key, v === "" ? "" : Number(v));
+        }}
+      />
+    </label>`;
+  }
+
+  private _forParts(cfg: TriggerSpec): { h: number; m: number; s: number } {
+    const f = cfg.for;
+    if (f && typeof f === "object")
+      return { h: f.hours || 0, m: f.minutes || 0, s: f.seconds || 0 };
+    if (typeof f === "string") {
+      const p = f.split(":").map(Number);
+      return { h: p[0] || 0, m: p[1] || 0, s: p[2] || 0 };
+    }
+    if (typeof f === "number") return { h: 0, m: 0, s: f };
+    return { h: 0, m: 0, s: 0 };
+  }
+
+  private _setForPart(cfg: TriggerSpec, i: number, part: "h" | "m" | "s", val: number) {
+    const p = this._forParts(cfg);
+    p[part] = isNaN(val) || val < 0 ? 0 : Math.floor(val);
+    const total = p.h + p.m + p.s;
+    this._setKey(
+      i, cfg, "for",
+      total ? { hours: p.h, minutes: p.m, seconds: p.s } : ""
+    );
+  }
+
+  private _forField(cfg: TriggerSpec, i: number) {
+    const p = this._forParts(cfg);
+    const inp = (part: "h" | "m" | "s", v: number, ph: string) => html`<input
+      type="number"
+      min="0"
+      placeholder=${ph}
+      .value=${v ? String(v) : ""}
+      @change=${(e: Event) =>
+        this._setForPart(cfg, i, part, Number((e.target as HTMLInputElement).value))}
+    />`;
+    return html`<label class="field"><span>Pendant (facultatif)</span>
+      <div class="dur-row">
+        ${inp("h", p.h, "hh")}<span>:</span>${inp("m", p.m, "mm")}<span>:</span>${inp("s", p.s, "ss")}
+      </div>
+    </label>`;
+  }
+
+  private _entityBody(cfg: TriggerSpec, i: number) {
+    if (!this._entityOf(cfg)) return "";
+    const numeric = this._entityType(cfg) === "numeric";
+    return html`
+      ${this._entityTypeField(cfg, i)}
+      ${this._attrField(cfg, i)}
+      ${numeric
+        ? html`${this._numField(cfg, i, "above", "Au-dessus de (facultatif)")}
+            ${this._numField(cfg, i, "below", "En-dessous de (facultatif)")}`
+        : html`${this._stateValueField(cfg, i, "from", "De (facultatif)")}
+            ${this._stateValueField(cfg, i, "to", "À (facultatif)")}`}
+      ${this._forField(cfg, i)}
+    `;
   }
 
   private _deviceField(cfg: TriggerSpec, i: number) {
@@ -331,9 +483,7 @@ export class HomexTriggerSelector extends LitElement {
                 ? html`<label class="field"><span>Action</span>${this._actionField(cfg, i)}</label>`
                 : ""}`
           : html`<label class="field"><span>Entité</span>${this._entityField(cfg, i)}</label>
-              ${this._entityOf(cfg)
-                ? html`<label class="field"><span>Action</span>${this._entityActionField(cfg, i)}</label>`
-                : ""}`}
+              ${this._entityBody(cfg, i)}`}
       </div>
     </div>`;
   }
