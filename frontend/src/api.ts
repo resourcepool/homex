@@ -44,6 +44,12 @@ export const fetchDeviceTriggers = async (
 export const updateRoom = (hass: HomeAssistant, payload: RoomUpdate) =>
   hass.callWS({ type: "homex/room/update", ...payload });
 
+export const syncLabels = (
+  hass: HomeAssistant,
+  entry_id: string
+): Promise<{ ok: boolean; updated: number }> =>
+  hass.callWS({ type: "homex/room/sync_labels", entry_id });
+
 export interface GroupPayload {
   entry_id: string;
   group_id: string;

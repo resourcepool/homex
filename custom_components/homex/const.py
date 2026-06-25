@@ -11,6 +11,10 @@ CONF_ROOM_NAME = "name"
 CONF_ROOM_ID = "room_id"
 CONF_AREA_ID = "area_id"  # optional link to a native HA area
 CONF_DEVICES = "devices"
+
+# Label applied to every entity/scene Homex manages. When the room is linked to
+# an HA area, its entities also inherit that area's labels.
+HOMEX_LABEL = "Homex"
 CONF_TRIGGERS = "triggers"
 
 # Groups inside a room.

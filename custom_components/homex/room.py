@@ -76,6 +76,7 @@ from .const import (
     CONF_SCENES,
     CONF_TRIGGERS,
     DOMAIN,
+    HOMEX_LABEL,
     SCENES_FILE,
     SCENES_LOCK,
     STRATEGY_RECALL_FIRST,
@@ -218,14 +219,23 @@ class Unit:
 
     @callback
     def _on_trigger(self, run_variables=None, context: Context | None = None) -> None:
-        """A trigger fired: apply the scene matching the unit's switch state."""
+        """A trigger fired: TOGGLE the group via its switch.
+
+        The group's switch (a RestoreEntity) persists its on/off state, so
+        toggling flips it and applies the opposite scene — instead of just
+        re-applying the current state.
+        """
         # Ignore triggers caused by Homex's own scene/switch actions.
         if self._controller.is_self_context(context):
             return
-        if self._is_on():
-            self.hass.async_create_task(self.apply_on())
-        else:
-            self.hass.async_create_task(self.apply_off())
+        self.hass.async_create_task(
+            self.hass.services.async_call(
+                "switch",
+                "toggle",
+                {"entity_id": self.switch_entity_id},
+                context=self._controller.new_context(),
+            )
+        )
 
     async def async_start(self) -> None:
         """Wire the group's triggers (entity state + device action) natively."""
@@ -442,6 +452,12 @@ class RoomController:
             )
             if unsub:
                 self._room_unsubs.append(unsub)
+        # Keep entities tied to the room's HA area + labels (re-applied on every
+        # reload, so changing the area or its labels propagates automatically).
+        try:
+            self.async_sync_labels()
+        except Exception:  # noqa: BLE001 - label/area registry issues must not abort
+            _LOGGER.exception("[%s] failed to sync area/labels", self.room_id)
         _LOGGER.info(
             "Homex room '%s' active: %d device(s), %d toggle/%d scene trigger(s), "
             "%d group(s), strategy=%s",
@@ -533,6 +549,68 @@ class RoomController:
             )
             ids.append(self.scene_entity_id(config_id))
         return ids
+
+    # -- Area & labels ------------------------------------------------------
+
+    def managed_entity_ids(self) -> list[str]:
+        """Every entity Homex owns or groups for this room: the generated
+        switch/light controls, the scene entities, and the member devices
+        (room + groups). De-duplicated, order preserved."""
+        ids: list[str] = []
+        for unit in self.units:
+            ids.append(unit.switch_entity_id)
+            ids.append(unit.light_entity_id)
+            ids.append(unit.scene_on_entity_id)
+            ids.append(unit.scene_off_entity_id)
+            ids.extend(unit.devices)
+        for scene in self.extra_scenes:
+            ids.append(self.scene_entity_id(self.extra_scene_id(scene["key"])))
+        seen: set[str] = set()
+        out: list[str] = []
+        for entity_id in ids:
+            if entity_id and entity_id not in seen:
+                seen.add(entity_id)
+                out.append(entity_id)
+        return out
+
+    @callback
+    def async_sync_labels(self) -> int:
+        """Assign every managed entity to the room's HA area and reset its
+        labels to exactly {Homex} ∪ the area's labels.
+
+        Labels are fully replaced (the old set is dropped and reapplied), so a
+        changed area or changed area labels propagate cleanly. The area id is
+        set to the room's area (``None`` clears the entity-level override).
+        Returns the number of entities updated.
+        """
+        from homeassistant.helpers import area_registry as ar
+        from homeassistant.helpers import label_registry as lr
+
+        ent_reg = er.async_get(self.hass)
+        label_reg = lr.async_get(self.hass)
+
+        homex_label = label_reg.async_get_label_by_name(HOMEX_LABEL)
+        if homex_label is None:
+            homex_label = label_reg.async_create(name=HOMEX_LABEL)
+        labels = {homex_label.label_id}
+
+        area_id = self.area_id
+        if area_id:
+            area = ar.async_get(self.hass).async_get_area(area_id)
+            if area is not None:
+                labels |= set(area.labels)
+
+        updated = 0
+        for entity_id in self.managed_entity_ids():
+            if ent_reg.async_get(entity_id) is None:
+                continue
+            ent_reg.async_update_entity(entity_id, area_id=area_id, labels=labels)
+            updated += 1
+        _LOGGER.debug(
+            "[%s] synced %d entities to area=%s with %d label(s)",
+            self.room_id, updated, area_id, len(labels),
+        )
+        return updated
 
     @callback
     def _toggle_action(self, run_variables=None, context: Context | None = None) -> None:

@@ -50,7 +50,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "47"
+PANEL_VERSION = "48"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -75,6 +75,7 @@ async def async_register_homex_panel(hass: HomeAssistant) -> None:
         ws_room_create,
         ws_room_update,
         ws_room_delete,
+        ws_room_sync_labels,
         ws_group_add,
         ws_group_update,
         ws_group_delete,
@@ -564,6 +565,30 @@ async def ws_room_update(hass: HomeAssistant, connection, msg) -> None:
 
     _save_room(hass, hub, sub, room)
     connection.send_result(msg["id"], {"ok": True})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/room/sync_labels",
+        vol.Required("entry_id"): str,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_room_sync_labels(hass: HomeAssistant, connection, msg) -> None:
+    """Re-assign the room's entities to its HA area and reset their labels
+    ({Homex} ∪ the area's labels). Uses the live controller when available."""
+    hub = _hub_entry(hass)
+    sub = _find_subentry(hub, msg["entry_id"]) if hub else None
+    if hub is None or sub is None:
+        connection.send_error(msg["id"], "not_found", "Unknown room")
+        return
+    live = hass.data.get(DOMAIN, {}).get(HUB_DATA)
+    controller = (
+        live.controllers.get(msg["entry_id"]) if live else None
+    ) or _controller(hass, hub, dict(sub.data))
+    updated = controller.async_sync_labels()
+    connection.send_result(msg["id"], {"ok": True, "updated": updated})
 
 
 @websocket_api.websocket_command(

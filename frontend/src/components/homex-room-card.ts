@@ -18,6 +18,7 @@ import {
   errorMessage,
   reorderScenes,
   sceneNext,
+  syncLabels,
 } from "../api";
 import { sharedStyles } from "../lib/styles";
 import "./homex-unit-controls";
@@ -41,6 +42,7 @@ export class HomexRoomCard extends LitElement {
   @state() private _renameScene: Scene | null = null;
   @state() private _deleteScenes = true;
   @state() private _deleting = false;
+  @state() private _syncing = false;
 
   static styles = [
     sharedStyles,
@@ -357,6 +359,19 @@ export class HomexRoomCard extends LitElement {
     }
   };
 
+  private _syncLabels = async () => {
+    this._menuOpen = false;
+    this._syncing = true;
+    try {
+      const res = await syncLabels(this.hass, this.room.entry_id);
+      alert(`Labels synchronisés : ${res.updated} entité(s) mise(s) à jour.`);
+    } catch (err) {
+      alert("Erreur Homex : " + errorMessage(err));
+    } finally {
+      this._syncing = false;
+    }
+  };
+
   private _openHa(scene: Scene) {
     window.open(`/config/scene/edit/${scene.config_id}`, "_blank", "noopener");
   }
@@ -509,6 +524,9 @@ export class HomexRoomCard extends LitElement {
                 </button>
                 <button @click=${() => this._pick("addgroup")}>
                   ＋ Ajouter un groupe
+                </button>
+                <button ?disabled=${this._syncing} @click=${this._syncLabels}>
+                  🏷 ${this._syncing ? "Synchronisation…" : "Synchroniser les labels"}
                 </button>
                 <div class="sep"></div>
                 <button class="danger-item" @click=${this._delete}>
