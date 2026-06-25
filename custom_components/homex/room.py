@@ -876,7 +876,7 @@ class RoomController:
         return changed
 
     def _pretty_targets(self) -> dict[str, str]:
-        """Room scene id -> pretty display name (groups keep technical names)."""
+        """Scene id -> pretty display name (room + group scenes)."""
         targets = {
             f"homex_{self.room_id}_turn_on": self._pretty_name("turn_on"),
             f"homex_{self.room_id}_turn_off": self._pretty_name("turn_off"),
@@ -884,6 +884,16 @@ class RoomController:
         for scene in self.extra_scenes:
             targets[self.extra_scene_id(scene["key"])] = self._pretty_name(
                 scene["key"], scene.get("name")
+            )
+        # Group scenes: HX - {room} - {group} - on / - off.
+        for unit in self.units:
+            if unit.is_room:
+                continue
+            targets[f"homex_{unit.slug}_turn_on"] = (
+                f"HX - {self.room_name} - {unit.name} - on"
+            )
+            targets[f"homex_{unit.slug}_turn_off"] = (
+                f"HX - {self.room_name} - {unit.name} - off"
             )
         return targets
 
