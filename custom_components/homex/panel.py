@@ -52,7 +52,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "52"
+PANEL_VERSION = "54"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -611,7 +611,10 @@ async def ws_room_sync_labels(hass: HomeAssistant, connection, msg) -> None:
         live.controllers.get(msg["entry_id"]) if live else None
     ) or _controller(hass, hub, dict(sub.data))
     updated = controller.async_sync_labels()
-    connection.send_result(msg["id"], {"ok": True, "updated": updated})
+    renamed = await controller.async_rename_scenes_to_convention()
+    connection.send_result(
+        msg["id"], {"ok": True, "updated": updated, "scenes_renamed": renamed}
+    )
 
 
 @websocket_api.websocket_command(

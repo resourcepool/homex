@@ -49,7 +49,7 @@ export const updateRoom = (hass: HomeAssistant, payload: RoomUpdate) =>
 export const syncLabels = (
   hass: HomeAssistant,
   entry_id: string
-): Promise<{ ok: boolean; updated: number }> =>
+): Promise<{ ok: boolean; updated: number; scenes_renamed: number }> =>
   hass.callWS({ type: "homex/room/sync_labels", entry_id });
 
 export const dimRoom = (hass: HomeAssistant, entry_id: string, delta: number) =>

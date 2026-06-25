@@ -373,6 +373,11 @@ class RoomController:
         return f"switch.homex_{self.room_id}_lights_toggle"
 
     @property
+    def group_switch_ids(self) -> list[str]:
+        """Switch entity ids of the room's groups."""
+        return [u.switch_entity_id for u in self.units if not u.is_room]
+
+    @property
     def groups(self) -> list[dict]:
         return list(self._cfg(CONF_GROUPS, []) or [])
 
@@ -836,6 +841,45 @@ class RoomController:
             )
             if renamed:
                 await self.hass.services.async_call("scene", "reload", blocking=True)
+
+    async def async_rename_scenes_to_convention(self) -> int:
+        """Force every Homex scene name (room + groups) to its convention name.
+
+        Unlike the startup prettify (which only renames scenes still named like
+        their technical id), this overwrites the display name even if it was
+        customized — it is the explicit "normalize names" action behind the
+        sync button. Returns the number of scenes renamed.
+        """
+        path = self.hass.config.path(SCENES_FILE)
+        lock = self.hass.data[DOMAIN][SCENES_LOCK]
+        targets = self._pretty_targets()
+        async with lock:
+            renamed = await self.hass.async_add_executor_job(
+                self._force_prettify_scenes, path, targets
+            )
+            if renamed:
+                await self.hass.services.async_call("scene", "reload", blocking=True)
+        return renamed
+
+    @staticmethod
+    def _force_prettify_scenes(path: str, pretty: dict[str, str]) -> int:
+        """Set the convention name for each known scene, even if customized."""
+        if not os.path.exists(path):
+            return 0
+        scenes = load_yaml(path)
+        if not isinstance(scenes, list):
+            return 0
+        renamed = 0
+        for scene in scenes:
+            if not isinstance(scene, dict):
+                continue
+            scene_id = scene.get("id")
+            if scene_id in pretty and scene.get("name") != pretty[scene_id]:
+                scene["name"] = pretty[scene_id]
+                renamed += 1
+        if renamed:
+            save_yaml(path, scenes)
+        return renamed
 
     def _seed_scenes(self, path: str) -> bool:
         """Append missing scenes with technical id == name. Runs in executor."""

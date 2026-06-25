@@ -6,10 +6,11 @@ import { errorMessage, fetchRooms } from "./api";
 import { loadHaComponents } from "./lib/ha-elements";
 import "./components/homex-room-card";
 import "./components/homex-room-dialog";
+import "./components/homex-export-dialog";
 
 // Bump together with PANEL_VERSION in panel.py. Shown in the header so you can
 // confirm a full page reload picked up the latest build.
-const BUILD = "52";
+const BUILD = "54";
 
 /** Homex sidebar panel: lists rooms and orchestrates loading / reloading. */
 @customElement("homex-panel")
@@ -22,6 +23,7 @@ export class HomexPanel extends LitElement {
   @state() private _rooms: Room[] | null = null;
   @state() private _error: string | null = null;
   @state() private _createOpen = false;
+  @state() private _exportOpen = false;
   // entry_id of the single expanded room (accordion), persisted in localStorage.
   @state() private _expanded: string | null =
     localStorage.getItem("homex_expanded") || null;
@@ -67,6 +69,10 @@ export class HomexPanel extends LitElement {
     button.primary {
       background: var(--primary-color);
       color: var(--text-primary-color, #fff);
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: default;
     }
     .floor-header {
       display: flex;
@@ -196,6 +202,12 @@ export class HomexPanel extends LitElement {
           <h1>Homex <span class="ver">v${BUILD}</span></h1>
           <div class="header-actions">
             <button @click=${this._reload}>Rafraîchir</button>
+            <button
+              ?disabled=${!this._rooms?.length}
+              @click=${() => (this._exportOpen = true)}
+            >
+              ⬇ Exporter
+            </button>
             <button class="primary" @click=${() => (this._createOpen = true)}>
               ＋ Nouvelle pièce
             </button>
@@ -209,6 +221,11 @@ export class HomexPanel extends LitElement {
         .open=${this._createOpen}
         @dialog-closed=${() => (this._createOpen = false)}
       ></homex-room-dialog>
+      <homex-export-dialog
+        .rooms=${this._rooms || []}
+        .open=${this._exportOpen}
+        @dialog-closed=${() => (this._exportOpen = false)}
+      ></homex-export-dialog>
     `;
   }
 }

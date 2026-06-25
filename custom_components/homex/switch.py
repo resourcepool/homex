@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import Event, HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from .const import DOMAIN, HUB_DATA
@@ -51,6 +52,43 @@ class RoomSwitch(SwitchEntity, RestoreEntity):
             self._attr_is_on = last_state.state == "on"
         if self._unit.is_room:
             self._unit._controller.bind_room_switch(self)
+            # A room is "on" as soon as any of its parts is on — its own member
+            # devices or any of its groups. Track them and reflect that state
+            # WITHOUT applying a room scene (the passive on must not trigger one).
+            watched = [
+                *self._unit.devices,
+                *self._unit._controller.group_switch_ids,
+            ]
+            if watched:
+                self.async_on_remove(
+                    async_track_state_change_event(
+                        self.hass, watched, self._on_part_changed
+                    )
+                )
+            self._recompute_room_on()
+
+    def _any_part_on(self) -> bool:
+        ids = [*self._unit.devices, *self._unit._controller.group_switch_ids]
+        for entity_id in ids:
+            state = self.hass.states.get(entity_id)
+            if state is not None and state.state == "on":
+                return True
+        return False
+
+    @callback
+    def _on_part_changed(self, event: Event) -> None:
+        self._recompute_room_on()
+
+    @callback
+    def _recompute_room_on(self) -> None:
+        """Derive on/off from the room's parts (no scene side effect)."""
+        on = self._any_part_on()
+        if on == self._attr_is_on:
+            return
+        self._attr_is_on = on
+        if not on:
+            self._active_scene = None  # nothing on → no active scene
+        self.async_write_ha_state()
 
     @callback
     def set_is_on(self, value: bool) -> None:

@@ -367,7 +367,10 @@ export class HomexRoomCard extends LitElement {
     this._syncing = true;
     try {
       const res = await syncLabels(this.hass, this.room.entry_id);
-      alert(`Labels synchronisés : ${res.updated} entité(s) mise(s) à jour.`);
+      alert(
+        `Synchronisé : ${res.updated} entité(s) (area + labels), ` +
+          `${res.scenes_renamed} scène(s) renommée(s).`
+      );
     } catch (err) {
       alert("Erreur Homex : " + errorMessage(err));
     } finally {
