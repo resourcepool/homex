@@ -644,10 +644,14 @@ class RoomController:
         # Ignore toggles caused by Homex's own scene/switch actions.
         if self.is_self_context(context):
             return
+        # The room is "on" as soon as a group is on, but the toggle acts on the
+        # room's own scene: turn off only when a room scene is active, otherwise
+        # turn on (apply the scene) — never toggle a running group off.
+        service = "turn_off" if self._active_scene_key is not None else "turn_on"
         self.hass.async_create_task(
             self.hass.services.async_call(
                 "switch",
-                "toggle",
+                service,
                 {"entity_id": self.room_switch_entity_id},
                 context=self.new_context(),
             )

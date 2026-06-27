@@ -706,7 +706,16 @@ let j = class extends x {
     return this.hass.states[t]?.state === "on";
   }
   _toggle(t) {
-    t.stopPropagation(), this.hass.callService("switch", "toggle", { entity_id: this.unit.switch });
+    t.stopPropagation();
+    const e = this.unit;
+    if (e.group_id) {
+      this.hass.callService("switch", "toggle", { entity_id: e.switch });
+      return;
+    }
+    const s = this.hass.states[e.switch]?.attributes?.active_scene != null;
+    this.hass.callService("switch", s ? "turn_off" : "turn_on", {
+      entity_id: e.switch
+    });
   }
   render() {
     const t = this.unit, e = this._isOn(t.switch);
@@ -3320,7 +3329,7 @@ var Us = Object.defineProperty, Rs = Object.getOwnPropertyDescriptor, M = (t, e,
     (n = t[o]) && (i = (r ? n(e, s, i) : n(i)) || i);
   return r && i && Us(e, s, i), i;
 };
-const Is = "54";
+const Is = "55";
 let E = class extends x {
   constructor() {
     super(...arguments), this.narrow = !1, this._rooms = null, this._error = null, this._createOpen = !1, this._exportOpen = !1, this._expanded = localStorage.getItem("homex_expanded") || null, this._loaded = !1, this._onToggleExpand = (t) => {

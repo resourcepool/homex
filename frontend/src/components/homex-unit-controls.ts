@@ -105,7 +105,19 @@ export class HomexUnitControls extends LitElement {
   }
   private _toggle(e: Event) {
     e.stopPropagation(); // don't trigger card expand/collapse
-    this.hass.callService("switch", "toggle", { entity_id: this.unit.switch });
+    const u = this.unit;
+    if (u.group_id) {
+      this.hass.callService("switch", "toggle", { entity_id: u.switch });
+      return;
+    }
+    // A room shows "on" as soon as one of its groups is on. Pressing it should
+    // turn the room ON (apply its scene) — never toggle a running group off.
+    // Only turn off when a room scene is actually active.
+    const sceneActive =
+      this.hass.states[u.switch]?.attributes?.active_scene != null;
+    this.hass.callService("switch", sceneActive ? "turn_off" : "turn_on", {
+      entity_id: u.switch,
+    });
   }
 
   render() {
