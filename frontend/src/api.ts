@@ -80,6 +80,31 @@ export interface RoomUpdate {
   scene_strategy?: "recall_first" | "recall_last";
 }
 
+export interface ShutterGroupPayload {
+  entry_id: string;
+  group_id?: string;
+  name?: string;
+  devices?: string[];
+  toggle_triggers?: TriggerSpec[];
+  open_triggers?: TriggerSpec[];
+  close_triggers?: TriggerSpec[];
+  stop_triggers?: TriggerSpec[];
+}
+export const addShutterGroup = (
+  hass: HomeAssistant,
+  entry_id: string,
+  name: string
+) => hass.callWS({ type: "homex/shutter_group/add", entry_id, name });
+export const updateShutterGroup = (
+  hass: HomeAssistant,
+  payload: ShutterGroupPayload
+) => hass.callWS({ type: "homex/shutter_group/update", ...payload });
+export const deleteShutterGroup = (
+  hass: HomeAssistant,
+  entry_id: string,
+  group_id: string
+) => hass.callWS({ type: "homex/shutter_group/delete", entry_id, group_id });
+
 export interface DeviceTrigger {
   label: string;
   trigger: TriggerSpec; // full HA device-trigger config, stored verbatim

@@ -240,6 +240,12 @@ export class HomexRoomDialog extends LitElement {
           "Switches",
           "Le module Switches gère les interrupteurs physiques de la pièce."
         )}
+        ${this._moduleRow(
+          "shutters",
+          "🪟",
+          "Shutters",
+          "Le module Shutters gère les volets roulants de la pièce."
+        )}
 
         ${this._hasModule("lights")
           ? html`

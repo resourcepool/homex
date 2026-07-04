@@ -83,13 +83,17 @@ from .const import (
     CONF_DIM,
     CONF_MODULES,
     CONF_SCENES,
+    CONF_SHUTTER_GROUPS,
     CONF_SWITCHES,
+    DEFAULT_SHUTTER_GROUP,
+    DEFAULT_SHUTTER_GROUP_NAME,
     CONF_TRIGGERS,
     DEFAULT_MODULES,
     DIM_STEP,
     DOMAIN,
     HOMEX_LABEL,
     MODULE_LIGHTS,
+    MODULE_SHUTTERS,
     SCENES_FILE,
     SCENES_LOCK,
     STRATEGY_RECALL_FIRST,
@@ -441,6 +445,81 @@ class RoomController:
         return MODULE_LIGHTS in self.modules
 
     @property
+    def shutters_enabled(self) -> bool:
+        return MODULE_SHUTTERS in self.modules
+
+    @property
+    def shutter_groups(self) -> list[dict]:
+        """Shutter groups, always including the default 'Général' group first."""
+        groups = [dict(g) for g in (self._cfg(CONF_SHUTTER_GROUPS, []) or [])]
+        if not any(g.get("id") == DEFAULT_SHUTTER_GROUP for g in groups):
+            groups.insert(
+                0,
+                {
+                    "id": DEFAULT_SHUTTER_GROUP,
+                    "name": DEFAULT_SHUTTER_GROUP_NAME,
+                    "devices": [],
+                },
+            )
+        return groups
+
+    def _shutter_group(self, group_id: str) -> dict | None:
+        return next(
+            (g for g in self.shutter_groups if g.get("id") == group_id), None
+        )
+
+    async def async_shutter(self, group_id: str, service: str) -> None:
+        """Call a cover service on one shutter group's covers.
+
+        Driven by the group's triggers and by Switches-module actions.
+        """
+        group = self._shutter_group(group_id)
+        covers = list((group or {}).get("devices", []) or [])
+        if not covers:
+            return
+        await self.hass.services.async_call(
+            "cover",
+            service,
+            {"entity_id": covers},
+            blocking=False,
+            context=self.new_context(),
+        )
+
+    def _make_shutter_handler(self, group_id: str, service: str):
+        @callback
+        def handler(run_variables=None, context: Context | None = None) -> None:
+            if self.is_self_context(context):
+                return
+            self.hass.async_create_task(self.async_shutter(group_id, service))
+
+        return handler
+
+    async def _start_shutter_triggers(self) -> None:
+        """Wire each shutter group's triggers (toggle / open / close / stop)."""
+        for group in self.shutter_groups:
+            gid = group.get("id")
+            for key, service in (
+                ("toggle_triggers", "toggle"),
+                ("open_triggers", "open_cover"),
+                ("close_triggers", "close_cover"),
+                ("stop_triggers", "stop_cover"),
+            ):
+                specs = normalize_trigger_specs(group.get(key))
+                configs = await self.build_trigger_configs(specs)
+                if not configs:
+                    continue
+                unsub = await async_initialize_triggers(
+                    self.hass,
+                    configs,
+                    self._make_shutter_handler(gid, service),
+                    DOMAIN,
+                    f"homex {self.room_id} shutter:{gid}:{service}",
+                    _LOGGER.log,
+                )
+                if unsub:
+                    self._room_unsubs.append(unsub)
+
+    @property
     def devices(self) -> list[str]:
         return list(self._cfg(CONF_DEVICES, []) or [])
 
@@ -611,6 +690,10 @@ class RoomController:
             await self._start_scene_triggers()
             # Dimmer triggers: brighten / dim the room's member lights.
             await self._start_dim_triggers()
+        # Shutters module (independent of lights): each group's triggers drive
+        # its own covers (open / close / stop / toggle).
+        if self.shutters_enabled:
+            await self._start_shutter_triggers()
         # Keep entities tied to the room's HA area + labels (re-applied on every
         # reload, so changing the area or its labels propagates automatically).
         try:
@@ -886,12 +969,26 @@ class RoomController:
         """Execute a Homex action on this room (from a switch button mapping).
 
         These map onto the room's existing behaviours; they are no-ops when the
-        room has no lights module (nothing to control) — the Switches module is
-        optional and a target room may not have Lights either.
+        room lacks the relevant module — the Switches module is optional and a
+        target room may not have Lights (or Shutters) either.
         """
+        kind = (action or {}).get("kind")
+        # Shutters actions target a shutter group (independent of lights).
+        shutter_services = {
+            "shutter_toggle": "toggle",
+            "shutter_open": "open_cover",
+            "shutter_close": "close_cover",
+            "shutter_stop": "stop_cover",
+        }
+        if kind in shutter_services:
+            if self.shutters_enabled:
+                await self.async_shutter(
+                    (action or {}).get("group_id") or DEFAULT_SHUTTER_GROUP,
+                    shutter_services[kind],
+                )
+            return
         if not self.lights_enabled:
             return
-        kind = (action or {}).get("kind")
         if kind == "toggle":
             service = "turn_off" if self._active_scene_key is not None else "turn_on"
             await self.hass.services.async_call(

@@ -48,6 +48,10 @@ export class HomexTriggersDialog extends LitElement {
     }
   }
 
+  private get _hasLights(): boolean {
+    return (this.room?.modules ?? []).includes("lights");
+  }
+
   private _close() {
     this.dispatchEvent(new CustomEvent("dialog-closed"));
   }
@@ -77,67 +81,71 @@ export class HomexTriggersDialog extends LitElement {
         heading="Déclencheurs de la pièce"
         @dialog-closed=${this._close}
       >
-        <div class="group">
-          <div class="section">Triggers toggle (allumer / éteindre)</div>
-          <p class="hint">
-            Chaque déclenchement permute l'état on/off de la pièce.
-          </p>
-          <homex-trigger-selector
-            .hass=${this.hass}
-            .value=${this._toggle}
-            @value-changed=${(e: CustomEvent) => (this._toggle = e.detail.value)}
-          ></homex-trigger-selector>
-          <homex-managed-triggers
-            .triggers=${this.room?.switch_triggers?.toggle ?? []}
-          ></homex-managed-triggers>
-        </div>
+        ${this._hasLights
+          ? html`
+              <div class="group">
+                <div class="section">Triggers toggle (allumer / éteindre)</div>
+                <p class="hint">
+                  Chaque déclenchement permute l'état on/off de la pièce.
+                </p>
+                <homex-trigger-selector
+                  .hass=${this.hass}
+                  .value=${this._toggle}
+                  @value-changed=${(e: CustomEvent) => (this._toggle = e.detail.value)}
+                ></homex-trigger-selector>
+                <homex-managed-triggers
+                  .triggers=${this.room?.switch_triggers?.toggle ?? []}
+                ></homex-managed-triggers>
+              </div>
 
-        <div class="group">
-          <div class="section">Triggers scene switching</div>
-          <p class="hint">Chaque déclenchement passe à la scène suivante (cycle).</p>
-          <homex-trigger-selector
-            .hass=${this.hass}
-            .value=${this._scene}
-            @value-changed=${(e: CustomEvent) => (this._scene = e.detail.value)}
-          ></homex-trigger-selector>
-          <homex-managed-triggers
-            .triggers=${this.room?.switch_triggers?.scene_next ?? []}
-          ></homex-managed-triggers>
-          <p class="hint">
-            La stratégie (repart de zéro / dernière utilisée) se règle dans
-            « Modifier la pièce ».
-          </p>
-        </div>
+              <div class="group">
+                <div class="section">Triggers scene switching</div>
+                <p class="hint">Chaque déclenchement passe à la scène suivante (cycle).</p>
+                <homex-trigger-selector
+                  .hass=${this.hass}
+                  .value=${this._scene}
+                  @value-changed=${(e: CustomEvent) => (this._scene = e.detail.value)}
+                ></homex-trigger-selector>
+                <homex-managed-triggers
+                  .triggers=${this.room?.switch_triggers?.scene_next ?? []}
+                ></homex-managed-triggers>
+                <p class="hint">
+                  La stratégie (repart de zéro / dernière utilisée) se règle dans
+                  « Modifier la pièce ».
+                </p>
+              </div>
 
-        <div class="group">
-          <div class="section">Dimmer + (monter la luminosité)</div>
-          <p class="hint">
-            Chaque déclenchement ajoute 20 à la luminosité des lumières de la pièce.
-          </p>
-          <homex-trigger-selector
-            .hass=${this.hass}
-            .value=${this._dimUp}
-            @value-changed=${(e: CustomEvent) => (this._dimUp = e.detail.value)}
-          ></homex-trigger-selector>
-          <homex-managed-triggers
-            .triggers=${this.room?.switch_triggers?.dim_up ?? []}
-          ></homex-managed-triggers>
-        </div>
+              <div class="group">
+                <div class="section">Dimmer + (monter la luminosité)</div>
+                <p class="hint">
+                  Chaque déclenchement ajoute 20 à la luminosité des lumières de la pièce.
+                </p>
+                <homex-trigger-selector
+                  .hass=${this.hass}
+                  .value=${this._dimUp}
+                  @value-changed=${(e: CustomEvent) => (this._dimUp = e.detail.value)}
+                ></homex-trigger-selector>
+                <homex-managed-triggers
+                  .triggers=${this.room?.switch_triggers?.dim_up ?? []}
+                ></homex-managed-triggers>
+              </div>
 
-        <div class="group">
-          <div class="section">Dimmer − (baisser la luminosité)</div>
-          <p class="hint">
-            Chaque déclenchement retire 20 à la luminosité des lumières de la pièce.
-          </p>
-          <homex-trigger-selector
-            .hass=${this.hass}
-            .value=${this._dimDown}
-            @value-changed=${(e: CustomEvent) => (this._dimDown = e.detail.value)}
-          ></homex-trigger-selector>
-          <homex-managed-triggers
-            .triggers=${this.room?.switch_triggers?.dim_down ?? []}
-          ></homex-managed-triggers>
-        </div>
+              <div class="group">
+                <div class="section">Dimmer − (baisser la luminosité)</div>
+                <p class="hint">
+                  Chaque déclenchement retire 20 à la luminosité des lumières de la pièce.
+                </p>
+                <homex-trigger-selector
+                  .hass=${this.hass}
+                  .value=${this._dimDown}
+                  @value-changed=${(e: CustomEvent) => (this._dimDown = e.detail.value)}
+                ></homex-trigger-selector>
+                <homex-managed-triggers
+                  .triggers=${this.room?.switch_triggers?.dim_down ?? []}
+                ></homex-managed-triggers>
+              </div>
+            `
+          : ""}
 
         <span slot="actions">
           <button @click=${this._close}>Annuler</button>

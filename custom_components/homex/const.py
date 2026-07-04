@@ -19,7 +19,16 @@ CONF_DEVICES = "devices"
 CONF_MODULES = "modules"
 MODULE_LIGHTS = "lights"
 MODULE_SWITCHES = "switches"
+MODULE_SHUTTERS = "shutters"
 DEFAULT_MODULES = [MODULE_LIGHTS]
+
+# Shutters module: roller shutters organized in groups. Each shutter group is a
+# dict {id, name, devices:[cover ids], toggle/open/close/stop _triggers}. A
+# default "Général" group always exists. Groups are also drivable via
+# Switches-module actions.
+CONF_SHUTTER_GROUPS = "shutter_groups"
+DEFAULT_SHUTTER_GROUP = "general"
+DEFAULT_SHUTTER_GROUP_NAME = "Général"
 
 # Switches module: physical controllers (interrupteurs) declared on a room. Each
 # switch is a dict {id, name, buttons, dim, rooms, triggers}. Triggers map a slot

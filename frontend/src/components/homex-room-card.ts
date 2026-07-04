@@ -18,6 +18,7 @@ import type {
   HomeAssistant,
   Room,
   Scene,
+  ShutterGroup,
   SwitchLayout,
 } from "../types";
 import { fireChanged } from "../types";
@@ -41,6 +42,7 @@ import "./homex-room-dialog";
 import "./homex-triggers-dialog";
 import "./homex-group-dialog";
 import "./homex-scene-dialog";
+import "./homex-shutter-group-dialog";
 import "./homex-switch-mapping";
 
 type DialogKind = "" | "room" | "triggers" | "addgroup" | "addscene" | "delete";
@@ -63,6 +65,8 @@ export class HomexRoomCard extends LitElement {
   @state() private _presets: DevicePreset[] = [];
   @state() private _layouts: SwitchLayout[] = [];
   @state() private _mappingSwitch: GlobalSwitch | null = null;
+  @state() private _shutterGroupOpen = false;
+  @state() private _shutterGroupEdit: ShutterGroup | null = null;
 
   static styles = [
     sharedStyles,
@@ -213,6 +217,33 @@ export class HomexRoomCard extends LitElement {
       .switch-meta {
         font-size: 12px;
         color: var(--secondary-text-color);
+      }
+      .shutter-group {
+        border: 1px solid var(--divider-color, #e0e0e0);
+        border-radius: 10px;
+        padding: 8px 12px;
+        margin-top: 10px;
+      }
+      .shutter-group-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .cfg-btn {
+        min-height: 0;
+        padding: 4px 10px;
+        font-size: 16px;
+        border-radius: 8px;
+        background: var(--secondary-background-color, #f0f0f0);
+      }
+      .shutter-cover {
+        font-size: 14px;
+        padding: 4px 0 4px 6px;
+        color: var(--primary-text-color);
+      }
+      .shutter-cover.empty {
+        color: var(--secondary-text-color);
+        font-size: 13px;
       }
       .stats {
         display: flex;
@@ -575,6 +606,7 @@ export class HomexRoomCard extends LitElement {
     const hasExtraScenes = r.scenes.some((s) => s.removable);
     const lightsOn = r.modules?.includes("lights") ?? true;
     const switchesOn = r.modules?.includes("switches") ?? false;
+    const shuttersOn = r.modules?.includes("shutters") ?? false;
     const hasDim = !!(r.dim_up_triggers?.length || r.dim_down_triggers?.length);
     return html`
       <ha-card>
@@ -680,8 +712,25 @@ export class HomexRoomCard extends LitElement {
               </div>
             `
           : ""}
+        ${shuttersOn
+          ? html`
+              <div class="module-title">Shutters</div>
+              <div class="stats">
+                <span class="stat">📦 ${(r.shutter_groups ?? []).length} groupe(s)</span>
+                <span class="stat">🪟 ${this._shutterCount(r)} volet(s)</span>
+              </div>
+            `
+          : ""}
         ${this.expanded
-          ? this._renderBody(r, activeKey, orderable, pinned, lightsOn, switchesOn)
+          ? this._renderBody(
+              r,
+              activeKey,
+              orderable,
+              pinned,
+              lightsOn,
+              switchesOn,
+              shuttersOn
+            )
           : ""}
       </ha-card>
 
@@ -695,11 +744,13 @@ export class HomexRoomCard extends LitElement {
     orderable: Scene[],
     pinned: Scene[],
     lightsOn: boolean,
-    switchesOn: boolean
+    switchesOn: boolean,
+    shuttersOn: boolean
   ) {
     const tabs: { key: string; label: string }[] = [];
     if (lightsOn) tabs.push({ key: "lights", label: "Lights" });
     if (switchesOn) tabs.push({ key: "switches", label: "Switches" });
+    if (shuttersOn) tabs.push({ key: "shutters", label: "Shutters" });
     if (!tabs.length) {
       return html`<div class="empty-body">Aucun module actif sur cette pièce.</div>`;
     }
@@ -719,7 +770,9 @@ export class HomexRoomCard extends LitElement {
       <div class="tab-panel">
         ${active === "lights"
           ? this._renderLightsTab(r, activeKey, orderable, pinned)
-          : this._renderSwitchesTab(r)}
+          : active === "switches"
+            ? this._renderSwitchesTab(r)
+            : this._renderShuttersTab(r)}
       </div>
     `;
   }
@@ -841,6 +894,54 @@ export class HomexRoomCard extends LitElement {
     `;
   }
 
+  private _openShutterGroup(g: ShutterGroup | null) {
+    this._shutterGroupEdit = g;
+    this._shutterGroupOpen = true;
+  }
+
+  private _renderShuttersTab(r: Room) {
+    const groups = r.shutter_groups ?? [];
+    return html`
+      <div class="section-row">
+        <span class="section">Groupes de volets</span>
+        <button @click=${() => this._openShutterGroup(null)}>＋ Groupe</button>
+      </div>
+      ${groups.map(
+        (g) => html`<div class="shutter-group">
+          <div class="shutter-group-head">
+            <span class="switch-name">📦 ${g.name}</span>
+            <button
+              class="cfg-btn"
+              title="Configurer le groupe"
+              @click=${() => this._openShutterGroup(g)}
+            >
+              ⚙
+            </button>
+          </div>
+          ${g.devices.length
+            ? g.devices.map(
+                (v) => html`<div class="shutter-cover">
+                  🪟 ${this._entityName(v)}
+                </div>`
+              )
+            : html`<div class="shutter-cover empty">Aucun volet dans ce groupe.</div>`}
+        </div>`
+      )}
+    `;
+  }
+
+  private _entityName(entityId: string): string {
+    return (
+      this.hass.states[entityId]?.attributes?.friendly_name || entityId
+    );
+  }
+  private _shutterCount(r: Room): number {
+    return (r.shutter_groups ?? []).reduce(
+      (n, g) => n + (g.devices?.length ?? 0),
+      0
+    );
+  }
+
   private _renderDialogs(r: Room) {
     return html`
       <homex-room-dialog
@@ -876,6 +977,13 @@ export class HomexRoomCard extends LitElement {
         .open=${this._renameScene !== null}
         @dialog-closed=${() => (this._renameScene = null)}
       ></homex-scene-dialog>
+      <homex-shutter-group-dialog
+        .hass=${this.hass}
+        .room=${r}
+        .group=${this._shutterGroupEdit}
+        .open=${this._shutterGroupOpen}
+        @dialog-closed=${() => (this._shutterGroupOpen = false)}
+      ></homex-shutter-group-dialog>
       ${this._mappingSwitch
         ? html`<homex-switch-mapping
             .hass=${this.hass}

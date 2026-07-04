@@ -36,9 +36,12 @@ from .const import (
     CONF_SCENE_STRATEGY,
     CONF_SCENE_TRIGGERS,
     CONF_SCENES,
+    CONF_SHUTTER_GROUPS,
     CONF_SWITCHES,
     CONF_TRIGGERS,
     DEFAULT_MODULES,
+    DEFAULT_SHUTTER_GROUP,
+    DEFAULT_SHUTTER_GROUP_NAME,
     DOMAIN,
     HUB_DATA,
     MODULE_LIGHTS,
@@ -58,7 +61,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "88"
+PANEL_VERSION = "91"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -153,6 +156,9 @@ async def async_register_homex_panel(hass: HomeAssistant) -> None:
         ws_group_add,
         ws_group_update,
         ws_group_delete,
+        ws_shutter_group_add,
+        ws_shutter_group_update,
+        ws_shutter_group_delete,
         ws_switch_add,
         ws_switch_update,
         ws_switch_delete,
@@ -220,6 +226,21 @@ def _serialize_unit(unit) -> dict:
         "light": unit.light_entity_id,
         "scene_on": unit.scene_on_entity_id,
         "scene_off": unit.scene_off_entity_id,
+    }
+
+
+def _serialize_shutter_group(g: dict) -> dict:
+    """A shutter group for the panel (normalized triggers + removable flag)."""
+    gid = g.get("id")
+    return {
+        "id": gid,
+        "name": g.get("name") or gid,
+        "devices": list(g.get("devices", []) or []),
+        "toggle_triggers": normalize_trigger_specs(g.get("toggle_triggers")),
+        "open_triggers": normalize_trigger_specs(g.get("open_triggers")),
+        "close_triggers": normalize_trigger_specs(g.get("close_triggers")),
+        "stop_triggers": normalize_trigger_specs(g.get("stop_triggers")),
+        "removable": gid != DEFAULT_SHUTTER_GROUP,
     }
 
 
@@ -348,6 +369,9 @@ async def ws_list_rooms(hass: HomeAssistant, connection, msg) -> None:
                 "scene_strategy": controller.scene_strategy,
                 "scenes": _room_scenes(controller),
                 "switches": controller.switches,
+                "shutter_groups": [
+                    _serialize_shutter_group(g) for g in controller.shutter_groups
+                ],
                 "switch_triggers": await _switch_triggers_for_room(
                     hass, controller.room_id
                 ),
@@ -942,6 +966,132 @@ async def ws_group_delete(hass: HomeAssistant, connection, msg) -> None:
 
     room[CONF_GROUPS] = [
         g for g in room.get(CONF_GROUPS, []) if g[CONF_GROUP_ID] != group_id
+    ]
+    _save_room(hass, hub, sub, room)
+    connection.send_result(msg["id"], {"ok": True})
+
+
+# -- Shutter groups (Shutters module) --------------------------------------
+
+
+def _room_for_msg(hass, connection, msg):
+    """(hub, subentry, room-dict) for a room WS message, or (None, None, None)."""
+    hub = _hub_entry(hass)
+    sub = _find_subentry(hub, msg["entry_id"]) if hub else None
+    if hub is None or sub is None:
+        connection.send_error(msg["id"], "not_found", "Unknown room")
+        return None, None, None
+    return hub, sub, dict(sub.data)
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/shutter_group/add",
+        vol.Required("entry_id"): str,
+        vol.Required("name"): str,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_shutter_group_add(hass: HomeAssistant, connection, msg) -> None:
+    hub, sub, room = _room_for_msg(hass, connection, msg)
+    if hub is None:
+        return
+    groups = [dict(g) for g in room.get(CONF_SHUTTER_GROUPS, [])]
+    taken = {g.get("id") for g in groups} | {DEFAULT_SHUTTER_GROUP}
+    base = _slugify(msg["name"]) or "groupe"
+    gid, i = base, 2
+    while gid in taken:
+        gid, i = f"{base}_{i}", i + 1
+    groups.append(
+        {
+            "id": gid,
+            "name": msg["name"],
+            "devices": [],
+            "toggle_triggers": [],
+            "open_triggers": [],
+            "close_triggers": [],
+            "stop_triggers": [],
+        }
+    )
+    room[CONF_SHUTTER_GROUPS] = groups
+    _save_room(hass, hub, sub, room)
+    connection.send_result(msg["id"], {"ok": True, "group_id": gid})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/shutter_group/update",
+        vol.Required("entry_id"): str,
+        vol.Required("group_id"): str,
+        vol.Optional("name"): str,
+        vol.Optional("devices"): [str],
+        vol.Optional("toggle_triggers"): list,
+        vol.Optional("open_triggers"): list,
+        vol.Optional("close_triggers"): list,
+        vol.Optional("stop_triggers"): list,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_shutter_group_update(hass: HomeAssistant, connection, msg) -> None:
+    hub, sub, room = _room_for_msg(hass, connection, msg)
+    if hub is None:
+        return
+    gid = msg["group_id"]
+    groups = [dict(g) for g in room.get(CONF_SHUTTER_GROUPS, [])]
+    group = next((g for g in groups if g.get("id") == gid), None)
+    if group is None:
+        # Upsert (e.g. first edit of the synthesized default 'Général' group).
+        group = {
+            "id": gid,
+            "name": (
+                DEFAULT_SHUTTER_GROUP_NAME
+                if gid == DEFAULT_SHUTTER_GROUP
+                else gid
+            ),
+            "devices": [],
+        }
+        groups.append(group)
+    if "name" in msg:
+        group["name"] = msg["name"]
+    if "devices" in msg:
+        group["devices"] = msg["devices"]
+    for field in (
+        "toggle_triggers",
+        "open_triggers",
+        "close_triggers",
+        "stop_triggers",
+    ):
+        if field in msg:
+            group[field] = msg[field]
+    room[CONF_SHUTTER_GROUPS] = groups
+    _save_room(hass, hub, sub, room)
+    connection.send_result(msg["id"], {"ok": True})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/shutter_group/delete",
+        vol.Required("entry_id"): str,
+        vol.Required("group_id"): str,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_shutter_group_delete(hass: HomeAssistant, connection, msg) -> None:
+    hub, sub, room = _room_for_msg(hass, connection, msg)
+    if hub is None:
+        return
+    if msg["group_id"] == DEFAULT_SHUTTER_GROUP:
+        connection.send_error(
+            msg["id"], "not_removable", "Le groupe par défaut ne peut pas être supprimé."
+        )
+        return
+    room[CONF_SHUTTER_GROUPS] = [
+        g
+        for g in room.get(CONF_SHUTTER_GROUPS, [])
+        if g.get("id") != msg["group_id"]
     ]
     _save_room(hass, hub, sub, room)
     connection.send_result(msg["id"], {"ok": True})

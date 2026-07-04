@@ -25,7 +25,10 @@ interface ActionItem {
 }
 
 // Homex modules that expose assignable actions (extensible).
-const MODULE_LABELS: Record<string, string> = { lights: "💡 Lights" };
+const MODULE_LABELS: Record<string, string> = {
+  lights: "💡 Lights",
+  shutters: "🪟 Shutters",
+};
 
 const TAP_LABELS: Record<TapMode, string> = {
   single: "Simple",
@@ -36,6 +39,8 @@ const TAP_LABELS: Record<TapMode, string> = {
 function actionKey(a: HomexAction): string {
   if (a.kind === "group") return `group:${a.group_id}`;
   if (a.kind === "scene") return `scene:${a.scene_key}`;
+  if (a.kind.startsWith("shutter_"))
+    return `${a.kind}:${(a as { group_id: string }).group_id}`;
   return a.kind;
 }
 
@@ -343,6 +348,29 @@ export class HomexSwitchMapping extends LitElement {
             scene_key: s.key,
           })
         );
+    }
+    // Shutters-module actions — 4 per shutter group.
+    if ((room.modules ?? []).includes("shutters")) {
+      for (const g of room.shutter_groups ?? []) {
+        list.push(
+          mk("shutters", `${g.name} — Permuter`, `${g.name} ⇅`, "⇅", {
+            kind: "shutter_toggle",
+            group_id: g.id,
+          }),
+          mk("shutters", `${g.name} — Ouvrir`, `${g.name} ⬆`, "⬆", {
+            kind: "shutter_open",
+            group_id: g.id,
+          }),
+          mk("shutters", `${g.name} — Fermer`, `${g.name} ⬇`, "⬇", {
+            kind: "shutter_close",
+            group_id: g.id,
+          }),
+          mk("shutters", `${g.name} — Stop`, `${g.name} ⏹`, "⏹", {
+            kind: "shutter_stop",
+            group_id: g.id,
+          })
+        );
+      }
     }
     return list;
   }

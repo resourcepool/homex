@@ -3,6 +3,7 @@ import { customElement, property, state } from "lit/decorators.js";
 import type {
   DevicePreset,
   HomeAssistant,
+  SwitchDevice,
   SwitchLayout,
   SwitchModel,
   TapMode,
@@ -12,6 +13,7 @@ import {
   deletePreset,
   errorMessage,
   fetchDeviceTriggers,
+  fetchSwitchDevices,
   fetchSwitchModels,
   savePreset,
 } from "../api";
@@ -30,9 +32,10 @@ export class HomexPresetEditor extends LitElement {
 
   @state() private _name = "";
   @state() private _id = "";
-  @state() private _deviceId = ""; // sample device of the selected model
+  @state() private _deviceId = ""; // reference device the actions are pulled from
   @state() private _modelKey = "";
   @state() private _models: SwitchModel[] = [];
+  @state() private _devices: SwitchDevice[] = []; // all switch-like devices
   @state() private _layoutId = "";
   @state() private _taps: Record<string, TapMode[]> = {};
   @state() private _bindings: Record<string, Record<string, string[]>> = {};
@@ -138,6 +141,7 @@ export class HomexPresetEditor extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     this._loadModels();
+    this._loadDevices();
   }
   private async _loadModels() {
     try {
@@ -145,6 +149,18 @@ export class HomexPresetEditor extends LitElement {
     } catch {
       this._models = [];
     }
+  }
+  private async _loadDevices() {
+    try {
+      this._devices = await fetchSwitchDevices(this.hass);
+    } catch {
+      this._devices = [];
+    }
+  }
+  /** Individual devices of the currently selected model, name-sorted. */
+  private _devicesForModel(): SwitchDevice[] {
+    if (!this._modelKey) return [];
+    return this._devices.filter((d) => d.model === this._modelKey);
   }
 
   willUpdate(changed: Map<string, unknown>) {
@@ -215,6 +231,8 @@ export class HomexPresetEditor extends LitElement {
   private _onModel(key: string) {
     this._modelKey = key;
     const model = this._models.find((m) => m.model === key);
+    // Default the reference device to the model's sample; the user may pick a
+    // different one below (same model can expose different actions per device).
     this._deviceId = model?.device_id ?? "";
     this._actions = [];
     // Changing model invalidates action bindings (different action set).
@@ -226,6 +244,13 @@ export class HomexPresetEditor extends LitElement {
       }
       this._loadActions();
     }
+  }
+  private _onRefDevice(deviceId: string) {
+    this._deviceId = deviceId;
+    this._actions = [];
+    // A different reference device may expose a different action set.
+    this._bindings = {};
+    if (deviceId) this._loadActions();
   }
   private _enabledModes(): TapMode[] {
     const set = new Set<TapMode>();
@@ -390,6 +415,33 @@ export class HomexPresetEditor extends LitElement {
         : html`<p class="hint">
             Aucun interrupteur détecté (appareil exposant des actions).
           </p>`}
+
+      ${this._modelKey
+        ? html`<div class="section">Appareil de référence</div>
+            <p class="hint">
+              Appareil du modèle duquel les actions sont récupérées. Un même
+              modèle peut exposer des actions différentes selon l'appareil.
+            </p>
+            ${this._devicesForModel().length
+              ? html`<select
+                  .value=${this._deviceId}
+                  @change=${(e: Event) =>
+                    this._onRefDevice((e.target as HTMLSelectElement).value)}
+                >
+                  <option value="">— Choisir un appareil —</option>
+                  ${this._devicesForModel().map(
+                    (d) => html`<option
+                      value=${d.device_id}
+                      ?selected=${d.device_id === this._deviceId}
+                    >
+                      ${d.name}
+                    </option>`
+                  )}
+                </select>`
+              : html`<p class="hint">
+                  Aucun appareil détecté pour ce modèle.
+                </p>`}`
+        : ""}
 
       <div class="section">Layout</div>
       ${this.layouts.length

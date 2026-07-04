@@ -103,7 +103,11 @@ export type HomexAction =
   | { kind: "dim_up" }
   | { kind: "dim_down" }
   | { kind: "group"; group_id: string }
-  | { kind: "scene"; scene_key: string };
+  | { kind: "scene"; scene_key: string }
+  | { kind: "shutter_toggle"; group_id: string }
+  | { kind: "shutter_open"; group_id: string }
+  | { kind: "shutter_close"; group_id: string }
+  | { kind: "shutter_stop"; group_id: string };
 
 /** A global switch (Switch Management): a name, a device, and assigned rooms.
  * Its layout/taps/actions come from the Device Preset of the device's model. */
@@ -162,6 +166,19 @@ export interface Room extends Unit {
   switches: HomexSwitch[];
   switch_triggers?: SwitchTriggers;
   groups: Group[];
+  shutter_groups?: ShutterGroup[];
+}
+
+/** A group of roller shutters (covers) in a room, with its own triggers. */
+export interface ShutterGroup {
+  id: string;
+  name: string;
+  devices: string[]; // cover entity ids
+  toggle_triggers: TriggerSpec[];
+  open_triggers: TriggerSpec[];
+  close_triggers: TriggerSpec[];
+  stop_triggers: TriggerSpec[];
+  removable: boolean; // false for the default "Général" group
 }
 
 // Bubbled by editing components after a successful mutation so the panel reloads.

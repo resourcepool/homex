@@ -11,7 +11,7 @@ import "./components/homex-switch-manager";
 
 // Bump together with PANEL_VERSION in panel.py. Shown in the header so you can
 // confirm a full page reload picked up the latest build.
-const BUILD = "88";
+const BUILD = "91";
 
 /** Homex sidebar panel: lists rooms and orchestrates loading / reloading. */
 @customElement("homex-panel")
