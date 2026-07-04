@@ -12,17 +12,28 @@ import {
   mdiPin,
   mdiThemeLightDark,
 } from "@mdi/js";
-import type { HomeAssistant, Room, Scene } from "../types";
+import type {
+  DevicePreset,
+  GlobalSwitch,
+  HomeAssistant,
+  Room,
+  Scene,
+  SwitchLayout,
+} from "../types";
 import { fireChanged } from "../types";
 import {
   deleteRoom,
   deleteScene,
   dimRoom,
   errorMessage,
+  fetchGlobalSwitches,
+  fetchLayouts,
+  fetchPresets,
   reorderScenes,
   sceneNext,
   syncLabels,
 } from "../api";
+import { deviceModelKey } from "../lib/device";
 import { sharedStyles } from "../lib/styles";
 import "./homex-unit-controls";
 import "./homex-group-row";
@@ -30,6 +41,7 @@ import "./homex-room-dialog";
 import "./homex-triggers-dialog";
 import "./homex-group-dialog";
 import "./homex-scene-dialog";
+import "./homex-switch-mapping";
 
 type DialogKind = "" | "room" | "triggers" | "addgroup" | "addscene" | "delete";
 
@@ -46,6 +58,11 @@ export class HomexRoomCard extends LitElement {
   @state() private _deleteScenes = true;
   @state() private _deleting = false;
   @state() private _syncing = false;
+  @state() private _activeTab = "";
+  @state() private _gswitches: GlobalSwitch[] = [];
+  @state() private _presets: DevicePreset[] = [];
+  @state() private _layouts: SwitchLayout[] = [];
+  @state() private _mappingSwitch: GlobalSwitch | null = null;
 
   static styles = [
     sharedStyles,
@@ -137,6 +154,65 @@ export class HomexRoomCard extends LitElement {
         height: 1px;
         background: var(--divider-color, #e0e0e0);
         margin: 6px 4px;
+      }
+      .menu-section {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--secondary-text-color);
+        padding: 8px 12px 2px;
+      }
+      .module-title {
+        margin: 14px 0 2px;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--secondary-text-color);
+      }
+      .tabs {
+        display: flex;
+        gap: 4px;
+        margin: 16px 0 0;
+        border-bottom: 1px solid var(--divider-color, #e0e0e0);
+      }
+      .tab {
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--secondary-text-color);
+        cursor: default;
+      }
+      .tab.active {
+        color: var(--primary-color);
+        border-bottom: 2px solid var(--primary-color);
+        margin-bottom: -1px;
+      }
+      .empty-body {
+        padding: 20px 4px;
+        color: var(--secondary-text-color);
+        font-size: 14px;
+      }
+      .switch-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 12px 4px;
+        border-top: 1px solid var(--divider-color, #ececec);
+        cursor: pointer;
+      }
+      .switch-row:hover {
+        background: var(--secondary-background-color, rgba(225, 225, 225, 0.06));
+      }
+      .switch-name {
+        font-size: 15px;
+        font-weight: 500;
+      }
+      .switch-meta {
+        font-size: 12px;
+        color: var(--secondary-text-color);
       }
       .stats {
         display: flex;
@@ -497,6 +573,9 @@ export class HomexRoomCard extends LitElement {
     const pinned = r.scenes.filter((s) => !s.orderable);
     // Scene switching only makes sense with extra scenes beyond turn_on/off.
     const hasExtraScenes = r.scenes.some((s) => s.removable);
+    const lightsOn = r.modules?.includes("lights") ?? true;
+    const switchesOn = r.modules?.includes("switches") ?? false;
+    const hasDim = !!(r.dim_up_triggers?.length || r.dim_down_triggers?.length);
     return html`
       <ha-card>
         <div class="head" @click=${this._toggleExpand} title="Plier / déplier">
@@ -509,9 +588,10 @@ export class HomexRoomCard extends LitElement {
             .areaIcon=${areaIcon}
             .floorName=${floorName}
             .activeScene=${activeScene}
+            .hideToggle=${!lightsOn}
           ></homex-unit-controls>
           <div class="head-actions">
-            ${r.dim_up_triggers?.length || r.dim_down_triggers?.length
+            ${lightsOn && hasDim
               ? html`
                   <button
                     class="round"
@@ -529,7 +609,7 @@ export class HomexRoomCard extends LitElement {
                   </button>
                 `
               : ""}
-            ${hasExtraScenes
+            ${lightsOn && hasExtraScenes
               ? html`<button
                   class="round"
                   title="Changer de scène"
@@ -556,12 +636,18 @@ export class HomexRoomCard extends LitElement {
               <div class="menu-backdrop" @click=${() => (this._menuOpen = false)}></div>
               <div class="menu">
                 <button @click=${() => this._pick("room")}>✏️ Modifier la pièce</button>
-                <button @click=${() => this._pick("triggers")}>
-                  ⚡ Déclencheurs (${r.triggers.length + r.scene_triggers.length})
-                </button>
-                <button @click=${() => this._pick("addgroup")}>
-                  ＋ Ajouter un groupe
-                </button>
+                ${lightsOn
+                  ? html`
+                      <div class="menu-section">Lights</div>
+                      <button @click=${() => this._pick("triggers")}>
+                        ⚡ Déclencheurs (${r.triggers.length + r.scene_triggers.length})
+                      </button>
+                      <button @click=${() => this._pick("addgroup")}>
+                        ＋ Ajouter un groupe
+                      </button>
+                      <div class="sep"></div>
+                    `
+                  : ""}
                 <button ?disabled=${this._syncing} @click=${this._syncLabels}>
                   🏷 ${this._syncing ? "Synchronisation…" : "Synchroniser les labels"}
                 </button>
@@ -573,14 +659,30 @@ export class HomexRoomCard extends LitElement {
             `
           : ""}
 
-        <div class="stats">
-          <span class="stat">🔌 ${r.devices.length} appareil(s)</span>
-          <span class="stat">🎬 ${r.scenes.length} scène(s)</span>
-          ${r.groups.length
-            ? html`<span class="stat">📦 ${r.groups.length} groupe(s)</span>`
-            : ""}
-        </div>
-        ${this.expanded ? this._renderBody(r, activeKey, orderable, pinned) : ""}
+        ${lightsOn
+          ? html`
+              <div class="module-title">Lights</div>
+              <div class="stats">
+                <span class="stat">🔌 ${r.devices.length} lumière(s)</span>
+                <span class="stat">🎬 ${r.scenes.length} scène(s)</span>
+                ${r.groups.length
+                  ? html`<span class="stat">📦 ${r.groups.length} groupe(s)</span>`
+                  : ""}
+              </div>
+            `
+          : ""}
+        ${switchesOn
+          ? html`
+              <div class="module-title">Switches</div>
+              <div class="stats">
+                <span class="stat">🎛 ${this._roomSwitches().length} interrupteur(s)</span>
+                <span class="stat">⚡ ${this._switchActionCount(r)} action(s)</span>
+              </div>
+            `
+          : ""}
+        ${this.expanded
+          ? this._renderBody(r, activeKey, orderable, pinned, lightsOn, switchesOn)
+          : ""}
       </ha-card>
 
       ${this._renderDialogs(r)}
@@ -591,35 +693,151 @@ export class HomexRoomCard extends LitElement {
     r: Room,
     activeKey: string | null,
     orderable: Scene[],
+    pinned: Scene[],
+    lightsOn: boolean,
+    switchesOn: boolean
+  ) {
+    const tabs: { key: string; label: string }[] = [];
+    if (lightsOn) tabs.push({ key: "lights", label: "Lights" });
+    if (switchesOn) tabs.push({ key: "switches", label: "Switches" });
+    if (!tabs.length) {
+      return html`<div class="empty-body">Aucun module actif sur cette pièce.</div>`;
+    }
+    const active = tabs.some((t) => t.key === this._activeTab)
+      ? this._activeTab
+      : tabs[0].key;
+    return html`
+      <div class="tabs">
+        ${tabs.map(
+          (t) => html`<span
+            class="tab ${t.key === active ? "active" : ""}"
+            @click=${() => (this._activeTab = t.key)}
+            >${t.label}</span
+          >`
+        )}
+      </div>
+      <div class="tab-panel">
+        ${active === "lights"
+          ? this._renderLightsTab(r, activeKey, orderable, pinned)
+          : this._renderSwitchesTab(r)}
+      </div>
+    `;
+  }
+
+  private _renderLightsTab(
+    r: Room,
+    activeKey: string | null,
+    orderable: Scene[],
     pinned: Scene[]
   ) {
     return html`
-        <div class="section-row">
-          <span class="section">Scènes</span>
-          <button @click=${() => this._pick("addscene")}>＋ Scène</button>
-        </div>
-        <ha-sortable handle-selector=".handle" @item-moved=${this._sceneMoved}>
-          <div>${orderable.map((sc) => this._sceneRow(sc, activeKey))}</div>
-        </ha-sortable>
-        ${pinned.map((sc) => this._sceneRow(sc, activeKey))}
+      <div class="section-row">
+        <span class="section">Scènes</span>
+        <button @click=${() => this._pick("addscene")}>＋ Scène</button>
+      </div>
+      <ha-sortable handle-selector=".handle" @item-moved=${this._sceneMoved}>
+        <div>${orderable.map((sc) => this._sceneRow(sc, activeKey))}</div>
+      </ha-sortable>
+      ${pinned.map((sc) => this._sceneRow(sc, activeKey))}
 
-        ${r.groups.length
-          ? html`
-              <div class="section-row">
-                <span class="section">Groupes</span>
-                <button @click=${() => this._pick("addgroup")}>＋ Groupe</button>
-              </div>
-              <div class="groups">
-                ${r.groups.map(
-                  (g) => html`<homex-group-row
-                    .hass=${this.hass}
-                    .room=${r}
-                    .group=${g}
-                  ></homex-group-row>`
-                )}
-              </div>
-            `
-          : ""}
+      ${r.groups.length
+        ? html`
+            <div class="section-row">
+              <span class="section">Groupes</span>
+              <button @click=${() => this._pick("addgroup")}>＋ Groupe</button>
+            </div>
+            <div class="groups">
+              ${r.groups.map(
+                (g) => html`<homex-group-row
+                  .hass=${this.hass}
+                  .room=${r}
+                  .group=${g}
+                ></homex-group-row>`
+              )}
+            </div>
+          `
+        : ""}
+    `;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this._loadSwitchData();
+  }
+  private async _loadSwitchData() {
+    try {
+      [this._gswitches, this._presets, this._layouts] = await Promise.all([
+        fetchGlobalSwitches(this.hass),
+        fetchPresets(this.hass),
+        fetchLayouts(this.hass),
+      ]);
+    } catch {
+      /* keep prior data */
+    }
+  }
+
+  /** Global switches associated with this room. */
+  private _roomSwitches(): GlobalSwitch[] {
+    const id = this.room.room_id;
+    return this._gswitches.filter((s) => (s.rooms || []).includes(id));
+  }
+  /** Number of Homex actions (switch triggers) registered on this room. */
+  private _switchActionCount(r: Room): number {
+    const st = r.switch_triggers;
+    if (!st) return 0;
+    let n =
+      st.toggle.length +
+      st.scene_next.length +
+      st.dim_up.length +
+      st.dim_down.length;
+    for (const arr of Object.values(st.scenes)) n += arr.length;
+    for (const arr of Object.values(st.groups)) n += arr.length;
+    return n;
+  }
+  private _presetFor(sw: GlobalSwitch): DevicePreset | undefined {
+    const key = deviceModelKey(this.hass, sw.device_id);
+    return this._presets.find((p) => p.model === key);
+  }
+  private _layoutFor(preset?: DevicePreset): SwitchLayout | undefined {
+    return preset ? this._layouts.find((l) => l.id === preset.layout_id) : undefined;
+  }
+
+  /** Adding a switch is owned by the Switch Manager — ask the panel to open its
+   * add flow (pre-associating this room) instead of duplicating a local modal. */
+  private _openSwitchManagerAdd() {
+    this.dispatchEvent(
+      new CustomEvent("open-switch-add", {
+        detail: { room_id: this.room.room_id },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  private _renderSwitchesTab(r: Room) {
+    const switches = this._roomSwitches();
+    return html`
+      <div class="section-row">
+        <span class="section">Interrupteurs</span>
+        <button @click=${() => this._openSwitchManagerAdd()}>＋ Interrupteur</button>
+      </div>
+      ${switches.length
+        ? switches.map((sw) => {
+            const preset = this._presetFor(sw);
+            return html`<div
+              class="switch-row"
+              @click=${() => (this._mappingSwitch = sw)}
+            >
+              <span class="switch-name">🎛 ${sw.name}</span>
+              <span class="switch-meta">
+                ${preset ? preset.name : "aucun preset"}
+              </span>
+            </div>`;
+          })
+        : html`<div class="empty-body">
+            Aucun interrupteur associé. Clique sur « ＋ Interrupteur » pour en
+            créer un (via le Switch Manager) et l'associer à cette pièce.
+          </div>`}
     `;
   }
 
@@ -658,6 +876,19 @@ export class HomexRoomCard extends LitElement {
         .open=${this._renameScene !== null}
         @dialog-closed=${() => (this._renameScene = null)}
       ></homex-scene-dialog>
+      ${this._mappingSwitch
+        ? html`<homex-switch-mapping
+            .hass=${this.hass}
+            .open=${true}
+            .sw=${this._mappingSwitch}
+            .layout=${this._layoutFor(this._presetFor(this._mappingSwitch))}
+            .taps=${this._presetFor(this._mappingSwitch)?.taps ?? {}}
+            @dialog-closed=${() => {
+              this._mappingSwitch = null;
+              this._loadSwitchData();
+            }}
+          ></homex-switch-mapping>`
+        : ""}
       ${this._dialog === "delete" ? this._renderDeleteConfirm(r) : ""}
     `;
   }

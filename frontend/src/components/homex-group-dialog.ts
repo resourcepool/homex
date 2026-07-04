@@ -1,4 +1,4 @@
-import { LitElement, html } from "lit";
+import { LitElement, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type { Group, HomeAssistant, Room, TriggerSpec } from "../types";
 import { fireChanged } from "../types";
@@ -9,6 +9,7 @@ import { slugify } from "../lib/slug";
 import "./homex-dialog";
 import "./homex-entity-picker";
 import "./homex-trigger-selector";
+import "./homex-managed-triggers";
 
 /** Modal to create a group (group = null) or edit/delete an existing one. */
 @customElement("homex-group-dialog")
@@ -22,10 +23,70 @@ export class HomexGroupDialog extends LitElement {
   @state() private _id = "";
   @state() private _devices: string[] = [];
   @state() private _triggers: TriggerSpec[] = [];
+  @state() private _dim = false;
+  @state() private _dimUp: TriggerSpec[] = [];
+  @state() private _dimDown: TriggerSpec[] = [];
   @state() private _busy = false;
   private _idEdited = false;
 
-  static styles = sharedStyles;
+  static styles = [
+    sharedStyles,
+    css`
+      .dim-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 14px;
+        border: 1px solid var(--divider-color, #e0e0e0);
+        border-radius: 10px;
+        margin: 12px 0 4px;
+        cursor: pointer;
+      }
+      .dim-name {
+        font-size: 15px;
+        font-weight: 500;
+      }
+      .toggle {
+        position: relative;
+        flex: 0 0 auto;
+        width: 42px;
+        height: 24px;
+        border-radius: 12px;
+        background: var(--switch-unchecked-track-color, #bdbdbd);
+        transition: background 0.2s;
+      }
+      .toggle.on {
+        background: var(--switch-checked-track-color, var(--primary-color));
+      }
+      .toggle input {
+        position: absolute;
+        inset: 0;
+        margin: 0;
+        opacity: 0;
+        cursor: pointer;
+      }
+      .toggle .knob {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        transition: transform 0.2s;
+      }
+      .toggle.on .knob {
+        transform: translateX(18px);
+      }
+      .hint {
+        font-size: 12px;
+        color: var(--secondary-text-color);
+        margin: 0 0 8px;
+      }
+    `,
+  ];
 
   willUpdate(changed: Map<string, unknown>) {
     if (changed.has("open") && this.open) {
@@ -33,6 +94,9 @@ export class HomexGroupDialog extends LitElement {
       this._id = this.group?.group_id ?? "";
       this._devices = this.group?.devices ?? [];
       this._triggers = (this.group?.triggers ?? []).map((t) => ({ ...t }));
+      this._dim = this.group?.dim ?? false;
+      this._dimUp = (this.group?.dim_up_triggers ?? []).map((t) => ({ ...t }));
+      this._dimDown = (this.group?.dim_down_triggers ?? []).map((t) => ({ ...t }));
       this._busy = false;
       this._idEdited = !!this.group;
     }
@@ -59,6 +123,11 @@ export class HomexGroupDialog extends LitElement {
       return;
     }
     const triggers: TriggerSpec[] = this._triggers;
+    const dimFields = {
+      dim: this._dim,
+      dim_up_triggers: this._dim ? this._dimUp : [],
+      dim_down_triggers: this._dim ? this._dimDown : [],
+    };
     this._busy = true;
     try {
       if (this.group) {
@@ -68,6 +137,7 @@ export class HomexGroupDialog extends LitElement {
           name,
           devices: this._devices,
           triggers,
+          ...dimFields,
         });
       } else {
         await addGroup(this.hass, {
@@ -76,6 +146,7 @@ export class HomexGroupDialog extends LitElement {
           name,
           devices: this._devices,
           triggers,
+          ...dimFields,
         });
       }
       fireChanged(this);
@@ -119,12 +190,58 @@ export class HomexGroupDialog extends LitElement {
           .value=${this._devices}
           @value-changed=${(e: CustomEvent) => (this._devices = e.detail.value)}
         ></homex-entity-picker>
+        <label class="dim-toggle">
+          <span class="dim-name">Activer le dimming du groupe</span>
+          <span class="toggle ${this._dim ? "on" : ""}">
+            <input
+              type="checkbox"
+              .checked=${this._dim}
+              @change=${(e: Event) =>
+        (this._dim = (e.target as HTMLInputElement).checked)}
+            />
+            <span class="knob"></span>
+          </span>
+        </label>
         <div class="section">Déclencheurs</div>
         <homex-trigger-selector
           .hass=${this.hass}
           .value=${this._triggers}
           @value-changed=${(e: CustomEvent) => (this._triggers = e.detail.value)}
         ></homex-trigger-selector>
+        ${editing
+          ? html`<homex-managed-triggers
+              .triggers=${this.room?.switch_triggers?.groups?.[
+                this.group!.group_id
+              ] ?? []}
+            ></homex-managed-triggers>`
+          : ""}
+
+        
+        ${this._dim
+          ? html`
+              <div class="section">Dimmer + (monter la luminosité)</div>
+              <p class="hint">
+                Chaque déclenchement ajoute 20 à la luminosité des lumières du
+                groupe.
+              </p>
+              <homex-trigger-selector
+                .hass=${this.hass}
+                .value=${this._dimUp}
+                @value-changed=${(e: CustomEvent) => (this._dimUp = e.detail.value)}
+              ></homex-trigger-selector>
+              <div class="section">Dimmer − (baisser la luminosité)</div>
+              <p class="hint">
+                Chaque déclenchement retire 20 à la luminosité des lumières du
+                groupe.
+              </p>
+              <homex-trigger-selector
+                .hass=${this.hass}
+                .value=${this._dimDown}
+                @value-changed=${(e: CustomEvent) =>
+                  (this._dimDown = e.detail.value)}
+              ></homex-trigger-selector>
+            `
+          : ""}
 
         <span slot="actions">
           ${editing

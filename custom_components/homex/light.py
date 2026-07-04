@@ -19,6 +19,8 @@ async def async_setup_entry(
 ) -> None:
     hub: HomexHub = hass.data[DOMAIN][HUB_DATA]
     for room_id, controller in hub.controllers.items():
+        if not controller.lights_enabled:
+            continue
         async_add_entities(
             [RoomLightGroup(unit) for unit in controller.units],
             config_subentry_id=hub.subentry_id(room_id),

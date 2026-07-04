@@ -8,6 +8,7 @@ import { textField } from "../lib/fields";
 import { slugify } from "../lib/slug";
 import "./homex-dialog";
 import "./homex-trigger-selector";
+import "./homex-managed-triggers";
 
 type Mode = "new" | "attach";
 
@@ -161,6 +162,13 @@ export class HomexSceneDialog extends LitElement {
           .value=${this._triggers}
           @value-changed=${(e: CustomEvent) => (this._triggers = e.detail.value)}
         ></homex-trigger-selector>
+        ${editing
+          ? html`<homex-managed-triggers
+              .triggers=${this.room?.switch_triggers?.scenes?.[
+                this.scene!.key
+              ] ?? []}
+            ></homex-managed-triggers>`
+          : ""}
         <span slot="actions">
           <button @click=${this._close}>Annuler</button>
           <button class="primary" ?disabled=${this._busy || !valid} @click=${this._save}>

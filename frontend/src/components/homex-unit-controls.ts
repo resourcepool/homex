@@ -15,6 +15,8 @@ export class HomexUnitControls extends LitElement {
   @property({ attribute: false }) areaIcon?: string;
   @property({ attribute: false }) floorName?: string;
   @property({ attribute: false }) activeScene?: string;
+  // Hide the on/off bulb (e.g. a room whose lights module is disabled).
+  @property({ type: Boolean }) hideToggle = false;
 
   static styles = [
     sharedStyles,
@@ -125,15 +127,17 @@ export class HomexUnitControls extends LitElement {
     const on = this._isOn(u.switch);
     return html`
       <div class="controls">
-        <button
-          class="bulb ${on ? "on" : ""}"
-          title=${on ? "Éteindre" : "Allumer"}
-          @click=${this._toggle}
-        >
-          <svg viewBox="0 0 24 24">
-            <path d=${on ? mdiLightbulb : mdiLightbulbOutline}></path>
-          </svg>
-        </button>
+        ${this.hideToggle
+          ? ""
+          : html`<button
+              class="bulb ${on ? "on" : ""}"
+              title=${on ? "Éteindre" : "Allumer"}
+              @click=${this._toggle}
+            >
+              <svg viewBox="0 0 24 24">
+                <path d=${on ? mdiLightbulb : mdiLightbulbOutline}></path>
+              </svg>
+            </button>`}
         ${this.areaIcon
           ? html`<ha-icon class="area-icon" .icon=${this.areaIcon}></ha-icon>`
           : ""}

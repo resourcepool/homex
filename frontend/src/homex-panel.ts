@@ -7,10 +7,11 @@ import { loadHaComponents } from "./lib/ha-elements";
 import "./components/homex-room-card";
 import "./components/homex-room-dialog";
 import "./components/homex-export-dialog";
+import "./components/homex-switch-manager";
 
 // Bump together with PANEL_VERSION in panel.py. Shown in the header so you can
 // confirm a full page reload picked up the latest build.
-const BUILD = "55";
+const BUILD = "88";
 
 /** Homex sidebar panel: lists rooms and orchestrates loading / reloading. */
 @customElement("homex-panel")
@@ -24,6 +25,11 @@ export class HomexPanel extends LitElement {
   @state() private _error: string | null = null;
   @state() private _createOpen = false;
   @state() private _exportOpen = false;
+  @state() private _view: "rooms" | "switches" = "rooms";
+  @state() private _menuOpen = false;
+  // When navigating to the Switch Manager to add a switch from a room card.
+  @state() private _switchStartAdd = false;
+  @state() private _switchAddRoom: string | null = null;
   // entry_id of the single expanded room (accordion), persisted in localStorage.
   @state() private _expanded: string | null =
     localStorage.getItem("homex_expanded") || null;
@@ -73,6 +79,41 @@ export class HomexPanel extends LitElement {
     button:disabled {
       opacity: 0.5;
       cursor: default;
+    }
+    .menu-wrap {
+      position: relative;
+    }
+    .kebab {
+      padding: 8px 12px;
+      font-size: 18px;
+      line-height: 1;
+    }
+    .menu-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+    }
+    .menu {
+      position: absolute;
+      top: 44px;
+      right: 0;
+      z-index: 31;
+      min-width: 200px;
+      background: var(--card-background-color, #fff);
+      border: 1px solid var(--divider-color, #e0e0e0);
+      border-radius: 10px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22);
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+    }
+    .menu button {
+      text-align: left;
+      background: transparent;
+      border-radius: 8px;
+    }
+    .menu button:hover {
+      background: var(--secondary-background-color, #f0f0f0);
     }
     .floor-header {
       display: flex;
@@ -137,6 +178,12 @@ export class HomexPanel extends LitElement {
     }
   };
 
+  private _onOpenSwitchAdd = (e: CustomEvent) => {
+    this._switchAddRoom = e.detail?.room_id ?? null;
+    this._switchStartAdd = true;
+    this._view = "switches";
+  };
+
   private _roomCard(room: Room) {
     return html`<homex-room-card
       .hass=${this.hass}
@@ -196,8 +243,20 @@ export class HomexPanel extends LitElement {
         )}
       `;
     }
+    if (this._view === "switches") {
+      return html`
+        <div class="wrap">
+          <homex-switch-manager
+            .hass=${this.hass}
+            .startAdd=${this._switchStartAdd}
+            .startAddRoom=${this._switchAddRoom}
+            @close=${() => (this._view = "rooms")}
+          ></homex-switch-manager>
+        </div>
+      `;
+    }
     return html`
-      <div class="wrap">
+      <div class="wrap" @open-switch-add=${this._onOpenSwitchAdd}>
         <header>
           <h1>Homex <span class="ver">v${BUILD}</span></h1>
           <div class="header-actions">
@@ -211,6 +270,35 @@ export class HomexPanel extends LitElement {
             <button class="primary" @click=${() => (this._createOpen = true)}>
               ＋ Nouvelle pièce
             </button>
+            <div class="menu-wrap">
+              <button
+                class="kebab"
+                title="Menu"
+                @click=${() => (this._menuOpen = !this._menuOpen)}
+              >
+                ⋮
+              </button>
+              ${this._menuOpen
+                ? html`
+                    <div
+                      class="menu-backdrop"
+                      @click=${() => (this._menuOpen = false)}
+                    ></div>
+                    <div class="menu">
+                      <button
+                        @click=${() => {
+                          this._menuOpen = false;
+                          this._switchStartAdd = false;
+                          this._switchAddRoom = null;
+                          this._view = "switches";
+                        }}
+                      >
+                        🎛 Switch Manager
+                      </button>
+                    </div>
+                  `
+                : ""}
+            </div>
           </div>
         </header>
         ${body}

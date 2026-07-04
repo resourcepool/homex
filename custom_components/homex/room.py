@@ -24,9 +24,14 @@ import logging
 import os
 from collections import deque
 
+from homeassistant.components.device_automation import (
+    DeviceAutomationType,
+    async_get_device_automations,
+)
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import EVENT_HOMEASSISTANT_STARTED
 from homeassistant.core import Context, HomeAssistant, callback
-from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.trigger import (
     async_initialize_triggers,
     async_validate_trigger_config,
@@ -75,11 +80,16 @@ from .const import (
     CONF_SCENE_TRIGGERS,
     CONF_DIM_DOWN_TRIGGERS,
     CONF_DIM_UP_TRIGGERS,
+    CONF_DIM,
+    CONF_MODULES,
     CONF_SCENES,
+    CONF_SWITCHES,
     CONF_TRIGGERS,
+    DEFAULT_MODULES,
     DIM_STEP,
     DOMAIN,
     HOMEX_LABEL,
+    MODULE_LIGHTS,
     SCENES_FILE,
     SCENES_LOCK,
     STRATEGY_RECALL_FIRST,
@@ -89,6 +99,44 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 ROOM_KEY = "room"
+
+
+async def _resolve_device_triggers(hass, device_id, labels) -> list[dict]:
+    """HA trigger configs of a device whose readable label is in ``labels``.
+
+    Preset bindings store the device action's display label; resolve it back to
+    the actual device trigger config so it can be wired like any trigger.
+    """
+    from .panel import _device_trigger_label  # lazy: panel imports room
+
+    want = set(labels or [])
+    if not want:
+        return []
+    try:
+        autos = await async_get_device_automations(
+            hass, DeviceAutomationType.TRIGGER, [device_id]
+        )
+    except Exception:  # noqa: BLE001 - unknown device / integration
+        return []
+    return [
+        {k: v for k, v in trig.items() if k != "metadata"}
+        for trig in autos.get(device_id, [])
+        if _device_trigger_label(trig) in want
+    ]
+
+
+def _make_switch_handler(controller: "RoomController", action: dict):
+    """A trigger callback that runs a Homex action on ``controller``'s room."""
+
+    @callback
+    def handler(run_variables=None, context: Context | None = None) -> None:
+        if controller.is_self_context(context):
+            return
+        controller.hass.async_create_task(
+            controller.async_run_homex_action(action)
+        )
+
+    return handler
 
 
 class Unit:
@@ -101,6 +149,7 @@ class Unit:
         name: str,
         devices: list[str],
         triggers: list[str],
+        cfg: dict | None = None,
     ) -> None:
         self._controller = controller
         self.hass = controller.hass
@@ -110,7 +159,52 @@ class Unit:
         self.name = name
         self.devices = list(devices or [])
         self.triggers = list(triggers or [])
+        self._cfg = dict(cfg or {})  # raw group config (dim triggers, etc.)
         self._unsubs: list = []
+
+    # -- Dimming (a group can dim its own member lights) --------------------
+
+    @property
+    def dim_enabled(self) -> bool:
+        return bool(self._cfg.get(CONF_DIM))
+
+    @property
+    def dim_up_specs(self) -> list[dict]:
+        return normalize_trigger_specs(self._cfg.get(CONF_DIM_UP_TRIGGERS))
+
+    @property
+    def dim_down_specs(self) -> list[dict]:
+        return normalize_trigger_specs(self._cfg.get(CONF_DIM_DOWN_TRIGGERS))
+
+    @property
+    def dim_light_ids(self) -> list[str]:
+        """This unit's real member lights (excludes Homex's own ONOFF groups)."""
+        return [
+            e
+            for e in self.devices
+            if e.startswith("light.") and not e.startswith("light.homex_")
+        ]
+
+    async def async_dim(self, delta: int) -> None:
+        lights = self.dim_light_ids
+        if not lights:
+            return
+        await self.hass.services.async_call(
+            "light",
+            "turn_on",
+            {"entity_id": lights, "brightness_step": delta},
+            blocking=False,
+            context=self._controller.new_context(),
+        )
+
+    def _make_dim_handler(self, delta: int):
+        @callback
+        def handler(run_variables=None, context: Context | None = None) -> None:
+            if self._controller.is_self_context(context):
+                return
+            self.hass.async_create_task(self.async_dim(delta))
+
+        return handler
 
     # -- Identity -----------------------------------------------------------
 
@@ -241,7 +335,7 @@ class Unit:
         )
 
     async def async_start(self) -> None:
-        """Wire the group's triggers (entity state + device action) natively."""
+        """Wire the group's toggle and (optional) dim triggers natively."""
         self.stop()
         configs = await self._controller.build_trigger_configs(self.trigger_specs)
         if configs:
@@ -255,6 +349,25 @@ class Unit:
             )
             if unsub:
                 self._unsubs.append(unsub)
+        # Dimmer triggers: brighten / dim this group's own member lights.
+        if self.dim_enabled:
+            for specs, delta in (
+                (self.dim_up_specs, DIM_STEP),
+                (self.dim_down_specs, -DIM_STEP),
+            ):
+                dim_configs = await self._controller.build_trigger_configs(specs)
+                if not dim_configs:
+                    continue
+                unsub = await async_initialize_triggers(
+                    self.hass,
+                    dim_configs,
+                    self._make_dim_handler(delta),
+                    DOMAIN,
+                    f"homex {self.slug} dim:{'up' if delta > 0 else 'down'}",
+                    _LOGGER.log,
+                )
+                if unsub:
+                    self._unsubs.append(unsub)
 
     def stop(self) -> None:
         while self._unsubs:
@@ -314,6 +427,18 @@ class RoomController:
     @property
     def area_id(self) -> str | None:
         return self._cfg(CONF_AREA_ID) or None
+
+    @property
+    def modules(self) -> list[str]:
+        """Enabled modules. Rooms without the key default to lights-on."""
+        value = self._cfg(CONF_MODULES)
+        if value is None:
+            return list(DEFAULT_MODULES)
+        return list(value)
+
+    @property
+    def lights_enabled(self) -> bool:
+        return MODULE_LIGHTS in self.modules
 
     @property
     def devices(self) -> list[str]:
@@ -382,6 +507,11 @@ class RoomController:
         return list(self._cfg(CONF_GROUPS, []) or [])
 
     @property
+    def switches(self) -> list[dict]:
+        """Declared switches (interrupteurs) of the switches module."""
+        return list(self._cfg(CONF_SWITCHES, []) or [])
+
+    @property
     def scene_order(self) -> list[dict]:
         """Ordered non-off scenes [{key, name}] — turn_on plus the extras.
 
@@ -434,6 +564,7 @@ class RoomController:
                         group.get(CONF_GROUP_NAME, group[CONF_GROUP_ID]),
                         group.get(CONF_DEVICES, []),
                         group.get(CONF_TRIGGERS, []),
+                        group,
                     )
                 )
             self._units = units
@@ -442,43 +573,44 @@ class RoomController:
     # -- Lifecycle ----------------------------------------------------------
 
     async def async_start(self) -> None:
-        """Seed the scenes and activate the automations."""
+        """Seed the scenes and activate the automations (lights module)."""
         await self.async_stop()
-        await self.async_ensure_scenes()
-        # Groups keep their own (on/off) trigger automation.
-        for unit in self.units:
-            if not unit.is_room:
-                await unit.async_start()
-        # Room triggers: toggle + scene-switching, each a mix of entity (state)
-        # and device (action) triggers, wired via HA's native trigger helper.
-        toggle_configs = await self.build_trigger_configs(self.trigger_specs)
-        if toggle_configs:
-            unsub = await async_initialize_triggers(
-                self.hass,
-                toggle_configs,
-                self._toggle_action,
-                DOMAIN,
-                f"homex {self.room_id} toggle",
-                _LOGGER.log,
-            )
-            if unsub:
-                self._room_unsubs.append(unsub)
-        scene_configs = await self.build_trigger_configs(self.scene_trigger_specs)
-        if scene_configs:
-            unsub = await async_initialize_triggers(
-                self.hass,
-                scene_configs,
-                self._scene_action,
-                DOMAIN,
-                f"homex {self.room_id} scene",
-                _LOGGER.log,
-            )
-            if unsub:
-                self._room_unsubs.append(unsub)
-        # Per-scene triggers: a trigger wired to a specific scene activates it.
-        await self._start_scene_triggers()
-        # Dimmer triggers: brighten / dim the room's member lights.
-        await self._start_dim_triggers()
+        if self.lights_enabled:
+            await self.async_ensure_scenes()
+            # Groups keep their own (on/off) trigger automation.
+            for unit in self.units:
+                if not unit.is_room:
+                    await unit.async_start()
+            # Room triggers: toggle + scene-switching, each a mix of entity
+            # (state) and device (action) triggers, wired via HA's helper.
+            toggle_configs = await self.build_trigger_configs(self.trigger_specs)
+            if toggle_configs:
+                unsub = await async_initialize_triggers(
+                    self.hass,
+                    toggle_configs,
+                    self._toggle_action,
+                    DOMAIN,
+                    f"homex {self.room_id} toggle",
+                    _LOGGER.log,
+                )
+                if unsub:
+                    self._room_unsubs.append(unsub)
+            scene_configs = await self.build_trigger_configs(self.scene_trigger_specs)
+            if scene_configs:
+                unsub = await async_initialize_triggers(
+                    self.hass,
+                    scene_configs,
+                    self._scene_action,
+                    DOMAIN,
+                    f"homex {self.room_id} scene",
+                    _LOGGER.log,
+                )
+                if unsub:
+                    self._room_unsubs.append(unsub)
+            # Per-scene triggers: a trigger wired to a scene activates it.
+            await self._start_scene_triggers()
+            # Dimmer triggers: brighten / dim the room's member lights.
+            await self._start_dim_triggers()
         # Keep entities tied to the room's HA area + labels (re-applied on every
         # reload, so changing the area or its labels propagates automatically).
         try:
@@ -486,9 +618,10 @@ class RoomController:
         except Exception:  # noqa: BLE001 - label/area registry issues must not abort
             _LOGGER.exception("[%s] failed to sync area/labels", self.room_id)
         _LOGGER.info(
-            "Homex room '%s' active: %d device(s), %d toggle/%d scene trigger(s), "
-            "%d group(s), strategy=%s",
+            "Homex room '%s' active: modules=%s, %d device(s), "
+            "%d toggle/%d scene trigger(s), %d group(s), strategy=%s",
             self.room_id,
+            ",".join(self.modules) or "none",
             len(self.devices),
             len(self.trigger_specs),
             len(self.scene_trigger_specs),
@@ -748,6 +881,47 @@ class RoomController:
             blocking=False,
             context=self.new_context(),
         )
+
+    async def async_run_homex_action(self, action: dict) -> None:
+        """Execute a Homex action on this room (from a switch button mapping).
+
+        These map onto the room's existing behaviours; they are no-ops when the
+        room has no lights module (nothing to control) — the Switches module is
+        optional and a target room may not have Lights either.
+        """
+        if not self.lights_enabled:
+            return
+        kind = (action or {}).get("kind")
+        if kind == "toggle":
+            service = "turn_off" if self._active_scene_key is not None else "turn_on"
+            await self.hass.services.async_call(
+                "switch",
+                service,
+                {"entity_id": self.room_switch_entity_id},
+                blocking=False,
+                context=self.new_context(),
+            )
+        elif kind == "scene_next":
+            await self.async_scene_switch()
+        elif kind == "dim_up":
+            await self.async_dim(DIM_STEP)
+        elif kind == "dim_down":
+            await self.async_dim(-DIM_STEP)
+        elif kind == "scene":
+            await self.async_activate_scene_key(action.get("scene_key", ""))
+        elif kind == "group":
+            gid = action.get("group_id")
+            unit = next(
+                (u for u in self.units if not u.is_room and u.key == gid), None
+            )
+            if unit is not None:
+                await self.hass.services.async_call(
+                    "switch",
+                    "toggle",
+                    {"entity_id": unit.switch_entity_id},
+                    blocking=False,
+                    context=self.new_context(),
+                )
 
     async def _start_scene_triggers(self) -> None:
         """Wire each scene's own triggers: firing one activates that scene."""
@@ -1021,6 +1195,7 @@ class HomexHub:
         self.entry = entry
         self.controllers: dict[str, RoomController] = {}
         self._subentry_by_room: dict[str, str] = {}
+        self._switch_unsubs: list = []
 
     @property
     def rooms(self) -> list[dict]:
@@ -1049,10 +1224,113 @@ class HomexHub:
                 await controller.async_start()
             except Exception:  # noqa: BLE001
                 _LOGGER.exception("Homex: failed to start room '%s'", room_id)
+        # Switch triggers depend on other integrations' device automations (e.g.
+        # MQTT/Zigbee2MQTT), which may not be ready during our setup. Wire now if
+        # HA is already running (config-entry reload), else once it has started.
+        if self.hass.is_running:
+            await self._async_wire_switches()
+        else:
+            self.hass.bus.async_listen_once(
+                EVENT_HOMEASSISTANT_STARTED, self._async_wire_switches_startup
+            )
+
+    async def _async_wire_switches_startup(self, _event=None) -> None:
+        """Wire on startup, retrying while device automations (MQTT/Z2M) appear.
+
+        After a cold start the backing devices' automations register a little
+        after HA is "started", so retry a few times until something wires.
+        """
+        import asyncio
+
+        for delay in (0, 5, 15, 30):
+            if delay:
+                await asyncio.sleep(delay)
+            self._teardown_switches()
+            if await self._async_wire_switches():
+                return
 
     async def async_stop(self) -> None:
+        self._teardown_switches()
         for controller in self.controllers.values():
             await controller.async_stop()
+
+    def _teardown_switches(self) -> None:
+        while self._switch_unsubs:
+            self._switch_unsubs.pop()()
+
+    async def async_rewire_switches(self) -> None:
+        """Re-attach switch button triggers after the switch store changes.
+
+        Global switches live outside the config entries, so editing their
+        mappings does not reload the integration — call this to apply changes.
+        """
+        self._teardown_switches()
+        await self._async_wire_switches()
+
+    async def _async_wire_switches(self) -> int:
+        """Wire every global switch's button mappings to its target room action.
+
+        For each (tap mode, button) the preset resolves the device trigger(s);
+        firing one runs the mapped Homex action on the target room. The Switches
+        module is optional — with no switches this is a no-op, and rooms without
+        a Lights module are skipped. Returns the number of triggers wired.
+        """
+        from . import panel  # lazy: panel imports room at module load
+
+        switches = await panel._get_gswitches(self.hass)
+        if not switches:
+            return 0
+        presets = await panel._get_presets(self.hass)
+        dev_reg = dr.async_get(self.hass)
+
+        def _preset(device_id):
+            dev = dev_reg.async_get(device_id) if device_id else None
+            if dev is None:
+                return None
+            key = f"{dev.manufacturer or ''}|{dev.model or ''}"
+            return next((p for p in presets if p.get("model") == key), None)
+
+        for sw in switches:
+            device_id = sw.get("device_id")
+            if not device_id:
+                continue
+            bindings = (_preset(device_id) or {}).get("bindings") or {}
+            for tap_mode, by_btn in (sw.get("mappings") or {}).items():
+                if not isinstance(by_btn, dict):
+                    continue
+                for btn, entry in by_btn.items():
+                    if not isinstance(entry, dict):
+                        continue
+                    controller = self.controllers.get(entry.get("room"))
+                    if controller is None or not controller.lights_enabled:
+                        continue
+                    labels = (bindings.get(tap_mode) or {}).get(btn) or []
+                    raw = await _resolve_device_triggers(self.hass, device_id, labels)
+                    configs = await controller.build_trigger_configs(raw)
+                    if not configs:
+                        continue
+                    try:
+                        unsub = await async_initialize_triggers(
+                            self.hass,
+                            configs,
+                            _make_switch_handler(controller, entry.get("action") or {}),
+                            DOMAIN,
+                            f"homex switch {sw.get('id')} {tap_mode}:{btn}",
+                            _LOGGER.log,
+                        )
+                    except Exception:  # noqa: BLE001
+                        _LOGGER.exception(
+                            "Homex: failed to wire switch '%s' button %s",
+                            sw.get("id"),
+                            btn,
+                        )
+                        continue
+                    if unsub:
+                        self._switch_unsubs.append(unsub)
+        _LOGGER.info(
+            "Homex: wired %d switch button trigger(s)", len(self._switch_unsubs)
+        )
+        return len(self._switch_unsubs)
 
     async def async_remove_all_scenes(self) -> None:
         for controller in self.controllers.values():

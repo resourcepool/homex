@@ -6,6 +6,7 @@ import { errorMessage, updateRoom } from "../api";
 import { sharedStyles } from "../lib/styles";
 import "./homex-dialog";
 import "./homex-trigger-selector";
+import "./homex-managed-triggers";
 
 /** Modal to configure a room's toggle and scene-switching triggers. */
 @customElement("homex-triggers-dialog")
@@ -86,6 +87,9 @@ export class HomexTriggersDialog extends LitElement {
             .value=${this._toggle}
             @value-changed=${(e: CustomEvent) => (this._toggle = e.detail.value)}
           ></homex-trigger-selector>
+          <homex-managed-triggers
+            .triggers=${this.room?.switch_triggers?.toggle ?? []}
+          ></homex-managed-triggers>
         </div>
 
         <div class="group">
@@ -96,6 +100,9 @@ export class HomexTriggersDialog extends LitElement {
             .value=${this._scene}
             @value-changed=${(e: CustomEvent) => (this._scene = e.detail.value)}
           ></homex-trigger-selector>
+          <homex-managed-triggers
+            .triggers=${this.room?.switch_triggers?.scene_next ?? []}
+          ></homex-managed-triggers>
           <p class="hint">
             La stratégie (repart de zéro / dernière utilisée) se règle dans
             « Modifier la pièce ».
@@ -112,6 +119,9 @@ export class HomexTriggersDialog extends LitElement {
             .value=${this._dimUp}
             @value-changed=${(e: CustomEvent) => (this._dimUp = e.detail.value)}
           ></homex-trigger-selector>
+          <homex-managed-triggers
+            .triggers=${this.room?.switch_triggers?.dim_up ?? []}
+          ></homex-managed-triggers>
         </div>
 
         <div class="group">
@@ -124,6 +134,9 @@ export class HomexTriggersDialog extends LitElement {
             .value=${this._dimDown}
             @value-changed=${(e: CustomEvent) => (this._dimDown = e.detail.value)}
           ></homex-trigger-selector>
+          <homex-managed-triggers
+            .triggers=${this.room?.switch_triggers?.dim_down ?? []}
+          ></homex-managed-triggers>
         </div>
 
         <span slot="actions">

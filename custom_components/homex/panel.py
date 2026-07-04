@@ -16,26 +16,32 @@ from homeassistant.components.device_automation import (
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry, ConfigSubentry
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers import device_registry as dr, entity_registry as er
+from homeassistant.helpers.storage import Store
 from homeassistant.setup import async_setup_component
 from homeassistant.util.yaml import load_yaml, save_yaml
 
 from .const import (
     CONF_AREA_ID,
     CONF_DEVICES,
+    CONF_DIM,
     CONF_DIM_DOWN_TRIGGERS,
     CONF_DIM_UP_TRIGGERS,
     CONF_GROUP_ID,
     CONF_GROUP_NAME,
     CONF_GROUPS,
+    CONF_MODULES,
     CONF_ROOM_ID,
     CONF_ROOM_NAME,
     CONF_SCENE_STRATEGY,
     CONF_SCENE_TRIGGERS,
     CONF_SCENES,
+    CONF_SWITCHES,
     CONF_TRIGGERS,
+    DEFAULT_MODULES,
     DOMAIN,
     HUB_DATA,
+    MODULE_LIGHTS,
     SCENES_FILE,
     SCENES_LOCK,
     STRATEGY_RECALL_FIRST,
@@ -52,10 +58,75 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "55"
+PANEL_VERSION = "88"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
+
+# Global switch layouts + global switches (switches module) — stored outside the
+# config entries in a dedicated Store, so editing them never reloads the
+# integration. One store document holds {"layouts": [...], "switches": [...]}.
+STORE_KEY = "homex_layouts"
+STORE_HANDLE = "_switch_store"
+STORE_DATA = "_switch_store_data"
+
+
+def _switch_store(hass: HomeAssistant) -> Store:
+    data = hass.data.setdefault(DOMAIN, {})
+    store = data.get(STORE_HANDLE)
+    if store is None:
+        store = Store(hass, 1, STORE_KEY)
+        data[STORE_HANDLE] = store
+    return store
+
+
+async def _store_doc(hass: HomeAssistant) -> dict:
+    data = hass.data.setdefault(DOMAIN, {})
+    if STORE_DATA not in data:
+        loaded = await _switch_store(hass).async_load() or {}
+        data[STORE_DATA] = {
+            "layouts": list(loaded.get("layouts", [])),
+            "switches": list(loaded.get("switches", [])),
+            "presets": list(loaded.get("presets", [])),
+        }
+    return data[STORE_DATA]
+
+
+async def _get_layouts(hass: HomeAssistant) -> list[dict]:
+    return (await _store_doc(hass))["layouts"]
+
+
+async def _set_layouts(hass: HomeAssistant, layouts: list[dict]) -> None:
+    doc = await _store_doc(hass)
+    doc["layouts"] = layouts
+    await _switch_store(hass).async_save(doc)
+
+
+async def _get_gswitches(hass: HomeAssistant) -> list[dict]:
+    return (await _store_doc(hass))["switches"]
+
+
+async def _set_gswitches(hass: HomeAssistant, switches: list[dict]) -> None:
+    doc = await _store_doc(hass)
+    doc["switches"] = switches
+    await _switch_store(hass).async_save(doc)
+
+
+async def _get_presets(hass: HomeAssistant) -> list[dict]:
+    return (await _store_doc(hass))["presets"]
+
+
+async def _set_presets(hass: HomeAssistant, presets: list[dict]) -> None:
+    doc = await _store_doc(hass)
+    doc["presets"] = presets
+    await _switch_store(hass).async_save(doc)
+
+
+async def _rewire_switches(hass: HomeAssistant) -> None:
+    """Re-attach switch button triggers after the switch/preset store changes."""
+    hub = hass.data.get(DOMAIN, {}).get(HUB_DATA)
+    if hub is not None:
+        await hub.async_rewire_switches()
 
 
 def _slugify(value: str) -> str:
@@ -82,6 +153,20 @@ async def async_register_homex_panel(hass: HomeAssistant) -> None:
         ws_group_add,
         ws_group_update,
         ws_group_delete,
+        ws_switch_add,
+        ws_switch_update,
+        ws_switch_delete,
+        ws_layouts,
+        ws_layout_save,
+        ws_layout_delete,
+        ws_gswitches,
+        ws_gswitch_save,
+        ws_gswitch_delete,
+        ws_presets,
+        ws_preset_save,
+        ws_preset_delete,
+        ws_switch_models,
+        ws_switch_devices,
         ws_scene_add,
         ws_scene_delete,
         ws_scene_reorder,
@@ -177,9 +262,67 @@ async def ws_device_triggers(hass: HomeAssistant, connection, msg) -> None:
     connection.send_result(msg["id"], {"triggers": out})
 
 
+_TAP_LABELS = {"single": "Simple", "double": "Double", "long": "Long"}
+
+
+async def _switch_triggers_for_room(hass: HomeAssistant, room_id: str) -> dict:
+    """Read-only triggers a room's actions receive from global switch buttons.
+
+    Grouped by target so each Lights-module trigger UI can show the extra,
+    Switches-managed triggers next to the editable ones.
+    """
+    out: dict = {
+        "toggle": [],
+        "scene_next": [],
+        "dim_up": [],
+        "dim_down": [],
+        "scenes": {},
+        "groups": {},
+    }
+    switches = await _get_gswitches(hass)
+    if not switches:
+        return out
+    presets = await _get_presets(hass)
+    dev_reg = dr.async_get(hass)
+
+    def _preset(device_id):
+        dev = dev_reg.async_get(device_id) if device_id else None
+        if dev is None:
+            return None
+        key = f"{dev.manufacturer or ''}|{dev.model or ''}"
+        return next((p for p in presets if p.get("model") == key), None)
+
+    for sw in switches:
+        preset = _preset(sw.get("device_id"))
+        bindings = (preset or {}).get("bindings") or {}
+        for tap_mode, by_btn in (sw.get("mappings") or {}).items():
+            if not isinstance(by_btn, dict):
+                continue
+            for btn, entry in by_btn.items():
+                if not isinstance(entry, dict) or entry.get("room") != room_id:
+                    continue
+                action = entry.get("action") or {}
+                kind = action.get("kind")
+                tap = _TAP_LABELS.get(tap_mode, tap_mode)
+                dev_actions = (bindings.get(tap_mode) or {}).get(btn) or []
+                suffix = f" → {', '.join(dev_actions)}" if dev_actions else ""
+                label = f"{sw.get('name', '?')} · Bouton {btn} ({tap}){suffix}"
+                if kind in ("toggle", "scene_next", "dim_up", "dim_down"):
+                    out[kind].append(label)
+                elif kind == "scene":
+                    out["scenes"].setdefault(
+                        action.get("scene_key", ""), []
+                    ).append(label)
+                elif kind == "group":
+                    out["groups"].setdefault(
+                        action.get("group_id", ""), []
+                    ).append(label)
+    return out
+
+
 @websocket_api.websocket_command({vol.Required("type"): "homex/rooms"})
-@callback
-def ws_list_rooms(hass: HomeAssistant, connection, msg) -> None:
+@websocket_api.async_response
+async def ws_list_rooms(hass: HomeAssistant, connection, msg) -> None:
     """Return every Homex room with its groups and editable config."""
     rooms = []
     hub = _hub_entry(hass)
@@ -196,6 +339,7 @@ def ws_list_rooms(hass: HomeAssistant, connection, msg) -> None:
                 "entry_id": controller.room_id,
                 "room_id": controller.room_id,
                 "area_id": controller.area_id,
+                "modules": controller.modules,
                 **_serialize_unit(units[0]),
                 "triggers": controller.trigger_specs,
                 "scene_triggers": controller.scene_trigger_specs,
@@ -203,8 +347,18 @@ def ws_list_rooms(hass: HomeAssistant, connection, msg) -> None:
                 "dim_down_triggers": controller.dim_down_trigger_specs,
                 "scene_strategy": controller.scene_strategy,
                 "scenes": _room_scenes(controller),
+                "switches": controller.switches,
+                "switch_triggers": await _switch_triggers_for_room(
+                    hass, controller.room_id
+                ),
                 "groups": [
-                    {"group_id": unit.key, **_serialize_unit(unit)}
+                    {
+                        "group_id": unit.key,
+                        **_serialize_unit(unit),
+                        "dim": unit.dim_enabled,
+                        "dim_up_triggers": unit.dim_up_specs,
+                        "dim_down_triggers": unit.dim_down_specs,
+                    }
                     for unit in units[1:]
                 ],
             }
@@ -446,6 +600,7 @@ async def _attach_existing_scene(
         vol.Required("room_id"): str,
         vol.Optional("devices"): [str],
         vol.Optional("area_id"): vol.Any(str, None),
+        vol.Optional("modules"): [str],
         vol.Optional("scene_strategy"): vol.In(
             [STRATEGY_RECALL_FIRST, STRATEGY_RECALL_LAST]
         ),
@@ -470,6 +625,7 @@ async def ws_room_create(hass: HomeAssistant, connection, msg) -> None:
         CONF_ROOM_ID: room_id,
         CONF_ROOM_NAME: msg["name"],
         CONF_AREA_ID: msg.get("area_id") or None,
+        CONF_MODULES: msg.get("modules", list(DEFAULT_MODULES)),
         CONF_DEVICES: msg.get("devices", []),
         CONF_TRIGGERS: [],
         CONF_SCENE_TRIGGERS: [],
@@ -536,6 +692,7 @@ def _remove_room_entities(hass: HomeAssistant, controller: RoomController) -> No
         vol.Optional("name"): str,
         vol.Optional("room_id"): str,
         vol.Optional("area_id"): vol.Any(str, None),
+        vol.Optional("modules"): [str],
         vol.Optional("devices"): [str],
         vol.Optional("triggers"): list,
         vol.Optional("scene_triggers"): list,
@@ -585,6 +742,19 @@ async def ws_room_update(hass: HomeAssistant, connection, msg) -> None:
         room[CONF_DIM_DOWN_TRIGGERS] = msg["dim_down_triggers"]
     if "scene_strategy" in msg:
         room[CONF_SCENE_STRATEGY] = msg["scene_strategy"]
+
+    # Modules: when the lights module is turned off, tear down its entities and
+    # scenes (they are recreated if it is turned back on).
+    if "modules" in msg:
+        old_lights = MODULE_LIGHTS in (
+            sub.data.get(CONF_MODULES) or list(DEFAULT_MODULES)
+        )
+        new_lights = MODULE_LIGHTS in msg["modules"]
+        room[CONF_MODULES] = msg["modules"]
+        if old_lights and not new_lights:
+            old_controller = _controller(hass, hub, dict(sub.data))
+            await old_controller.async_remove_scenes()
+            _remove_room_entities(hass, old_controller)
 
     _save_room(hass, hub, sub, room)
     connection.send_result(msg["id"], {"ok": True})
@@ -649,6 +819,9 @@ async def ws_room_dim(hass: HomeAssistant, connection, msg) -> None:
         vol.Required("name"): str,
         vol.Required("devices"): [str],
         vol.Optional("triggers"): list,
+        vol.Optional("dim"): bool,
+        vol.Optional("dim_up_triggers"): list,
+        vol.Optional("dim_down_triggers"): list,
     }
 )
 @websocket_api.require_admin
@@ -677,6 +850,9 @@ async def ws_group_add(hass: HomeAssistant, connection, msg) -> None:
             CONF_GROUP_NAME: msg["name"],
             CONF_DEVICES: msg["devices"],
             CONF_TRIGGERS: msg.get("triggers", []),
+            CONF_DIM: msg.get("dim", False),
+            CONF_DIM_UP_TRIGGERS: msg.get("dim_up_triggers", []),
+            CONF_DIM_DOWN_TRIGGERS: msg.get("dim_down_triggers", []),
         }
     )
     room[CONF_GROUPS] = groups
@@ -692,6 +868,9 @@ async def ws_group_add(hass: HomeAssistant, connection, msg) -> None:
         vol.Optional("name"): str,
         vol.Optional("devices"): [str],
         vol.Optional("triggers"): list,
+        vol.Optional("dim"): bool,
+        vol.Optional("dim_up_triggers"): list,
+        vol.Optional("dim_down_triggers"): list,
     }
 )
 @websocket_api.require_admin
@@ -716,6 +895,12 @@ async def ws_group_update(hass: HomeAssistant, connection, msg) -> None:
         group[CONF_DEVICES] = msg["devices"]
     if "triggers" in msg:
         group[CONF_TRIGGERS] = msg["triggers"]
+    if "dim" in msg:
+        group[CONF_DIM] = msg["dim"]
+    if "dim_up_triggers" in msg:
+        group[CONF_DIM_UP_TRIGGERS] = msg["dim_up_triggers"]
+    if "dim_down_triggers" in msg:
+        group[CONF_DIM_DOWN_TRIGGERS] = msg["dim_down_triggers"]
 
     room[CONF_GROUPS] = groups
     _save_room(hass, hub, sub, room)
@@ -757,6 +942,361 @@ async def ws_group_delete(hass: HomeAssistant, connection, msg) -> None:
 
     room[CONF_GROUPS] = [
         g for g in room.get(CONF_GROUPS, []) if g[CONF_GROUP_ID] != group_id
+    ]
+    _save_room(hass, hub, sub, room)
+    connection.send_result(msg["id"], {"ok": True})
+
+
+@websocket_api.websocket_command({vol.Required("type"): "homex/layouts"})
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_layouts(hass: HomeAssistant, connection, msg) -> None:
+    """Return every global switch layout."""
+    connection.send_result(msg["id"], {"layouts": await _get_layouts(hass)})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/layout/save",
+        vol.Required("layout"): dict,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_layout_save(hass: HomeAssistant, connection, msg) -> None:
+    """Create or update a switch layout (upsert by its id)."""
+    layout = dict(msg["layout"])
+    layout_id = str(layout.get("id") or "").strip().lower()
+    if not ID_RE.match(layout_id):
+        connection.send_error(msg["id"], "invalid_id", "Invalid layout id")
+        return
+    layout["id"] = layout_id
+    layouts = [l for l in await _get_layouts(hass) if l.get("id") != layout_id]
+    layouts.append(layout)
+    await _set_layouts(hass, layouts)
+    connection.send_result(msg["id"], {"ok": True})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/layout/delete",
+        vol.Required("layout_id"): str,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_layout_delete(hass: HomeAssistant, connection, msg) -> None:
+    layouts = [
+        l for l in await _get_layouts(hass) if l.get("id") != msg["layout_id"]
+    ]
+    await _set_layouts(hass, layouts)
+    connection.send_result(msg["id"], {"ok": True})
+
+
+async def _action_device_ids(hass: HomeAssistant) -> dict[str, list]:
+    """Device triggers for every device that exposes an "action" trigger."""
+    dev_reg = dr.async_get(hass)
+    try:
+        autos = await async_get_device_automations(
+            hass, DeviceAutomationType.TRIGGER, list(dev_reg.devices)
+        )
+    except Exception:  # noqa: BLE001
+        return {}
+    return {
+        dev_id: triggers
+        for dev_id, triggers in autos.items()
+        if any(t.get("type") == "action" for t in triggers)
+    }
+
+
+@websocket_api.websocket_command({vol.Required("type"): "homex/switch_devices"})
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_switch_devices(hass: HomeAssistant, connection, msg) -> None:
+    """List individual switch-like devices (interrupteurs) for a switch."""
+    dev_reg = dr.async_get(hass)
+    out = []
+    for dev_id in await _action_device_ids(hass):
+        dev = dev_reg.async_get(dev_id)
+        if dev is None:
+            continue
+        out.append(
+            {
+                "device_id": dev_id,
+                "name": dev.name_by_user or dev.name or dev_id,
+                "model": f"{dev.manufacturer or ''}|{dev.model or ''}",
+                "model_label": " ".join(
+                    p for p in (dev.manufacturer, dev.model) if p
+                )
+                or "modèle inconnu",
+            }
+        )
+    connection.send_result(
+        msg["id"],
+        {"devices": sorted(out, key=lambda d: d["name"].lower())},
+    )
+
+
+@websocket_api.websocket_command({vol.Required("type"): "homex/switch_models"})
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_switch_models(hass: HomeAssistant, connection, msg) -> None:
+    """List unique models of switch-like devices (interrupteurs).
+
+    A device is treated as a switch/remote when it exposes at least one device
+    trigger of type "action" (Zigbee2MQTT button events). Grouped by model so
+    a Device Preset targets a model, not an individual device.
+    """
+    dev_reg = dr.async_get(hass)
+    models: dict[str, dict] = {}
+    for dev_id in await _action_device_ids(hass):
+        dev = dev_reg.async_get(dev_id)
+        if dev is None:
+            continue
+        key = f"{dev.manufacturer or ''}|{dev.model or ''}"
+        entry = models.get(key)
+        if entry is None:
+            models[key] = {
+                "model": key,
+                "label": " ".join(
+                    p for p in (dev.manufacturer, dev.model) if p
+                )
+                or "modèle inconnu",
+                "device_id": dev_id,  # a sample device to resolve the actions
+                "count": 1,
+            }
+        else:
+            entry["count"] += 1
+    connection.send_result(
+        msg["id"],
+        {"models": sorted(models.values(), key=lambda m: m["label"].lower())},
+    )
+
+
+@websocket_api.websocket_command({vol.Required("type"): "homex/presets"})
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_presets(hass: HomeAssistant, connection, msg) -> None:
+    """Return every device preset (standard mapping per device model)."""
+    connection.send_result(msg["id"], {"presets": await _get_presets(hass)})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/preset/save",
+        vol.Required("preset"): dict,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_preset_save(hass: HomeAssistant, connection, msg) -> None:
+    """Create or update a device preset (upsert by its id)."""
+    preset = dict(msg["preset"])
+    pid = str(preset.get("id") or "").strip().lower()
+    if not ID_RE.match(pid):
+        connection.send_error(msg["id"], "invalid_id", "Invalid preset id")
+        return
+    preset["id"] = pid
+    presets = [p for p in await _get_presets(hass) if p.get("id") != pid]
+    presets.append(preset)
+    await _set_presets(hass, presets)
+    await _rewire_switches(hass)
+    connection.send_result(msg["id"], {"ok": True})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/preset/delete",
+        vol.Required("preset_id"): str,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_preset_delete(hass: HomeAssistant, connection, msg) -> None:
+    presets = [
+        p for p in await _get_presets(hass) if p.get("id") != msg["preset_id"]
+    ]
+    await _set_presets(hass, presets)
+    await _rewire_switches(hass)
+    connection.send_result(msg["id"], {"ok": True})
+
+
+@websocket_api.websocket_command({vol.Required("type"): "homex/switches"})
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_gswitches(hass: HomeAssistant, connection, msg) -> None:
+    """Return every global switch (Switch Management)."""
+    connection.send_result(msg["id"], {"switches": await _get_gswitches(hass)})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/switch/save",
+        vol.Required("switch"): dict,
+        vol.Optional("create", default=False): bool,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_gswitch_save(hass: HomeAssistant, connection, msg) -> None:
+    """Create or update a global switch (upsert by its id).
+
+    When `create` is set, a colliding id is rejected instead of overwriting the
+    existing switch.
+    """
+    sw = dict(msg["switch"])
+    sw_id = str(sw.get("id") or "").strip().lower()
+    if not ID_RE.match(sw_id):
+        connection.send_error(msg["id"], "invalid_id", "Invalid switch id")
+        return
+    sw["id"] = sw_id
+    existing = await _get_gswitches(hass)
+    if msg["create"] and any(s.get("id") == sw_id for s in existing):
+        connection.send_error(
+            msg["id"], "id_exists", f"Un interrupteur avec l'id « {sw_id} » existe déjà."
+        )
+        return
+    switches = [s for s in existing if s.get("id") != sw_id]
+    switches.append(sw)
+    await _set_gswitches(hass, switches)
+    await _rewire_switches(hass)
+    connection.send_result(msg["id"], {"ok": True})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/switch/remove",
+        vol.Required("switch_id"): str,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_gswitch_delete(hass: HomeAssistant, connection, msg) -> None:
+    switches = [
+        s for s in await _get_gswitches(hass) if s.get("id") != msg["switch_id"]
+    ]
+    await _set_gswitches(hass, switches)
+    await _rewire_switches(hass)
+    connection.send_result(msg["id"], {"ok": True})
+
+
+def _switch_fields(msg: dict) -> dict:
+    """The stored representation of a switch from a WS message."""
+    return {
+        "id": msg["switch_id"],
+        "name": msg["name"],
+        "buttons": int(msg.get("buttons", 1)),
+        "dim": bool(msg.get("dim", False)),
+        # Visual layout: a columns x rows grid; layout is a flat list of button
+        # keys ("button_1"...) or "" for an empty cell, in reading order.
+        "columns": int(msg.get("columns", 1)),
+        "rows": int(msg.get("rows", 1)),
+        "layout": list(msg.get("layout", [])),
+        "rooms": list(msg.get("rooms", [])),
+        "triggers": dict(msg.get("triggers", {})),
+    }
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/switch/add",
+        vol.Required("entry_id"): str,
+        vol.Required("switch_id"): str,
+        vol.Required("name"): str,
+        vol.Optional("buttons"): int,
+        vol.Optional("dim"): bool,
+        vol.Optional("columns"): int,
+        vol.Optional("rows"): int,
+        vol.Optional("layout"): [str],
+        vol.Optional("rooms"): [str],
+        vol.Optional("triggers"): dict,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_switch_add(hass: HomeAssistant, connection, msg) -> None:
+    hub = _hub_entry(hass)
+    sub = _find_subentry(hub, msg["entry_id"]) if hub else None
+    if hub is None or sub is None:
+        connection.send_error(msg["id"], "not_found", "Unknown room")
+        return
+    room = dict(sub.data)
+
+    switch_id = msg["switch_id"].strip().lower()
+    if not ID_RE.match(switch_id):
+        connection.send_error(msg["id"], "invalid_id", "Invalid switch id")
+        return
+    switches = [dict(s) for s in room.get(CONF_SWITCHES, [])]
+    if any(s.get("id") == switch_id for s in switches):
+        connection.send_error(msg["id"], "switch_exists", "Switch id already exists")
+        return
+
+    switches.append({**_switch_fields(msg), "id": switch_id})
+    room[CONF_SWITCHES] = switches
+    _save_room(hass, hub, sub, room)
+    connection.send_result(msg["id"], {"ok": True})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/switch/update",
+        vol.Required("entry_id"): str,
+        vol.Required("switch_id"): str,
+        vol.Optional("name"): str,
+        vol.Optional("buttons"): int,
+        vol.Optional("dim"): bool,
+        vol.Optional("columns"): int,
+        vol.Optional("rows"): int,
+        vol.Optional("layout"): [str],
+        vol.Optional("rooms"): [str],
+        vol.Optional("triggers"): dict,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_switch_update(hass: HomeAssistant, connection, msg) -> None:
+    hub = _hub_entry(hass)
+    sub = _find_subentry(hub, msg["entry_id"]) if hub else None
+    if hub is None or sub is None:
+        connection.send_error(msg["id"], "not_found", "Unknown room")
+        return
+    room = dict(sub.data)
+
+    switches = [dict(s) for s in room.get(CONF_SWITCHES, [])]
+    target = next(
+        (s for s in switches if s.get("id") == msg["switch_id"]), None
+    )
+    if target is None:
+        connection.send_error(msg["id"], "not_found", "Unknown switch")
+        return
+    for key in (
+        "name", "buttons", "dim", "columns", "rows", "layout", "rooms", "triggers"
+    ):
+        if key in msg:
+            target[key] = msg[key]
+    room[CONF_SWITCHES] = switches
+    _save_room(hass, hub, sub, room)
+    connection.send_result(msg["id"], {"ok": True})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/switch/delete",
+        vol.Required("entry_id"): str,
+        vol.Required("switch_id"): str,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_switch_delete(hass: HomeAssistant, connection, msg) -> None:
+    hub = _hub_entry(hass)
+    sub = _find_subentry(hub, msg["entry_id"]) if hub else None
+    if hub is None or sub is None:
+        connection.send_error(msg["id"], "not_found", "Unknown room")
+        return
+    room = dict(sub.data)
+    room[CONF_SWITCHES] = [
+        s for s in room.get(CONF_SWITCHES, []) if s.get("id") != msg["switch_id"]
     ]
     _save_room(hass, hub, sub, room)
     connection.send_result(msg["id"], {"ok": True})

@@ -12,6 +12,21 @@ CONF_ROOM_ID = "room_id"
 CONF_AREA_ID = "area_id"  # optional link to a native HA area
 CONF_DEVICES = "devices"
 
+# Modules enabled on a room. Homex is a modular room manager; each module adds a
+# set of features. "lights" is the first module (switch + light group + scenes +
+# groups + triggers). Rooms with no "modules" key default to lights-on so
+# pre-module rooms keep working.
+CONF_MODULES = "modules"
+MODULE_LIGHTS = "lights"
+MODULE_SWITCHES = "switches"
+DEFAULT_MODULES = [MODULE_LIGHTS]
+
+# Switches module: physical controllers (interrupteurs) declared on a room. Each
+# switch is a dict {id, name, buttons, dim, rooms, triggers}. Triggers map a slot
+# ("button_1".."button_N", "dim_up", "dim_down") to a list of raw HA trigger
+# configs. No room action is wired yet — this is declaration only for now.
+CONF_SWITCHES = "switches"
+
 # Label applied to every entity/scene Homex manages. When the room is linked to
 # an HA area, its entities also inherit that area's labels.
 HOMEX_LABEL = "Homex"
@@ -38,6 +53,8 @@ STRATEGY_RECALL_LAST = "recall_last"
 CONF_DIM_UP_TRIGGERS = "dim_up_triggers"
 CONF_DIM_DOWN_TRIGGERS = "dim_down_triggers"
 DIM_STEP = 20
+# A group can opt into dimming (its own dim +/- triggers over its own lights).
+CONF_DIM = "dim"
 
 # Triggers can also be devices (any state change of the device's entities).
 CONF_TRIGGER_DEVICES = "trigger_devices"
