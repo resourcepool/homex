@@ -45,6 +45,21 @@ export const fetchSwitchDevices = async (
 ): Promise<import("./types").SwitchDevice[]> =>
   (await hass.callWS({ type: "homex/switch_devices" })).devices || [];
 
+export const fetchShutterModels = async (
+  hass: HomeAssistant
+): Promise<import("./types").ShutterModel[]> =>
+  (await hass.callWS({ type: "homex/shutter_models" })).models || [];
+export const fetchShutterPresets = async (
+  hass: HomeAssistant
+): Promise<import("./types").ShutterPreset[]> =>
+  (await hass.callWS({ type: "homex/shutter_presets" })).presets || [];
+export const saveShutterPreset = (
+  hass: HomeAssistant,
+  preset: import("./types").ShutterPreset
+) => hass.callWS({ type: "homex/shutter_preset/save", preset });
+export const deleteShutterPreset = (hass: HomeAssistant, preset_id: string) =>
+  hass.callWS({ type: "homex/shutter_preset/delete", preset_id });
+
 export const fetchRooms = async (hass: HomeAssistant): Promise<Room[]> =>
   (await hass.callWS({ type: "homex/rooms" })).rooms || [];
 

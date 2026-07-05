@@ -8,10 +8,11 @@ import "./components/homex-room-card";
 import "./components/homex-room-dialog";
 import "./components/homex-export-dialog";
 import "./components/homex-switch-manager";
+import "./components/homex-shutter-manager";
 
 // Bump together with PANEL_VERSION in panel.py. Shown in the header so you can
 // confirm a full page reload picked up the latest build.
-const BUILD = "91";
+const BUILD = "96";
 
 /** Homex sidebar panel: lists rooms and orchestrates loading / reloading. */
 @customElement("homex-panel")
@@ -25,7 +26,7 @@ export class HomexPanel extends LitElement {
   @state() private _error: string | null = null;
   @state() private _createOpen = false;
   @state() private _exportOpen = false;
-  @state() private _view: "rooms" | "switches" = "rooms";
+  @state() private _view: "rooms" | "switches" | "shutters" = "rooms";
   @state() private _menuOpen = false;
   // When navigating to the Switch Manager to add a switch from a room card.
   @state() private _switchStartAdd = false;
@@ -255,6 +256,16 @@ export class HomexPanel extends LitElement {
         </div>
       `;
     }
+    if (this._view === "shutters") {
+      return html`
+        <div class="wrap">
+          <homex-shutter-manager
+            .hass=${this.hass}
+            @close=${() => (this._view = "rooms")}
+          ></homex-shutter-manager>
+        </div>
+      `;
+    }
     return html`
       <div class="wrap" @open-switch-add=${this._onOpenSwitchAdd}>
         <header>
@@ -294,6 +305,14 @@ export class HomexPanel extends LitElement {
                         }}
                       >
                         🎛 Switch Manager
+                      </button>
+                      <button
+                        @click=${() => {
+                          this._menuOpen = false;
+                          this._view = "shutters";
+                        }}
+                      >
+                        🪟 Shutter Manager
                       </button>
                     </div>
                   `

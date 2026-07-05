@@ -67,6 +67,34 @@ export interface SwitchLayout {
 
 export type TapMode = "single" | "double" | "long";
 
+/** A unique shutter device model (a model owning a cover entity). */
+export interface ShutterModel {
+  model: string;
+  label: string;
+  device_id: string; // sample device
+  count: number;
+  devices: { device_id: string; name: string }[];
+}
+
+/** One "sensor == value" identifier used to detect a shutter motion state. */
+export interface ShutterCondition {
+  entity_id: string;
+  state: string;
+}
+
+/** A shutter device preset: how to smart-toggle a shutter model's covers. */
+export interface ShutterPreset {
+  id: string;
+  name: string;
+  model: string; // model key
+  model_label: string;
+  device_id: string; // reference device the actions/sensors are derived from
+  smart_toggle: boolean;
+  moving_up: ShutterCondition; // a single sensor = value identifier
+  moving_down: ShutterCondition;
+  stopped: ShutterCondition;
+}
+
 /** A unique switch/remote device model (interrupteur). */
 export interface SwitchModel {
   model: string; // model key (manufacturer|model)

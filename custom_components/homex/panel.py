@@ -61,7 +61,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "91"
+PANEL_VERSION = "96"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -91,6 +91,7 @@ async def _store_doc(hass: HomeAssistant) -> dict:
             "layouts": list(loaded.get("layouts", [])),
             "switches": list(loaded.get("switches", [])),
             "presets": list(loaded.get("presets", [])),
+            "shutter_presets": list(loaded.get("shutter_presets", [])),
         }
     return data[STORE_DATA]
 
@@ -122,6 +123,16 @@ async def _get_presets(hass: HomeAssistant) -> list[dict]:
 async def _set_presets(hass: HomeAssistant, presets: list[dict]) -> None:
     doc = await _store_doc(hass)
     doc["presets"] = presets
+    await _switch_store(hass).async_save(doc)
+
+
+async def _get_shutter_presets(hass: HomeAssistant) -> list[dict]:
+    return (await _store_doc(hass))["shutter_presets"]
+
+
+async def _set_shutter_presets(hass: HomeAssistant, presets: list[dict]) -> None:
+    doc = await _store_doc(hass)
+    doc["shutter_presets"] = presets
     await _switch_store(hass).async_save(doc)
 
 
@@ -173,6 +184,10 @@ async def async_register_homex_panel(hass: HomeAssistant) -> None:
         ws_preset_delete,
         ws_switch_models,
         ws_switch_devices,
+        ws_shutter_presets,
+        ws_shutter_preset_save,
+        ws_shutter_preset_delete,
+        ws_shutter_models,
         ws_scene_add,
         ws_scene_delete,
         ws_scene_reorder,
@@ -1221,6 +1236,104 @@ async def ws_switch_models(hass: HomeAssistant, connection, msg) -> None:
         msg["id"],
         {"models": sorted(models.values(), key=lambda m: m["label"].lower())},
     )
+
+
+@websocket_api.websocket_command({vol.Required("type"): "homex/shutter_models"})
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_shutter_models(hass: HomeAssistant, connection, msg) -> None:
+    """Unique models of shutter devices (devices that own a cover entity).
+
+    Each model lists its devices so a Shutter Device Preset can pick a reference
+    device to derive its actions/sensors from.
+    """
+    ent_reg = er.async_get(hass)
+    dev_reg = dr.async_get(hass)
+    by_model: dict[str, dict] = {}
+    seen: set[str] = set()
+    for entity in ent_reg.entities.values():
+        if entity.domain != "cover" or not entity.device_id:
+            continue
+        dev = dev_reg.async_get(entity.device_id)
+        if dev is None:
+            continue
+        key = f"{dev.manufacturer or ''}|{dev.model or ''}"
+        model = by_model.setdefault(
+            key,
+            {
+                "model": key,
+                "label": " ".join(
+                    p for p in (dev.manufacturer, dev.model) if p
+                )
+                or "modèle inconnu",
+                "device_id": entity.device_id,
+                "devices": [],
+            },
+        )
+        if entity.device_id not in seen:
+            seen.add(entity.device_id)
+            model["devices"].append(
+                {
+                    "device_id": entity.device_id,
+                    "name": dev.name_by_user or dev.name or entity.device_id,
+                }
+            )
+    for model in by_model.values():
+        model["count"] = len(model["devices"])
+    connection.send_result(
+        msg["id"],
+        {"models": sorted(by_model.values(), key=lambda m: m["label"].lower())},
+    )
+
+
+@websocket_api.websocket_command({vol.Required("type"): "homex/shutter_presets"})
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_shutter_presets(hass: HomeAssistant, connection, msg) -> None:
+    """Return every shutter device preset (per shutter model)."""
+    connection.send_result(
+        msg["id"], {"presets": await _get_shutter_presets(hass)}
+    )
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/shutter_preset/save",
+        vol.Required("preset"): dict,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_shutter_preset_save(hass: HomeAssistant, connection, msg) -> None:
+    """Create or update a shutter device preset (upsert by id)."""
+    preset = dict(msg["preset"])
+    pid = str(preset.get("id") or "").strip().lower()
+    if not ID_RE.match(pid):
+        connection.send_error(msg["id"], "invalid_id", "Invalid preset id")
+        return
+    preset["id"] = pid
+    presets = [p for p in await _get_shutter_presets(hass) if p.get("id") != pid]
+    presets.append(preset)
+    await _set_shutter_presets(hass, presets)
+    connection.send_result(msg["id"], {"ok": True})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/shutter_preset/delete",
+        vol.Required("preset_id"): str,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_shutter_preset_delete(hass: HomeAssistant, connection, msg) -> None:
+    presets = [
+        p
+        for p in await _get_shutter_presets(hass)
+        if p.get("id") != msg["preset_id"]
+    ]
+    await _set_shutter_presets(hass, presets)
+    connection.send_result(msg["id"], {"ok": True})
 
 
 @websocket_api.websocket_command({vol.Required("type"): "homex/presets"})
