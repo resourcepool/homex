@@ -34,7 +34,7 @@ import {
   sceneNext,
   syncLabels,
 } from "../api";
-import { deviceModelKey } from "../lib/device";
+import { resolveSwitchPreset } from "../lib/device";
 import { sharedStyles } from "../lib/styles";
 import "./homex-unit-controls";
 import "./homex-group-row";
@@ -848,8 +848,7 @@ export class HomexRoomCard extends LitElement {
     return n;
   }
   private _presetFor(sw: GlobalSwitch): DevicePreset | undefined {
-    const key = deviceModelKey(this.hass, sw.device_id);
-    return this._presets.find((p) => p.model === key);
+    return resolveSwitchPreset(this.hass, this._presets, sw);
   }
   private _layoutFor(preset?: DevicePreset): SwitchLayout | undefined {
     return preset ? this._layouts.find((l) => l.id === preset.layout_id) : undefined;

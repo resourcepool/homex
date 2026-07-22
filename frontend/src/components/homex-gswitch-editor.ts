@@ -13,7 +13,11 @@ import {
   fetchSwitchDevices,
   saveGlobalSwitch,
 } from "../api";
-import { deviceModelKey, deviceModelLabel } from "../lib/device";
+import {
+  deviceModelLabel,
+  presetsForSwitch,
+  resolveSwitchPreset,
+} from "../lib/device";
 import { sharedStyles } from "../lib/styles";
 import { textField } from "../lib/fields";
 import { slugify } from "../lib/slug";
@@ -30,6 +34,7 @@ export class HomexGswitchEditor extends LitElement {
   @state() private _name = "";
   @state() private _id = "";
   @state() private _deviceId = "";
+  @state() private _presetId = "";
   @state() private _devices: SwitchDevice[] = [];
   @state() private _rooms: string[] = [];
   @state() private _allRooms: { room_id: string; name: string }[] = [];
@@ -108,6 +113,7 @@ export class HomexGswitchEditor extends LitElement {
       this._name = this.sw?.name ?? "";
       this._id = this.sw?.id ?? "";
       this._deviceId = this.sw?.device_id ?? "";
+      this._presetId = this.sw?.preset_id ?? "";
       this._rooms = [...(this.sw?.rooms ?? this.initialRooms ?? [])];
       this._idEdited = !!this.sw;
       this._busy = false;
@@ -139,10 +145,28 @@ export class HomexGswitchEditor extends LitElement {
     }
   }
 
+  /** Presets matching the selected device's model. */
+  private _modelPresets(): DevicePreset[] {
+    if (!this._deviceId) return [];
+    return presetsForSwitch(this.hass, this.presets, this._deviceId);
+  }
+
   private _preset(): DevicePreset | undefined {
     if (!this._deviceId) return undefined;
-    const key = deviceModelKey(this.hass, this._deviceId);
-    return this.presets.find((p) => p.model === key);
+    return resolveSwitchPreset(this.hass, this.presets, {
+      device_id: this._deviceId,
+      preset_id: this._presetId,
+    });
+  }
+
+  private _onDevice(deviceId: string) {
+    this._deviceId = deviceId;
+    // The chosen preset must belong to the new device's model; drop it if not,
+    // then default to the model's single preset when there is only one.
+    const ofModel = this._modelPresets();
+    if (!ofModel.some((p) => p.id === this._presetId)) {
+      this._presetId = ofModel.length === 1 ? ofModel[0].id : "";
+    }
   }
 
   private _onName(v: string) {
@@ -179,7 +203,14 @@ export class HomexGswitchEditor extends LitElement {
     try {
       await saveGlobalSwitch(
         this.hass,
-        { id, name, device_id: this._deviceId, rooms: this._rooms },
+        {
+          ...(this.sw ?? {}),
+          id,
+          name,
+          device_id: this._deviceId,
+          preset_id: this._preset()?.id ?? "",
+          rooms: this._rooms,
+        },
         !this.sw // creating: reject a colliding id instead of overwriting
       );
       this._close();
@@ -201,6 +232,40 @@ export class HomexGswitchEditor extends LitElement {
     }
   }
 
+  /** Preset section: choose among the model's presets, or offer to create one. */
+  private _renderPreset(preset: DevicePreset | undefined) {
+    const ofModel = this._modelPresets();
+    const modelLabel = deviceModelLabel(this.hass, this._deviceId);
+    if (!ofModel.length) {
+      return html`<div class="preset-box">
+        <div class="row">
+          <span>Aucun preset pour le modèle <b>${modelLabel}</b>.</span>
+          <button class="primary" @click=${this._createPreset}>
+            ＋ Créer un preset
+          </button>
+        </div>
+      </div>`;
+    }
+    return html`<div class="preset-box ${preset ? "ok" : ""}">
+      <div class="section">Preset</div>
+      <select
+        .value=${preset?.id ?? ""}
+        @change=${(e: Event) =>
+          (this._presetId = (e.target as HTMLSelectElement).value)}
+      >
+        ${ofModel.map(
+          (p) => html`<option value=${p.id} ?selected=${p.id === preset?.id}>
+            ${p.name}
+          </option>`
+        )}
+      </select>
+      <div class="row">
+        <span class="hint">Modèle : ${modelLabel}</span>
+        <button @click=${this._createPreset}>＋ Nouveau preset</button>
+      </div>
+    </div>`;
+  }
+
   render() {
     const editing = !!this.sw;
     const preset = this._preset();
@@ -213,7 +278,7 @@ export class HomexGswitchEditor extends LitElement {
         ? html`<select
             .value=${this._deviceId}
             @change=${(e: Event) =>
-              (this._deviceId = (e.target as HTMLSelectElement).value)}
+              this._onDevice((e.target as HTMLSelectElement).value)}
           >
             <option value="">— Choisir un interrupteur —</option>
             ${this._devices.map(
@@ -226,25 +291,7 @@ export class HomexGswitchEditor extends LitElement {
             Aucun interrupteur détecté (appareil exposant des actions).
           </p>`}
 
-      ${this._deviceId
-        ? preset
-          ? html`<div class="preset-box ok">
-              ✅ Preset utilisé :
-              <b>${preset.name}</b>
-              <div class="hint">Modèle : ${deviceModelLabel(this.hass, this._deviceId)}</div>
-            </div>`
-          : html`<div class="preset-box">
-              <div class="row">
-                <span>
-                  Aucun preset pour le modèle
-                  <b>${deviceModelLabel(this.hass, this._deviceId)}</b>.
-                </span>
-                <button class="primary" @click=${this._createPreset}>
-                  ＋ Créer un preset
-                </button>
-              </div>
-            </div>`
-        : ""}
+      ${this._deviceId ? this._renderPreset(preset) : ""}
 
       <div class="section">Pièces Homex assignées (0..n)</div>
       <div class="rooms">

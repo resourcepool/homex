@@ -7,7 +7,7 @@ import type {
   SwitchLayout,
 } from "../types";
 import { fetchGlobalSwitches, fetchLayouts, fetchPresets } from "../api";
-import { deviceModelKey } from "../lib/device";
+import { resolveSwitchPreset } from "../lib/device";
 import { sharedStyles } from "../lib/styles";
 import "./homex-layout-editor";
 import "./homex-preset-editor";
@@ -404,8 +404,7 @@ export class HomexSwitchManager extends LitElement {
     }
     return html`<div class="grid">
       ${this._gswitches.map((s) => {
-        const key = deviceModelKey(this.hass, s.device_id);
-        const preset = this._presets.find((p) => p.model === key);
+        const preset = resolveSwitchPreset(this.hass, this._presets, s);
         const layout = preset
           ? this._layouts.find((l) => l.id === preset.layout_id)
           : undefined;

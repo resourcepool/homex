@@ -76,10 +76,14 @@ export interface ShutterModel {
   devices: { device_id: string; name: string }[];
 }
 
-/** One "sensor == value" identifier used to detect a shutter motion state. */
+/** One "sensor == value" identifier used to detect a shutter motion state.
+ * The sensor is stored generically (domain + entity-id suffix after the device
+ * slug) so it can be reconstructed per device: `{domain}.{device_slug}_{suffix}`.
+ * The value is matched case-insensitively. */
 export interface ShutterCondition {
-  entity_id: string;
-  state: string;
+  domain: string; // "sensor" | "binary_sensor"
+  suffix: string; // entity object-id part after the device slug
+  state: string; // matched value (case-insensitive)
 }
 
 /** A shutter device preset: how to smart-toggle a shutter model's covers. */
@@ -147,6 +151,9 @@ export interface GlobalSwitch {
   id: string;
   name: string;
   device_id: string;
+  // Which Device Preset this switch uses among those matching its model.
+  // Optional/legacy: when absent, the first preset of the model is used.
+  preset_id?: string;
   rooms: string[]; // assigned Homex room ids (0..n)
   // Button→action mapping: tapMode → button → { room, action }. A button does
   // one thing; the action names which of the switch's rooms it targets.

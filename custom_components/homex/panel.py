@@ -61,7 +61,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "96"
+PANEL_VERSION = "97"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -321,15 +321,22 @@ async def _switch_triggers_for_room(hass: HomeAssistant, room_id: str) -> dict:
     presets = await _get_presets(hass)
     dev_reg = dr.async_get(hass)
 
-    def _preset(device_id):
+    def _preset(sw):
+        device_id = sw.get("device_id")
         dev = dev_reg.async_get(device_id) if device_id else None
         if dev is None:
             return None
         key = f"{dev.manufacturer or ''}|{dev.model or ''}"
-        return next((p for p in presets if p.get("model") == key), None)
+        of_model = [p for p in presets if p.get("model") == key]
+        preset_id = sw.get("preset_id")
+        if preset_id:
+            chosen = next((p for p in of_model if p.get("id") == preset_id), None)
+            if chosen:
+                return chosen
+        return of_model[0] if of_model else None
 
     for sw in switches:
-        preset = _preset(sw.get("device_id"))
+        preset = _preset(sw)
         bindings = (preset or {}).get("bindings") or {}
         for tap_mode, by_btn in (sw.get("mappings") or {}).items():
             if not isinstance(by_btn, dict):

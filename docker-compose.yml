@@ -13,3 +13,13 @@ services:
     restart: unless-stopped
     environment:
       - TZ=Europe/Paris
+
+  # MQTT broker to emulate Zigbee2MQTT devices (fake test devices with actions).
+  mosquitto:
+    container_name: homex-mosquitto
+    image: eclipse-mosquitto:2
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+    ports:
+      - "1884:1883"
+    restart: unless-stopped

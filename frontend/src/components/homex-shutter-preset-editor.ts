@@ -29,16 +29,36 @@ export class HomexShutterPresetEditor extends LitElement {
   @state() private _modelKey = "";
   @state() private _deviceId = "";
   @state() private _smart = false;
-  @state() private _up: ShutterCondition = { entity_id: "", state: "" };
-  @state() private _down: ShutterCondition = { entity_id: "", state: "" };
-  @state() private _stopped: ShutterCondition = { entity_id: "", state: "" };
+  @state() private _up: ShutterCondition = { domain: "", suffix: "", state: "" };
+  @state() private _down: ShutterCondition = { domain: "", suffix: "", state: "" };
+  @state() private _stopped: ShutterCondition = { domain: "", suffix: "", state: "" };
   @state() private _busy = false;
   private _idEdited = false;
 
-  private static _cond(v: unknown): ShutterCondition {
-    // Accept a single condition or (legacy) an array; default empty.
+  private static EMPTY: ShutterCondition = { domain: "", suffix: "", state: "" };
+
+  /** Normalize a stored condition into {domain, suffix, state}, migrating the
+   * legacy {entity_id, state} shape using the reference device slug. */
+  private _cond(v: unknown): ShutterCondition {
     const c: any = Array.isArray(v) ? v[0] : v;
-    return { entity_id: c?.entity_id ?? "", state: c?.state ?? "" };
+    if (!c) return { ...HomexShutterPresetEditor.EMPTY };
+    if (c.suffix !== undefined || c.domain !== undefined) {
+      return { domain: c.domain ?? "", suffix: c.suffix ?? "", state: c.state ?? "" };
+    }
+    // Legacy {entity_id, state}: derive domain + suffix from the ref device.
+    const [domain, objectId = ""] = String(c.entity_id ?? "").split(".");
+    const slug = this._deviceSlug();
+    const suffix =
+      slug && objectId.startsWith(slug + "_")
+        ? objectId.slice(slug.length + 1)
+        : objectId;
+    return { domain: domain ?? "", suffix, state: c.state ?? "" };
+  }
+
+  /** Entity-id prefix (slug) for the current reference device. */
+  private _deviceSlug(): string {
+    const dev = this.hass.devices?.[this._deviceId];
+    return slugify(dev?.name_by_user || dev?.name || "");
   }
 
   static styles = [
@@ -171,9 +191,9 @@ export class HomexShutterPresetEditor extends LitElement {
       this._modelKey = p?.model ?? "";
       this._deviceId = p?.device_id ?? "";
       this._smart = p?.smart_toggle ?? false;
-      this._up = HomexShutterPresetEditor._cond(p?.moving_up);
-      this._down = HomexShutterPresetEditor._cond(p?.moving_down);
-      this._stopped = HomexShutterPresetEditor._cond(p?.stopped);
+      this._up = this._cond(p?.moving_up);
+      this._down = this._cond(p?.moving_down);
+      this._stopped = this._cond(p?.stopped);
       this._idEdited = !!p;
       this._busy = false;
     }
@@ -186,9 +206,9 @@ export class HomexShutterPresetEditor extends LitElement {
     this._modelKey = key;
     const m = this._model();
     this._deviceId = m?.devices[0]?.device_id ?? "";
-    this._up = { entity_id: "", state: "" };
-    this._down = { entity_id: "", state: "" };
-    this._stopped = { entity_id: "", state: "" };
+    this._up = { ...HomexShutterPresetEditor.EMPTY };
+    this._down = { ...HomexShutterPresetEditor.EMPTY };
+    this._stopped = { ...HomexShutterPresetEditor.EMPTY };
     if (m && !this._idEdited) {
       this._name = m.label;
       this._id = slugify(m.label);
@@ -199,23 +219,40 @@ export class HomexShutterPresetEditor extends LitElement {
     if (!this._idEdited) this._id = slugify(v);
   }
 
-  /** Sensors of the reference device (to build motion-state conditions from). */
-  private _refEntities(): { entity_id: string; name: string }[] {
+  /** Sensors of the reference device, exposed generically (domain + suffix).
+   * The suffix (entity object-id minus the device slug) is what is stored, so
+   * the sensor can be reconstructed for any device of the model. */
+  private _refSensors(): {
+    domain: string;
+    suffix: string;
+    key: string;
+    entity_id: string;
+  }[] {
     const reg = this.hass.entities || {};
     const CAPTEURS = new Set(["sensor", "binary_sensor"]);
+    const slug = this._deviceSlug();
     return Object.values(reg)
       .filter(
         (e: any) =>
           e.device_id === this._deviceId &&
           CAPTEURS.has(String(e.entity_id).split(".")[0])
       )
-      .map((e: any) => ({
-        entity_id: e.entity_id,
-        name:
-          this.hass.states[e.entity_id]?.attributes?.friendly_name ||
-          e.entity_id,
-      }))
-      .sort((a: any, b: any) => a.name.localeCompare(b.name));
+      .map((e: any) => {
+        const [domain, objectId = ""] = String(e.entity_id).split(".");
+        const suffix =
+          slug && objectId.startsWith(slug + "_")
+            ? objectId.slice(slug.length + 1)
+            : objectId;
+        return { domain, suffix, key: `${domain}|${suffix}`, entity_id: e.entity_id };
+      })
+      .sort((a, b) => a.suffix.localeCompare(b.suffix));
+  }
+
+  /** The reference-device entity id for a condition (reconstructed from suffix). */
+  private _condEntityId(cond: ShutterCondition): string {
+    if (!cond.domain || !cond.suffix) return "";
+    const slug = this._deviceSlug();
+    return `${cond.domain}.${slug ? slug + "_" : ""}${cond.suffix}`;
   }
 
   /** Suggested values for a sensor: its enum options + its current state. */
@@ -239,23 +276,25 @@ export class HomexShutterPresetEditor extends LitElement {
     onChange: (v: ShutterCondition) => void
   ) {
     const listId = `dl-${key}`;
-    const suggestions = this._sensorValues(cond.entity_id);
+    const selected = cond.domain && cond.suffix ? `${cond.domain}|${cond.suffix}` : "";
+    const suggestions = this._sensorValues(this._condEntityId(cond));
     return html`<div class="cond">
       <div class="section">${title}</div>
       <p class="hint">${hint}</p>
       <div class="cond-row">
         <select
-          .value=${cond.entity_id}
-          @change=${(e: Event) =>
-            onChange({
-              ...cond,
-              entity_id: (e.target as HTMLSelectElement).value,
-            })}
+          .value=${selected}
+          @change=${(e: Event) => {
+            const [domain = "", suffix = ""] = (
+              e.target as HTMLSelectElement
+            ).value.split("|");
+            onChange({ ...cond, domain, suffix });
+          }}
         >
           <option value="">— Capteur —</option>
-          ${this._refEntities().map(
-            (ent) => html`<option value=${ent.entity_id} ?selected=${ent.entity_id === cond.entity_id}>
-              ${ent.name}
+          ${this._refSensors().map(
+            (s) => html`<option value=${s.key} ?selected=${s.key === selected}>
+              ${s.suffix}
             </option>`
           )}
         </select>
@@ -288,7 +327,11 @@ export class HomexShutterPresetEditor extends LitElement {
       alert("Choisis un modèle et un device de référence.");
       return;
     }
-    const empty = { entity_id: "", state: "" };
+    // Values are matched case-insensitively → store them lowercased.
+    const norm = (c: ShutterCondition): ShutterCondition =>
+      this._smart
+        ? { ...c, state: (c.state || "").trim().toLowerCase() }
+        : { ...HomexShutterPresetEditor.EMPTY };
     this._busy = true;
     try {
       await saveShutterPreset(this.hass, {
@@ -298,9 +341,9 @@ export class HomexShutterPresetEditor extends LitElement {
         model_label: this._model()?.label ?? this._modelKey,
         device_id: this._deviceId,
         smart_toggle: this._smart,
-        moving_up: this._smart ? this._up : empty,
-        moving_down: this._smart ? this._down : empty,
-        stopped: this._smart ? this._stopped : empty,
+        moving_up: norm(this._up),
+        moving_down: norm(this._down),
+        stopped: norm(this._stopped),
       });
       this._close();
     } catch (err) {
@@ -352,9 +395,9 @@ export class HomexShutterPresetEditor extends LitElement {
               .value=${this._deviceId}
               @change=${(e: Event) => {
                 this._deviceId = (e.target as HTMLSelectElement).value;
-                this._up = { entity_id: "", state: "" };
-                this._down = { entity_id: "", state: "" };
-                this._stopped = { entity_id: "", state: "" };
+                this._up = { ...HomexShutterPresetEditor.EMPTY };
+                this._down = { ...HomexShutterPresetEditor.EMPTY };
+                this._stopped = { ...HomexShutterPresetEditor.EMPTY };
               }}
             >
               ${model.devices.map(
