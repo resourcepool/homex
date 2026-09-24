@@ -723,6 +723,23 @@ class RoomController:
     def bind_room_switch(self, entity) -> None:
         self._room_switch = entity
 
+    @property
+    def last_scene_key(self) -> str | None:
+        return self._last_scene_key
+
+    def restore_scene_memory(
+        self, last_key: str | None, active_key: str | None
+    ) -> None:
+        """Restore the scene memory persisted on the room switch (after a restart).
+
+        Keys that no longer exist are harmless: every consumer checks them
+        against the current scene order and falls back to the first scene.
+        """
+        if last_key and self._last_scene_key is None:
+            self._last_scene_key = last_key
+        if active_key and self._active_scene_key is None:
+            self._update_active(active_key)
+
     def _update_active(self, key: str | None) -> None:
         """Record the active scene and expose it on the room switch."""
         self._active_scene_key = key

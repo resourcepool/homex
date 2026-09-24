@@ -61,7 +61,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "97"
+PANEL_VERSION = "99"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -1168,17 +1168,37 @@ async def ws_layout_delete(hass: HomeAssistant, connection, msg) -> None:
 async def _action_device_ids(hass: HomeAssistant) -> dict[str, list]:
     """Device triggers for every device that exposes an "action" trigger."""
     dev_reg = dr.async_get(hass)
+
+    def with_action(autos: dict) -> dict[str, list]:
+        return {
+            dev_id: triggers
+            for dev_id, triggers in autos.items()
+            if any(t.get("type") == "action" for t in triggers)
+        }
+
+    # device_ids=None: HA lists every device itself. Passing list(dev_reg.devices)
+    # broke in HA 2026.9 (iterating the registry now yields DeviceEntry objects,
+    # not ids → DeviceNotFound), and None also skips devices whose integration
+    # raises InvalidDeviceAutomationConfig instead of failing the whole call.
     try:
-        autos = await async_get_device_automations(
-            hass, DeviceAutomationType.TRIGGER, list(dev_reg.devices)
+        return with_action(
+            await async_get_device_automations(hass, DeviceAutomationType.TRIGGER)
         )
     except Exception:  # noqa: BLE001
-        return {}
-    return {
-        dev_id: triggers
-        for dev_id, triggers in autos.items()
-        if any(t.get("type") == "action" for t in triggers)
-    }
+        _LOGGER.debug("Bulk device trigger listing failed", exc_info=True)
+    # Still failing: query device by device so the others still show up.
+    autos: dict[str, list] = {}
+    # Iterating the registry yields device ids before HA 2026.9, entries since.
+    for dev_id in [getattr(d, "id", d) for d in dev_reg.devices]:
+        try:
+            autos.update(
+                await async_get_device_automations(
+                    hass, DeviceAutomationType.TRIGGER, [dev_id]
+                )
+            )
+        except Exception:  # noqa: BLE001
+            _LOGGER.debug("Device triggers failed for %s", dev_id, exc_info=True)
+    return with_action(autos)
 
 
 @websocket_api.websocket_command({vol.Required("type"): "homex/switch_devices"})

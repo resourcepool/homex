@@ -21,6 +21,10 @@ export class HomexUnitControls extends LitElement {
   static styles = [
     sharedStyles,
     css`
+      :host {
+        display: block;
+        min-width: 0;
+      }
       .controls {
         display: flex;
         align-items: center;
@@ -53,6 +57,7 @@ export class HomexUnitControls extends LitElement {
         fill: currentColor;
       }
       .area-icon {
+        flex: 0 0 auto;
         --mdc-icon-size: 22px;
         color: var(--secondary-text-color);
       }
@@ -71,10 +76,12 @@ export class HomexUnitControls extends LitElement {
       .line2 {
         display: flex;
         align-items: center;
-        gap: 8px;
+        flex-wrap: wrap;
+        gap: 4px 8px;
       }
       strong {
         font-size: 17px;
+        overflow-wrap: anywhere;
       }
       .group strong {
         font-size: 15px;
@@ -91,6 +98,7 @@ export class HomexUnitControls extends LitElement {
       .rid {
         font-size: 12px;
         color: var(--secondary-text-color);
+        overflow-wrap: anywhere;
       }
       .floor {
         font-size: 12px;

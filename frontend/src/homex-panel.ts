@@ -1,4 +1,5 @@
 import { LitElement, css, html } from "lit";
+import { mdiDownload, mdiMenu, mdiRefresh } from "@mdi/js";
 import { customElement, property, state } from "lit/decorators.js";
 import type { HomeAssistant, Room } from "./types";
 import { HOMEX_CHANGED } from "./types";
@@ -12,7 +13,7 @@ import "./components/homex-shutter-manager";
 
 // Bump together with PANEL_VERSION in panel.py. Shown in the header so you can
 // confirm a full page reload picked up the latest build.
-const BUILD = "96";
+const BUILD = "99";
 
 /** Homex sidebar panel: lists rooms and orchestrates loading / reloading. */
 @customElement("homex-panel")
@@ -47,8 +48,32 @@ export class HomexPanel extends LitElement {
     header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px 12px;
       margin-bottom: 16px;
+    }
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1 1 auto;
+    }
+    /* HA hides its sidebar on narrow screens: panels must offer the toggle. */
+    .menu-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      margin-left: -8px;
+      border-radius: 50%;
+      background: transparent;
+    }
+    .menu-btn svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
     }
     h1 {
       font-size: 22px;
@@ -64,6 +89,27 @@ export class HomexPanel extends LitElement {
     .header-actions {
       display: flex;
       gap: 8px;
+      margin-left: auto;
+    }
+    .header-actions button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    .ico {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+    @media (max-width: 600px) {
+      .wrap {
+        padding: 12px;
+      }
+      /* Icon-only secondary actions to fit a phone width. */
+      .lbl {
+        display: none;
+      }
     }
     button {
       cursor: pointer;
@@ -179,6 +225,12 @@ export class HomexPanel extends LitElement {
     }
   };
 
+  private _toggleSidebar() {
+    this.dispatchEvent(
+      new Event("hass-toggle-menu", { bubbles: true, composed: true })
+    );
+  }
+
   private _onOpenSwitchAdd = (e: CustomEvent) => {
     this._switchAddRoom = e.detail?.room_id ?? null;
     this._switchStartAdd = true;
@@ -269,14 +321,30 @@ export class HomexPanel extends LitElement {
     return html`
       <div class="wrap" @open-switch-add=${this._onOpenSwitchAdd}>
         <header>
-          <h1>Homex <span class="ver">v${BUILD}</span></h1>
+          <div class="title">
+            ${this.narrow
+              ? html`<button
+                  class="menu-btn"
+                  title="Menu"
+                  @click=${this._toggleSidebar}
+                >
+                  <svg viewBox="0 0 24 24"><path d=${mdiMenu}></path></svg>
+                </button>`
+              : ""}
+            <h1>Homex <span class="ver">v${BUILD}</span></h1>
+          </div>
           <div class="header-actions">
-            <button @click=${this._reload}>Rafraîchir</button>
+            <button title="Rafraîchir" @click=${this._reload}>
+              <svg class="ico" viewBox="0 0 24 24"><path d=${mdiRefresh}></path></svg
+              ><span class="lbl">Rafraîchir</span>
+            </button>
             <button
+              title="Exporter"
               ?disabled=${!this._rooms?.length}
               @click=${() => (this._exportOpen = true)}
             >
-              ⬇ Exporter
+              <svg class="ico" viewBox="0 0 24 24"><path d=${mdiDownload}></path></svg
+              ><span class="lbl">Exporter</span>
             </button>
             <button class="primary" @click=${() => (this._createOpen = true)}>
               ＋ Nouvelle pièce

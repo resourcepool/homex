@@ -79,6 +79,7 @@ export class HomexRoomCard extends LitElement {
       .head {
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
         gap: 8px;
         cursor: pointer;
       }
@@ -88,13 +89,17 @@ export class HomexRoomCard extends LitElement {
         height: 24px;
         fill: var(--secondary-text-color);
       }
+      /* Title shrinks (min-width: 0) and the actions wrap onto their own
+         line on narrow screens instead of overflowing the card. */
       homex-unit-controls {
-        flex: 1;
+        flex: 1 1 160px;
+        min-width: 0;
       }
       .head-actions {
         display: flex;
         align-items: center;
         gap: 4px;
+        margin-left: auto;
       }
       .round {
         width: 42px;
@@ -213,10 +218,23 @@ export class HomexRoomCard extends LitElement {
       .switch-name {
         font-size: 15px;
         font-weight: 500;
+        min-width: 0;
+        overflow-wrap: anywhere;
       }
       .switch-meta {
         font-size: 12px;
         color: var(--secondary-text-color);
+        text-align: right;
+      }
+      @media (max-width: 600px) {
+        .switch-row {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 2px;
+        }
+        .switch-meta {
+          text-align: left;
+        }
       }
       .shutter-group {
         border: 1px solid var(--divider-color, #e0e0e0);

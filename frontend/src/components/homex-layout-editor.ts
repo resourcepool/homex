@@ -65,6 +65,11 @@ export class HomexLayoutEditor extends LitElement {
         flex: 1 1 260px;
         min-width: 240px;
       }
+      /* Canvas column: 380px wide, shrinking to the screen on phones. */
+      .stage {
+        flex: 0 1 380px;
+        min-width: 0;
+      }
       .fields {
         display: flex;
         gap: 10px;
@@ -123,7 +128,7 @@ export class HomexLayoutEditor extends LitElement {
       }
       svg.canvas {
         width: 380px;
-        max-width: 78vw;
+        max-width: 100%;
         height: auto;
         aspect-ratio: 1;
         background: var(--card-background-color, #111);
@@ -197,7 +202,7 @@ export class HomexLayoutEditor extends LitElement {
         border: 1px dashed var(--divider-color, #666);
         border-radius: 8px;
         width: 380px;
-        max-width: 78vw;
+        max-width: 100%;
         box-sizing: border-box;
       }
       .tray.over {
@@ -673,7 +678,7 @@ export class HomexLayoutEditor extends LitElement {
           </p>
         </div>
 
-        <div>
+        <div class="stage">
           <svg class="canvas" viewBox="0 0 20 20">
             <defs>
               <clipPath id="shapeclip">${this._shapeClip()}</clipPath>

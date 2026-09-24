@@ -45,7 +45,12 @@ class RoomSwitch(SwitchEntity, RestoreEntity):
     @property
     def extra_state_attributes(self) -> dict:
         # The active scene (key) while the room is on; None when off.
-        return {"active_scene": self._active_scene}
+        attrs = {"active_scene": self._active_scene}
+        if self._unit.is_room:
+            # Last used scene, persisted (RestoreEntity) so recall_last
+            # survives a Home Assistant restart.
+            attrs["last_scene"] = self._unit._controller.last_scene_key
+        return attrs
 
     async def async_added_to_hass(self) -> None:
         await super().async_added_to_hass()
@@ -68,6 +73,14 @@ class RoomSwitch(SwitchEntity, RestoreEntity):
                     )
                 )
             self._recompute_room_on()
+            if last_state is not None:
+                attrs = last_state.attributes
+                active = attrs.get("active_scene")
+                self._unit._controller.restore_scene_memory(
+                    attrs.get("last_scene") or active,
+                    # Only still "active" if the room actually came back on.
+                    active if self._attr_is_on else None,
+                )
 
     def _any_part_on(self) -> bool:
         ids = [*self._unit.devices, *self._unit._controller.group_switch_ids]

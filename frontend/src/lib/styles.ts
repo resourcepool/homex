@@ -41,21 +41,16 @@ export const sharedStyles = css`
     font-weight: 500;
     margin: 20px 0 8px;
     color: var(--primary-text-color);
+    overflow-wrap: anywhere;
   }
   .actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     margin-top: 20px;
   }
 
-  /* Native Material text field, full width with breathing room. */
-  ha-textfield {
-    display: block;
-    width: 100%;
-    margin: 12px 0;
-  }
-
-  /* Fallback text field (stacked label + large input). */
+  /* Text field (stacked label + large input). */
   .field {
     display: flex;
     flex-direction: column;

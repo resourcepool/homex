@@ -59,6 +59,8 @@ export class HomexSwitchMapping extends LitElement {
   @state() private _mappings: Record<string, Record<string, SwitchButtonAction>> = {};
   @state() private _tapTab: TapMode = "single";
   @state() private _dragId = "";
+  // Action picked by a tap, assigned by tapping a button (touch screens).
+  @state() private _picked = "";
   @state() private _dropBtn: number | null = null; // button highlighted under a drag
   @state() private _busy = false;
 
@@ -78,6 +80,25 @@ export class HomexSwitchMapping extends LitElement {
       .right {
         flex: 1;
         min-width: 0;
+      }
+      /* Phone: switch visual first, then the action list, full width. */
+      @media (max-width: 700px) {
+        .cols {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .right {
+          order: -1;
+        }
+        .left {
+          flex: none;
+          max-height: none;
+          overflow: visible;
+        }
+        svg.canvas {
+          max-width: 320px;
+          margin: 0 auto;
+        }
       }
       .section {
         font-size: 13px;
@@ -121,6 +142,12 @@ export class HomexSwitchMapping extends LitElement {
       /* Assigned somewhere on the switch — greyed but still draggable. */
       .act.used {
         opacity: 0.45;
+      }
+      /* Picked by a tap (touch alternative to dragging). */
+      .act.picked {
+        opacity: 1;
+        border-color: var(--primary-color);
+        background: color-mix(in srgb, var(--primary-color) 18%, transparent);
       }
       .act .badge {
         flex: 0 0 auto;
@@ -287,6 +314,7 @@ export class HomexSwitchMapping extends LitElement {
       this._tapTab = this._enabledModes()[0] ?? "single";
       this._busy = false;
       this._dragId = "";
+      this._picked = "";
       this._loadRooms();
     }
   }
@@ -420,7 +448,8 @@ export class HomexSwitchMapping extends LitElement {
   }
 
   private _assign(mode: string, btn: number) {
-    const item = this._itemById(this._dragId);
+    const item = this._itemById(this._dragId || this._picked);
+    this._picked = "";
     if (!item) return;
     this._mappings = {
       ...this._mappings,
@@ -430,6 +459,11 @@ export class HomexSwitchMapping extends LitElement {
       },
     };
     this._dragId = "";
+  }
+  /** Tap on a button: assign the picked action, else clear the button. */
+  private _tapButton(mode: string, btn: number, assigned: boolean) {
+    if (this._picked) this._assign(mode, btn);
+    else if (assigned) this._clear(mode, btn);
   }
   private _clear(mode: string, btn: number) {
     const byBtn = { ...(this._mappings[mode] ?? {}) };
@@ -457,13 +491,19 @@ export class HomexSwitchMapping extends LitElement {
 
   private _actionRow(a: ActionItem, used: Set<string>) {
     return html`<div
-      class="act ${used.has(a.id) ? "used" : ""}"
+      class="act ${used.has(a.id) ? "used" : ""} ${this._picked === a.id
+        ? "picked"
+        : ""}"
       draggable="true"
-      @dragstart=${() => (this._dragId = a.id)}
+      @dragstart=${() => {
+        this._picked = "";
+        this._dragId = a.id;
+      }}
       @dragend=${() => {
         this._dragId = "";
         this._dropBtn = null;
       }}
+      @click=${() => (this._picked = this._picked === a.id ? "" : a.id)}
     >
       <span class="badge">${a.short}</span>
       <span>${a.label}</span>
@@ -520,7 +560,7 @@ export class HomexSwitchMapping extends LitElement {
             if (on) this._assign(active, z.n);
             this._dropBtn = null;
           }}
-          @click=${() => on && v && this._clear(active, z.n)}></rect>`;
+          @click=${() => on && this._tapButton(active, z.n, !!v)}></rect>`;
         if (!v || !item) {
           return svg`${rect}<text class="bn" x=${cx} y=${cy}>${z.n}</text>`;
         }
@@ -558,7 +598,7 @@ export class HomexSwitchMapping extends LitElement {
             this._assign(active, n);
             this._dropBtn = null;
           }}
-          @click=${() => v && this._clear(active, n)}
+          @click=${() => this._tapButton(active, n, !!v)}
         >
           <span class="ichip-n">${n}</span>
           ${item
@@ -610,8 +650,8 @@ export class HomexSwitchMapping extends LitElement {
                       `
                     )}
             <p class="hint">
-              Glisse une action sur un bouton du canvas. Clique un bouton assigné
-              pour le vider.
+              Glisse une action sur un bouton du canvas (ou touche une action
+              puis un bouton). Touche un bouton assigné pour le vider.
             </p>
           </div>
           <div class="right">

@@ -66,6 +66,16 @@ export class HomexDialog extends LitElement {
       padding: 12px 20px;
       border-top: 1px solid var(--divider-color, #e0e0e0);
     }
+    @media (max-width: 600px) {
+      .content {
+        padding: 16px 14px;
+      }
+      header,
+      .footer {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+    }
   `;
 
   private _close() {

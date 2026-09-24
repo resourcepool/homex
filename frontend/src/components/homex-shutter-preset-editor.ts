@@ -132,16 +132,20 @@ export class HomexShutterPresetEditor extends LitElement {
       }
       .cond-row {
         display: flex;
+        flex-wrap: wrap;
         gap: 8px;
         align-items: center;
         margin: 6px 0;
       }
+      /* Sensor + value side by side, stacked when too narrow. */
       .cond-row select {
-        flex: 2;
+        flex: 2 1 180px;
+        min-width: 0;
         margin: 0;
       }
       .cond-row input {
-        flex: 1;
+        flex: 1 1 100px;
+        min-width: 0;
         box-sizing: border-box;
         padding: 12px 14px;
         font-size: 15px;

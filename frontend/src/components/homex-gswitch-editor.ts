@@ -55,26 +55,63 @@ export class HomexGswitchEditor extends LitElement {
         color: var(--primary-text-color);
         margin: 6px 0;
       }
-      .rooms {
+      details.multi {
+        position: relative;
+        margin: 6px 0;
+      }
+      details.multi summary {
+        list-style: none;
         display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin: 4px 0 8px;
-      }
-      .chip {
-        display: inline-flex;
         align-items: center;
-        padding: 6px 12px;
-        border-radius: 16px;
+        gap: 8px;
+        padding: 12px 14px;
+        font-size: 15px;
         border: 1px solid var(--divider-color, #ccc);
-        cursor: pointer;
-        font-size: 14px;
-        user-select: none;
+        border-radius: 8px;
+        background: var(--card-background-color, #fff);
+        color: var(--primary-text-color);
       }
-      .chip.on {
-        background: var(--primary-color);
-        color: var(--text-primary-color, #fff);
+      details.multi summary::-webkit-details-marker {
+        display: none;
+      }
+      details.multi summary span {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      details.multi summary span.placeholder {
+        color: var(--secondary-text-color);
+      }
+      details.multi[open] summary {
+        margin-bottom: 0;
         border-color: var(--primary-color);
+      }
+      .options {
+        position: absolute;
+        z-index: 2;
+        left: 0;
+        right: 0;
+        margin-top: 4px;
+        max-height: 260px;
+        overflow-y: auto;
+        padding: 4px 0;
+        border: 1px solid var(--divider-color, #ccc);
+        border-radius: 8px;
+        background: var(--card-background-color, #fff);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+      .options label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 14px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .options label:hover {
+        background: var(--secondary-background-color, rgba(127, 127, 127, 0.12));
       }
       .hint {
         font-size: 12px;
@@ -266,6 +303,36 @@ export class HomexGswitchEditor extends LitElement {
     </div>`;
   }
 
+  /** Rooms multi-select: a dropdown of checkable rooms. */
+  private _renderRooms() {
+    if (!this._allRooms.length) {
+      return html`<p class="hint">Aucune pièce avec le module Switches.</p>`;
+    }
+    const selected = this._allRooms
+      .filter((r) => this._rooms.includes(r.room_id))
+      .map((r) => r.name);
+    return html`<details class="multi">
+      <summary>
+        <span class=${selected.length ? "" : "placeholder"}>
+          ${selected.length ? selected.join(", ") : "— Aucune pièce —"}
+        </span>
+        ▾
+      </summary>
+      <div class="options">
+        ${this._allRooms.map(
+          (r) => html`<label>
+            <input
+              type="checkbox"
+              .checked=${this._rooms.includes(r.room_id)}
+              @change=${() => this._toggleRoom(r.room_id)}
+            />
+            ${r.name}
+          </label>`
+        )}
+      </div>
+    </details>`;
+  }
+
   render() {
     const editing = !!this.sw;
     const preset = this._preset();
@@ -294,17 +361,7 @@ export class HomexGswitchEditor extends LitElement {
       ${this._deviceId ? this._renderPreset(preset) : ""}
 
       <div class="section">Pièces Homex assignées (0..n)</div>
-      <div class="rooms">
-        ${this._allRooms.length
-          ? this._allRooms.map(
-              (r) => html`<span
-                class="chip ${this._rooms.includes(r.room_id) ? "on" : ""}"
-                @click=${() => this._toggleRoom(r.room_id)}
-                >${r.name}</span
-              >`
-            )
-          : html`<span class="hint">Aucune pièce.</span>`}
-      </div>
+      ${this._renderRooms()}
 
       <div class="actions">
         ${editing
