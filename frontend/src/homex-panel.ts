@@ -13,7 +13,7 @@ import "./components/homex-shutter-manager";
 
 // Bump together with PANEL_VERSION in panel.py. Shown in the header so you can
 // confirm a full page reload picked up the latest build.
-const BUILD = "99";
+const BUILD = "100";
 
 /** Homex sidebar panel: lists rooms and orchestrates loading / reloading. */
 @customElement("homex-panel")
@@ -225,6 +225,13 @@ export class HomexPanel extends LitElement {
     }
   };
 
+  /** Leaving a manager: switches/presets changed there feed the room cards
+   * (switch action counts), so reload the rooms. */
+  private _backToRooms = () => {
+    this._view = "rooms";
+    this._reload();
+  };
+
   private _toggleSidebar() {
     this.dispatchEvent(
       new Event("hass-toggle-menu", { bubbles: true, composed: true })
@@ -303,7 +310,7 @@ export class HomexPanel extends LitElement {
             .hass=${this.hass}
             .startAdd=${this._switchStartAdd}
             .startAddRoom=${this._switchAddRoom}
-            @close=${() => (this._view = "rooms")}
+            @close=${this._backToRooms}
           ></homex-switch-manager>
         </div>
       `;
@@ -313,7 +320,7 @@ export class HomexPanel extends LitElement {
         <div class="wrap">
           <homex-shutter-manager
             .hass=${this.hass}
-            @close=${() => (this._view = "rooms")}
+            @close=${this._backToRooms}
           ></homex-shutter-manager>
         </div>
       `;

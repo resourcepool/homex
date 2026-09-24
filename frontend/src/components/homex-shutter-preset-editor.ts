@@ -24,6 +24,7 @@ export class HomexShutterPresetEditor extends LitElement {
   @property({ attribute: false }) preset: ShutterPreset | null = null;
 
   @state() private _name = "";
+  private _nameTyped = false; // name typed by the user (not a model default)
   @state() private _id = "";
   @state() private _models: ShutterModel[] = [];
   @state() private _modelKey = "";
@@ -191,6 +192,7 @@ export class HomexShutterPresetEditor extends LitElement {
     if (changed.has("preset")) {
       const p = this.preset;
       this._name = p?.name ?? "";
+      this._nameTyped = !!p;
       this._id = p?.id ?? "";
       this._modelKey = p?.model ?? "";
       this._deviceId = p?.device_id ?? "";
@@ -213,13 +215,15 @@ export class HomexShutterPresetEditor extends LitElement {
     this._up = { ...HomexShutterPresetEditor.EMPTY };
     this._down = { ...HomexShutterPresetEditor.EMPTY };
     this._stopped = { ...HomexShutterPresetEditor.EMPTY };
-    if (m && !this._idEdited) {
+    // Default the name to the model label unless the user typed one.
+    if (m && (!this._name.trim() || !this._nameTyped)) {
       this._name = m.label;
-      this._id = slugify(m.label);
+      if (!this._idEdited) this._id = slugify(m.label);
     }
   }
   private _onName(v: string) {
     this._name = v;
+    this._nameTyped = true;
     if (!this._idEdited) this._id = slugify(v);
   }
 

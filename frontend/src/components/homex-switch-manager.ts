@@ -38,6 +38,8 @@ export class HomexSwitchManager extends LitElement {
   @state() private _editingSwitch = false;
   @state() private _editSwitch: GlobalSwitch | null = null;
   private _fromSwitchFlow = false;
+  // Switch form left to create a preset, restored when the preset closes.
+  @state() private _switchDraft: Partial<GlobalSwitch> | null = null;
 
   static styles = [
     sharedStyles,
@@ -172,6 +174,7 @@ export class HomexSwitchManager extends LitElement {
       this._startAddHandled = true;
       this._section = "switches";
       this._editSwitch = null;
+      this._switchDraft = null;
       this._addRooms = this.startAddRoom ? [this.startAddRoom] : [];
       this._editingSwitch = true;
     }
@@ -199,21 +202,29 @@ export class HomexSwitchManager extends LitElement {
     this._editingLayout = false;
     this._load();
   }
-  private _onPresetClosed() {
+  private _onPresetClosed(e?: CustomEvent) {
     this._editingPreset = false;
     this._prefillDevice = "";
     this._load();
     if (this._fromSwitchFlow) {
       this._fromSwitchFlow = false;
       this._section = "switches";
+      // Back to the switch being edited, on the preset just created (if any).
+      const savedId = e?.detail?.preset_id;
+      if (savedId && this._switchDraft) {
+        this._switchDraft = { ...this._switchDraft, preset_id: savedId };
+      }
+      this._editingSwitch = true;
     }
   }
   private _onSwitchClosed() {
     this._editingSwitch = false;
+    this._switchDraft = null;
     this._load();
   }
   private _onCreatePreset(e: CustomEvent) {
     // From the switch editor: no preset for the device model — create one.
+    this._switchDraft = e.detail.draft ?? null;
     this._editingSwitch = false;
     this._prefillDevice = e.detail.device_id || "";
     this._editPreset = null;
@@ -232,6 +243,7 @@ export class HomexSwitchManager extends LitElement {
       this._editingPreset = true;
     } else {
       this._editSwitch = null;
+      this._switchDraft = null;
       this._addRooms = [];
       this._editingSwitch = true;
     }
@@ -278,7 +290,7 @@ export class HomexSwitchManager extends LitElement {
     if (this._editingPreset) {
       return html`
         <div class="head">
-          <button @click=${this._onPresetClosed}>← Presets</button>
+          <button @click=${() => this._onPresetClosed()}>← Presets</button>
           <h2>${this._editPreset ? "Modifier le preset" : "Nouveau device preset"}</h2>
         </div>
         <div class="editor">
@@ -304,6 +316,7 @@ export class HomexSwitchManager extends LitElement {
             .sw=${this._editSwitch}
             .presets=${this._presets}
             .initialRooms=${this._addRooms}
+            .draft=${this._switchDraft}
             @switch-closed=${this._onSwitchClosed}
             @create-preset=${this._onCreatePreset}
           ></homex-gswitch-editor>
@@ -412,6 +425,7 @@ export class HomexSwitchManager extends LitElement {
           class="card"
           @click=${() => {
             this._editSwitch = s;
+            this._switchDraft = null;
             this._editingSwitch = true;
           }}
         >

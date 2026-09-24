@@ -9,6 +9,7 @@ import type {
   SwitchLayout,
   TapMode,
 } from "../types";
+import { fireChanged } from "../types";
 import { errorMessage, fetchRooms, saveGlobalSwitch } from "../api";
 import { sharedStyles } from "../lib/styles";
 import "./homex-dialog";
@@ -478,6 +479,7 @@ export class HomexSwitchMapping extends LitElement {
     this._busy = true;
     try {
       await saveGlobalSwitch(this.hass, { ...this.sw, mappings: this._mappings });
+      fireChanged(this); // rooms' switch action counts depend on the mappings
       this._close();
     } catch (err) {
       this._busy = false;

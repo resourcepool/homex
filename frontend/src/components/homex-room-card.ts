@@ -811,23 +811,24 @@ export class HomexRoomCard extends LitElement {
       </ha-sortable>
       ${pinned.map((sc) => this._sceneRow(sc, activeKey))}
 
+      <div class="section-row">
+        <span class="section">Groupes</span>
+        <button @click=${() => this._pick("addgroup")}>＋ Groupe</button>
+      </div>
       ${r.groups.length
-        ? html`
-            <div class="section-row">
-              <span class="section">Groupes</span>
-              <button @click=${() => this._pick("addgroup")}>＋ Groupe</button>
-            </div>
-            <div class="groups">
-              ${r.groups.map(
-                (g) => html`<homex-group-row
-                  .hass=${this.hass}
-                  .room=${r}
-                  .group=${g}
-                ></homex-group-row>`
-              )}
-            </div>
-          `
-        : ""}
+        ? html`<div class="groups">
+            ${r.groups.map(
+              (g) => html`<homex-group-row
+                .hass=${this.hass}
+                .room=${r}
+                .group=${g}
+              ></homex-group-row>`
+            )}
+          </div>`
+        : html`<div class="empty-body">
+            Aucun groupe. Un groupe pilote une partie des lumières de la pièce
+            (ex. une lampe de chevet).
+          </div>`}
     `;
   }
 

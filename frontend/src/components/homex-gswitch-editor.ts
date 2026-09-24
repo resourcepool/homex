@@ -30,6 +30,8 @@ export class HomexGswitchEditor extends LitElement {
   @property({ attribute: false }) sw: GlobalSwitch | null = null;
   @property({ attribute: false }) presets: DevicePreset[] = [];
   @property({ attribute: false }) initialRooms: string[] = [];
+  // Unsaved form state to restore (after a detour to create a preset).
+  @property({ attribute: false }) draft: Partial<GlobalSwitch> | null = null;
 
   @state() private _name = "";
   @state() private _id = "";
@@ -146,13 +148,14 @@ export class HomexGswitchEditor extends LitElement {
   ];
 
   willUpdate(changed: Map<string, unknown>) {
-    if (changed.has("sw")) {
-      this._name = this.sw?.name ?? "";
-      this._id = this.sw?.id ?? "";
-      this._deviceId = this.sw?.device_id ?? "";
-      this._presetId = this.sw?.preset_id ?? "";
-      this._rooms = [...(this.sw?.rooms ?? this.initialRooms ?? [])];
-      this._idEdited = !!this.sw;
+    if (changed.has("sw") || changed.has("draft")) {
+      const src = { ...(this.sw ?? {}), ...(this.draft ?? {}) };
+      this._name = src.name ?? "";
+      this._id = src.id ?? "";
+      this._deviceId = src.device_id ?? "";
+      this._presetId = src.preset_id ?? "";
+      this._rooms = [...(src.rooms ?? this.initialRooms ?? [])];
+      this._idEdited = !!this.sw || !!this.draft?.id;
       this._busy = false;
       this._loadRooms();
     }
@@ -173,7 +176,26 @@ export class HomexGswitchEditor extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     this._loadDevices();
+    document.addEventListener("click", this._closeRoomsOutside);
+    document.addEventListener("keydown", this._closeRoomsOnEscape);
   }
+  disconnectedCallback() {
+    document.removeEventListener("click", this._closeRoomsOutside);
+    document.removeEventListener("keydown", this._closeRoomsOnEscape);
+    super.disconnectedCallback();
+  }
+  // The rooms dropdown overlays the form: close it like a native select.
+  private _roomsDropdown(): HTMLDetailsElement | null {
+    return this.shadowRoot?.querySelector("details.multi") ?? null;
+  }
+  private _closeRoomsOutside = (e: Event) => {
+    const d = this._roomsDropdown();
+    if (d?.open && !e.composedPath().includes(d)) d.open = false;
+  };
+  private _closeRoomsOnEscape = (e: KeyboardEvent) => {
+    const d = this._roomsDropdown();
+    if (d?.open && e.key === "Escape") d.open = false;
+  };
   private async _loadDevices() {
     try {
       this._devices = await fetchSwitchDevices(this.hass);
@@ -221,7 +243,18 @@ export class HomexGswitchEditor extends LitElement {
   private _createPreset() {
     // Ask the manager to open the Device Preset editor for this model.
     this.dispatchEvent(
-      new CustomEvent("create-preset", { detail: { device_id: this._deviceId } })
+      new CustomEvent("create-preset", {
+        detail: {
+          device_id: this._deviceId,
+          draft: {
+            name: this._name,
+            id: this._id,
+            device_id: this._deviceId,
+            preset_id: this._presetId,
+            rooms: this._rooms,
+          },
+        },
+      })
     );
   }
 

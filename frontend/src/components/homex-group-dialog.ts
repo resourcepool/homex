@@ -159,7 +159,7 @@ export class HomexGroupDialog extends LitElement {
 
   private async _delete() {
     if (!this.group) return;
-    if (!confirm(`Supprimer le groupe "${this.group.group_id}" ?`)) return;
+    if (!confirm(`Supprimer le groupe "${this.group.name || this.group.group_id}" ?`)) return;
     this._busy = true;
     try {
       await deleteGroup(this.hass, this.room.entry_id, this.group.group_id);

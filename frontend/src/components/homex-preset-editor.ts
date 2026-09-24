@@ -31,6 +31,7 @@ export class HomexPresetEditor extends LitElement {
   @property({ attribute: false }) prefillDevice = "";
 
   @state() private _name = "";
+  private _nameTyped = false; // name typed by the user (not a model default)
   @state() private _id = "";
   @state() private _deviceId = ""; // reference device the actions are pulled from
   @state() private _modelKey = "";
@@ -167,6 +168,7 @@ export class HomexPresetEditor extends LitElement {
     if (changed.has("preset")) {
       const p = this.preset;
       this._name = p?.name ?? "";
+      this._nameTyped = !!p;
       this._id = p?.id ?? "";
       this._deviceId = p?.device_id ?? this.prefillDevice ?? "";
       this._modelKey =
@@ -238,9 +240,10 @@ export class HomexPresetEditor extends LitElement {
     // Changing model invalidates action bindings (different action set).
     this._bindings = {};
     if (model) {
-      if (!this._idEdited) {
+      // Default the name to the model label unless the user typed one.
+      if (!this._name.trim() || !this._nameTyped) {
         this._name = model.label;
-        this._id = slugify(model.label);
+        if (!this._idEdited) this._id = slugify(model.label);
       }
       this._loadActions();
     }
@@ -288,14 +291,18 @@ export class HomexPresetEditor extends LitElement {
   }
   private _onName(v: string) {
     this._name = v;
+    this._nameTyped = true;
     if (!this._idEdited) this._id = slugify(v);
   }
   private _onId(v: string) {
     this._id = v;
     this._idEdited = true;
   }
-  private _close() {
-    this.dispatchEvent(new CustomEvent("preset-closed"));
+  /** ``savedId``: the preset just saved, so a caller can select it. */
+  private _close(savedId = "") {
+    this.dispatchEvent(
+      new CustomEvent("preset-closed", { detail: { preset_id: savedId } })
+    );
   }
 
   private async _save() {
@@ -325,7 +332,7 @@ export class HomexPresetEditor extends LitElement {
         taps: this._taps,
         bindings: this._bindings,
       });
-      this._close();
+      this._close(id);
     } catch (err) {
       this._busy = false;
       alert("Erreur Homex : " + errorMessage(err));

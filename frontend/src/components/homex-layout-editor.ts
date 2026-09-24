@@ -45,6 +45,9 @@ export class HomexLayoutEditor extends LitElement {
   @state() private _rows = 1;
   @state() private _colLines: number[] = [];
   @state() private _rowLines: number[] = [];
+  // Buttons made invisible on purpose (dragged to the tray): never auto-placed,
+  // unlike buttons left unplaced only for lack of a free cell.
+  private _userHidden = new Set<number>();
   @state() private _assignments: number[] = [];
   @state() private _busy = false;
   @state() private _dragClient: { x: number; y: number } | null = null;
@@ -293,6 +296,8 @@ export class HomexLayoutEditor extends LitElement {
         this._resetDividers();
       }
       this._assignments = l?.assignments ? [...l.assignments] : [];
+      // A stored layout's unplaced buttons were made invisible on purpose.
+      this._userHidden = new Set(l?.assignments ? this._unassigned() : []);
       this._reconcile();
     }
   }
@@ -326,8 +331,13 @@ export class HomexLayoutEditor extends LitElement {
 
   /** Fit the per-cell assignments to the current button count and grid: keep
    * placements that still fit, then place any not-yet-placed button in a free
-   * cell. Buttons that don't fit remain unassigned (save is blocked). */
+   * cell. Buttons that don't fit remain unassigned (save is blocked).
+   * Buttons the user made invisible are never auto-placed. */
   private _reconcile() {
+    for (const bn of [...this._userHidden]) {
+      if (bn > this._buttons) this._userHidden.delete(bn);
+    }
+    const hidden = this._userHidden;
     const zones = Math.max(1, this._columns) * Math.max(1, this._rows);
     const old = this._assignments;
     const next = new Array(zones).fill(0);
@@ -340,7 +350,7 @@ export class HomexLayoutEditor extends LitElement {
       }
     }
     for (let bn = 1; bn <= this._buttons; bn++) {
-      if (!present.has(bn)) {
+      if (!present.has(bn) && !hidden.has(bn)) {
         const idx = next.indexOf(0);
         if (idx >= 0) {
           next[idx] = bn;
@@ -470,10 +480,14 @@ export class HomexLayoutEditor extends LitElement {
         if (d.fromCell >= 0) {
           [a[d.fromCell], a[this._hoverCell]] = [a[this._hoverCell], a[d.fromCell]];
         } else {
-          a[this._hoverCell] = d.button; // from tray: displaces the occupant
+          // From tray: displaces the occupant, which becomes invisible.
+          if (a[this._hoverCell] > 0) this._userHidden.add(a[this._hoverCell]);
+          a[this._hoverCell] = d.button;
+          this._userHidden.delete(d.button);
         }
         this._assignments = a;
       } else if (this._overTray && d.fromCell >= 0) {
+        this._userHidden.add(a[d.fromCell]);
         a[d.fromCell] = 0; // send back to the invisible tray
         this._assignments = a;
       }
