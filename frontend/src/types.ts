@@ -76,14 +76,24 @@ export interface ShutterModel {
   devices: { device_id: string; name: string }[];
 }
 
-/** One "sensor == value" identifier used to detect a shutter motion state.
- * The sensor is stored generically (domain + entity-id suffix after the device
- * slug) so it can be reconstructed per device: `{domain}.{device_slug}_{suffix}`.
+/** One "value == state" identifier used to detect a shutter motion state,
+ * stored generically so it applies to every device of the model:
+ * - source "entity": a HA sensor, `{domain}.{device_slug}_{suffix}`;
+ * - source "z2m": a field of the device's Zigbee2MQTT JSON state (dot path).
  * The value is matched case-insensitively. */
 export interface ShutterCondition {
-  domain: string; // "sensor" | "binary_sensor"
-  suffix: string; // entity object-id part after the device slug
+  source?: "entity" | "z2m"; // absent = "entity" (older presets)
+  domain: string; // "sensor" | "binary_sensor" (entity source)
+  suffix: string; // entity object-id part after the device slug (entity source)
+  field?: string; // Z2M state field, e.g. "motor_run_status" (z2m source)
   state: string; // matched value (case-insensitive)
+}
+
+/** A device's Zigbee2MQTT state, flattened (see homex/z2m/state). */
+export interface Z2MState {
+  available: boolean; // a Z2M device and MQTT is set up
+  topic: string | null;
+  fields: { field: string; value: unknown }[];
 }
 
 /** A shutter device preset: how to smart-toggle a shutter model's covers. */

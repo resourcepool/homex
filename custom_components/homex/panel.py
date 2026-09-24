@@ -49,6 +49,7 @@ from .const import (
     SCENES_LOCK,
     STRATEGY_RECALL_FIRST,
     STRATEGY_RECALL_LAST,
+    Z2M_BRIDGE,
 )
 from .room import (
     RoomController,
@@ -61,7 +62,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "100"
+PANEL_VERSION = "101"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -143,6 +144,13 @@ async def _rewire_switches(hass: HomeAssistant) -> None:
         await hub.async_rewire_switches()
 
 
+async def _resync_shutters(hass: HomeAssistant) -> None:
+    """Re-watch shutter motion after the shutter preset store changes."""
+    hub = hass.data.get(DOMAIN, {}).get(HUB_DATA)
+    if hub is not None:
+        await hub.async_sync_shutters()
+
+
 def _slugify(value: str) -> str:
     """Normalize a label into a valid id (mirrors the frontend slugify)."""
     text = unicodedata.normalize("NFD", value or "")
@@ -188,6 +196,7 @@ async def async_register_homex_panel(hass: HomeAssistant) -> None:
         ws_shutter_preset_save,
         ws_shutter_preset_delete,
         ws_shutter_models,
+        ws_z2m_state,
         ws_scene_add,
         ws_scene_delete,
         ws_scene_reorder,
@@ -1313,6 +1322,34 @@ async def ws_shutter_models(hass: HomeAssistant, connection, msg) -> None:
     )
 
 
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/z2m/state",
+        vol.Required("device_id"): str,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_z2m_state(hass: HomeAssistant, connection, msg) -> None:
+    """A device's Zigbee2MQTT JSON state, flattened (for condition fields).
+
+    ``available`` is False when the device is not a Z2M device or MQTT is not
+    set up; ``fields`` is then empty.
+    """
+    from .z2m import Z2MBridge, flatten_fields
+
+    bridge = hass.data.setdefault(DOMAIN, {}).setdefault(Z2M_BRIDGE, Z2MBridge(hass))
+    topic = await bridge.async_topic(msg["device_id"])
+    state = await bridge.async_fetch(msg["device_id"]) if topic else None
+    fields = [
+        {"field": k, "value": v}
+        for k, v in sorted(flatten_fields(state or {}).items())
+    ]
+    connection.send_result(
+        msg["id"], {"available": bool(topic), "topic": topic, "fields": fields}
+    )
+
+
 @websocket_api.websocket_command({vol.Required("type"): "homex/shutter_presets"})
 @websocket_api.require_admin
 @websocket_api.async_response
@@ -1342,6 +1379,7 @@ async def ws_shutter_preset_save(hass: HomeAssistant, connection, msg) -> None:
     presets = [p for p in await _get_shutter_presets(hass) if p.get("id") != pid]
     presets.append(preset)
     await _set_shutter_presets(hass, presets)
+    await _resync_shutters(hass)
     connection.send_result(msg["id"], {"ok": True})
 
 
@@ -1360,6 +1398,7 @@ async def ws_shutter_preset_delete(hass: HomeAssistant, connection, msg) -> None
         if p.get("id") != msg["preset_id"]
     ]
     await _set_shutter_presets(hass, presets)
+    await _resync_shutters(hass)
     connection.send_result(msg["id"], {"ok": True})
 
 

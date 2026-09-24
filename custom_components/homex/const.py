@@ -74,6 +74,10 @@ SCENES_FILE = "scenes.yaml"
 
 # hass.data[DOMAIN] key for the shared scenes.yaml write lock.
 SCENES_LOCK = "_scenes_lock"
+# hass.data[DOMAIN] keys: Zigbee2MQTT state bridge and shutter smart toggle,
+# kept across hub reloads (cached states, last shutter directions).
+Z2M_BRIDGE = "_z2m_bridge"
+SHUTTER_MOTION = "_shutter_motion"
 
 # Domains accepted for the room devices and for the triggers.
 DEVICE_DOMAINS = ["light", "switch", "input_boolean"]

@@ -96,6 +96,7 @@ from .const import (
     MODULE_SHUTTERS,
     SCENES_FILE,
     SCENES_LOCK,
+    SHUTTER_MOTION,
     STRATEGY_RECALL_FIRST,
     STRATEGY_RECALL_LAST,
 )
@@ -477,6 +478,13 @@ class RoomController:
         covers = list((group or {}).get("devices", []) or [])
         if not covers:
             return
+        motion = self.hass.data.get(DOMAIN, {}).get(SHUTTER_MOTION)
+        if motion is not None:
+            if service == "toggle":
+                # Smart toggle for covers whose Shutter Device Preset enables it.
+                await motion.async_toggle(covers, self.new_context())
+                return
+            motion.remember(covers, service)
         await self.hass.services.async_call(
             "cover",
             service,
@@ -1343,9 +1351,14 @@ class HomexHub:
         # HA is already running (config-entry reload), else once it has started.
         if self.hass.is_running:
             await self._async_wire_switches()
+            self.hass.async_create_task(self.async_sync_shutters())
         else:
             self.hass.bus.async_listen_once(
                 EVENT_HOMEASSISTANT_STARTED, self._async_wire_switches_startup
+            )
+            # Needs MQTT (Zigbee2MQTT states) up: wait for HA to be started.
+            self.hass.bus.async_listen_once(
+                EVENT_HOMEASSISTANT_STARTED, self.async_sync_shutters
             )
 
     async def _async_wire_switches_startup(self, _event=None) -> None:
@@ -1365,8 +1378,29 @@ class HomexHub:
 
     async def async_stop(self) -> None:
         self._teardown_switches()
+        motion = self.hass.data.get(DOMAIN, {}).get(SHUTTER_MOTION)
+        if motion is not None:
+            motion.async_stop()
         for controller in self.controllers.values():
             await controller.async_stop()
+
+    async def async_sync_shutters(self, _event=None) -> None:
+        """Watch the motion of every grouped cover with a smart preset, so the
+        smart toggle knows each shutter's last direction."""
+        motion = self.hass.data.get(DOMAIN, {}).get(SHUTTER_MOTION)
+        if motion is None:
+            return
+        covers = [
+            cover
+            for controller in self.controllers.values()
+            if controller.shutters_enabled
+            for group in controller.shutter_groups
+            for cover in group.get("devices", []) or []
+        ]
+        try:
+            await motion.async_sync(covers)
+        except Exception:  # noqa: BLE001 - never break the hub over this
+            _LOGGER.exception("Homex: failed to watch shutter motion")
 
     def _teardown_switches(self) -> None:
         while self._switch_unsubs:

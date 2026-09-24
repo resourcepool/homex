@@ -49,6 +49,11 @@ export const fetchShutterModels = async (
   hass: HomeAssistant
 ): Promise<import("./types").ShutterModel[]> =>
   (await hass.callWS({ type: "homex/shutter_models" })).models || [];
+export const fetchZ2MState = (
+  hass: HomeAssistant,
+  device_id: string
+): Promise<import("./types").Z2MState> =>
+  hass.callWS({ type: "homex/z2m/state", device_id });
 export const fetchShutterPresets = async (
   hass: HomeAssistant
 ): Promise<import("./types").ShutterPreset[]> =>

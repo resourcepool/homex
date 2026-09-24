@@ -8,8 +8,17 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .const import DOMAIN, HUB_DATA, PLATFORMS, SCENES_LOCK
+from .const import (
+    DOMAIN,
+    HUB_DATA,
+    PLATFORMS,
+    SCENES_LOCK,
+    SHUTTER_MOTION,
+    Z2M_BRIDGE,
+)
 from .room import HomexHub
+from .shutter import ShutterMotion
+from .z2m import Z2MBridge
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -19,6 +28,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     domain_data = hass.data.setdefault(DOMAIN, {})
     # Shared lock so concurrent scene writes don't clobber scenes.yaml.
     domain_data.setdefault(SCENES_LOCK, asyncio.Lock())
+    # Zigbee2MQTT state reader + shutter smart toggle: live across reloads.
+    bridge = domain_data.setdefault(Z2M_BRIDGE, Z2MBridge(hass))
+    domain_data.setdefault(SHUTTER_MOTION, ShutterMotion(hass, bridge))
 
     # Register the sidebar panel as soon as the hub is set up — both on boot
     # (entry already exists) and when added at runtime (HACS install). Doing it

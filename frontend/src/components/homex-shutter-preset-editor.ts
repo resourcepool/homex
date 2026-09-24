@@ -5,11 +5,13 @@ import type {
   ShutterCondition,
   ShutterModel,
   ShutterPreset,
+  Z2MState,
 } from "../types";
 import {
   deleteShutterPreset,
   errorMessage,
   fetchShutterModels,
+  fetchZ2MState,
   saveShutterPreset,
 } from "../api";
 import { sharedStyles } from "../lib/styles";
@@ -30,21 +32,42 @@ export class HomexShutterPresetEditor extends LitElement {
   @state() private _modelKey = "";
   @state() private _deviceId = "";
   @state() private _smart = false;
-  @state() private _up: ShutterCondition = { domain: "", suffix: "", state: "" };
-  @state() private _down: ShutterCondition = { domain: "", suffix: "", state: "" };
-  @state() private _stopped: ShutterCondition = { domain: "", suffix: "", state: "" };
+  @state() private _up = { ...HomexShutterPresetEditor.EMPTY };
+  @state() private _down = { ...HomexShutterPresetEditor.EMPTY };
+  @state() private _stopped = { ...HomexShutterPresetEditor.EMPTY };
+  // Zigbee2MQTT state of the reference device (null while loading).
+  @state() private _z2m: Z2MState | null = null;
   @state() private _busy = false;
   private _idEdited = false;
 
-  private static EMPTY: ShutterCondition = { domain: "", suffix: "", state: "" };
+  private static EMPTY: ShutterCondition = {
+    source: "entity",
+    domain: "",
+    suffix: "",
+    field: "",
+    state: "",
+  };
 
   /** Normalize a stored condition into {domain, suffix, state}, migrating the
    * legacy {entity_id, state} shape using the reference device slug. */
   private _cond(v: unknown): ShutterCondition {
     const c: any = Array.isArray(v) ? v[0] : v;
     if (!c) return { ...HomexShutterPresetEditor.EMPTY };
+    if (c.source === "z2m") {
+      return {
+        ...HomexShutterPresetEditor.EMPTY,
+        source: "z2m",
+        field: c.field ?? "",
+        state: c.state ?? "",
+      };
+    }
     if (c.suffix !== undefined || c.domain !== undefined) {
-      return { domain: c.domain ?? "", suffix: c.suffix ?? "", state: c.state ?? "" };
+      return {
+        ...HomexShutterPresetEditor.EMPTY,
+        domain: c.domain ?? "",
+        suffix: c.suffix ?? "",
+        state: c.state ?? "",
+      };
     }
     // Legacy {entity_id, state}: derive domain + suffix from the ref device.
     const [domain, objectId = ""] = String(c.entity_id ?? "").split(".");
@@ -53,7 +76,12 @@ export class HomexShutterPresetEditor extends LitElement {
       slug && objectId.startsWith(slug + "_")
         ? objectId.slice(slug.length + 1)
         : objectId;
-    return { domain: domain ?? "", suffix, state: c.state ?? "" };
+    return {
+      ...HomexShutterPresetEditor.EMPTY,
+      domain: domain ?? "",
+      suffix,
+      state: c.state ?? "",
+    };
   }
 
   /** Entity-id prefix (slug) for the current reference device. */
@@ -155,6 +183,25 @@ export class HomexShutterPresetEditor extends LitElement {
         background: var(--card-background-color, #fff);
         color: var(--primary-text-color);
       }
+      .sources {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 4px 0 6px;
+      }
+      button.src {
+        min-height: 0;
+        padding: 6px 12px;
+        font-size: 13px;
+        border-radius: 16px;
+        border: 1px solid var(--divider-color, #ccc);
+        background: transparent;
+      }
+      button.src.on {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: var(--text-primary-color, #fff);
+      }
       .x {
         flex: 0 0 auto;
         cursor: pointer;
@@ -180,6 +227,23 @@ export class HomexShutterPresetEditor extends LitElement {
     super.connectedCallback();
     this._loadModels();
   }
+  updated(changed: Map<string, unknown>) {
+    if (changed.has("_deviceId")) this._loadZ2M();
+  }
+  /** Fields of the reference device's Zigbee2MQTT state (if it is a Z2M one). */
+  private async _loadZ2M() {
+    const deviceId = this._deviceId;
+    this._z2m = null;
+    if (!deviceId) return;
+    try {
+      const st = await fetchZ2MState(this.hass, deviceId);
+      if (deviceId === this._deviceId) this._z2m = st;
+    } catch {
+      if (deviceId === this._deviceId)
+        this._z2m = { available: false, topic: null, fields: [] };
+    }
+  }
+
   private async _loadModels() {
     try {
       this._models = await fetchShutterModels(this.hass);
@@ -275,7 +339,14 @@ export class HomexShutterPresetEditor extends LitElement {
     return [...out];
   }
 
-  /** One entry (Montée / Descente / Arrêt) = a single sensor with a value. */
+  /** Current value of a Z2M field on the reference device, as text. */
+  private _z2mValue(field: string): string {
+    const f = this._z2m?.fields.find((x) => x.field === field);
+    return f === undefined || f.value === null ? "" : String(f.value);
+  }
+
+  /** One entry (Montée / Descente / Arrêt) = a single value to match, read
+   * from a HA sensor or from the device's Zigbee2MQTT state. */
   private _condEditor(
     key: string,
     title: string,
@@ -284,28 +355,79 @@ export class HomexShutterPresetEditor extends LitElement {
     onChange: (v: ShutterCondition) => void
   ) {
     const listId = `dl-${key}`;
-    const selected = cond.domain && cond.suffix ? `${cond.domain}|${cond.suffix}` : "";
-    const suggestions = this._sensorValues(this._condEntityId(cond));
+    const z2m = cond.source === "z2m";
+    const z2mAvailable = !!this._z2m?.available;
+    let picker;
+    let suggestions: string[];
+    if (z2m) {
+      const fields = this._z2m?.fields ?? [];
+      const known = fields.some((f) => f.field === cond.field);
+      picker = html`<select
+        .value=${cond.field ?? ""}
+        @change=${(e: Event) =>
+          onChange({ ...cond, field: (e.target as HTMLSelectElement).value })}
+      >
+        <option value="">— Champ Zigbee2MQTT —</option>
+        ${cond.field && !known
+          ? html`<option value=${cond.field} selected>${cond.field}</option>`
+          : ""}
+        ${fields.map(
+          (f) => html`<option value=${f.field} ?selected=${f.field === cond.field}>
+            ${f.field} (${String(f.value)})
+          </option>`
+        )}
+      </select>`;
+      const current = cond.field ? this._z2mValue(cond.field) : "";
+      suggestions = current ? [current] : [];
+    } else {
+      const selected =
+        cond.domain && cond.suffix ? `${cond.domain}|${cond.suffix}` : "";
+      picker = html`<select
+        .value=${selected}
+        @change=${(e: Event) => {
+          const [domain = "", suffix = ""] = (
+            e.target as HTMLSelectElement
+          ).value.split("|");
+          onChange({ ...cond, domain, suffix });
+        }}
+      >
+        <option value="">— Capteur —</option>
+        ${this._refSensors().map(
+          (s) => html`<option value=${s.key} ?selected=${s.key === selected}>
+            ${s.suffix}
+          </option>`
+        )}
+      </select>`;
+      suggestions = this._sensorValues(this._condEntityId(cond));
+    }
     return html`<div class="cond">
       <div class="section">${title}</div>
       <p class="hint">${hint}</p>
+      ${z2mAvailable || z2m
+        ? html`<div class="sources">
+            <button
+              class="src ${z2m ? "" : "on"}"
+              @click=${() =>
+                onChange({ ...HomexShutterPresetEditor.EMPTY, state: cond.state })}
+            >
+              Capteur HA
+            </button>
+            <button
+              class="src ${z2m ? "on" : ""}"
+              ?disabled=${!z2mAvailable && !z2m}
+              @click=${() =>
+                onChange({
+                  ...HomexShutterPresetEditor.EMPTY,
+                  source: "z2m",
+                  state: cond.state,
+                })}
+            >
+              État Zigbee2MQTT
+            </button>
+          </div>`
+        : ""}
       <div class="cond-row">
-        <select
-          .value=${selected}
-          @change=${(e: Event) => {
-            const [domain = "", suffix = ""] = (
-              e.target as HTMLSelectElement
-            ).value.split("|");
-            onChange({ ...cond, domain, suffix });
-          }}
-        >
-          <option value="">— Capteur —</option>
-          ${this._refSensors().map(
-            (s) => html`<option value=${s.key} ?selected=${s.key === selected}>
-              ${s.suffix}
-            </option>`
-          )}
-        </select>
+        ${picker}
         <input
           placeholder="valeur"
           list=${listId}
@@ -428,8 +550,11 @@ export class HomexShutterPresetEditor extends LitElement {
               </span>
             </label>
             <p class="hint">
-              Si activée, indique comment détecter l'état du volet (souvent un ou
-              plusieurs capteurs avec une valeur précise).
+              Si activée, indique comment détecter l'état du volet : un capteur
+              Home Assistant, ou un champ de l'état Zigbee2MQTT de l'appareil
+              (ex. motor_run_status), avec une valeur précise. « Permuter »
+              arrête alors un volet en mouvement, et relance un volet arrêté
+              dans le sens inverse de son dernier mouvement.
             </p>
             ${this._smart
               ? html`
