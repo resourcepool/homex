@@ -172,6 +172,9 @@ export class HomexShutterPresetEditor extends LitElement {
         min-width: 0;
         margin: 0;
       }
+      .cond-row input.field-name {
+        flex: 2 1 180px;
+      }
       .cond-row input {
         flex: 1 1 100px;
         min-width: 0;
@@ -362,7 +365,19 @@ export class HomexShutterPresetEditor extends LitElement {
     if (z2m) {
       const fields = this._z2m?.fields ?? [];
       const known = fields.some((f) => f.field === cond.field);
-      picker = html`<select
+      // No state received yet (Z2M publishes on change): type the field name.
+      picker = !fields.length
+        ? html`<input
+            class="field-name"
+            placeholder="champ, ex. motor_run_status"
+            .value=${cond.field ?? ""}
+            @change=${(e: Event) =>
+              onChange({
+                ...cond,
+                field: (e.target as HTMLInputElement).value.trim(),
+              })}
+          />`
+        : html`<select
         .value=${cond.field ?? ""}
         @change=${(e: Event) =>
           onChange({ ...cond, field: (e.target as HTMLSelectElement).value })}
@@ -439,6 +454,13 @@ export class HomexShutterPresetEditor extends LitElement {
           ${suggestions.map((v) => html`<option value=${v}></option>`)}
         </datalist>
       </div>
+      ${z2m && this._z2m?.available && !this._z2m.fields.length
+        ? html`<p class="hint">
+            Aucun état reçu de Zigbee2MQTT pour cet appareil pour l'instant
+            (il est publié à chaque changement : bouge le volet puis rouvre ce
+            preset pour voir la liste des champs), ou saisis le nom du champ.
+          </p>`
+        : ""}
     </div>`;
   }
 

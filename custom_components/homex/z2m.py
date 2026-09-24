@@ -67,12 +67,31 @@ def flatten_fields(state: dict, prefix: str = "") -> dict[str, Any]:
     return out
 
 
+# Z2M expose "access" bit meaning the property can be read with /get.
+ACCESS_GET = 0b100
+
+
+def _gettable_property(exposes) -> str | None:
+    """First property of a Z2M device definition that supports /get."""
+    for expose in exposes or []:
+        if not isinstance(expose, dict):
+            continue
+        prop = expose.get("property")
+        if prop and int(expose.get("access") or 0) & ACCESS_GET:
+            return prop
+        nested = _gettable_property(expose.get("features"))
+        if nested:
+            return nested
+    return None
+
+
 class Z2MBridge:
     """Caches Zigbee2MQTT device states per HA device (lazily subscribed)."""
 
     def __init__(self, hass: HomeAssistant) -> None:
         self.hass = hass
         self._topics: dict[str, str] = {}  # ieee -> "<base>/<friendly_name>"
+        self._gettable: dict[str, str] = {}  # ieee -> a property Z2M can /get
         self._states: dict[str, dict] = {}  # device_id -> last JSON state
         self._subs: dict[str, Callable[[], None]] = {}  # device_id -> unsub
         self._listeners: dict[str, list[StateListener]] = {}
@@ -120,6 +139,9 @@ class Z2MBridge:
             name = device.get("friendly_name")
             if ieee and name:
                 self._topics[ieee] = f"{base}/{name}"
+                prop = _gettable_property((device.get("definition") or {}).get("exposes"))
+                if prop:
+                    self._gettable[ieee] = prop
         self._ready.set()
 
     async def async_topic(self, device_id: str) -> str | None:
@@ -181,11 +203,21 @@ class Z2MBridge:
 
         self._subs[device_id] = await mqtt.async_subscribe(self.hass, topic, on_state)
         # States aren't retained: ask Z2M to republish this one now.
-        await mqtt.async_publish(self.hass, f"{topic}/get", json.dumps({"state": ""}))
+        await self._async_request(device_id, topic)
         return remove
+
+    async def _async_request(self, device_id: str, topic: str) -> None:
+        """Ask Z2M to republish the device's state (answered with the full
+        cached state). Only properties the device can read are accepted."""
+        from homeassistant.components import mqtt
+
+        ieee = _ieee(self.hass, device_id) or ""
+        prop = self._gettable.get(ieee, "state")
+        await mqtt.async_publish(self.hass, f"{topic}/get", json.dumps({prop: ""}))
 
     async def async_fetch(self, device_id: str, timeout: float = 3) -> dict | None:
         """The device's state, waiting briefly for Z2M's answer if not cached."""
+        already_watched = device_id in self._subs
         await self.async_watch(device_id)
         if device_id in self._states:
             return self._states[device_id]
@@ -193,6 +225,10 @@ class Z2MBridge:
             return None
         fut = self.hass.loop.create_future()
         self._waiters.setdefault(device_id, []).append(fut)
+        if already_watched:  # nothing received yet: ask again
+            topic = await self.async_topic(device_id)
+            if topic:
+                await self._async_request(device_id, topic)
         try:
             return await asyncio.wait_for(fut, timeout)
         except TimeoutError:

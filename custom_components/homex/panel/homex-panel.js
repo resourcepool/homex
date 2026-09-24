@@ -6574,7 +6574,7 @@ let v = class extends b {
     let c, p;
     if (a) {
       const g = this._z2m?.fields ?? [], u = g.some((m) => m.field === i.field);
-      c = n`<select
+      c = g.length ? n`<select
         .value=${i.field ?? ""}
         @change=${(m) => o({ ...i, field: m.target.value })}
       >
@@ -6585,7 +6585,15 @@ let v = class extends b {
             ${m.field} (${String(m.value)})
           </option>`
       )}
-      </select>`;
+      </select>` : n`<input
+            class="field-name"
+            placeholder="champ, ex. motor_run_status"
+            .value=${i.field ?? ""}
+            @change=${(m) => o({
+        ...i,
+        field: m.target.value.trim()
+      })}
+          />`;
       const _ = i.field ? this._z2mValue(i.field) : "";
       p = _ ? [_] : [];
     } else {
@@ -6639,6 +6647,11 @@ let v = class extends b {
           ${p.map((g) => n`<option value=${g}></option>`)}
         </datalist>
       </div>
+      ${a && this._z2m?.available && !this._z2m.fields.length ? n`<p class="hint">
+            Aucun état reçu de Zigbee2MQTT pour cet appareil pour l'instant
+            (il est publié à chaque changement : bouge le volet puis rouvre ce
+            preset pour voir la liste des champs), ou saisis le nom du champ.
+          </p>` : ""}
     </div>`;
   }
   _close() {
@@ -6860,6 +6873,9 @@ v.styles = [
         flex: 2 1 180px;
         min-width: 0;
         margin: 0;
+      }
+      .cond-row input.field-name {
+        flex: 2 1 180px;
       }
       .cond-row input {
         flex: 1 1 100px;
@@ -7127,7 +7143,7 @@ var ao = Object.defineProperty, no = Object.getOwnPropertyDescriptor, B = (e, t,
     (a = e[r]) && (o = (i ? a(t, s, o) : a(o)) || o);
   return i && o && ao(t, s, o), o;
 };
-const lo = "101";
+const lo = "102";
 let z = class extends b {
   constructor() {
     super(...arguments), this.narrow = !1, this._rooms = null, this._error = null, this._createOpen = !1, this._exportOpen = !1, this._view = "rooms", this._menuOpen = !1, this._switchStartAdd = !1, this._switchAddRoom = null, this._expanded = localStorage.getItem("homex_expanded") || null, this._loaded = !1, this._onToggleExpand = (e) => {
