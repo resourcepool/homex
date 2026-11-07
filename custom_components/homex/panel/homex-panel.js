@@ -10882,7 +10882,7 @@ var sa, ca = "select.homex_climate_tolerance_mode", la = (sa = class extends v {
     `], sa);
 O([b({ attribute: !1 })], la.prototype, "hass", void 0), O([b({ attribute: !1 })], la.prototype, "rooms", void 0), O([x()], la.prototype, "_zones", void 0), O([x()], la.prototype, "_systems", void 0), O([x()], la.prototype, "_enabledLocal", void 0), O([x()], la.prototype, "_loaded", void 0), O([x()], la.prototype, "_busy", void 0), O([x()], la.prototype, "_roomBusy", void 0), la = O([y("homex-climate-dashboard")], la);
 // src/homex-panel.ts
-var ua, da = "194", $ = (ua = class extends v {
+var ua, da = "195", $ = (ua = class extends v {
 	constructor(...e) {
 		super(...e), this.narrow = !1, this._rooms = null, this._error = null, this._createOpen = !1, this._exportOpen = !1, this._menuOpen = !1, this._dashTab = localStorage.getItem("homex_dash_tab") === "climate" ? "climate" : "general", this._expanded = localStorage.getItem("homex_expanded") || null, this._loaded = !1, this._onToggleExpand = (e) => {
 			let t = e.detail.entry_id;

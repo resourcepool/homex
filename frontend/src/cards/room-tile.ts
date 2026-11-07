@@ -33,6 +33,7 @@ import {
   mdiCloud,
   mdiFire,
   mdiFireOff,
+  mdiHomeOutline,
   mdiLightbulbAlertOutline,
   mdiLightbulbOnOutline,
   mdiLightbulbOutline,
@@ -162,7 +163,19 @@ export class HomexRoomTile extends LitElement {
 
   // -- Actions ------------------------------------------------------------------
 
+  /** Default variant of a room without the lights module (and no switch
+   * configured): a greyed room icon, no tap action. */
+  private get _noAction() {
+    return (
+      !this._climate &&
+      !this._config!.entity &&
+      !this.hass.states[`switch.homex_${this._config!.room}_lights_toggle`] &&
+      (!this._room || !this._room.modules?.includes("lights"))
+    );
+  }
+
   private _toggle() {
+    if (this._noAction) return;
     const st = this.hass.states[this._entity];
     if (!st) return;
     // Lights, as on the Homex dashboard: turn the room on (apply its scene)
@@ -292,7 +305,8 @@ export class HomexRoomTile extends LitElement {
             : light === "off"
               ? "Éteinte — allumer"
               : (this.hass.formatEntityState?.(st) ?? st.state);
-    const missing = !st || st.state === "unavailable";
+    const noAction = this._noAction;
+    const missing = !noAction && (!st || st.state === "unavailable");
     const t = roomMetric(this.hass, this._config.room, "temperature");
     const h = roomMetric(this.hass, this._config.room, "humidity");
     const air = this._air();
@@ -306,14 +320,20 @@ export class HomexRoomTile extends LitElement {
     const shutterS = this._shutterStatus();
     const hasRight = t || h || heatingS !== nothing || shutterS !== nothing;
     return html`<ha-card
-      class=${on ? "on" : ""}
+      class=${noAction ? "static" : on ? "on" : ""}
       style=${heating ? "--tile-color: var(--state-climate-heat-color, #ff8100)" : ""}
-      title=${title}
+      title=${noAction ? this._name() : title}
       @click=${this._toggle}
     >
       <div class="main">
         <div class="icon">
-          ${path && !this._config.icon ? icon(path) : html`<ha-icon .icon=${this._config.icon || "mdi:radiator"}></ha-icon>`}
+          ${this._config.icon
+            ? html`<ha-icon .icon=${this._config.icon}></ha-icon>`
+            : noAction
+              ? icon(mdiHomeOutline)
+              : path
+                ? icon(path)
+                : html`<ha-icon .icon=${"mdi:radiator"}></ha-icon>`}
         </div>
         <div class="info">
           <div class="name">${this._name()}</div>
@@ -383,6 +403,9 @@ export class HomexRoomTile extends LitElement {
       flex-direction: column;
       justify-content: center;
       overflow: hidden;
+    }
+    ha-card.static {
+      cursor: default;
     }
     ha-card.empty {
       padding: 16px;
