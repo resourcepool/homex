@@ -70,7 +70,6 @@ export class HomexHeatingSystemEditor extends LitElement {
     return_sensor: "",
   };
   @state() private _circulator = "";
-  @state() private _force = "";
   @state() private _minRuntime = "5";
   @state() private _rules: RuleDraft[] = [];
   @state() private _busy = false;
@@ -190,7 +189,6 @@ export class HomexHeatingSystemEditor extends LitElement {
         return_sensor: s?.return_sensor ?? "",
       };
       this._circulator = s?.circulator ?? "";
-      this._force = s?.force ?? "";
       this._minRuntime = String(s?.min_runtime ?? 5);
       this._rules = (s?.rules ?? []).map((r) => ({
         type: LEGACY_RULES[r.type] ?? r.type,
@@ -276,7 +274,6 @@ export class HomexHeatingSystemEditor extends LitElement {
     return (
       [...this._required].every((k) => !!this._tank[k]) &&
       !!this._circulator &&
-      this._force !== this._circulator &&
       !Number.isNaN(parseFloat(this._minRuntime)) &&
       this._rules.every((r) => !this._ruleError(r))
     );
@@ -301,7 +298,6 @@ export class HomexHeatingSystemEditor extends LitElement {
             ...base,
             ...this._tank,
             circulator: this._circulator,
-            force: this._force,
             min_runtime: parseFloat(this._minRuntime) || 0,
             zones: this._zones,
             aggressive: this._aggressive,
@@ -461,6 +457,28 @@ export class HomexHeatingSystemEditor extends LitElement {
     </div>`;
   }
 
+  /** The manual force: the Homex switch entity of an existing tank. */
+  private _renderForce() {
+    const entity = this.system ? `switch.homex_system_${this.system.id}_force` : "";
+    const st = entity ? this.hass.states[entity] : undefined;
+    return html`<div class="checks">
+        <label>
+          ${toggleSwitch(st?.state === "on", (on) =>
+            this.hass.callService("switch", on ? "turn_on" : "turn_off", { entity_id: entity }),
+            !st
+          )}
+          Forçage manuel
+        </label>
+      </div>
+      <p class="hint">
+        Tant qu'il est activé, le circulateur tourne quelles que soient les règles et la
+        demande des radiateurs (si le chauffage est activé globalement).
+        ${st
+          ? html`Entité : <code>${entity}</code> (s'applique immédiatement).`
+          : "Disponible une fois le système enregistré."}
+      </p>`;
+  }
+
   private _renderTank() {
     const sensors = this._grouped(this._tempSensors(false));
     const setpoints = this._grouped(this._tempSensors(true));
@@ -495,19 +513,8 @@ export class HomexHeatingSystemEditor extends LitElement {
           (v) => (this._minRuntime = v),
           "1"
         )}
-        <homex-select
-          label="Forçage manuel (optionnel)"
-          placeholder="Aucun forçage"
-          .value=${this._force}
-          .groups=${this._grouped(this._contacts.filter((id) => id !== this._circulator))}
-          @value-changed=${(e: CustomEvent) => (this._force = e.detail.value)}
-        ></homex-select>
       </div>
-      <p class="hint">
-        Forçage manuel : tant que cet interrupteur est allumé, le circulateur tourne
-        quelles que soient les règles et la demande des radiateurs (si le chauffage
-        est activé globalement).
-      </p>
+      ${this._renderForce()}
 
       <div class="section">Règles de circulation</div>
       <p class="hint">

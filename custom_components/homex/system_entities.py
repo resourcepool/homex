@@ -1,10 +1,11 @@
 """Entities exposed by each heating system (boiler, buffer tank).
 
 binary_sensor.homex_system_<id>_<key>: demand, contact (boiler),
-circulation / forced / rule_<type> (buffer tank);
+circulation / rule_<type> (buffer tank);
 sensor.homex_system_<id>_<key>: gap_<type> (°C), min_runtime_left (s),
 runtime_today (min: circulator on-time since midnight, restored on restart);
-switch.homex_system_<id>_aggressive: the system's agressive mode.
+switch.homex_system_<id>_aggressive: the system's agressive mode;
+switch.homex_system_<id>_force: a buffer tank's manual force.
 
 They read the systems manager's last computed status (heating_systems.py),
 which writes them after every drive pass.
@@ -40,7 +41,7 @@ ICONS = {
     "demand": "mdi:fire-alert",
     "contact": "mdi:electric-switch",
     "circulation": "mdi:pump",
-    "forced": "mdi:hand-back-right",
+    "force": "mdi:hand-back-right",
     "aggressive": "mdi:speedometer",
     "min_runtime_left": "mdi:timer-sand",
     "runtime_today": "mdi:timer-outline",
@@ -101,8 +102,6 @@ class SystemBinarySensor(_SystemEntity, BinarySensorEntity):
             return status.get("demand")
         if self.key in ("contact", "circulation"):
             return status.get("want")
-        if self.key == "forced":
-            return status.get("forced")
         if self.key.startswith("rule_"):
             return (status.get("rule_by_type") or {}).get(self.key.removeprefix("rule_"))
         return None
@@ -219,24 +218,32 @@ def _sensor(manager, system_id: str, key: str, label: str):
     return cls(manager, system_id, key, label)
 
 
-class SystemAggressiveSwitch(_SystemEntity, SwitchEntity):
+class SystemSwitch(_SystemEntity, SwitchEntity):
+    """A system setting stored by Homex: its agressive mode, or a buffer
+    tank's manual force."""
+
     _domain = "switch"
 
     @property
     def is_on(self) -> bool:
-        return bool(self._system.get("aggressive"))
+        return bool(self._system.get("forced" if self.key == "force" else "aggressive"))
+
+    async def _async_set(self, on: bool) -> None:
+        if self.key == "force":
+            await self._manager.async_set_forced(self.system_id, on)
+        else:
+            await self._manager.async_set_aggressive(self.system_id, on)
+        self.async_write_ha_state()
 
     async def async_turn_on(self, **kwargs) -> None:
-        await self._manager.async_set_aggressive(self.system_id, True)
-        self.async_write_ha_state()
+        await self._async_set(True)
 
     async def async_turn_off(self, **kwargs) -> None:
-        await self._manager.async_set_aggressive(self.system_id, False)
-        self.async_write_ha_state()
+        await self._async_set(False)
 
 
 ENTITY_CLASSES = {
     "binary_sensor": SystemBinarySensor,
     "sensor": _sensor,
-    "switch": SystemAggressiveSwitch,
+    "switch": SystemSwitch,
 }

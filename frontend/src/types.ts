@@ -358,7 +358,7 @@ export interface HeatingSystem {
   flow_sensor?: string;
   return_sensor?: string;
   circulator?: string;
-  force?: string; // manual force (switch.* / input_boolean.*), optional
+  forced?: boolean; // manual force, driven by switch.homex_system_<id>_force
   min_runtime?: number; // minutes
   rules?: CirculationRule[];
 }
@@ -372,5 +372,5 @@ export interface TankStatus {
   return: number | null;
   rules: boolean[];
   demand: boolean; // heating enabled and some radiator needs heat
-  forced: boolean; // manual force on (heating enabled)
+  forced: boolean; // manual force on (and heating enabled)
 }

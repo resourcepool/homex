@@ -8552,7 +8552,7 @@ var ki, Ai = "global", ji = ["switch", "input_boolean"], Mi = ["input_number", "
 			tank_sensor: "",
 			flow_sensor: "",
 			return_sensor: ""
-		}, this._circulator = "", this._force = "", this._minRuntime = "5", this._rules = [], this._busy = !1, this._idEdited = !1;
+		}, this._circulator = "", this._minRuntime = "5", this._rules = [], this._busy = !1, this._idEdited = !1;
 	}
 	willUpdate(e) {
 		if (e.has("system")) {
@@ -8562,7 +8562,7 @@ var ki, Ai = "global", ji = ["switch", "input_boolean"], Mi = ["input_number", "
 				tank_sensor: e?.tank_sensor ?? "",
 				flow_sensor: e?.flow_sensor ?? "",
 				return_sensor: e?.return_sensor ?? ""
-			}, this._circulator = e?.circulator ?? "", this._force = e?.force ?? "", this._minRuntime = String(e?.min_runtime ?? 5), this._rules = (e?.rules ?? []).map((e) => ({
+			}, this._circulator = e?.circulator ?? "", this._minRuntime = String(e?.min_runtime ?? 5), this._rules = (e?.rules ?? []).map((e) => ({
 				type: Fi[e.type] ?? e.type,
 				delta: String(e.delta),
 				tolerance: String(e.tolerance)
@@ -8614,7 +8614,7 @@ var ki, Ai = "global", ji = ["switch", "input_boolean"], Mi = ["input_number", "
 		return new Set(this._rules.flatMap((e) => Pi[e.type].gap));
 	}
 	get _tankValid() {
-		return [...this._required].every((e) => !!this._tank[e]) && !!this._circulator && this._force !== this._circulator && !Number.isNaN(parseFloat(this._minRuntime)) && this._rules.every((e) => !this._ruleError(e));
+		return [...this._required].every((e) => !!this._tank[e]) && !!this._circulator && !Number.isNaN(parseFloat(this._minRuntime)) && this._rules.every((e) => !this._ruleError(e));
 	}
 	_toggleZone(e) {
 		let t = this._zones.filter((e) => e !== Ai), n = t.includes(e) ? t.filter((t) => t !== e) : [...t, e];
@@ -8633,7 +8633,6 @@ var ki, Ai = "global", ji = ["switch", "input_boolean"], Mi = ["input_number", "
 			...e,
 			...this._tank,
 			circulator: this._circulator,
-			force: this._force,
 			min_runtime: parseFloat(this._minRuntime) || 0,
 			zones: this._zones,
 			aggressive: this._aggressive,
@@ -8760,6 +8759,20 @@ var ki, Ai = "global", ji = ["switch", "input_boolean"], Mi = ["input_number", "
       <div class="explain ${r ? "err" : ""}">${l}${u}</div>
     </div>`;
 	}
+	_renderForce() {
+		let e = this.system ? `switch.homex_system_${this.system.id}_force` : "", t = e ? this.hass.states[e] : void 0;
+		return h`<div class="checks">
+        <label>
+          ${j(t?.state === "on", (t) => this.hass.callService("switch", t ? "turn_on" : "turn_off", { entity_id: e }), !t)}
+          Forçage manuel
+        </label>
+      </div>
+      <p class="hint">
+        Tant qu'il est activé, le circulateur tourne quelles que soient les règles et la
+        demande des radiateurs (si le chauffage est activé globalement).
+        ${t ? h`Entité : <code>${e}</code> (s'applique immédiatement).` : "Disponible une fois le système enregistré."}
+      </p>`;
+	}
 	_renderTank() {
 		let e = this._grouped(this._tempSensors(!1)), t = this._grouped(this._tempSensors(!0)), n = this._grouped(this._contacts);
 		return h`
@@ -8787,19 +8800,8 @@ var ki, Ai = "global", ji = ["switch", "input_boolean"], Mi = ["input_number", "
           @value-changed=${(e) => this._circulator = e.detail.value}
         ></homex-select>
         ${this._num("Temps d'exécution minimal (min)", this._minRuntime, (e) => this._minRuntime = e, "1")}
-        <homex-select
-          label="Forçage manuel (optionnel)"
-          placeholder="Aucun forçage"
-          .value=${this._force}
-          .groups=${this._grouped(this._contacts.filter((e) => e !== this._circulator))}
-          @value-changed=${(e) => this._force = e.detail.value}
-        ></homex-select>
       </div>
-      <p class="hint">
-        Forçage manuel : tant que cet interrupteur est allumé, le circulateur tourne
-        quelles que soient les règles et la demande des radiateurs (si le chauffage
-        est activé globalement).
-      </p>
+      ${this._renderForce()}
 
       <div class="section">Règles de circulation</div>
       <p class="hint">
@@ -8947,7 +8949,7 @@ var ki, Ai = "global", ji = ["switch", "input_boolean"], Mi = ["input_number", "
         cursor: pointer;
       }
     `], ki);
-O([b({ attribute: !1 })], Z.prototype, "hass", void 0), O([b({ attribute: !1 })], Z.prototype, "system", void 0), O([b({ attribute: !1 })], Z.prototype, "zones", void 0), O([x()], Z.prototype, "_sysName", void 0), O([x()], Z.prototype, "_id", void 0), O([x()], Z.prototype, "_type", void 0), O([x()], Z.prototype, "_contact", void 0), O([x()], Z.prototype, "_zones", void 0), O([x()], Z.prototype, "_aggressive", void 0), O([x()], Z.prototype, "_tank", void 0), O([x()], Z.prototype, "_circulator", void 0), O([x()], Z.prototype, "_force", void 0), O([x()], Z.prototype, "_minRuntime", void 0), O([x()], Z.prototype, "_rules", void 0), O([x()], Z.prototype, "_busy", void 0), Z = O([y("homex-heating-system-editor")], Z);
+O([b({ attribute: !1 })], Z.prototype, "hass", void 0), O([b({ attribute: !1 })], Z.prototype, "system", void 0), O([b({ attribute: !1 })], Z.prototype, "zones", void 0), O([x()], Z.prototype, "_sysName", void 0), O([x()], Z.prototype, "_id", void 0), O([x()], Z.prototype, "_type", void 0), O([x()], Z.prototype, "_contact", void 0), O([x()], Z.prototype, "_zones", void 0), O([x()], Z.prototype, "_aggressive", void 0), O([x()], Z.prototype, "_tank", void 0), O([x()], Z.prototype, "_circulator", void 0), O([x()], Z.prototype, "_minRuntime", void 0), O([x()], Z.prototype, "_rules", void 0), O([x()], Z.prototype, "_busy", void 0), Z = O([y("homex-heating-system-editor")], Z);
 // src/components/homex-heating-manager.ts
 var Li, Ri = [
 	"modes",
@@ -9227,7 +9229,7 @@ var Li, Ri = [
         ${e.flow_sensor ? h`<span class="temp" title="Départ">↗ ${n(e.flow_sensor)}</span>` : ""}
         <span class="temp" title="Retour">↘ ${n(e.return_sensor)}</span>
         ${e.aggressive ? h`<span class="temp">Agressif</span>` : ""}
-        ${e.force && this.hass.states[e.force]?.state === "on" ? h`<span class="temp" title=${this.hass.states[e.force]?.attributes?.friendly_name ?? e.force}>Forcé</span>` : ""}
+        ${this.hass.states[`switch.homex_system_${e.id}_force`]?.state === "on" ? h`<span class="temp" title="Forçage manuel activé">Forcé</span>` : ""}
         ${(() => {
 			let t = parseFloat(this.hass.states[`sensor.homex_system_${e.id}_runtime_today`]?.state ?? "");
 			if (Number.isNaN(t)) return "";
@@ -10472,7 +10474,7 @@ var Qi, $i = "select.homex_climate_tolerance_mode", ea = (Qi = class extends v {
     `], Qi);
 O([b({ attribute: !1 })], ea.prototype, "hass", void 0), O([b({ attribute: !1 })], ea.prototype, "rooms", void 0), O([x()], ea.prototype, "_zones", void 0), O([x()], ea.prototype, "_enabledLocal", void 0), O([x()], ea.prototype, "_loaded", void 0), O([x()], ea.prototype, "_busy", void 0), O([x()], ea.prototype, "_roomBusy", void 0), ea = O([y("homex-climate-dashboard")], ea);
 // src/homex-panel.ts
-var ta, na = "172", $ = (ta = class extends v {
+var ta, na = "173", $ = (ta = class extends v {
 	constructor(...e) {
 		super(...e), this.narrow = !1, this._rooms = null, this._error = null, this._createOpen = !1, this._exportOpen = !1, this._menuOpen = !1, this._dashTab = localStorage.getItem("homex_dash_tab") === "climate" ? "climate" : "general", this._expanded = localStorage.getItem("homex_expanded") || null, this._loaded = !1, this._onToggleExpand = (e) => {
 			let t = e.detail.entry_id;

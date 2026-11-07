@@ -17,9 +17,9 @@ both floored at 0 (a negative gap means nothing to catch up).
 It asks for circulation once gap >= delta and stops asking once
 gap < tolerance (hysteresis in between). The circulator runs while any rule
 asks for it AND the heating demands heat (the system's scope needs heat,
-heating enabled globally). An optional manual force entity (switch /
-input_boolean) runs it whatever the rules and the demand, while heating is
-enabled globally. Once started it runs at least min_runtime minutes,
+heating enabled globally). Its manual force, a Homex switch
+(switch.homex_system_<id>_force, persisted in the store as "forced"), runs
+it whatever the rules and the demand, while heating is enabled globally. Once started it runs at least min_runtime minutes,
 whatever stops it.
 
 A buffer tank has a scope (global or zones: whose heat demand counts) and an
@@ -83,7 +83,7 @@ def system_entity_keys(system: dict) -> dict[str, list[tuple[str, str]]]:
     if stype == "boiler":
         binary.append(("contact", "Contact sec"))
     else:
-        binary += [("circulation", "Circulation"), ("forced", "Forçage")]
+        binary.append(("circulation", "Circulation"))
         for rule in system.get("rules") or []:
             rtype = LEGACY_RULES.get(rule.get("type"), rule.get("type"))
             if rtype in RULE_GAPS:
@@ -94,7 +94,8 @@ def system_entity_keys(system: dict) -> dict[str, list[tuple[str, str]]]:
     return {
         "binary_sensor": binary,
         "sensor": sensors,
-        "switch": [("aggressive", "Mode agressif")],
+        "switch": [("aggressive", "Mode agressif")]
+        + ([("force", "Forçage manuel")] if stype == "buffer_tank" else []),
     }
 
 
@@ -254,6 +255,16 @@ class HeatingSystems:
             await self._async_tolerance(system, "normal")
         await self.async_update()
 
+    async def async_set_forced(self, sid: str, on: bool) -> None:
+        """The buffer tank's manual force switch: persist it, then re-drive."""
+        doc = await _doc(self.hass)
+        system = next((s for s in doc.get("systems", []) if s.get("id") == sid), None)
+        if system is None:
+            return
+        system["forced"] = bool(on)
+        await _save(self.hass)
+        await self.async_update()
+
     @callback
     def _on_state(self, event: Event) -> None:
         entity_id = event.data.get("entity_id", "")
@@ -261,7 +272,6 @@ class HeatingSystems:
         for s in self._systems():
             watched.add(s.get("contact"))
             watched.add(s.get("circulator"))
-            watched.add(s.get("force"))
             watched.update(s.get(key) for key in TANK_SENSORS)
         watched.discard(None)
         watched.discard("")
@@ -402,9 +412,8 @@ class HeatingSystems:
 
     def _forced(self, system: dict) -> bool:
         """Manual force on, while heating is enabled globally."""
-        force = self.hass.states.get(system.get("force") or "")
         doc = self.hass.data.get(DOMAIN, {}).get(STORE_DATA) or {}
-        return force is not None and force.state == "on" and doc.get("enabled", True)
+        return bool(system.get("forced")) and doc.get("enabled", True)
 
     async def _async_drive_tank(self, system: dict) -> None:
         sid = system["id"]
@@ -518,11 +527,6 @@ def _clean_tank(sid: str, name: str, raw: dict) -> dict:
     circulator = str(raw.get("circulator") or "")
     if not circulator or circulator.split(".", 1)[0] not in CONTACT_DOMAINS:
         raise vol.Invalid("Le circulateur doit être un switch ou un input_boolean")
-    force = str(raw.get("force") or "")
-    if force and force.split(".", 1)[0] not in CONTACT_DOMAINS:
-        raise vol.Invalid("Le forçage doit être un switch ou un input_boolean")
-    if force and force == circulator:
-        raise vol.Invalid("Le forçage doit être différent du circulateur")
     try:
         min_runtime = max(0.0, float(raw.get("min_runtime") or 0))
     except (TypeError, ValueError) as err:
@@ -557,7 +561,8 @@ def _clean_tank(sid: str, name: str, raw: dict) -> dict:
         "type": "buffer_tank",
         **sensors,
         "circulator": circulator,
-        "force": force,
+        # Runtime state of the force switch, kept across saves (see the WS).
+        "forced": bool(raw.get("forced")),
         "min_runtime": min_runtime,
         "rules": rules,
         "zones": _clean_zones(raw),
@@ -595,6 +600,9 @@ async def ws_heating_system_save(hass: HomeAssistant, connection, msg) -> None:
         )
         return
     previous = next((s for s in systems if s.get("id") == system["id"]), None)
+    if system.get("type") == "buffer_tank":
+        # The force is driven by its switch entity, not by the editor.
+        system["forced"] = bool((previous or {}).get("forced"))
     doc["systems"] = [s for s in systems if s.get("id") != system["id"]] + [system]
     await _save(hass)
     manager = systems_manager(hass)

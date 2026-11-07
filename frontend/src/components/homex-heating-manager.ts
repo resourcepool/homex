@@ -598,8 +598,8 @@ export class HomexHeatingManager extends LitElement {
         ${sys.flow_sensor ? html`<span class="temp" title="Départ">↗ ${temp(sys.flow_sensor)}</span>` : ""}
         <span class="temp" title="Retour">↘ ${temp(sys.return_sensor)}</span>
         ${sys.aggressive ? html`<span class="temp">Agressif</span>` : ""}
-        ${sys.force && this.hass.states[sys.force]?.state === "on"
-          ? html`<span class="temp" title=${this.hass.states[sys.force]?.attributes?.friendly_name ?? sys.force}>Forcé</span>`
+        ${this.hass.states[`switch.homex_system_${sys.id}_force`]?.state === "on"
+          ? html`<span class="temp" title="Forçage manuel activé">Forcé</span>`
           : ""}
         ${(() => {
           const rt = parseFloat(this.hass.states[`sensor.homex_system_${sys.id}_runtime_today`]?.state ?? "");
