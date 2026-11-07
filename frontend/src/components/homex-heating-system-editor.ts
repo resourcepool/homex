@@ -445,7 +445,7 @@ export class HomexHeatingSystemEditor extends LitElement {
     }
     const now =
       !err && a != null && b != null
-        ? ` Actuellement ${def.a} − ${def.b} = ${fmt(a - b)}.`
+        ? ` Actuellement ${def.a} − ${def.b} = ${fmt(Math.max(0, a - b))}.`
         : "";
     return html`<div class="rule">
       <div class="title">Règle ${i + 1} · ${def.label}</div>

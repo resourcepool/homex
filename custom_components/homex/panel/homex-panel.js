@@ -8746,7 +8746,7 @@ var ki, Ai = "global", ji = ["switch", "input_boolean"], Mi = ["input_number", "
 			let t = parseFloat(e.delta), n = parseFloat(e.tolerance);
 			l = s == null ? `Circule quand ballon ≤ consigne − ${e.delta} °C ; s'arrête quand ballon > consigne − ${e.tolerance} °C.` : `Consigne ${i(s)} : circule quand ballon ≤ ${i(s - t)} ; s'arrête quand ballon > ${i(s - n)}.`;
 		} else r || (l = `Circule quand départ − retour ≥ ${e.delta} °C ; s'arrête quand départ − retour < ${e.tolerance} °C.`);
-		let u = !r && s != null && c != null ? ` Actuellement ${n.a} − ${n.b} = ${i(s - c)}.` : "";
+		let u = !r && s != null && c != null ? ` Actuellement ${n.a} − ${n.b} = ${i(Math.max(0, s - c))}.` : "";
 		return h`<div class="rule">
       <div class="title">Règle ${t + 1} · ${n.label}</div>
       ${this._num("Delta (°C)", e.delta, (e) => this._setRule(t, { delta: e }))}
@@ -10472,7 +10472,7 @@ var Qi, $i = "select.homex_climate_tolerance_mode", ea = (Qi = class extends v {
     `], Qi);
 O([b({ attribute: !1 })], ea.prototype, "hass", void 0), O([b({ attribute: !1 })], ea.prototype, "rooms", void 0), O([x()], ea.prototype, "_zones", void 0), O([x()], ea.prototype, "_enabledLocal", void 0), O([x()], ea.prototype, "_loaded", void 0), O([x()], ea.prototype, "_busy", void 0), O([x()], ea.prototype, "_roomBusy", void 0), ea = O([y("homex-climate-dashboard")], ea);
 // src/homex-panel.ts
-var ta, na = "171", $ = (ta = class extends v {
+var ta, na = "172", $ = (ta = class extends v {
 	constructor(...e) {
 		super(...e), this.narrow = !1, this._rooms = null, this._error = null, this._createOpen = !1, this._exportOpen = !1, this._menuOpen = !1, this._dashTab = localStorage.getItem("homex_dash_tab") === "climate" ? "climate" : "general", this._expanded = localStorage.getItem("homex_expanded") || null, this._loaded = !1, this._onToggleExpand = (e) => {
 			let t = e.detail.entry_id;

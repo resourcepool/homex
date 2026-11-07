@@ -12,7 +12,8 @@ A buffer tank drives a circulator (a switch entity) from temperature
 sensors (setpoint, tank, flow, return) and circulation rules. Each rule
 compares a gap between two temperatures with its delta and tolerance:
 - "setpoint_tank": gap = setpoint - tank;
-- "flow_return": gap = flow - return.
+- "flow_return": gap = flow - return;
+both floored at 0 (a negative gap means nothing to catch up).
 It asks for circulation once gap >= delta and stops asking once
 gap < tolerance (hysteresis in between). The circulator runs while any rule
 asks for it AND the heating demands heat (the system's scope needs heat,
@@ -377,7 +378,7 @@ class HeatingSystems:
                 a, b = (temps[k] for k in sensors)
                 gaps[rtype] = None
                 if a is not None and b is not None:
-                    gap = gaps[rtype] = round(a - b, 2)
+                    gap = gaps[rtype] = max(0.0, round(a - b, 2))
                     if gap >= float(rule.get("delta", 0)):
                         on = True
                     elif gap < float(rule.get("tolerance", 0)):
