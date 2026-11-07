@@ -1,10 +1,11 @@
 /** Lovelace cards shipped by Homex, loaded on every dashboard (the
  * integration registers this module as an extra frontend JS URL).
  *
- * custom:homex-room-tile — a room tile: its switch (lights toggle by default,
- * or e.g. switch.homex_<room>_heating), tapped to toggle; the room's Homex
- * temperature / humidity on the second line, and its air quality (CO₂, PM2.5,
- * PM10) on a third line when the room has those readings.
+ * custom:homex-room-tile — a full-width room tile: its switch (lights toggle
+ * by default, or e.g. switch.homex_<room>_heating), tapped to toggle; status
+ * icons (heating demand / not heated, shutters open / partly / closed), its
+ * air quality (CO₂, PM2.5, PM10) when available, and its Homex temperature
+ * and humidity stacked on the right.
  *
  *   type: custom:homex-room-tile
  *   room: salon                    # Homex room id
@@ -12,9 +13,34 @@
  *   name: Salon                    # optional
  *   icon: mdi:sofa                 # optional
  */
-import { LitElement, css, html, nothing } from "lit";
+import { LitElement, css, html, nothing, svg } from "lit";
 import { property, state } from "lit/decorators.js";
-import type { HomeAssistant } from "./types";
+import {
+  mdiFire,
+  mdiFireOff,
+  mdiRadiatorOff,
+  mdiWindowShutter,
+  mdiWindowShutterOpen,
+} from "@mdi/js";
+import type { HomeAssistant, Room } from "./types";
+
+// A shutter half-way: frame + slats on the top half only.
+const SHUTTER_HALF =
+  "M3 4H21V6H20V20H18V6H6V20H4V6H3V4M7 7H17V9H7V7M7 10H17V12H7V10M7 13H17V14H7V13Z";
+
+/** The Homex rooms (radiators, shutters, heating switch), fetched once per
+ * page load and shared by every tile. */
+let roomsPromise: Promise<Room[]> | undefined;
+function homexRooms(hass: HomeAssistant): Promise<Room[]> {
+  roomsPromise ??= hass.connection
+    .sendMessagePromise({ type: "homex/rooms" })
+    .then((r: { rooms: Room[] }) => r.rooms)
+    .catch((err: unknown) => {
+      roomsPromise = undefined; // retry on the next render
+      throw err;
+    });
+  return roomsPromise!;
+}
 
 interface RoomTileConfig {
   type: string;
@@ -38,6 +64,66 @@ const fmt = (hass: HomeAssistant, value: number, digits = 1) =>
 class HomexRoomTile extends LitElement {
   @property({ attribute: false }) hass!: HomeAssistant;
   @state() private _config?: RoomTileConfig;
+  @state() private _room?: Room;
+
+  updated() {
+    if (this.hass && this._config && !this._room) {
+      homexRooms(this.hass)
+        .then((rooms) => {
+          this._room = rooms.find((r) => r.room_id === this._config!.room);
+        })
+        .catch(() => undefined);
+    }
+  }
+
+  /** The room's radiator valves (climate entities of its radiator devices). */
+  private _valves(): string[] {
+    const devices = new Set((this._room?.heating?.radiators ?? []).map((r) => r.device_id));
+    if (!devices.size) return [];
+    return Object.values(this.hass.entities ?? {})
+      .filter((e: any) => e.entity_id.startsWith("climate.") && devices.has(e.device_id))
+      .map((e: any) => e.entity_id);
+  }
+
+  private _covers(): string[] {
+    return [...new Set((this._room?.shutter_groups ?? []).flatMap((g) => g.devices))];
+  }
+
+  private _heatingStatus() {
+    if (!this._room?.heating?.radiators?.length) return nothing;
+    if (this._room.heating.enabled === false)
+      return this._status(mdiRadiatorOff, "off", "Pièce non chauffée");
+    const demand = this._valves().some(
+      (v) => this.hass.states[v]?.attributes.hvac_action === "heating"
+    );
+    return demand
+      ? this._status(mdiFire, "heat", "Demande de chauffe")
+      : this._status(mdiFireOff, "", "Pas de demande de chauffe");
+  }
+
+  private _shutterStatus() {
+    const covers = this._covers()
+      .map((c) => this.hass.states[c])
+      .filter((st) => st && st.state !== "unavailable" && st.state !== "unknown");
+    if (!covers.length) return nothing;
+    // 0 = closed .. 100 = open, per cover.
+    const pos = covers.map((st) => {
+      const p = st.attributes.current_position;
+      if (typeof p === "number") return p;
+      return st.state === "closed" ? 0 : 100;
+    });
+    const avg = Math.round(pos.reduce((a, b) => a + b, 0) / pos.length);
+    if (pos.every((p) => p === 0)) return this._status(mdiWindowShutter, "", "Volets fermés");
+    if (pos.every((p) => p === 100))
+      return this._status(mdiWindowShutterOpen, "", "Volets ouverts");
+    return this._status(SHUTTER_HALF, "", `Volets ouverts à ${avg} %`);
+  }
+
+  private _status(path: string, cls: string, title: string) {
+    return html`<span class="status ${cls}" title=${title}
+      ><svg viewBox="0 0 24 24">${svg`<path d=${path}></path>`}</svg></span
+    >`;
+  }
 
   static getStubConfig() {
     return { room: "salon" };
@@ -67,7 +153,7 @@ class HomexRoomTile extends LitElement {
   }
 
   getGridOptions() {
-    return { columns: 6, rows: "auto", min_columns: 3 };
+    return { columns: "full", rows: "auto", min_columns: 6 };
   }
 
   private _name() {
@@ -110,33 +196,33 @@ class HomexRoomTile extends LitElement {
         : this.hass.formatEntityState?.(st) ?? st.state;
     const t = this._metric("temperature");
     const h = this._metric("humidity");
-    const line2 = [
-      stateLabel,
-      t ? `${fmt(this.hass, t.value)} ${t.unit ?? "°C"}` : null,
-      h ? `${fmt(this.hass, h.value, 0)} %` : null,
-    ].filter(Boolean);
     const air = this._air();
     return html`<ha-card
       class=${on ? "on" : ""}
       style=${heating ? "--tile-color: var(--state-climate-heat-color, #ff8100)" : ""}
       @click=${this._toggle}
     >
-      <div class="row">
-        <div class="icon" @click=${this._moreInfo} title="Détails">
-          <ha-icon .icon=${icon}></ha-icon>
-        </div>
-        <div class="info">
-          <div class="name">${this._name()}</div>
-          <div class="sub">${line2.join(" · ")}</div>
-          ${air.length
-            ? html`<div class="sub air">
-                ${air
-                  .map(({ label, m }) => `${label} ${fmt(this.hass, m!.value, 0)}${m!.unit ? " " + m!.unit : ""}`)
-                  .join(" · ")}
-              </div>`
-            : nothing}
-        </div>
+      <div class="icon" @click=${this._moreInfo} title="Détails">
+        <ha-icon .icon=${icon}></ha-icon>
       </div>
+      <div class="info">
+        <div class="name">${this._name()}</div>
+        <div class="sub">${stateLabel}</div>
+        ${air.length
+          ? html`<div class="sub air">
+              ${air
+                .map(({ label, m }) => `${label} ${fmt(this.hass, m!.value, 0)}${m!.unit ? " " + m!.unit : ""}`)
+                .join(" · ")}
+            </div>`
+          : nothing}
+      </div>
+      <div class="statuses">${this._heatingStatus()}${this._shutterStatus()}</div>
+      ${t || h
+        ? html`<div class="readings">
+            ${t ? html`<div class="temp">${fmt(this.hass, t.value)} ${t.unit ?? "°C"}</div>` : nothing}
+            ${h ? html`<div class="hum">${fmt(this.hass, h.value, 0)} %</div>` : nothing}
+          </div>`
+        : nothing}
     </ha-card>`;
   }
 
@@ -147,17 +233,50 @@ class HomexRoomTile extends LitElement {
     ha-card {
       height: 100%;
       box-sizing: border-box;
-      padding: 10px;
+      padding: 10px 14px 10px 10px;
       cursor: pointer;
       display: flex;
       align-items: center;
-    }
-    .row {
-      display: flex;
-      align-items: center;
       gap: 10px;
-      min-width: 0;
-      width: 100%;
+    }
+    .statuses {
+      flex: none;
+      display: flex;
+      gap: 6px;
+    }
+    .status {
+      display: flex;
+      color: var(--secondary-text-color);
+      opacity: 0.8;
+    }
+    .status svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+    .status.heat {
+      color: var(--state-climate-heat-color, #ff8100);
+      opacity: 1;
+    }
+    .status.off {
+      color: var(--error-color, #db4437);
+      opacity: 1;
+    }
+    .readings {
+      flex: none;
+      text-align: right;
+      min-width: 56px;
+    }
+    .temp {
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 20px;
+      color: var(--primary-text-color);
+    }
+    .hum {
+      font-size: 12px;
+      line-height: 16px;
+      color: var(--secondary-text-color);
     }
     .icon {
       flex: none;
