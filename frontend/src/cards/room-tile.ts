@@ -7,15 +7,16 @@
  * - on the right, past a separator: status icons (flame: heating / no demand
  *   / not heated; shutters open / partly / closed) and temperature over
  *   humidity — tapped, they open the room detail modal;
- * - the room's scenes below (the active one selected; none when off),
- *   optionally filtered.
+ * - optionally, the room's scenes below as a button group (the active one
+ *   selected; none when off), when it has 2+ scenes.
  *
  *   type: custom:homex-room-tile
  *   room: salon                          # Homex room id
  *   entity: switch.homex_salon_heating   # optional
  *   name: Salon                          # optional
  *   icon: mdi:sofa                       # optional
- *   show_scenes: true                    # optional (default true)
+ *   show_scenes: true                    # optional (default false; rooms
+ *                                        # with 2+ scenes only)
  *   scenes: [turn_on, film]              # optional: scene keys shown
  */
 import { LitElement, css, html, nothing } from "lit";
@@ -28,6 +29,7 @@ import {
   mdiLightbulbAlertOutline,
   mdiLightbulbOnOutline,
   mdiLightbulbOutline,
+  mdiPalette,
   mdiWindowShutter,
   mdiWindowShutterOpen,
 } from "@mdi/js";
@@ -140,13 +142,6 @@ export class HomexRoomTile extends LitElement {
     this.hass.callService("switch", off ? "turn_off" : "turn_on", { entity_id: this._entity });
   }
 
-  private _moreInfo(ev: Event) {
-    ev.stopPropagation();
-    this.dispatchEvent(
-      new CustomEvent("hass-more-info", { detail: { entityId: this._entity }, bubbles: true, composed: true })
-    );
-  }
-
   private _openDetail(ev: Event) {
     ev.stopPropagation();
     if (!this._room) return;
@@ -194,12 +189,12 @@ export class HomexRoomTile extends LitElement {
   }
 
   private _scenes() {
-    if (!this._room || this._config?.show_scenes === false) return [];
+    if (!this._room || this._config?.show_scenes !== true) return [];
     if (!this._room.modules?.includes("lights")) return [];
+    const all = (this._room.scenes ?? []).filter((s) => s.key !== "turn_off");
+    if (all.length < 2) return []; // a single scene: the toggle is enough
     const shown = this._config?.scenes;
-    return (this._room.scenes ?? []).filter(
-      (s) => s.key !== "turn_off" && (!shown || shown.includes(s.key))
-    );
+    return all.filter((s) => !shown || shown.includes(s.key));
   }
 
   private _heatingStatus() {
@@ -277,7 +272,7 @@ export class HomexRoomTile extends LitElement {
       @click=${this._toggle}
     >
       <div class="main">
-        <div class="icon" @click=${this._moreInfo} title="Détails">
+        <div class="icon">
           ${path && !this._config.icon ? icon(path) : html`<ha-icon .icon=${this._config.icon || "mdi:radiator"}></ha-icon>`}
         </div>
         <div class="info">
@@ -309,6 +304,8 @@ export class HomexRoomTile extends LitElement {
       </div>
       ${scenes.length
         ? html`<div class="scenes">
+            <span class="scenes-icon" title="Scènes">${icon(mdiPalette)}</span>
+            <div class="group">
             ${scenes.map(
               (s) =>
                 html`<button
@@ -319,6 +316,7 @@ export class HomexRoomTile extends LitElement {
                   ${s.name}
                 </button>`
             )}
+            </div>
           </div>`
         : nothing}
     </ha-card>`;
@@ -477,40 +475,69 @@ export class HomexRoomTile extends LitElement {
       min-width: 56px;
     }
     .temp {
-      font-size: 16px;
-      font-weight: 500;
-      line-height: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 16px;
       color: var(--primary-text-color);
     }
     .hum {
       font-size: 12px;
+      font-weight: 600;
       line-height: 16px;
       color: var(--secondary-text-color);
     }
     .scenes {
       display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      padding-left: 46px;
+      align-items: center;
+      gap: 10px;
+    }
+    .scenes-icon {
+      flex: none;
+      width: 36px;
+      display: flex;
+      justify-content: center;
+      color: var(--secondary-text-color);
+    }
+    .scenes-icon svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+    .group {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      margin-right: 4px;
+      border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.35));
+      border-radius: 10px;
+      overflow: hidden;
     }
     .scene {
+      flex: 1 1 0;
+      min-width: 0;
+      min-height: 38px;
+      padding: 4px 6px;
       font: inherit;
-      font-size: 12px;
+      font-size: 13px;
       line-height: 16px;
-      padding: 4px 10px;
-      border-radius: 14px;
-      border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.35));
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border: none;
+      border-left: 1px solid var(--divider-color, rgba(127, 127, 127, 0.35));
       background: none;
       color: var(--primary-text-color);
       cursor: pointer;
+    }
+    .scene:first-child {
+      border-left: none;
     }
     .scene:hover {
       background: rgba(127, 127, 127, 0.1);
     }
     .scene.active {
-      border-color: var(--tile-color);
-      background: color-mix(in srgb, var(--tile-color) 22%, transparent);
-      font-weight: 500;
+      background: color-mix(in srgb, var(--tile-color) 28%, transparent);
+      font-weight: 600;
     }
   `;
 }

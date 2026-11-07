@@ -127,43 +127,35 @@ export class HomexRoomDetail extends LitElement {
 
   // -- Sections ---------------------------------------------------------------
 
+  /** The room's climate on 3 lines at most: temperature · humidity, CO₂,
+   * PM2.5 · PM10 — values and air levels only. */
   private _climate() {
-    const rows = METRICS.map((m) => ({ ...m, v: roomMetric(this.hass, this.room.room_id, m.key) })).filter(
-      (m) => m.v
-    );
-    if (!rows.length) return nothing;
+    const room = this.room.room_id;
+    const v = (key: string) => roomMetric(this.hass, room, key);
+    const item = (key: string) => {
+      const m = METRICS.find((x) => x.key === key)!;
+      const val = v(key);
+      if (!val) return undefined;
+      const unit = key === "humidity" ? "%" : (val.unit ?? "");
+      const lvl = m.air ? airLevel(m.air, val.value).level : undefined;
+      return html`<span class="item" title=${m.label}>
+        <span class="micon">${icon(m.path)}</span>
+        ${m.air === "pm25" || m.air === "pm10" ? html`<span class="tag">${m.label.slice(2)}</span>` : nothing}
+        <span class="mvalue">${fmt(this.hass, val.value, m.digits, key === "temperature" ? 1 : 0)} ${unit}</span>
+        ${lvl !== undefined ? html`<span class="pill l${lvl}">${LEVEL_NAMES[lvl]}</span>` : nothing}
+      </span>`;
+    };
+    const lines = [
+      [item("temperature"), item("humidity")],
+      [item("co2")],
+      [item("pm25"), item("pm10")],
+    ]
+      .map((l) => l.filter((x) => x))
+      .filter((l) => l.length);
+    if (!lines.length) return nothing;
     return html`<section>
       <h3>Climat</h3>
-      ${rows.map((m) => {
-        const lvl = m.air ? airLevel(m.air, m.v!.value).level : undefined;
-        const unit = m.key === "humidity" ? "%" : (m.v!.unit ?? "");
-        const sensors =
-          (this.hass.states[`sensor.homex_${this.room.room_id}_${m.key}`]?.attributes.sensors as string[]) ?? [];
-        const rule = this.hass.states[`sensor.homex_${this.room.room_id}_${m.key}`]?.attributes.rule as string;
-        return html`<div class="metric">
-          <div class="mrow">
-            <span class="micon">${icon(m.path)}</span>
-            <span class="mlabel">${m.label}</span>
-            ${lvl !== undefined ? html`<span class="pill l${lvl}">${LEVEL_NAMES[lvl]}</span>` : nothing}
-            <span class="mvalue">${fmt(this.hass, m.v!.value, m.digits, m.key === "temperature" ? 1 : 0)} ${unit}</span>
-          </div>
-          ${sensors.length > 1 || (sensors.length === 1 && rule !== "mean")
-            ? html`<div class="sources">
-                ${sensors.map((s) => {
-                  const st = this.hass.states[s];
-                  const v = st ? parseFloat(st.state) : NaN;
-                  return html`<div class="source">
-                    <span>${friendly(this.hass, s)}</span>
-                    <span>${Number.isNaN(v) ? (st?.state ?? "—") : `${fmt(this.hass, v, m.digits)} ${st!.attributes.unit_of_measurement ?? ""}`}</span>
-                  </div>`;
-                })}
-                <div class="source muted">Règle : ${rule === "max" ? "maximum" : rule === "min" ? "minimum" : "moyenne"}</div>
-              </div>`
-            : sensors.length === 1
-              ? html`<div class="sources"><div class="source muted"><span>${friendly(this.hass, sensors[0])}</span></div></div>`
-              : nothing}
-        </div>`;
-      })}
+      ${lines.map((l) => html`<div class="mline">${l}</div>`)}
     </section>`;
   }
 
@@ -258,24 +250,12 @@ export class HomexRoomDetail extends LitElement {
       ${covers.map((c) => {
         const st = this.hass.states[c];
         const pos = coverPosition(st);
-        const positionable = typeof st.attributes.current_position === "number";
         return html`<div class="cover">
           <div class="line">
             <span class="grow">${friendly(this.hass, c)}</span>
             <span class="muted">${st.state === "opening" ? "s'ouvre" : st.state === "closing" ? "se ferme" : `${pos} %`}</span>
             ${this._coverButtons(c)}
           </div>
-          ${positionable
-            ? html`<input
-                type="range"
-                min="0"
-                max="100"
-                step="5"
-                .value=${String(pos)}
-                @change=${(e: Event) =>
-                  this._cover("set_cover_position", c, { position: Number((e.target as HTMLInputElement).value) })}
-              />`
-            : nothing}
         </div>`;
       })}
     </section>`;
@@ -291,7 +271,7 @@ export class HomexRoomDetail extends LitElement {
 
   render() {
     if (!this.hass || !this.room) return nothing;
-    const body = [this._climate(), this._heatingSection(), this._shutters()].filter((s) => s !== nothing);
+    const body = [this._climate(), this._shutters(), this._heatingSection()].filter((s) => s !== nothing);
     return html`<div class="backdrop" @click=${this.close}></div>
       <div class="dialog" role="dialog" aria-modal="true" aria-label=${this.heading}>
         <header>
@@ -363,8 +343,22 @@ export class HomexRoomDetail extends LitElement {
       height: 20px;
       fill: currentColor;
     }
-    .metric {
-      padding: 4px 0;
+    .mline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 20px;
+      min-height: 32px;
+    }
+    .item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tag {
+      font-size: 10px;
+      color: var(--secondary-text-color);
+      margin-left: -4px;
     }
     .mrow,
     .line {
@@ -461,11 +455,6 @@ export class HomexRoomDetail extends LitElement {
     .buttons {
       display: inline-flex;
       gap: 4px;
-    }
-    .cover input[type="range"] {
-      width: 100%;
-      accent-color: var(--primary-color);
-      margin: 0 0 6px;
     }
     .switch {
       position: relative;

@@ -70,17 +70,17 @@ export class HomexRoomTileEditor extends LitElement {
           @change=${(e: Event) => this._set({ name: (e.target as HTMLInputElement).value })}
         />
       </label>
-      ${scenes.length
+      ${scenes.length > 1
         ? html`<label class="check">
               <input
                 type="checkbox"
-                .checked=${this._config.show_scenes !== false}
+                .checked=${this._config.show_scenes === true}
                 @change=${(e: Event) =>
-                  this._set({ show_scenes: (e.target as HTMLInputElement).checked ? undefined : false })}
+                  this._set({ show_scenes: (e.target as HTMLInputElement).checked ? true : undefined })}
               />
               Afficher les scènes
             </label>
-            ${this._config.show_scenes !== false
+            ${this._config.show_scenes === true
               ? html`<div class="scenes">
                   ${scenes.map(
                     (s) => html`<label class="check">
