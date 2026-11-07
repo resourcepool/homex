@@ -71,7 +71,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "183"
+PANEL_VERSION = "185"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -212,6 +212,7 @@ async def async_register_homex_panel(hass: HomeAssistant) -> None:
         ws_scene_reorder,
         ws_scene_rename,
         ws_scene_next,
+        ws_scene_activate,
         *HEATING_WS_COMMANDS,
         *HEATING_ZONE_WS_COMMANDS,
         *HEATING_SYSTEM_WS_COMMANDS,
@@ -1861,6 +1862,25 @@ async def ws_scene_next(hass: HomeAssistant, connection, msg) -> None:
         live.controllers.get(room[CONF_ROOM_ID]) if live else None
     ) or _controller(hass, hub, room)
     await controller.async_scene_switch()
+    connection.send_result(msg["id"], {"ok": True})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/scene/activate",
+        vol.Required("room_id"): str,
+        vol.Required("key"): str,
+    }
+)
+@websocket_api.async_response
+async def ws_scene_activate(hass: HomeAssistant, connection, msg) -> None:
+    """Activate one of a room's scenes (dashboards): like a scene trigger."""
+    live = hass.data.get(DOMAIN, {}).get(HUB_DATA)
+    controller = live.controllers.get(msg["room_id"]) if live else None
+    if controller is None:
+        connection.send_error(msg["id"], "not_found", "Unknown room")
+        return
+    await controller.async_activate_scene_key(msg["key"])
     connection.send_result(msg["id"], {"ok": True})
 
 

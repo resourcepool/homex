@@ -40,7 +40,14 @@ from homeassistant.helpers.event import (
 )
 from homeassistant.helpers.storage import Store
 
-from .const import CONF_HEATING, CONF_MODULES, CONF_ROOM_ID, DOMAIN, MODULE_HEATING
+from .const import (
+    CONF_HEATING,
+    CONF_MODULES,
+    CONF_ROOM_ID,
+    DOMAIN,
+    HUB_DATA,
+    MODULE_HEATING,
+)
 from .shutter import condition_entity
 
 _LOGGER = logging.getLogger(__name__)
@@ -129,6 +136,9 @@ async def _doc(hass: HomeAssistant) -> dict:
             "enabled": loaded.get("enabled", True),
             "tolerance_mode": loaded.get("tolerance_mode", "normal"),
             "systems": list(loaded.get("systems", [])),
+            # Per-room setpoint override: {room_id: {"setpoint", "mode"}}, only
+            # valid while the room stays in that mode (expires on a change).
+            "overrides": dict(loaded.get("overrides", {})),
         }
     return data[STORE_DATA]
 
@@ -386,8 +396,26 @@ def room_mode(hass: HomeAssistant, room_id: str, heating: dict | None) -> str:
 
 
 def room_setpoint(hass: HomeAssistant, room_id: str, mode: str) -> float | None:
-    """The temperature a room gets in a heating mode: from its setpoint group
-    (the one listing the room, else the default one); None when unset."""
+    """The temperature a room gets in a heating mode: its override for that
+    mode (set from a dashboard), else from its setpoint group (the one listing
+    the room, else the default one); None when unset."""
+    override = room_override(hass, room_id, mode)
+    if override is not None:
+        return override
+    return group_setpoint(hass, room_id, mode)
+
+
+def room_override(hass: HomeAssistant, room_id: str, mode: str) -> float | None:
+    """The room's setpoint override, when set for this mode."""
+    doc = hass.data.get(DOMAIN, {}).get(STORE_DATA) or {}
+    override = (doc.get("overrides") or {}).get(room_id) or {}
+    if override.get("mode") != mode or override.get("setpoint") is None:
+        return None
+    return float(override["setpoint"])
+
+
+def group_setpoint(hass: HomeAssistant, room_id: str, mode: str) -> float | None:
+    """The setpoint group's temperature for the room in a mode."""
     groups = (hass.data.get(DOMAIN, {}).get(STORE_DATA) or {}).get("groups", [])
     group = next((g for g in groups if room_id in g.get("rooms", [])), None) or next(
         (g for g in groups if g.get("id") == DEFAULT_GROUP), None
@@ -767,6 +795,9 @@ async def async_rename_room(hass: HomeAssistant, old_id: str, new_id: str) -> No
     doc = await _doc(hass)
     for item in [*doc["groups"], *doc.get("zones", [])]:
         item["rooms"] = [new_id if r == old_id else r for r in item.get("rooms", [])]
+    overrides = doc.setdefault("overrides", {})
+    if old_id in overrides:
+        overrides[new_id] = overrides.pop(old_id)
     await _save(hass)
 
 
@@ -964,7 +995,91 @@ async def async_set_heating_enabled(hass: HomeAssistant, enabled: bool) -> None:
     _LOGGER.info("Homex heating: %s", "enabled" if enabled else "disabled")
 
 
+def _room_heating_cfg(hass: HomeAssistant, room_id: str) -> dict | None:
+    """A room's Heating module config (None: unknown room)."""
+    from .room import HomexHub  # lazy: room imports heating
+
+    hub: HomexHub | None = hass.data.get(DOMAIN, {}).get(HUB_DATA)
+    controller = hub.controllers.get(room_id) if hub else None
+    if controller is None:
+        return None
+    return controller._cfg(CONF_HEATING) or {}
+
+
+@websocket_api.websocket_command(
+    {vol.Required("type"): "homex/heating/room_status", vol.Required("room_id"): str}
+)
+@websocket_api.async_response
+async def ws_heating_room_status(hass: HomeAssistant, connection, msg) -> None:
+    """A room's heating state for dashboards: its effective mode, setpoint
+    (with the group's one and the override when set)."""
+    doc = await _doc(hass)
+    room_id = msg["room_id"]
+    heating = _room_heating_cfg(hass, room_id)
+    if heating is None:
+        connection.send_error(msg["id"], "not_found", "Unknown room")
+        return
+    mode = room_mode(hass, room_id, heating)
+    name = next((p["name"] for p in doc["presets"] if p["id"] == mode), mode)
+    off = mode == UNHEATED and unheated_cuts(hass, room_id)
+    connection.send_result(
+        msg["id"],
+        {
+            "enabled": doc.get("enabled", True),
+            "room_enabled": heating.get("enabled", True) is not False,
+            "mode": mode,
+            "mode_name": name,
+            "off": off,
+            "setpoint": None if off else room_setpoint(hass, room_id, mode),
+            "group_setpoint": group_setpoint(hass, room_id, mode),
+            "override": room_override(hass, room_id, mode),
+            "min": TEMP_MIN,
+            "max": TEMP_MAX,
+            "step": TEMP_STEP,
+        },
+    )
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/heating/room_setpoint",
+        vol.Required("room_id"): str,
+        # None: back to the setpoint group's temperature.
+        vol.Required("setpoint"): vol.Any(None, vol.Coerce(float)),
+    }
+)
+@websocket_api.async_response
+async def ws_heating_room_setpoint(hass: HomeAssistant, connection, msg) -> None:
+    """Override a room's setpoint while it stays in its current mode."""
+    doc = await _doc(hass)
+    room_id = msg["room_id"]
+    heating = _room_heating_cfg(hass, room_id)
+    if heating is None:
+        connection.send_error(msg["id"], "not_found", "Unknown room")
+        return
+    overrides = doc.setdefault("overrides", {})
+    if msg["setpoint"] is None:
+        overrides.pop(room_id, None)
+    else:
+        try:
+            setpoint = _temp(msg["setpoint"])
+        except vol.Invalid as err:
+            connection.send_error(msg["id"], "invalid", str(err))
+            return
+        overrides[room_id] = {
+            "setpoint": setpoint,
+            "mode": room_mode(hass, room_id, heating),
+        }
+    await _save(hass)
+    enforcer: RadiatorEnforcer | None = hass.data.get(DOMAIN, {}).get(ENFORCER)
+    if enforcer is not None:
+        await enforcer.async_enforce_all()
+    connection.send_result(msg["id"], {"ok": True})
+
+
 WS_COMMANDS = (
+    ws_heating_room_status,
+    ws_heating_room_setpoint,
     ws_heating_enabled,
     ws_heating_models,
     ws_heating_device_preset_save,
