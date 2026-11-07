@@ -3,7 +3,7 @@
  *
  * custom:homex-room-tile — a full-width room tile: its switch (lights toggle
  * by default, or e.g. switch.homex_<room>_heating), tapped to toggle; status
- * icons (heating demand / not heated, shutters open / partly / closed), its
+ * icons (flame: heating / no demand / not heated, shutters open / partly / closed), its
  * air quality pills (CO₂, worst of PM2.5 / PM10) when available, and its Homex temperature
  * and humidity stacked on the right.
  *
@@ -21,7 +21,8 @@ import {
   mdiLightbulbAlertOutline,
   mdiLightbulbOnOutline,
   mdiLightbulbOutline,
-  mdiRadiatorOff,
+  mdiChartBubble,
+  mdiCloud,
   mdiWindowShutter,
   mdiWindowShutterOpen,
 } from "@mdi/js";
@@ -105,13 +106,13 @@ class HomexRoomTile extends LitElement {
   private _heatingStatus() {
     if (!this._room?.heating?.radiators?.length) return nothing;
     if (this._room.heating.enabled === false)
-      return this._status(mdiRadiatorOff, "off", "Pièce non chauffée");
+      return this._status(mdiFireOff, "off", "Pièce non chauffée");
     const demand = this._valves().some(
       (v) => this.hass.states[v]?.attributes.hvac_action === "heating"
     );
     return demand
       ? this._status(mdiFire, "heat", "Demande de chauffe")
-      : this._status(mdiFireOff, "", "Pas de demande de chauffe");
+      : this._status(mdiFire, "", "Pas de demande de chauffe");
   }
 
   private _shutterStatus() {
@@ -160,13 +161,16 @@ class HomexRoomTile extends LitElement {
   /** Air quality pills: CO₂, and the worst of PM2.5 / PM10 (vs. its
    * guideline). */
   private _air() {
-    const pill = (key: AirKey, label: string) => {
+    const pill = (key: AirKey, label: string, icon: string, tag = "") => {
       const m = this._metric(key);
-      return m && { key, label, ...m, ...airLevel(key, m.value) };
+      return m && { key, label, icon, tag, ...m, ...airLevel(key, m.value) };
     };
-    const pms = [pill("pm25", "PM2.5"), pill("pm10", "PM10")].filter((p) => !!p);
+    const pms = [
+      pill("pm25", "PM2.5", mdiChartBubble, "2.5"),
+      pill("pm10", "PM10", mdiChartBubble, "10"),
+    ].filter((p) => !!p);
     const pm = pms.sort((a, b) => b.ratio - a.ratio)[0];
-    return [pill("co2", "CO₂"), pm].filter((p) => !!p);
+    return [pill("co2", "CO₂", mdiCloud), pm].filter((p) => !!p);
   }
 
   getCardSize() {
@@ -268,7 +272,10 @@ class HomexRoomTile extends LitElement {
               ${air.map(
                 (p) =>
                   html`<span class="pill l${p.level}" title=${`${p.label} : ${fmt(this.hass, p.value, 1)} ${p.unit ?? ""}`}
-                    >${p.label} ${fmt(this.hass, p.value, 0)}</span
+                    ><svg viewBox="0 0 24 24">${svg`<path d=${p.icon}></path>`}</svg>${p.tag
+                      ? html`<small>${p.tag}</small>`
+                      : nothing}
+                    ${fmt(this.hass, p.value, 0)}</span
                   >`
               )}
             </div>`
@@ -391,8 +398,21 @@ class HomexRoomTile extends LitElement {
       padding: 0 6px;
       border-radius: 7px;
       white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
       color: var(--pill);
       background: color-mix(in srgb, var(--pill) 18%, transparent);
+    }
+    .pill svg {
+      width: 11px;
+      height: 11px;
+      fill: currentColor;
+    }
+    .pill small {
+      font-size: 8px;
+      margin-left: -2px;
+      opacity: 0.85;
     }
     .pill.l1 {
       --pill: var(--warning-color, #ffa600);
