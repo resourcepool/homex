@@ -155,6 +155,10 @@ export class HomexClimateMetrics extends LitElement {
         padding: 12px 14px;
         margin-bottom: 12px;
       }
+      .metric .rule {
+        max-width: 320px;
+        margin: 10px 0 4px;
+      }
       .metric-head {
         display: flex;
         align-items: center;
@@ -358,21 +362,24 @@ export class HomexClimateMetrics extends LitElement {
       <div class="metric-head">
         <span class="title">${def.icon} ${def.label}</span>
         ${cfg.sensors.length
-          ? html`<span class="ref">${this._reference(def.key)}</span>
-              <homex-select
-                class="rule"
-                .value=${cfg.rule}
-                .options=${RULES.map(([v, l]) => ({ value: v, label: l }))}
-                @value-changed=${(e: CustomEvent) =>
-                  this._setCfg(def.key, { ...cfg, rule: e.detail.value as MetricRule })}
-              ></homex-select>`
+          ? html`<span class="ref">${this._reference(def.key)}</span>`
           : ""}
       </div>
+      ${cfg.sensors.length > 1
+        ? html`<homex-select
+            class="rule"
+            label="Calcul de la valeur de référence"
+            .value=${cfg.rule}
+            .options=${RULES.map(([v, l]) => ({ value: v, label: l }))}
+            @value-changed=${(e: CustomEvent) =>
+              this._setCfg(def.key, { ...cfg, rule: e.detail.value as MetricRule })}
+          ></homex-select>`
+        : ""}
       ${cfg.sensors.map(
         (s, i) => html`<div class="sensor">
           <span>${this._friendly(s.entity_id)}</span>
           <span class="cur">${this._current(s.entity_id)}</span>
-          ${cfg.rule === "mean"
+          ${cfg.rule === "mean" && cfg.sensors.length > 1
             ? html`<input
                 type="number"
                 min="0"

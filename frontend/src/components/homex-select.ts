@@ -91,12 +91,16 @@ export class HomexSelect extends LitElement {
       overflow: hidden;
       white-space: nowrap;
     }
+    /* The primary info keeps its room; the secondary shrinks first. */
     .value .primary {
+      flex: 0 0 auto;
+      max-width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     .value .secondary {
-      flex: 0 1 auto;
+      flex: 1 1 0;
+      min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       font-size: 13px;

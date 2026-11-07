@@ -134,13 +134,18 @@ export class HomexHeatingDevicePresetEditor extends LitElement {
       }
       .param-body {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
         gap: 10px;
         margin-top: 10px;
       }
+      /* Grid / flex children may shrink below their content (long entity ids). */
+      .param-body > *,
+      .tolerances > * {
+        min-width: 0;
+      }
       @media (max-width: 600px) {
         .param-body {
-          grid-template-columns: 1fr;
+          grid-template-columns: minmax(0, 1fr);
         }
       }
       .param-body label {

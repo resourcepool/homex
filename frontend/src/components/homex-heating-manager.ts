@@ -146,6 +146,15 @@ export class HomexHeatingManager extends LitElement {
       .toggle.on .knob {
         transform: translateX(18px);
       }
+      .tab-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 12px;
+      }
+      .tab-picker {
+        display: none;
+        margin-bottom: 12px;
+      }
       .tabs {
         display: flex;
         gap: 4px;
@@ -241,6 +250,18 @@ export class HomexHeatingManager extends LitElement {
       .hint {
         font-size: 13px;
         color: var(--secondary-text-color);
+      }
+      /* Phones (last, to override the rules above). */
+      @media (max-width: 600px) {
+        .tab-actions button {
+          flex: 1;
+        }
+        .tabs {
+          display: none;
+        }
+        .tab-picker {
+          display: block;
+        }
       }
     `,
   ];
@@ -413,7 +434,7 @@ export class HomexHeatingManager extends LitElement {
             <div>
               <div class="name">${p.name}</div>
               <div class="meta">
-                ${p.id}${p.builtin ? " · par défaut" : ""}${p.unheated ? " · sans consigne" : ""}
+                ${p.id}${p.builtin ? " · par défaut" : ""}${p.unheated ? " · coupé ou consigne" : ""}
               </div>
             </div>
           </div>
@@ -457,7 +478,8 @@ export class HomexHeatingManager extends LitElement {
           <div class="temps">
             ${this._presets.map(
               (p) => html`<span class="temp"
-                >${p.name} · ${p.unheated ? "coupé" : formatTemp(g.setpoints[p.id])}</span
+                >${p.name} ·
+                ${p.unheated && g.setpoints[p.id] == null ? "coupé" : formatTemp(g.setpoints[p.id])}</span
               >`
             )}
           </div>
@@ -694,9 +716,6 @@ export class HomexHeatingManager extends LitElement {
             <span class="knob"></span>
           </span>
         </label>
-        <button class="primary" @click=${() => this._openEditor(section)}>
-          ${ADD_LABELS[section]}
-        </button>
       </div>
       <div class="tabs">
         ${SECTIONS.map((key) => [key, SECTION_LABELS[key]] as [Section, string]).map(
@@ -708,6 +727,20 @@ export class HomexHeatingManager extends LitElement {
             >${label}</span
           >`
         )}
+      </div>
+      <!-- Phones: too many tabs for one row, a section picker instead. -->
+      <homex-select
+        class="tab-picker"
+        .value=${section}
+        .options=${SECTIONS.map((key) => ({ value: key, label: SECTION_LABELS[key] }))}
+        @value-changed=${(e: CustomEvent) => {
+          if (e.detail.value !== section) navigate(this._url(e.detail.value), true);
+        }}
+      ></homex-select>
+      <div class="tab-actions">
+        <button class="primary" @click=${() => this._openEditor(section)}>
+          ${ADD_LABELS[section]}
+        </button>
       </div>
       ${!this._loaded
         ? html`<div class="msg">Chargement…</div>`

@@ -11,6 +11,7 @@ export const DEFAULT_HEATING_GROUP = "default";
 const TEMP_MIN = 5;
 const TEMP_MAX = 30;
 const TEMP_STEP = 0.5;
+const UNHEATED_DEFAULT = 12; // °C, when Unheated gets a setpoint
 
 const clampTemp = (t: number) =>
   Math.min(TEMP_MAX, Math.max(TEMP_MIN, Math.round(t / TEMP_STEP) * TEMP_STEP));
@@ -82,6 +83,14 @@ export class HomexHeatingGroupEditor extends LitElement {
         background: var(--card-background-color, #fff);
         color: var(--primary-text-color);
       }
+      .cut {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--secondary-text-color);
+        cursor: pointer;
+      }
       .unit {
         font-size: 14px;
         color: var(--secondary-text-color);
@@ -151,6 +160,42 @@ export class HomexHeatingGroupEditor extends LitElement {
     );
   }
 
+  /** −/+ stepper (0.5 °C) for one heating mode's setpoint. */
+  private _stepper(presetId: string, t: number | undefined) {
+    return html`<div class="stepper">
+      <button
+        title="−0,5 °C"
+        @click=${() => this._setTemp(presetId, (t ?? 20) - TEMP_STEP)}
+      >
+        <svg viewBox="0 0 24 24"><path d=${mdiMinus}></path></svg>
+      </button>
+      <input
+        type="number"
+        inputmode="decimal"
+        min=${TEMP_MIN}
+        max=${TEMP_MAX}
+        step=${TEMP_STEP}
+        .value=${t != null ? String(t) : ""}
+        placeholder="—"
+        @change=${(e: Event) =>
+          this._setTemp(presetId, parseFloat((e.target as HTMLInputElement).value))}
+      />
+      <button
+        title="+0,5 °C"
+        @click=${() => this._setTemp(presetId, (t ?? 20) + TEMP_STEP)}
+      >
+        <svg viewBox="0 0 24 24"><path d=${mdiPlus}></path></svg>
+      </button>
+      <span class="unit">°C</span>
+    </div>`;
+  }
+
+  private _setUnheatedCut(presetId: string, cut: boolean) {
+    const { [presetId]: _drop, ...rest } = this._setpoints;
+    // Uncut: start from a frost-protection-like temperature.
+    this._setpoints = cut ? rest : { ...rest, [presetId]: UNHEATED_DEFAULT };
+  }
+
   private _close() {
     this.dispatchEvent(new CustomEvent("heating-group-closed"));
   }
@@ -203,41 +248,22 @@ export class HomexHeatingGroupEditor extends LitElement {
 
       <div class="section">Consignes de température</div>
       ${this.presets.map((p) => {
+        const t = this._setpoints[p.id];
         if (p.unheated) {
+          // Unheated: heating cut (no setpoint), or a temperature (frost guard…).
+          const cut = t == null;
           return html`<div class="setpoint">
             <span class="label">${p.name}</span>
-            <span class="unit">Chauffage coupé</span>
+            <label class="cut">
+              ${toggleSwitch(cut, (on) => this._setUnheatedCut(p.id, on))}
+              Chauffage coupé
+            </label>
+            ${cut ? "" : this._stepper(p.id, t)}
           </div>`;
         }
-        const t = this._setpoints[p.id];
         return html`<div class="setpoint">
           <span class="label">${p.name}</span>
-          <div class="stepper">
-            <button
-              title="−0,5 °C"
-              @click=${() => this._setTemp(p.id, (t ?? 20) - TEMP_STEP)}
-            >
-              <svg viewBox="0 0 24 24"><path d=${mdiMinus}></path></svg>
-            </button>
-            <input
-              type="number"
-              inputmode="decimal"
-              min=${TEMP_MIN}
-              max=${TEMP_MAX}
-              step=${TEMP_STEP}
-              .value=${t != null ? String(t) : ""}
-              placeholder="—"
-              @change=${(e: Event) =>
-                this._setTemp(p.id, parseFloat((e.target as HTMLInputElement).value))}
-            />
-            <button
-              title="+0,5 °C"
-              @click=${() => this._setTemp(p.id, (t ?? 20) + TEMP_STEP)}
-            >
-              <svg viewBox="0 0 24 24"><path d=${mdiPlus}></path></svg>
-            </button>
-            <span class="unit">°C</span>
-          </div>
+          ${this._stepper(p.id, t)}
         </div>`;
       })}
 

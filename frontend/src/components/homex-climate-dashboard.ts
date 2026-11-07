@@ -135,6 +135,11 @@ export class HomexClimateDashboard extends LitElement {
       .zone-mode {
         width: 200px;
       }
+      @media (max-width: 600px) {
+        .zone-mode {
+          width: 100%;
+        }
+      }
     `,
   ];
 

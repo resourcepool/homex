@@ -7,8 +7,8 @@ module: editing them never reloads the integration. One document holds
 
 - A preset is a heating mode. The built-in ones, Normal and Unheated, can be
   renamed but not deleted. A room's effective mode is its zone's mode, or
-  Unheated when the room's own heating is disabled; Unheated keeps the room's
-  valves off.
+  Unheated when the room's own heating is disabled. Unheated keeps the room's
+  valves off, unless its setpoint group gives Unheated a temperature.
 - A heating group gives a temperature setpoint per preset to a set of rooms.
   The built-in "default" group applies to every room not in another group;
   a room belongs to at most one group.
@@ -56,7 +56,7 @@ TEMP_STEP = 0.5
 
 BUILTIN_PRESETS = [
     {"id": "normal", "name": "Normal", "builtin": True},
-    # No setpoint: the room is not heated (its valves are kept off).
+    # Heating cut (valves kept off), unless a setpoint group gives it a temperature.
     {"id": "unheated", "name": "Unheated", "builtin": True, "unheated": True},
 ]
 UNHEATED = "unheated"
@@ -264,7 +264,7 @@ async def ws_heating_group_save(hass: HomeAssistant, connection, msg) -> None:
         setpoints = {
             pid: _temp(value)
             for pid, value in (raw.get("setpoints") or {}).items()
-            if pid in preset_ids and pid != UNHEATED and value is not None
+            if pid in preset_ids and value is not None
         }
     except (vol.Invalid, TypeError, ValueError) as err:
         connection.send_error(msg["id"], "invalid_temp", str(err))
@@ -289,6 +289,10 @@ async def ws_heating_group_save(hass: HomeAssistant, connection, msg) -> None:
         groups.append(group)
     doc["groups"] = groups
     await _save(hass)
+    # Unheated may have switched between "cut" and a temperature.
+    enforcer: RadiatorEnforcer | None = hass.data.get(DOMAIN, {}).get(ENFORCER)
+    if enforcer is not None:
+        await enforcer.async_enforce_all()
     connection.send_result(msg["id"], {"ok": True})
 
 
@@ -377,6 +381,16 @@ def room_mode(hass: HomeAssistant, room_id: str, heating: dict | None) -> str:
         (z for z in zones if z.get("id") == "default"), None
     )
     return (zone or {}).get("mode") or "normal"
+
+
+def unheated_cuts(hass: HomeAssistant, room_id: str) -> bool:
+    """Whether Unheated cuts the room's heating: unless the room's setpoint
+    group gives Unheated a temperature (e.g. frost protection)."""
+    groups = (hass.data.get(DOMAIN, {}).get(STORE_DATA) or {}).get("groups", [])
+    group = next((g for g in groups if room_id in g.get("rooms", [])), None) or next(
+        (g for g in groups if g.get("id") == DEFAULT_GROUP), None
+    )
+    return (group or {}).get("setpoints", {}).get(UNHEATED) is None
 
 
 def tolerance_mode(hass: HomeAssistant, zone_id: str | None = None) -> str:
@@ -565,7 +579,7 @@ class RadiatorEnforcer:
         @callback
         def _on_change(event) -> None:
             unheated = {
-                rad["device_id"] for _, rad in self._radiators() if rad["mode"] == UNHEATED
+                rad["device_id"] for _, rad in self._radiators() if rad["off"]
             }
             for device_id, preset in by_source.get(event.data["entity_id"], []):
                 if device_id in unheated:
@@ -603,7 +617,8 @@ class RadiatorEnforcer:
 
     def _radiators(self) -> list[tuple[str, dict]]:
         """(room_id, radiator) of every room with the Climate module; each
-        radiator carries its room's effective mode as "mode"."""
+        radiator carries its room's effective mode as "mode", and "off" when
+    that mode cuts the heating (Unheated without a setpoint)."""
         out = []
         for sub in self.entry.subentries.values():
             room = sub.data
@@ -612,8 +627,10 @@ class RadiatorEnforcer:
             room_id = room.get(CONF_ROOM_ID, "")
             heating = room.get(CONF_HEATING) or {}
             mode = room_mode(self.hass, room_id, heating)
+            # Unheated with no setpoint = heating cut: valves kept off.
+            off = mode == UNHEATED and unheated_cuts(self.hass, room_id)
             for radiator in heating.get("radiators", []):
-                out.append((room_id, {**radiator, "mode": mode}))
+                out.append((room_id, {**radiator, "mode": mode, "off": off}))
         return out
 
     async def _async_keep_off(self, room_id: str, radiator: dict) -> None:
@@ -648,7 +665,7 @@ class RadiatorEnforcer:
             return  # heating off: no preset (nor mode) re-applied
         presets = {p["id"]: p for p in doc["device_presets"]}
         for room_id, radiator in self._radiators():
-            if radiator["mode"] == UNHEATED:
+            if radiator["off"]:
                 await self._async_keep_off(room_id, radiator)
                 continue
             preset = presets.get(radiator.get("preset_id") or "")

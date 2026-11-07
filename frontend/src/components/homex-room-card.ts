@@ -656,8 +656,6 @@ export class HomexRoomCard extends LitElement {
       : undefined;
     const area = r.area_id ? this.hass.areas?.[r.area_id] : null;
     const areaIcon = area?.icon || undefined;
-    const floor = area?.floor_id ? this.hass.floors?.[area.floor_id] : null;
-    const floorName = floor?.name || undefined;
     const orderable = r.scenes.filter((s) => s.orderable);
     const pinned = r.scenes.filter((s) => !s.orderable);
     // Scene switching only makes sense with extra scenes beyond turn_on/off.
@@ -677,7 +675,7 @@ export class HomexRoomCard extends LitElement {
             .hass=${this.hass}
             .unit=${r}
             .areaIcon=${areaIcon}
-            .floorName=${floorName}
+            hideId
             .activeScene=${activeScene}
             .hideToggle=${!lightsOn}
             .info=${climateOn ? this._climateReadings(r) : []}

@@ -160,6 +160,14 @@ export class HomexRoomClimate extends LitElement {
       @media (max-width: 600px) {
         .row {
           flex-wrap: wrap;
+          row-gap: 6px;
+        }
+        /* Name + preset on their own line; state, temperatures, actions below. */
+        .row .info {
+          flex-basis: 100%;
+        }
+        .row .temps {
+          margin-left: auto;
         }
       }
     `,

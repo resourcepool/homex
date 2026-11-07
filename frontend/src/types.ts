@@ -270,7 +270,7 @@ export interface HeatingPreset {
   id: string;
   name: string;
   builtin: boolean;
-  unheated?: boolean; // "Non chauffé": no setpoint, heating off
+  unheated?: boolean; // Unheated: heating cut, unless a setpoint group gives it a temperature
 }
 
 /** Temperature setpoints (°C, per heating preset) for a set of rooms. The
