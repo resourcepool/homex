@@ -391,7 +391,7 @@ export class HomexRoomTile extends LitElement {
       margin-top: 3px;
     }
     .pill {
-      --pill: var(--success-color, #43a047);
+      --pill: var(--secondary-text-color, #9e9e9e);
       font-size: 10px;
       font-weight: 500;
       line-height: 14px;

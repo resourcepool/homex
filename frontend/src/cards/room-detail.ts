@@ -24,7 +24,6 @@ import {
   airLevel,
   coverPosition,
   fmt,
-  friendly,
   icon,
   roomCovers,
   roomMetric,
@@ -37,13 +36,6 @@ interface HeatingStatus {
   room_enabled: boolean;
   mode: string;
   mode_name: string;
-  off: boolean;
-  setpoint: number | null;
-  group_setpoint: number | null;
-  override: number | null;
-  min: number;
-  max: number;
-  step: number;
 }
 
 const METRICS: { key: string; label: string; path: string; air?: AirKey; digits: number }[] = [
@@ -107,15 +99,12 @@ export class HomexRoomDetail extends LitElement {
     }
   }
 
-  private async _setpoint(value: number | null) {
+  /** The radiators' target temperature, set directly on the valves (not
+   * Homex's setpoint settings). */
+  private async _setpoint(valves: string[], value: number) {
     this._busy = true;
     try {
-      await this.hass.connection.sendMessagePromise({
-        type: "homex/heating/room_setpoint",
-        room_id: this.room.room_id,
-        setpoint: value,
-      });
-      await this._loadHeating();
+      await this.hass.callService("climate", "set_temperature", { entity_id: valves, temperature: value });
     } finally {
       this._busy = false;
     }
@@ -163,25 +152,32 @@ export class HomexRoomDetail extends LitElement {
     if (!this.room.heating?.radiators?.length) return nothing;
     const sw = this.hass.states[this._heatingSwitch];
     const h = this._heating;
-    const valves = roomValves(this.hass, this.room);
+    const valves = roomValves(this.hass, this.room).filter((v) => this.hass.states[v]);
     const demand = valves.some((v) => this.hass.states[v]?.attributes.hvac_action === "heating");
     const roomOn = sw ? sw.state === "on" : h?.room_enabled !== false;
+    // The radiators' target (the first valve's; they share the room's).
+    const a = valves.length ? this.hass.states[valves[0]].attributes : undefined;
+    const target = typeof a?.temperature === "number" ? (a.temperature as number) : undefined;
+    const step = (a?.target_temp_step as number) || 0.5;
+    const min = (a?.min_temp as number) ?? 5;
+    const max = (a?.max_temp as number) ?? 30;
+    const current = valves
+      .map((v) => this.hass.states[v].attributes.current_temperature)
+      .filter((t): t is number => typeof t === "number");
     return html`<section>
       <h3>Chauffage</h3>
       <div class="line">
-        <span class="status ${!roomOn ? "off" : demand ? "heat" : ""}"
+        <span
+          class="status ${!roomOn ? "off" : demand ? "heat" : ""}"
+          title=${!roomOn ? "" : demand ? "En chauffe" : "Pas de demande de chauffe"}
           >${icon(!roomOn ? mdiFireOff : mdiFire)}</span
         >
         <span class="grow">
-          ${!roomOn
-            ? "Pièce non chauffée"
-            : demand
-              ? "En chauffe"
-              : "Pas de demande de chauffe"}
+          ${roomOn ? "Pièce chauffée" : "Pièce non chauffée"}
           ${h ? html`<span class="muted"> · mode ${h.mode_name}${h.enabled ? "" : " · chauffage global coupé"}</span>` : nothing}
         </span>
         ${sw
-          ? html`<label class="switch" title="Chauffage de la pièce">
+          ? html`<label class="switch" title=${roomOn ? "Ne plus chauffer la pièce" : "Chauffer la pièce"}>
               <input
                 type="checkbox"
                 .checked=${roomOn}
@@ -194,43 +190,33 @@ export class HomexRoomDetail extends LitElement {
             </label>`
           : nothing}
       </div>
-      ${h && !h.off && h.setpoint != null
+      ${roomOn && target !== undefined
         ? html`<div class="line setpoint">
             <span class="grow">
-              Consigne
-              ${h.override != null
-                ? html`<span class="muted"> · surchargée (mode : ${h.group_setpoint ?? "—"} °C)</span>`
-                : html`<span class="muted"> · du mode ${h.mode_name}</span>`}
+              Consigne des radiateurs
+              ${current.length
+                ? html`<span class="muted">
+                    · mesurée ${fmt(this.hass, current.reduce((x, y) => x + y, 0) / current.length)} °C</span
+                  >`
+                : nothing}
             </span>
-            <button class="round" ?disabled=${this._busy || h.setpoint <= h.min} @click=${() => this._setpoint(h.setpoint! - h.step)}>
+            <button
+              class="round"
+              title="Baisser"
+              ?disabled=${this._busy || target - step < min}
+              @click=${() => this._setpoint(valves, target - step)}
+            >
               ${icon(mdiMinus)}
             </button>
-            <span class="big">${fmt(this.hass, h.setpoint, 1, 1)} °C</span>
-            <button class="round" ?disabled=${this._busy || h.setpoint >= h.max} @click=${() => this._setpoint(h.setpoint! + h.step)}>
+            <span class="big">${fmt(this.hass, target, 1, 1)} °C</span>
+            <button
+              class="round"
+              title="Monter"
+              ?disabled=${this._busy || target + step > max}
+              @click=${() => this._setpoint(valves, target + step)}
+            >
               ${icon(mdiPlus)}
             </button>
-          </div>
-          ${h.override != null
-            ? html`<div class="line">
-                <span class="grow muted">La surcharge tombe au prochain changement de mode.</span>
-                <button class="text" ?disabled=${this._busy} @click=${() => this._setpoint(null)}>Revenir au mode</button>
-              </div>`
-            : nothing}`
-        : nothing}
-      ${valves.length
-        ? html`<div class="sources">
-            ${valves.map((v) => {
-              const st = this.hass.states[v];
-              const a = st?.attributes ?? {};
-              return html`<div class="source">
-                <span>${friendly(this.hass, v)}</span>
-                <span>
-                  ${a.current_temperature != null ? `${fmt(this.hass, a.current_temperature)} °C` : ""}
-                  ${a.temperature != null ? ` → ${fmt(this.hass, a.temperature)} °C` : ""}
-                  · ${a.hvac_action === "heating" ? "chauffe" : st?.state === "off" ? "coupé" : (a.hvac_action ?? st?.state ?? "—")}
-                </span>
-              </div>`;
-            })}
           </div>`
         : nothing}
     </section>`;
@@ -239,34 +225,40 @@ export class HomexRoomDetail extends LitElement {
   private _shutters() {
     const covers = roomCovers(this.room).filter((c) => this.hass.states[c]);
     if (!covers.length) return nothing;
+    const label = (st: any) => {
+      if (st.state === "opening") return "Ouverture";
+      if (st.state === "closing") return "Fermeture";
+      const pos = coverPosition(st);
+      return pos === 0 ? "Fermé" : pos === 100 ? "Ouvert" : `Entrouvert · ${pos} %`;
+    };
+    const columns = [
+      ...(covers.length > 1 ? [{ title: "Tous", state: "", entity: covers as string | string[] }] : []),
+      ...covers.map((c, i) => ({
+        title: covers.length > 1 ? `Volet ${i + 1}` : "",
+        state: label(this.hass.states[c]),
+        entity: c as string | string[],
+      })),
+    ];
     return html`<section>
       <h3>Volets</h3>
-      ${covers.length > 1
-        ? html`<div class="line">
-            <span class="grow">Tous les volets</span>
-            ${this._coverButtons(covers)}
+      <div class="covers">
+        ${columns.map(
+          (col) => html`<div class="cover ${col.state ? "" : "all"}">
+            ${col.title ? html`<div class="ctitle">${col.title}</div>` : nothing}
+            <div class="cstate">${col.state || "\u00a0"}</div>
+            <button class="big-btn" title="Ouvrir" @click=${() => this._cover("open_cover", col.entity)}>
+              ${icon(mdiArrowCollapseUp)}
+            </button>
+            <button class="big-btn" title="Stop" @click=${() => this._cover("stop_cover", col.entity)}>
+              ${icon(mdiStop)}
+            </button>
+            <button class="big-btn" title="Fermer" @click=${() => this._cover("close_cover", col.entity)}>
+              ${icon(mdiArrowCollapseDown)}
+            </button>
           </div>`
-        : nothing}
-      ${covers.map((c) => {
-        const st = this.hass.states[c];
-        const pos = coverPosition(st);
-        return html`<div class="cover">
-          <div class="line">
-            <span class="grow">${friendly(this.hass, c)}</span>
-            <span class="muted">${st.state === "opening" ? "s'ouvre" : st.state === "closing" ? "se ferme" : `${pos} %`}</span>
-            ${this._coverButtons(c)}
-          </div>
-        </div>`;
-      })}
+        )}
+      </div>
     </section>`;
-  }
-
-  private _coverButtons(entity: string | string[]) {
-    return html`<span class="buttons">
-      <button class="round" title="Ouvrir" @click=${() => this._cover("open_cover", entity)}>${icon(mdiArrowCollapseUp)}</button>
-      <button class="round" title="Stop" @click=${() => this._cover("stop_cover", entity)}>${icon(mdiStop)}</button>
-      <button class="round" title="Fermer" @click=${() => this._cover("close_cover", entity)}>${icon(mdiArrowCollapseDown)}</button>
-    </span>`;
   }
 
   render() {
@@ -402,7 +394,7 @@ export class HomexRoomDetail extends LitElement {
       font-size: 12px;
     }
     .pill {
-      --pill: var(--success-color, #43a047);
+      --pill: var(--secondary-text-color, #9e9e9e);
       font-size: 11px;
       font-weight: 500;
       padding: 1px 8px;
@@ -452,9 +444,47 @@ export class HomexRoomDetail extends LitElement {
       font-weight: 500;
       padding: 6px 8px;
     }
-    .buttons {
-      display: inline-flex;
-      gap: 4px;
+    .covers {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+    .cover {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      min-width: 84px;
+    }
+    .cover.all {
+      padding-right: 12px;
+      border-right: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
+    }
+    .ctitle {
+      font-weight: 500;
+      font-size: 13px;
+    }
+    .cstate {
+      font-size: 12px;
+      color: var(--secondary-text-color);
+      min-height: 16px;
+    }
+    .big-btn {
+      width: 64px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(127, 127, 127, 0.15);
+    }
+    .big-btn:hover {
+      background: rgba(127, 127, 127, 0.25);
+    }
+    .big-btn svg {
+      width: 26px;
+      height: 26px;
     }
     .switch {
       position: relative;
