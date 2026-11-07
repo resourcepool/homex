@@ -8,7 +8,8 @@
  *   / not heated; shutters open / partly / closed) and temperature over
  *   humidity — tapped, they open the room detail modal;
  * - optionally, the room's scenes below as a button group (the active one
- *   selected; none when off), when it has 2+ scenes.
+ *   selected; none when off), when it has 2+ scenes. A scene tapped is
+ *   always activated (the room turned on with it when off).
  *
  *   type: custom:homex-room-tile
  *   room: salon                          # Homex room id
@@ -163,12 +164,14 @@ export class HomexRoomTile extends LitElement {
     }).observe(document.body, { childList: true });
   }
 
-  private _activateScene(ev: Event, key: string, active: boolean) {
+  /** Always activates the scene (never turns the room off: rapid taps on
+   * scenes, or on the active one, must keep the room on). */
+  private _activateScene(ev: Event, key: string) {
     ev.stopPropagation();
     this.hass.connection.sendMessagePromise({
       type: "homex/scene/activate",
       room_id: this._config!.room,
-      key: active ? "turn_off" : key, // the active scene again: turn off
+      key,
     });
   }
 
@@ -310,8 +313,8 @@ export class HomexRoomTile extends LitElement {
               (s) =>
                 html`<button
                   class="scene ${s.key === active ? "active" : ""}"
-                  title=${s.key === active ? `${s.name} — éteindre` : s.name}
-                  @click=${(e: Event) => this._activateScene(e, s.key, s.key === active)}
+                  title=${s.name}
+                  @click=${(e: Event) => this._activateScene(e, s.key)}
                 >
                   ${s.name}
                 </button>`

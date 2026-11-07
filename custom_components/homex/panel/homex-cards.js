@@ -1121,11 +1121,11 @@ var et, tt = "M3 4H21V6H20V20H18V6H6V20H4V6H3V4M7 7H17V9H7V7M7 10H17V12H7V10M7 1
 			t.isConnected || (n(), r.disconnect());
 		}).observe(document.body, { childList: !0 });
 	}
-	_activateScene(e, t, n) {
+	_activateScene(e, t) {
 		e.stopPropagation(), this.hass.connection.sendMessagePromise({
 			type: "homex/scene/activate",
 			room_id: this._config.room,
-			key: n ? "turn_off" : t
+			key: t
 		});
 	}
 	_air() {
@@ -1201,8 +1201,8 @@ var et, tt = "M3 4H21V6H20V20H18V6H6V20H4V6H3V4M7 7H17V9H7V7M7 10H17V12H7V10M7 1
             <div class="group">
             ${u.map((e) => k`<button
                   class="scene ${e.key === d ? "active" : ""}"
-                  title=${e.key === d ? `${e.name} — éteindre` : e.name}
-                  @click=${(t) => this._activateScene(t, e.key, e.key === d)}
+                  title=${e.name}
+                  @click=${(t) => this._activateScene(t, e.key)}
                 >
                   ${e.name}
                 </button>`)}
