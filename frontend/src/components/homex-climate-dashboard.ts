@@ -1,13 +1,14 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { mdiAlert, mdiFire, mdiFireOff } from "@mdi/js";
-import type { HeatingZone, HomeAssistant, Room } from "../types";
+import type { HeatingSystem, HeatingZone, HomeAssistant, Room } from "../types";
 import { fireChanged } from "../types";
 import { errorMessage, fetchHeating, setHeatingEnabled, updateRoom } from "../api";
 import { radiatorClimate, roomIsHeating, roomZoneMode, stuckWarning } from "../lib/climate";
 import { toggleSwitch } from "../lib/fields";
 import { sharedStyles } from "../lib/styles";
 import "./homex-select";
+import "./homex-heating-systems-card";
 
 // Which tolerance the device presets enforce (normal / agressive): the global
 // one sets every zone's (TOLERANCE_ENTITY_<zone>).
@@ -21,6 +22,7 @@ export class HomexClimateDashboard extends LitElement {
   @property({ attribute: false }) rooms: Room[] = [];
 
   @state() private _zones: HeatingZone[] = [];
+  @state() private _systems: HeatingSystem[] = [];
   @state() private _enabledLocal = true;
   /** Global heating: switch.homex_heating (live), else the last loaded value. */
   private get _enabled(): boolean {
@@ -197,6 +199,7 @@ export class HomexClimateDashboard extends LitElement {
     try {
       const heating = await fetchHeating(this.hass);
       this._zones = heating.zones ?? [];
+      this._systems = heating.systems ?? [];
       this._enabledLocal = heating.enabled ?? true;
     } catch {
       this._zones = [];
@@ -312,6 +315,11 @@ export class HomexClimateDashboard extends LitElement {
             : ""}
         </div>
       </div>
+      <homex-heating-systems-card
+        .hass=${this.hass}
+        .systems=${this._systems}
+        .zones=${this._zones}
+      ></homex-heating-systems-card>
       <div class="card">
         <div class="card-title">Zones</div>
         ${this._zones.map((z) => this._renderZone(z))}
