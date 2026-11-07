@@ -11,6 +11,7 @@ import type {
 import { errorMessage, fetchRooms, updateRoom } from "../api";
 import { goBack, joinPath, navigate, segments } from "../lib/router";
 import { sharedStyles } from "../lib/styles";
+import { entityArea } from "../lib/area";
 import "./homex-select";
 
 const CLIMATE_MODULE = "heating"; // the Climate module's key
@@ -272,10 +273,6 @@ export class HomexClimateMetrics extends LitElement {
 
   // --- Sensors --------------------------------------------------------------
 
-  private _entityArea(entityId: string): string | undefined {
-    const ent = this.hass.entities?.[entityId];
-    return ent?.area_id || (ent?.device_id && this.hass.devices?.[ent.device_id]?.area_id) || undefined;
-  }
   private _friendly(entityId: string): string {
     return this.hass.states[entityId]?.attributes?.friendly_name || entityId;
   }
@@ -297,7 +294,7 @@ export class HomexClimateMetrics extends LitElement {
         this.hass.states[id]?.attributes?.device_class === def.deviceClass
     );
     const inArea = room.area_id
-      ? all.filter((id) => this._entityArea(id) === room.area_id).sort(byName)
+      ? all.filter((id) => entityArea(this.hass, id) === room.area_id).sort(byName)
       : [];
     const others = all.filter((id) => !inArea.includes(id)).sort(byName);
     return { area: inArea, others };

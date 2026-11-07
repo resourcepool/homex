@@ -19,6 +19,7 @@ import {
   resolveSwitchPreset,
 } from "../lib/device";
 import { sharedStyles } from "../lib/styles";
+import { areaNames, deviceArea, splitByArea } from "../lib/area";
 import "./homex-select";
 import { textField, toggleSwitch } from "../lib/fields";
 import { slugify } from "../lib/slug";
@@ -40,7 +41,7 @@ export class HomexGswitchEditor extends LitElement {
   @state() private _presetId = "";
   @state() private _devices: SwitchDevice[] = [];
   @state() private _rooms: string[] = [];
-  @state() private _allRooms: { room_id: string; name: string }[] = [];
+  @state() private _allRooms: { room_id: string; name: string; area_id?: string | null }[] = [];
   @state() private _busy = false;
   private _idEdited = false;
 
@@ -157,7 +158,7 @@ export class HomexGswitchEditor extends LitElement {
       // Only rooms with the Switches module enabled can host a switch.
       this._allRooms = rooms
         .filter((r) => (r.modules ?? []).includes("switches"))
-        .map((r) => ({ room_id: r.room_id, name: r.name }));
+        .map((r) => ({ room_id: r.room_id, name: r.name, area_id: r.area_id }));
     } catch {
       this._allRooms = [];
     }
@@ -349,6 +350,20 @@ export class HomexGswitchEditor extends LitElement {
   render() {
     const editing = !!this.sw;
     const preset = this._preset();
+    // Devices of the assigned rooms' Home Assistant areas first.
+    const areaIds = this._allRooms
+      .filter((r) => this._rooms.includes(r.room_id) && r.area_id)
+      .map((r) => r.area_id as string);
+    const { inArea, others } = splitByArea(
+      this._devices,
+      (d) => deviceArea(this.hass, d.device_id),
+      areaIds
+    );
+    const deviceOpt = (d: { device_id: string; name: string; model_label: string }) => ({
+      value: d.device_id,
+      label: d.name,
+      secondary: d.model_label,
+    });
     return html`
       ${textField("Nom", this._name, (v) => this._onName(v), "Interrupteur chevet")}
       ${editing ? html`<div class="section">Id : ${this.sw!.id}</div>` : ""}
@@ -358,11 +373,15 @@ export class HomexGswitchEditor extends LitElement {
         ? html`<homex-select
             placeholder="Choisir un interrupteur…"
             .value=${this._deviceId}
-            .options=${this._devices.map((d) => ({
-              value: d.device_id,
-              label: d.name,
-              secondary: d.model_label,
-            }))}
+            .options=${areaIds.length ? [] : this._devices.map(deviceOpt)}
+            .groups=${areaIds.length
+              ? [
+                  ...(inArea.length
+                    ? [{ label: `Pièce : ${areaNames(this.hass, areaIds)}`, options: inArea.map(deviceOpt) }]
+                    : []),
+                  { label: "Autres", options: others.map(deviceOpt) },
+                ]
+              : []}
             @value-changed=${(e: CustomEvent) => this._onDevice(e.detail.value)}
           ></homex-select>`
         : html`<p class="hint">

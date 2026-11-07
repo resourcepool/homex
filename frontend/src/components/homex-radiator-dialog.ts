@@ -16,6 +16,7 @@ import {
   updateRoom,
 } from "../api";
 import { sharedStyles } from "../lib/styles";
+import { areaNames, deviceArea, entityArea, splitByArea } from "../lib/area";
 import "./homex-select";
 import "./homex-dialog";
 
@@ -144,6 +145,10 @@ export class HomexRadiatorDialog extends LitElement {
           this.hass.states[id]?.attributes?.device_class === "temperature"
       )
       .sort((a, b) => name(a).localeCompare(name(b)));
+    // Then the temperature sensors of the room's Home Assistant area.
+    const { inArea, others: rest } = splitByArea(others, (id) => entityArea(this.hass, id), [
+      this.room.area_id,
+    ]);
     const sel = this._rad.external_sensor ?? "";
     const opt = (id: string, label = name(id)) => ({
       value: id,
@@ -164,7 +169,10 @@ export class HomexRadiatorDialog extends LitElement {
           ...(roomSensors.length
             ? [{ label: "Capteurs de la pièce", options: roomSensors.map((id) => opt(id)) }]
             : []),
-          { label: "Autres", options: others.map((id) => opt(id)) },
+          ...(inArea.length
+            ? [{ label: `Pièce : ${areaNames(this.hass, [this.room.area_id])}`, options: inArea.map((id) => opt(id)) }]
+            : []),
+          { label: "Autres", options: rest.map((id) => opt(id)) },
         ]}
         @value-changed=${(e: CustomEvent) =>
           (this._rad = { ...this._rad, external_sensor: e.detail.value })}
@@ -185,6 +193,21 @@ export class HomexRadiatorDialog extends LitElement {
       (r.heating?.radiators ?? []).some((x) => x.device_id === this._rad.device_id)
     );
     const presets = this._modelPresets;
+    // Thermostats of the room's Home Assistant area first, then the others.
+    const areaId = this.room.area_id || "";
+    const areaName = areaId ? this.hass.areas?.[areaId]?.name : undefined;
+    const { inArea, others } = splitByArea(
+      this._thermostats,
+      (d) => deviceArea(this.hass, d.device_id),
+      [areaId]
+    );
+    const thermostatOpt = (d: { device_id: string; name: string; label: string }) => ({
+      value: d.device_id,
+      label: d.name,
+      secondary: d.label,
+      tertiary: used.has(d.device_id) ? "déjà dans la pièce" : undefined,
+      disabled: used.has(d.device_id),
+    });
     return html`
       <homex-dialog
         compact
@@ -197,13 +220,15 @@ export class HomexRadiatorDialog extends LitElement {
           placeholder="Choisir un radiateur…"
           .value=${this._rad.device_id}
           ?disabled=${editing}
-          .options=${this._thermostats.map((d) => ({
-            value: d.device_id,
-            label: d.name,
-            secondary: d.label,
-            tertiary: used.has(d.device_id) ? "déjà dans la pièce" : undefined,
-            disabled: used.has(d.device_id),
-          }))}
+          .options=${areaId ? [] : this._thermostats.map(thermostatOpt)}
+          .groups=${areaId
+            ? [
+                ...(inArea.length
+                  ? [{ label: `Pièce : ${areaName ?? areaId}`, options: inArea.map(thermostatOpt) }]
+                  : []),
+                { label: "Autres", options: others.map(thermostatOpt) },
+              ]
+            : []}
           @value-changed=${(e: CustomEvent) => this._onDevice(e.detail.value)}
         ></homex-select>
         ${other ? html`<p class="hint warn">Déjà dans la pièce « ${other.name} ».</p>` : ""}

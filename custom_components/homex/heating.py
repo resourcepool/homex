@@ -9,7 +9,9 @@ module: editing them never reloads the integration. One document holds
   renamed but not deleted. A room's effective mode is its zone's mode, or
   Unheated when the room's own heating is disabled. Unheated keeps the room's
   valves off, unless its setpoint group gives Unheated a temperature.
-- A heating group gives a temperature setpoint per preset to a set of rooms.
+- A heating group gives a temperature setpoint per preset to a set of rooms;
+  every radiator of a Climate room gets the setpoint of its room's effective
+  mode (climate.set_temperature, re-checked every 10 minutes).
   The built-in "default" group applies to every room not in another group;
   a room belongs to at most one group.
 - A device preset fixes settings (tolerance, mode, lock, sensor) on every
@@ -383,14 +385,21 @@ def room_mode(hass: HomeAssistant, room_id: str, heating: dict | None) -> str:
     return (zone or {}).get("mode") or "normal"
 
 
-def unheated_cuts(hass: HomeAssistant, room_id: str) -> bool:
-    """Whether Unheated cuts the room's heating: unless the room's setpoint
-    group gives Unheated a temperature (e.g. frost protection)."""
+def room_setpoint(hass: HomeAssistant, room_id: str, mode: str) -> float | None:
+    """The temperature a room gets in a heating mode: from its setpoint group
+    (the one listing the room, else the default one); None when unset."""
     groups = (hass.data.get(DOMAIN, {}).get(STORE_DATA) or {}).get("groups", [])
     group = next((g for g in groups if room_id in g.get("rooms", [])), None) or next(
         (g for g in groups if g.get("id") == DEFAULT_GROUP), None
     )
-    return (group or {}).get("setpoints", {}).get(UNHEATED) is None
+    value = (group or {}).get("setpoints", {}).get(mode)
+    return None if value is None else float(value)
+
+
+def unheated_cuts(hass: HomeAssistant, room_id: str) -> bool:
+    """Whether Unheated cuts the room's heating: unless the room's setpoint
+    group gives Unheated a temperature (e.g. frost protection)."""
+    return room_setpoint(hass, room_id, UNHEATED) is None
 
 
 def tolerance_mode(hass: HomeAssistant, zone_id: str | None = None) -> str:
@@ -559,9 +568,10 @@ class RadiatorEnforcer:
         self._unsubs.append(
             async_track_time_interval(self.hass, self._tick, ENFORCE_INTERVAL)
         )
-        self._unsubs.append(
-            async_call_later(self.hass, ENFORCE_FIRST_DELAY, self._tick)
-        )
+        # At boot, let MQTT entities come up first; on a reload (room saved)
+        # they are there: apply right away.
+        delay = 2 if self.hass.is_running else ENFORCE_FIRST_DELAY
+        self._unsubs.append(async_call_later(self.hass, delay, self._tick))
         self.hass.async_create_task(self._async_track_sources())
 
     async def _async_track_sources(self) -> None:
@@ -617,8 +627,9 @@ class RadiatorEnforcer:
 
     def _radiators(self) -> list[tuple[str, dict]]:
         """(room_id, radiator) of every room with the Climate module; each
-        radiator carries its room's effective mode as "mode", and "off" when
-    that mode cuts the heating (Unheated without a setpoint)."""
+        radiator carries its room's effective mode as "mode", "off" when that
+        mode cuts the heating (Unheated without a setpoint), else "setpoint":
+        the mode's temperature for the room (None when unset)."""
         out = []
         for sub in self.entry.subentries.values():
             room = sub.data
@@ -629,8 +640,11 @@ class RadiatorEnforcer:
             mode = room_mode(self.hass, room_id, heating)
             # Unheated with no setpoint = heating cut: valves kept off.
             off = mode == UNHEATED and unheated_cuts(self.hass, room_id)
+            setpoint = None if off else room_setpoint(self.hass, room_id, mode)
             for radiator in heating.get("radiators", []):
-                out.append((room_id, {**radiator, "mode": mode, "off": off}))
+                out.append(
+                    (room_id, {**radiator, "mode": mode, "off": off, "setpoint": setpoint})
+                )
         return out
 
     async def _async_keep_off(self, room_id: str, radiator: dict) -> None:
@@ -645,6 +659,45 @@ class RadiatorEnforcer:
             _LOGGER.info("Homex heating: [%s] %s off (unheated)", room_id, entity_id)
         except Exception as err:  # noqa: BLE001 - keep going with the others
             _LOGGER.warning("Homex heating: [%s] %s off failed: %s", room_id, entity_id, err)
+
+    async def _async_setpoint(self, room_id: str, radiator: dict) -> None:
+        """Bring a valve to its room's setpoint: heating on (a cut / manual off
+        valve is turned back to heat) and its target temperature set."""
+        entity_id = _param_entity(
+            self.hass, radiator.get("device_id", ""), {"domain": "climate", "suffix": ""}
+        )
+        st = self.hass.states.get(entity_id) if entity_id else None
+        if st is None or st.state in ("unknown", "unavailable"):
+            return  # offline: retried at the next pass
+        target = radiator["setpoint"]
+        attrs = st.attributes
+        try:
+            if st.state == "off" and "heat" in (attrs.get("hvac_modes") or []):
+                await _apply_param(self.hass, entity_id, "heat")
+                _LOGGER.info("Homex heating: [%s] %s back to heat", room_id, entity_id)
+            if attrs.get("min_temp") is not None:
+                target = max(float(attrs["min_temp"]), target)
+            if attrs.get("max_temp") is not None:
+                target = min(float(attrs["max_temp"]), target)
+            current = attrs.get("temperature")
+            if current is not None and abs(float(current) - target) < 0.05:
+                return
+            await self.hass.services.async_call(
+                "climate",
+                "set_temperature",
+                {"entity_id": entity_id, "temperature": target},
+                blocking=True,
+            )
+            _LOGGER.info(
+                "Homex heating: [%s] %s setpoint %s → %s (%s)",
+                room_id,
+                entity_id,
+                current,
+                target,
+                radiator["mode"],
+            )
+        except Exception as err:  # noqa: BLE001 - keep going with the others
+            _LOGGER.warning("Homex heating: [%s] %s setpoint failed: %s", room_id, entity_id, err)
 
     async def async_all_off(self) -> None:
         """Heating disabled: turn every room radiator's valve off."""
@@ -669,30 +722,36 @@ class RadiatorEnforcer:
                 await self._async_keep_off(room_id, radiator)
                 continue
             preset = presets.get(radiator.get("preset_id") or "")
-            if preset is None or not radiator.get("device_id"):
-                continue
-            fixed, failed = await async_enforce_device(
-                self.hass, radiator["device_id"], preset
+            if preset is not None and radiator.get("device_id"):
+                await self._async_enforce_preset(room_id, radiator, preset)
+            # The setpoint last: the preset may have just set the valve's mode.
+            if radiator["setpoint"] is not None:
+                await self._async_setpoint(room_id, radiator)
+
+    async def _async_enforce_preset(self, room_id: str, radiator: dict, preset: dict) -> None:
+        """Re-apply a radiator's device preset settings that drifted."""
+        fixed, failed = await async_enforce_device(
+            self.hass, radiator["device_id"], preset
+        )
+        if preset.get("external_input") and radiator.get("external_sensor"):
+            await self._async_write(
+                radiator["device_id"], preset, radiator["external_sensor"]
             )
-            if preset.get("external_input") and radiator.get("external_sensor"):
-                await self._async_write(
-                    radiator["device_id"], preset, radiator["external_sensor"]
-                )
-            if fixed:
-                _LOGGER.info(
-                    "Homex heating: [%s] %s re-applied %s",
-                    room_id,
-                    radiator["device_id"],
-                    ", ".join(fixed),
-                )
-            for fail in failed:
-                _LOGGER.warning(
-                    "Homex heating: [%s] %s %s: %s",
-                    room_id,
-                    radiator["device_id"],
-                    fail["param"],
-                    fail["error"],
-                )
+        if fixed:
+            _LOGGER.info(
+                "Homex heating: [%s] %s re-applied %s",
+                room_id,
+                radiator["device_id"],
+                ", ".join(fixed),
+            )
+        for fail in failed:
+            _LOGGER.warning(
+                "Homex heating: [%s] %s %s: %s",
+                room_id,
+                radiator["device_id"],
+                fail["param"],
+                fail["error"],
+            )
 
 
 async def async_forget_room(hass: HomeAssistant, room_id: str) -> None:
