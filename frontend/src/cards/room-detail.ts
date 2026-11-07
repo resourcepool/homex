@@ -415,9 +415,6 @@ export class HomexRoomDetail extends LitElement {
     .status.heat {
       color: var(--state-climate-heat-color, #ff8100);
     }
-    .status.off {
-      color: var(--error-color, #db4437);
-    }
     button {
       font: inherit;
       color: inherit;

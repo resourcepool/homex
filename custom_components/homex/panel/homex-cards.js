@@ -952,9 +952,6 @@ Qe = X, Qe.styles = o`
     .status.heat {
       color: var(--state-climate-heat-color, #ff8100);
     }
-    .status.off {
-      color: var(--error-color, #db4437);
-    }
     button {
       font: inherit;
       color: inherit;
@@ -1351,10 +1348,6 @@ et = Z, et.styles = o`
     }
     .status.heat {
       color: var(--state-climate-heat-color, #ff8100);
-      opacity: 1;
-    }
-    .status.off {
-      color: var(--error-color, #db4437);
       opacity: 1;
     }
     .readings {

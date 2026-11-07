@@ -470,10 +470,6 @@ export class HomexRoomTile extends LitElement {
       color: var(--state-climate-heat-color, #ff8100);
       opacity: 1;
     }
-    .status.off {
-      color: var(--error-color, #db4437);
-      opacity: 1;
-    }
     .readings {
       display: flex;
       flex-direction: column;
