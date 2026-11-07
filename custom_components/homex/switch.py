@@ -1,7 +1,8 @@
 """switch.homex_{slug}_lights_toggle - on/off state of the room and each group;
 switch.homex_heating - the global heating switch (Climate module);
 switch.homex_{slug}_heating - a room's own heating (off = Unheated), for each
-room with radiators."""
+room with radiators.
+Room switches carry the room's Homex temperature / humidity as attributes."""
 
 from __future__ import annotations
 
@@ -72,6 +73,44 @@ async def async_setup_entry(
 
 
 ROOM_HEATING_PREFIX = "homex_room_heating_"
+# The room's Homex climate readings, shown on its switches (e.g. in a tile's
+# state content): attribute -> metric sensor key.
+CLIMATE_ATTRS = {"temperature": "temperature", "humidity": "humidity"}
+
+
+def _metric_entity(room_id: str, metric: str) -> str:
+    return f"sensor.homex_{room_id}_{metric}"
+
+
+def _climate_attrs(hass: HomeAssistant, room_id: str) -> dict:
+    """The room's temperature / humidity (sensor.homex_<room>_<metric>), when
+    the room has them."""
+    attrs = {}
+    for attr, metric in CLIMATE_ATTRS.items():
+        st = hass.states.get(_metric_entity(room_id, metric))
+        if st is None:
+            continue
+        try:
+            attrs[attr] = float(st.state)
+        except (TypeError, ValueError):
+            attrs[attr] = None  # unknown / unavailable
+    return attrs
+
+
+def _track_climate(entity, room_id: str) -> None:
+    """Re-write the switch's state when the room's readings change."""
+
+    @callback
+    def _changed(event: Event) -> None:
+        entity.async_write_ha_state()
+
+    entity.async_on_remove(
+        async_track_state_change_event(
+            entity.hass,
+            [_metric_entity(room_id, m) for m in CLIMATE_ATTRS.values()],
+            _changed,
+        )
+    )
 
 
 class RoomHeatingSwitch(SwitchEntity):
@@ -92,6 +131,13 @@ class RoomHeatingSwitch(SwitchEntity):
     @property
     def is_on(self) -> bool:
         return self._heating.get("enabled", True) is not False
+
+    @property
+    def extra_state_attributes(self) -> dict:
+        return _climate_attrs(self.hass, self._room_id)
+
+    async def async_added_to_hass(self) -> None:
+        _track_climate(self, self._room_id)
 
     async def _async_set(self, on: bool) -> None:
         entry = self._hub.entry
@@ -137,6 +183,7 @@ class RoomSwitch(SwitchEntity, RestoreEntity):
             # Last used scene, persisted (RestoreEntity) so recall_last
             # survives a Home Assistant restart.
             attrs["last_scene"] = self._unit._controller.last_scene_key
+            attrs.update(_climate_attrs(self.hass, self._unit._controller.room_id))
         return attrs
 
     async def async_added_to_hass(self) -> None:
@@ -146,6 +193,7 @@ class RoomSwitch(SwitchEntity, RestoreEntity):
             self._attr_is_on = last_state.state == "on"
         if self._unit.is_room:
             self._unit._controller.bind_room_switch(self)
+            _track_climate(self, self._unit._controller.room_id)
             # A room is "on" as soon as any of its parts is on — its own member
             # devices or any of its groups. Track them and reflect that state
             # WITHOUT applying a room scene (the passive on must not trigger one).
