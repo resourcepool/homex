@@ -71,7 +71,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "177"
+PANEL_VERSION = "178"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -246,6 +246,10 @@ async def async_register_homex_panel(hass: HomeAssistant) -> None:
         sidebar_icon="mdi:home-lightbulb",
         require_admin=False,
     )
+    # Lovelace cards (custom:homex-room-tile), loaded on every dashboard.
+    from homeassistant.components.frontend import add_extra_js_url
+
+    add_extra_js_url(hass, f"{STATIC_URL}/homex-cards.js?v={PANEL_VERSION}")
 
     domain_data[PANEL_REGISTERED] = True
     _LOGGER.info("Homex sidebar panel registered at /%s", PANEL_URL_PATH)
