@@ -732,7 +732,7 @@ var Qe, $e = [
             </label>` : j}
       </div>
       ${i && o !== void 0 ? k`<div class="line setpoint">
-            <span class="grow">
+            <span class="grow" title="Gardée jusqu'au prochain changement de mode">
               Consigne des radiateurs
               ${u.length ? k`<span class="muted">
                     · mesurée ${K(this.hass, u.reduce((e, t) => e + t, 0) / u.length)} °C</span
@@ -1201,10 +1201,10 @@ var et, tt = "M3 4H21V6H20V20H18V6H6V20H4V6H3V4M7 7H17V9H7V7M7 10H17V12H7V10M7 1
             <div class="group">
             ${u.map((e) => k`<button
                   class="scene ${e.key === d ? "active" : ""}"
-                  title=${e.name}
+                  title=${this._config.scene_names?.[e.key] || e.name}
                   @click=${(t) => this._activateScene(t, e.key)}
                 >
-                  ${e.name}
+                  ${this._config.scene_names?.[e.key] || e.name}
                 </button>`)}
             </div>
           </div>` : j}
@@ -1453,6 +1453,14 @@ var nt, Q = class extends z {
 			composed: !0
 		}));
 	}
+	_include(e, t, n) {
+		let r = this._config.scenes ?? e, i = n ? [...r, t] : r.filter((e) => e !== t), a = e.every((e) => i.includes(e));
+		this._set({ scenes: a ? void 0 : e.filter((e) => i.includes(e)) });
+	}
+	_rename(e, t) {
+		let n = { ...this._config.scene_names ?? {} };
+		t.trim() ? n[e] = t.trim() : delete n[e], this._set({ scene_names: Object.keys(n).length ? n : void 0 });
+	}
 	render() {
 		if (!this._config) return j;
 		let e = this._rooms.find((e) => e.room_id === this._config.room), t = this._config.room, n = t ? [[`switch.homex_${t}_lights_toggle`, "Lumières"], [`switch.homex_${t}_heating`, "Chauffage"]].filter(([e]) => this.hass.states[e]) : [], r = this._config.entity || `switch.homex_${t}_lights_toggle`, i = (e?.scenes ?? []).filter((e) => e.key !== "turn_off"), a = this._config.scenes;
@@ -1487,26 +1495,37 @@ var nt, Q = class extends z {
           @change=${(e) => this._set({ name: e.target.value })}
         />
       </label>
-      ${i.length > 1 ? k`<label class="check">
-              <input
-                type="checkbox"
-                .checked=${this._config.show_scenes === !0}
-                @change=${(e) => this._set({ show_scenes: e.target.checked ? !0 : void 0 })}
-              />
-              Afficher les scènes
-            </label>
-            ${this._config.show_scenes === !0 ? k`<div class="scenes">
-                  ${i.map((e) => k`<label class="check">
+      ${i.length > 1 ? k`<div class="toggle-row">
+              <span>Afficher les scènes</span>
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  .checked=${this._config.show_scenes === !0}
+                  @change=${(e) => this._set({ show_scenes: e.target.checked ? !0 : void 0 })}
+                />
+                <span></span>
+              </label>
+            </div>
+            ${this._config.show_scenes === !0 ? k`<div class="scene-list">
+                  <div class="hint">Scènes du widget — décocher pour masquer, libellé facultatif</div>
+                  ${i.map((e) => {
+			let t = !a || a.includes(e.key);
+			return k`<div class="scene-row ${t ? "" : "excluded"}">
                       <input
                         type="checkbox"
-                        .checked=${!a || a.includes(e.key)}
-                        @change=${(t) => {
-			let n = t.target.checked, r = a ?? i.map((e) => e.key), o = n ? [...r, e.key] : r.filter((t) => t !== e.key), s = i.every((e) => o.includes(e.key));
-			this._set({ scenes: s ? void 0 : i.map((e) => e.key).filter((e) => o.includes(e)) });
-		}}
+                        title=${t ? "Retirer du widget" : "Ajouter au widget"}
+                        .checked=${t}
+                        @change=${(t) => this._include(i.map((e) => e.key), e.key, t.target.checked)}
                       />
-                      ${e.name}
-                    </label>`)}
+                      <input
+                        class="label"
+                        .value=${this._config.scene_names?.[e.key] ?? ""}
+                        placeholder=${e.name}
+                        ?disabled=${!t}
+                        @change=${(t) => this._rename(e.key, t.target.value)}
+                      />
+                    </div>`;
+		})}
                 </div>` : j}` : j}
     `;
 	}
@@ -1538,11 +1557,79 @@ nt = Q, nt.styles = o`
       background: var(--card-background-color, transparent);
       color: var(--primary-text-color);
     }
-    .scenes {
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      color: var(--primary-text-color);
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 22px;
+      flex: none;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .switch span {
+      position: absolute;
+      inset: 0;
+      border-radius: 11px;
+      background: rgba(127, 127, 127, 0.4);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .switch span::before {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 2px;
+      top: 2px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.2s;
+    }
+    .switch input:checked + span {
+      background: var(--primary-color, #03a9f4);
+    }
+    .switch input:checked + span::before {
+      transform: translateX(18px);
+    }
+    .scene-list {
       display: flex;
       flex-direction: column;
       gap: 6px;
-      padding-left: 26px;
+      border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.35));
+      border-radius: 8px;
+      padding: 10px;
+    }
+    .hint {
+      font-size: 12px;
+      color: var(--secondary-text-color);
+    }
+    .scene-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .scene-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      flex: none;
+      accent-color: var(--primary-color);
+    }
+    .scene-row .label {
+      flex: 1;
+      min-width: 0;
+    }
+    .scene-row.excluded .label {
+      opacity: 0.5;
     }
   `, Y([B({ attribute: !1 })], Q.prototype, "hass", void 0), Y([V()], Q.prototype, "_config", void 0), Y([V()], Q.prototype, "_rooms", void 0), customElements.get("homex-room-tile-editor") || customElements.define("homex-room-tile-editor", Q);
 // src/homex-cards.ts

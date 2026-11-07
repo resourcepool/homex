@@ -192,7 +192,7 @@ export class HomexRoomDetail extends LitElement {
       </div>
       ${roomOn && target !== undefined
         ? html`<div class="line setpoint">
-            <span class="grow">
+            <span class="grow" title="Gardée jusqu'au prochain changement de mode">
               Consigne des radiateurs
               ${current.length
                 ? html`<span class="muted">

@@ -136,6 +136,10 @@ async def _doc(hass: HomeAssistant) -> dict:
             "enabled": loaded.get("enabled", True),
             "tolerance_mode": loaded.get("tolerance_mode", "normal"),
             "systems": list(loaded.get("systems", [])),
+            # Per radiator device: the {"mode", "setpoint"} last applied, so
+            # a setpoint is only re-applied when its mode / value changes (a
+            # manual setpoint holds until then, across restarts too).
+            "applied_setpoints": dict(loaded.get("applied_setpoints", {})),
         }
     return data[STORE_DATA]
 
@@ -667,15 +671,16 @@ class RadiatorEnforcer:
         except Exception as err:  # noqa: BLE001 - keep going with the others
             _LOGGER.warning("Homex heating: [%s] %s off failed: %s", room_id, entity_id, err)
 
-    async def _async_setpoint(self, room_id: str, radiator: dict) -> None:
+    async def _async_setpoint(self, room_id: str, radiator: dict) -> bool:
         """Bring a valve to its room's setpoint: heating on (a cut / manual off
-        valve is turned back to heat) and its target temperature set."""
+        valve is turned back to heat) and its target temperature set. False
+        when it could not (offline, failure): retried at the next pass."""
         entity_id = _param_entity(
             self.hass, radiator.get("device_id", ""), {"domain": "climate", "suffix": ""}
         )
         st = self.hass.states.get(entity_id) if entity_id else None
         if st is None or st.state in ("unknown", "unavailable"):
-            return  # offline: retried at the next pass
+            return False  # offline: retried at the next pass
         target = radiator["setpoint"]
         attrs = st.attributes
         try:
@@ -688,7 +693,7 @@ class RadiatorEnforcer:
                 target = min(float(attrs["max_temp"]), target)
             current = attrs.get("temperature")
             if current is not None and abs(float(current) - target) < 0.05:
-                return
+                return True
             await self.hass.services.async_call(
                 "climate",
                 "set_temperature",
@@ -705,9 +710,16 @@ class RadiatorEnforcer:
             )
         except Exception as err:  # noqa: BLE001 - keep going with the others
             _LOGGER.warning("Homex heating: [%s] %s setpoint failed: %s", room_id, entity_id, err)
+            return False
+        return True
 
     async def async_all_off(self) -> None:
-        """Heating disabled: turn every room radiator's valve off."""
+        """Heating disabled: turn every room radiator's valve off (their
+        setpoints are re-applied when it is enabled again)."""
+        doc = await _doc(self.hass)
+        if doc.get("applied_setpoints"):
+            doc["applied_setpoints"] = {}
+            await _save(self.hass)
         for room_id, radiator in self._radiators():
             entity_id = _param_entity(
                 self.hass, radiator.get("device_id", ""), {"domain": "climate", "suffix": ""}
@@ -720,20 +732,38 @@ class RadiatorEnforcer:
                 _LOGGER.warning("Homex heating: [%s] %s off failed: %s", room_id, entity_id, err)
 
     async def async_enforce_all(self) -> None:
+        """Every pass (load, every 10 min, mode / settings changes): device
+        presets re-applied where they drifted, Unheated valves kept off, and
+        each valve's setpoint applied only when its room's mode or setpoint
+        changed since it was last applied — a setpoint set by hand on the
+        valve holds until the next mode change."""
         doc = await _doc(self.hass)
         if not doc.get("enabled", True):
             return  # heating off: no preset (nor mode) re-applied
         presets = {p["id"]: p for p in doc["device_presets"]}
+        applied = doc.setdefault("applied_setpoints", {})
+        changed = False
         for room_id, radiator in self._radiators():
+            device_id = radiator.get("device_id") or ""
             if radiator["off"]:
                 await self._async_keep_off(room_id, radiator)
+                # Heated again later: its setpoint is applied then.
+                changed |= applied.pop(device_id, None) is not None
                 continue
             preset = presets.get(radiator.get("preset_id") or "")
-            if preset is not None and radiator.get("device_id"):
+            if preset is not None and device_id:
                 await self._async_enforce_preset(room_id, radiator, preset)
             # The setpoint last: the preset may have just set the valve's mode.
-            if radiator["setpoint"] is not None:
-                await self._async_setpoint(room_id, radiator)
+            if radiator["setpoint"] is None:
+                continue
+            wanted = {"mode": radiator["mode"], "setpoint": radiator["setpoint"]}
+            if applied.get(device_id) == wanted:
+                continue  # already applied for this mode: manual changes hold
+            if await self._async_setpoint(room_id, radiator):
+                applied[device_id] = wanted
+                changed = True
+        if changed:
+            await _save(self.hass)
 
     async def _async_enforce_preset(self, room_id: str, radiator: dict, preset: dict) -> None:
         """Re-apply a radiator's device preset settings that drifted."""

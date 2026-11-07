@@ -19,6 +19,7 @@
  *   show_scenes: true                    # optional (default false; rooms
  *                                        # with 2+ scenes only)
  *   scenes: [turn_on, film]              # optional: scene keys shown
+ *   scene_names: { turn_on: Normal }     # optional: scene labels
  */
 import { LitElement, css, html, nothing } from "lit";
 import { property, state } from "lit/decorators.js";
@@ -57,6 +58,8 @@ export interface RoomTileConfig {
   icon?: string;
   show_scenes?: boolean;
   scenes?: string[];
+  /** Optional labels per scene key (default: the scene's name). */
+  scene_names?: Record<string, string>;
 }
 
 // A shutter half-way: frame + slats on the top half only.
@@ -313,10 +316,10 @@ export class HomexRoomTile extends LitElement {
               (s) =>
                 html`<button
                   class="scene ${s.key === active ? "active" : ""}"
-                  title=${s.name}
+                  title=${this._config!.scene_names?.[s.key] || s.name}
                   @click=${(e: Event) => this._activateScene(e, s.key)}
                 >
-                  ${s.name}
+                  ${this._config!.scene_names?.[s.key] || s.name}
                 </button>`
             )}
             </div>

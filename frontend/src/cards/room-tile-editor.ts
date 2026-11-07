@@ -28,6 +28,22 @@ export class HomexRoomTileEditor extends LitElement {
     this.dispatchEvent(new CustomEvent("config-changed", { detail: { config }, bubbles: true, composed: true }));
   }
 
+  /** Include / exclude a scene; every scene included: no filter (new scenes
+   * show up too). */
+  private _include(keys: string[], key: string, on: boolean) {
+    const cur = this._config!.scenes ?? keys;
+    const next = on ? [...cur, key] : cur.filter((k) => k !== key);
+    const all = keys.every((k) => next.includes(k));
+    this._set({ scenes: all ? undefined : keys.filter((k) => next.includes(k)) });
+  }
+
+  private _rename(key: string, label: string) {
+    const names = { ...(this._config!.scene_names ?? {}) };
+    if (label.trim()) names[key] = label.trim();
+    else delete names[key];
+    this._set({ scene_names: Object.keys(names).length ? names : undefined });
+  }
+
   render() {
     if (!this._config) return nothing;
     const room = this._rooms.find((r) => r.room_id === this._config!.room);
@@ -71,34 +87,39 @@ export class HomexRoomTileEditor extends LitElement {
         />
       </label>
       ${scenes.length > 1
-        ? html`<label class="check">
-              <input
-                type="checkbox"
-                .checked=${this._config.show_scenes === true}
-                @change=${(e: Event) =>
-                  this._set({ show_scenes: (e.target as HTMLInputElement).checked ? true : undefined })}
-              />
-              Afficher les scènes
-            </label>
+        ? html`<div class="toggle-row">
+              <span>Afficher les scènes</span>
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  .checked=${this._config.show_scenes === true}
+                  @change=${(e: Event) =>
+                    this._set({ show_scenes: (e.target as HTMLInputElement).checked ? true : undefined })}
+                />
+                <span></span>
+              </label>
+            </div>
             ${this._config.show_scenes === true
-              ? html`<div class="scenes">
-                  ${scenes.map(
-                    (s) => html`<label class="check">
+              ? html`<div class="scene-list">
+                  <div class="hint">Scènes du widget — décocher pour masquer, libellé facultatif</div>
+                  ${scenes.map((s) => {
+                    const included = !shown || shown.includes(s.key);
+                    return html`<div class="scene-row ${included ? "" : "excluded"}">
                       <input
                         type="checkbox"
-                        .checked=${!shown || shown.includes(s.key)}
-                        @change=${(e: Event) => {
-                          const on = (e.target as HTMLInputElement).checked;
-                          const cur = shown ?? scenes.map((x) => x.key);
-                          const next = on ? [...cur, s.key] : cur.filter((k) => k !== s.key);
-                          // Every scene shown: no filter (new scenes show up too).
-                          const all = scenes.every((x) => next.includes(x.key));
-                          this._set({ scenes: all ? undefined : scenes.map((x) => x.key).filter((k) => next.includes(k)) });
-                        }}
+                        title=${included ? "Retirer du widget" : "Ajouter au widget"}
+                        .checked=${included}
+                        @change=${(e: Event) => this._include(scenes.map((x) => x.key), s.key, (e.target as HTMLInputElement).checked)}
                       />
-                      ${s.name}
-                    </label>`
-                  )}
+                      <input
+                        class="label"
+                        .value=${this._config!.scene_names?.[s.key] ?? ""}
+                        placeholder=${s.name}
+                        ?disabled=${!included}
+                        @change=${(e: Event) => this._rename(s.key, (e.target as HTMLInputElement).value)}
+                      />
+                    </div>`;
+                  })}
                 </div>`
               : nothing}`
         : nothing}
@@ -132,11 +153,79 @@ export class HomexRoomTileEditor extends LitElement {
       background: var(--card-background-color, transparent);
       color: var(--primary-text-color);
     }
-    .scenes {
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      color: var(--primary-text-color);
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 22px;
+      flex: none;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .switch span {
+      position: absolute;
+      inset: 0;
+      border-radius: 11px;
+      background: rgba(127, 127, 127, 0.4);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .switch span::before {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 2px;
+      top: 2px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.2s;
+    }
+    .switch input:checked + span {
+      background: var(--primary-color, #03a9f4);
+    }
+    .switch input:checked + span::before {
+      transform: translateX(18px);
+    }
+    .scene-list {
       display: flex;
       flex-direction: column;
       gap: 6px;
-      padding-left: 26px;
+      border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.35));
+      border-radius: 8px;
+      padding: 10px;
+    }
+    .hint {
+      font-size: 12px;
+      color: var(--secondary-text-color);
+    }
+    .scene-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .scene-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      flex: none;
+      accent-color: var(--primary-color);
+    }
+    .scene-row .label {
+      flex: 1;
+      min-width: 0;
+    }
+    .scene-row.excluded .label {
+      opacity: 0.5;
     }
   `;
 }
