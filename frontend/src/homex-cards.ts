@@ -4,7 +4,7 @@
  * custom:homex-room-tile — a full-width room tile: its switch (lights toggle
  * by default, or e.g. switch.homex_<room>_heating), tapped to toggle; status
  * icons (heating demand / not heated, shutters open / partly / closed), its
- * air quality (CO₂, PM2.5, PM10) when available, and its Homex temperature
+ * air quality pills (CO₂, worst of PM2.5 / PM10) when available, and its Homex temperature
  * and humidity stacked on the right.
  *
  *   type: custom:homex-room-tile
@@ -50,14 +50,24 @@ interface RoomTileConfig {
   icon?: string;
 }
 
-const AIR = [
-  ["co2", "CO₂"],
-  ["pm25", "PM2.5"],
-  ["pm10", "PM10"],
-] as const;
+/** Air quality levels: [good up to, fair up to] — above is poor. CO₂ in ppm;
+ * PM in µg/m³ (WHO 24 h guidelines: PM2.5 15, PM10 45). */
+const AIR_LEVELS = {
+  co2: [800, 1200],
+  pm25: [15, 35],
+  pm10: [45, 100],
+} as const;
+type AirKey = keyof typeof AIR_LEVELS;
 
-const fmt = (hass: HomeAssistant, value: number, digits = 1) =>
+/** 0 = good, 1 = fair, 2 = poor, and a severity ratio to compare metrics. */
+const airLevel = (key: AirKey, value: number) => {
+  const [good, fair] = AIR_LEVELS[key];
+  return { level: value <= good ? 0 : value <= fair ? 1 : 2, ratio: value / good };
+};
+
+const fmt = (hass: HomeAssistant, value: number, digits = 1, min = 0) =>
   value.toLocaleString(hass.locale?.language || undefined, {
+    minimumFractionDigits: min,
     maximumFractionDigits: digits,
   });
 
@@ -144,8 +154,16 @@ class HomexRoomTile extends LitElement {
     return Number.isNaN(value) ? undefined : { value, unit: st!.attributes.unit_of_measurement as string | undefined };
   }
 
+  /** Air quality pills: CO₂, and the worst of PM2.5 / PM10 (vs. its
+   * guideline). */
   private _air() {
-    return AIR.map(([key, label]) => ({ label, m: this._metric(key) })).filter((a) => a.m);
+    const pill = (key: AirKey, label: string) => {
+      const m = this._metric(key);
+      return m && { key, label, ...m, ...airLevel(key, m.value) };
+    };
+    const pms = [pill("pm25", "PM2.5"), pill("pm10", "PM10")].filter((p) => !!p);
+    const pm = pms.sort((a, b) => b.ratio - a.ratio)[0];
+    return [pill("co2", "CO₂"), pm].filter((p) => !!p);
   }
 
   getCardSize() {
@@ -209,17 +227,20 @@ class HomexRoomTile extends LitElement {
         <div class="name">${this._name()}</div>
         <div class="sub">${stateLabel}</div>
         ${air.length
-          ? html`<div class="sub air">
-              ${air
-                .map(({ label, m }) => `${label} ${fmt(this.hass, m!.value, 0)}${m!.unit ? " " + m!.unit : ""}`)
-                .join(" · ")}
+          ? html`<div class="pills">
+              ${air.map(
+                (p) =>
+                  html`<span class="pill l${p.level}" title=${`${p.label} : ${fmt(this.hass, p.value, 1)} ${p.unit ?? ""}`}
+                    >${p.label} ${fmt(this.hass, p.value, 0)}</span
+                  >`
+              )}
             </div>`
           : nothing}
       </div>
       <div class="statuses">${this._heatingStatus()}${this._shutterStatus()}</div>
       ${t || h
         ? html`<div class="readings">
-            ${t ? html`<div class="temp">${fmt(this.hass, t.value)} ${t.unit ?? "°C"}</div>` : nothing}
+            ${t ? html`<div class="temp">${fmt(this.hass, t.value, 1, 1)} ${t.unit ?? "°C"}</div>` : nothing}
             ${h ? html`<div class="hum">${fmt(this.hass, h.value, 0)} %</div>` : nothing}
           </div>`
         : nothing}
@@ -315,8 +336,27 @@ class HomexRoomTile extends LitElement {
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .air {
-      color: var(--secondary-text-color);
+    .pills {
+      display: flex;
+      gap: 4px;
+      margin-top: 3px;
+    }
+    .pill {
+      --pill: var(--success-color, #43a047);
+      font-size: 10px;
+      font-weight: 500;
+      line-height: 14px;
+      padding: 0 6px;
+      border-radius: 7px;
+      white-space: nowrap;
+      color: var(--pill);
+      background: color-mix(in srgb, var(--pill) 18%, transparent);
+    }
+    .pill.l1 {
+      --pill: var(--warning-color, #ffa600);
+    }
+    .pill.l2 {
+      --pill: var(--error-color, #db4437);
     }
   `;
 }

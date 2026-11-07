@@ -567,11 +567,20 @@ function ke(e) {
 		throw Z = void 0, e;
 	}), Z;
 }
-var Ae = [
-	["co2", "CO₂"],
-	["pm25", "PM2.5"],
-	["pm10", "PM10"]
-], Q = (e, t, n = 1) => t.toLocaleString(e.locale?.language || void 0, { maximumFractionDigits: n }), $ = class extends q {
+var Ae = {
+	co2: [800, 1200],
+	pm25: [15, 35],
+	pm10: [45, 100]
+}, je = (e, t) => {
+	let [n, r] = Ae[e];
+	return {
+		level: t <= n ? 0 : t <= r ? 1 : 2,
+		ratio: t / n
+	};
+}, Q = (e, t, n = 1, r = 0) => t.toLocaleString(e.locale?.language || void 0, {
+	minimumFractionDigits: r,
+	maximumFractionDigits: n
+}), $ = class extends q {
 	updated() {
 		this.hass && this._config && !this._room && ke(this.hass).then((e) => {
 			this._room = e.find((e) => e.room_id === this._config.room);
@@ -619,10 +628,16 @@ var Ae = [
 		};
 	}
 	_air() {
-		return Ae.map(([e, t]) => ({
-			label: t,
-			m: this._metric(e)
-		})).filter((e) => e.m);
+		let e = (e, t) => {
+			let n = this._metric(e);
+			return n && {
+				key: e,
+				label: t,
+				...n,
+				...je(e, n.value)
+			};
+		}, t = [e("pm25", "PM2.5"), e("pm10", "PM10")].filter((e) => !!e).sort((e, t) => t.ratio - e.ratio)[0];
+		return [e("co2", "CO₂"), t].filter((e) => !!e);
 	}
 	getCardSize() {
 		return this._air().length ? 2 : 1;
@@ -662,13 +677,15 @@ var Ae = [
       <div class="info">
         <div class="name">${this._name()}</div>
         <div class="sub">${i}</div>
-        ${s.length ? I`<div class="sub air">
-              ${s.map(({ label: e, m: t }) => `${e} ${Q(this.hass, t.value, 0)}${t.unit ? " " + t.unit : ""}`).join(" · ")}
+        ${s.length ? I`<div class="pills">
+              ${s.map((e) => I`<span class="pill l${e.level}" title=${`${e.label} : ${Q(this.hass, e.value, 1)} ${e.unit ?? ""}`}
+                    >${e.label} ${Q(this.hass, e.value, 0)}</span
+                  >`)}
             </div>` : R}
       </div>
       <div class="statuses">${this._heatingStatus()}${this._shutterStatus()}</div>
       ${a || o ? I`<div class="readings">
-            ${a ? I`<div class="temp">${Q(this.hass, a.value)} ${a.unit ?? "°C"}</div>` : R}
+            ${a ? I`<div class="temp">${Q(this.hass, a.value, 1, 1)} ${a.unit ?? "°C"}</div>` : R}
             ${o ? I`<div class="hum">${Q(this.hass, o.value, 0)} %</div>` : R}
           </div>` : R}
     </ha-card>`;
@@ -763,8 +780,27 @@ if (De = $, De.styles = o`
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .air {
-      color: var(--secondary-text-color);
+    .pills {
+      display: flex;
+      gap: 4px;
+      margin-top: 3px;
+    }
+    .pill {
+      --pill: var(--success-color, #43a047);
+      font-size: 10px;
+      font-weight: 500;
+      line-height: 14px;
+      padding: 0 6px;
+      border-radius: 7px;
+      white-space: nowrap;
+      color: var(--pill);
+      background: color-mix(in srgb, var(--pill) 18%, transparent);
+    }
+    .pill.l1 {
+      --pill: var(--warning-color, #ffa600);
+    }
+    .pill.l2 {
+      --pill: var(--error-color, #db4437);
     }
   `, X([J({ attribute: !1 })], $.prototype, "hass", void 0), X([Y()], $.prototype, "_config", void 0), X([Y()], $.prototype, "_room", void 0), !customElements.get("homex-room-tile")) {
 	customElements.define("homex-room-tile", $);
