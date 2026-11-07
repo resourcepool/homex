@@ -71,7 +71,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "160"
+PANEL_VERSION = "162"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -1906,10 +1906,9 @@ async def ws_scene_rename(hass: HomeAssistant, connection, msg) -> None:
                 scene["triggers"] = triggers
     room[CONF_SCENES] = _scenes_value(controller, order)
     _save_room(hass, hub, sub, room)
-    # turn_on keeps the fixed "HX - room - on" label; extras embed their name.
+    # turn_on keeps its fixed label; extras embed their name.
     if key != "turn_on":
-        room_name = room.get(CONF_ROOM_NAME) or controller.room_id
         await _set_scene_name(
-            hass, controller.extra_scene_id(key), f"HX - {room_name} - on - {name}"
+            hass, controller.extra_scene_id(key), controller._pretty_name(key, name)
         )
     connection.send_result(msg["id"], {"ok": True})

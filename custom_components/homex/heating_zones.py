@@ -37,7 +37,14 @@ from homeassistant.helpers.trigger import (
     async_validate_trigger_config,
 )
 
-from .const import CONF_HEATING, CONF_MODULES, CONF_ROOM_ID, DOMAIN, MODULE_HEATING
+from .const import (
+    CONF_HEATING,
+    CONF_MODULES,
+    CONF_ROOM_ID,
+    DOMAIN,
+    MODULE_HEATING,
+    hx_name,
+)
 from .heating import (
     ENFORCER,
     STORE_DATA,
@@ -73,6 +80,15 @@ def ensure_zones(doc: dict) -> list[dict]:
             },
         )
     return zones
+
+
+def zone_name(hass: HomeAssistant, zone_id: str | None) -> str:
+    """A zone's display name ("Global" for None), for entity names."""
+    if zone_id is None:
+        return "Global"
+    doc = hass.data.get(DOMAIN, {}).get(STORE_DATA) or {}
+    zone = next((z for z in doc.get("zones", []) if z["id"] == zone_id), None)
+    return zone["name"] if zone else zone_id
 
 
 def zones_manager(hass: HomeAssistant) -> "HeatingZones":
@@ -410,8 +426,7 @@ class ZoneModeSelect(SelectEntity):
 
     @property
     def name(self) -> str:
-        zone, _ = self._data()
-        return f"Chauffage {zone['name'] if zone else self.zone_id}"
+        return hx_name("Climate", zone_name(self.hass, self.zone_id), "Mode")
 
     @property
     def options(self) -> list[str]:
@@ -428,6 +443,7 @@ class ZoneModeSelect(SelectEntity):
         zone, _ = self._data()
         return {
             "zone_id": self.zone_id,
+            "zone_name": zone_name(self.hass, self.zone_id),
             "mode_id": zone.get("mode") if zone else None,
             # Mode names by id (e.g. the Unheated mode's current name).
             "modes": {m["id"]: m["name"] for m in self._data()[1]},
@@ -457,9 +473,7 @@ class ZoneToleranceSelect(SelectEntity):
 
     @property
     def name(self) -> str:
-        doc = self.hass.data[DOMAIN][STORE_DATA]
-        zone = next((z for z in doc.get("zones", []) if z["id"] == self.zone_id), None)
-        return f"Climate mode de tolérance {zone['name'] if zone else self.zone_id}"
+        return hx_name("Climate", zone_name(self.hass, self.zone_id), "Tolérance")
 
     @property
     def current_option(self) -> str:
@@ -488,11 +502,7 @@ class HeatingNeededSensor(BinarySensorEntity):
 
     @property
     def name(self) -> str:
-        if self.zone_id is None:
-            return "Chauffage nécessaire"
-        doc = self.hass.data[DOMAIN][STORE_DATA]
-        zone = next((z for z in doc.get("zones", []) if z["id"] == self.zone_id), None)
-        return f"Chauffage nécessaire {zone['name'] if zone else self.zone_id}"
+        return hx_name("Climate", zone_name(self.hass, self.zone_id), "Chauffage nécessaire")
 
     @property
     def is_on(self) -> bool:

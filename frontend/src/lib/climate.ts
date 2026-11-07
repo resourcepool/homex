@@ -31,7 +31,7 @@ export function roomZoneMode(
     selects.find((s) => (s.attributes?.rooms ?? []).includes(room.room_id)) ??
     selects.find((s) => s.attributes?.zone_id === "default");
   if (!st || st.state === "unavailable" || st.state === "unknown") return undefined;
-  const zone = String(st.attributes?.friendly_name ?? "").replace(/^Chauffage /, "");
+  const zone = String(st.attributes?.zone_name ?? st.attributes?.zone_id ?? "");
   if (room.heating?.enabled === false) {
     return { zone, mode: st.attributes?.modes?.unheated ?? "Unheated", own: true };
   }

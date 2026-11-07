@@ -72,7 +72,12 @@ export class HomexHeatingManager extends LitElement {
   @state() private _devicePresets: HeatingDevicePreset[] = [];
   @state() private _zones: HeatingZone[] = [];
   @state() private _systems: HeatingSystem[] = [];
-  @state() private _enabled = true;
+  @state() private _enabledLocal = true;
+  /** Global heating: switch.homex_heating (live), else the last loaded value. */
+  private get _enabled(): boolean {
+    const st = this.hass?.states["switch.homex_heating"];
+    return st ? st.state === "on" : this._enabledLocal;
+  }
   @state() private _switching = false;
   @state() private _rooms: Room[] = [];
   @state() private _loaded = false;
@@ -282,7 +287,7 @@ export class HomexHeatingManager extends LitElement {
       this._devicePresets = heating.device_presets ?? [];
       this._zones = heating.zones ?? [];
       this._systems = heating.systems ?? [];
-      this._enabled = heating.enabled ?? true;
+      this._enabledLocal = heating.enabled ?? true;
       this._rooms = rooms;
     } catch {
       this._presets = [];
@@ -329,7 +334,7 @@ export class HomexHeatingManager extends LitElement {
     this._switching = true;
     try {
       await setHeatingEnabled(this.hass, enabled);
-      this._enabled = enabled;
+      this._enabledLocal = enabled;
     } catch (err) {
       alert("Erreur Homex : " + errorMessage(err));
     } finally {

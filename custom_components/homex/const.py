@@ -110,3 +110,9 @@ TRIGGER_DOMAINS = [
 ]
 
 PLATFORMS = ["switch", "light", "select", "sensor", "binary_sensor"]
+
+
+def hx_name(module: str, place: str, name: str) -> str:
+    """Display name of every entity Homex creates: HX - {module} - {place} - {name}
+    (place: the room, else the heating zone or "Global")."""
+    return f"HX - {module} - {place} - {name}"

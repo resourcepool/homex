@@ -21,7 +21,12 @@ export class HomexClimateDashboard extends LitElement {
   @property({ attribute: false }) rooms: Room[] = [];
 
   @state() private _zones: HeatingZone[] = [];
-  @state() private _enabled = true;
+  @state() private _enabledLocal = true;
+  /** Global heating: switch.homex_heating (live), else the last loaded value. */
+  private get _enabled(): boolean {
+    const st = this.hass?.states["switch.homex_heating"];
+    return st ? st.state === "on" : this._enabledLocal;
+  }
   @state() private _loaded = false;
   @state() private _busy = false;
 
@@ -187,7 +192,7 @@ export class HomexClimateDashboard extends LitElement {
     try {
       const heating = await fetchHeating(this.hass);
       this._zones = heating.zones ?? [];
-      this._enabled = heating.enabled ?? true;
+      this._enabledLocal = heating.enabled ?? true;
     } catch {
       this._zones = [];
     }
@@ -197,8 +202,9 @@ export class HomexClimateDashboard extends LitElement {
   private async _toggle() {
     this._busy = true;
     try {
-      await setHeatingEnabled(this.hass, !this._enabled);
-      this._enabled = !this._enabled;
+      const target = !this._enabled;
+      await setHeatingEnabled(this.hass, target);
+      this._enabledLocal = target;
     } catch (err) {
       alert("Erreur Homex : " + errorMessage(err));
     } finally {

@@ -69,6 +69,7 @@ def remove_scene_entities(hass: HomeAssistant, scene_ids) -> None:
             registry.async_remove(entity_id)
 
 from .const import (
+    hx_name,
     CONF_AREA_ID,
     CONF_DEVICES,
     CONF_GROUP_ID,
@@ -223,11 +224,9 @@ class Unit:
 
     @property
     def switch_name(self) -> str:
-        """Friendly name: HX - {room} - toggle lights [- via the group name]."""
+        """HX - Lights - {room} - Toggle | {group} toggle."""
         room = self._controller.room_name
-        if self.is_room:
-            return f"HX - {room} - toggle lights"
-        return f"HX - {room} - {self.name} - toggle lights"
+        return hx_name("Lights", room, "Toggle" if self.is_room else f"{self.name} toggle")
 
     @property
     def light_entity_id(self) -> str:
@@ -235,11 +234,11 @@ class Unit:
 
     @property
     def light_name(self) -> str:
-        """Friendly name: HX - {room} - lights [- via the group name]."""
+        """HX - Lights - {room} - Light group | {group} light group."""
         room = self._controller.room_name
-        if self.is_room:
-            return f"HX - {room} - lights"
-        return f"HX - {room} - {self.name} - lights"
+        return hx_name(
+            "Lights", room, "Light group" if self.is_room else f"{self.name} light group"
+        )
 
     @property
     def scene_on_entity_id(self) -> str:
@@ -797,13 +796,31 @@ class RoomController:
         )
 
     def _pretty_name(self, key: str, display: str | None = None) -> str:
-        """HA scene display name: HX - {room} - on/off [- {scene name}]."""
-        room = self.room_name
+        """HA scene display name: HX - Lights - {room} - Scène On|Off|{name}."""
         if key == "turn_on":
-            return f"HX - {room} - on"
+            return hx_name("Lights", self.room_name, "Scène On")
         if key == "turn_off":
-            return f"HX - {room} - off"
-        return f"HX - {room} - on - {display or key}"
+            return hx_name("Lights", self.room_name, "Scène Off")
+        return hx_name("Lights", self.room_name, f"Scène {display or key}")
+
+    def _legacy_pretty_targets(self) -> dict[str, str]:
+        """Scene id -> the former default display name (HX - {room} - on…),
+        so scenes still named so are moved to the current convention."""
+        room = self.room_name
+        legacy = {
+            f"homex_{self.room_id}_turn_on": f"HX - {room} - on",
+            f"homex_{self.room_id}_turn_off": f"HX - {room} - off",
+        }
+        for scene in self.extra_scenes:
+            legacy[self.extra_scene_id(scene["key"])] = (
+                f"HX - {room} - on - {scene.get('name') or scene['key']}"
+            )
+        for unit in self.units:
+            if unit.is_room:
+                continue
+            legacy[f"homex_{unit.slug}_turn_on"] = f"HX - {room} - {unit.name} - on"
+            legacy[f"homex_{unit.slug}_turn_off"] = f"HX - {room} - {unit.name} - off"
+        return legacy
 
     def scene_entities(self) -> list[str]:
         """Ordered, switchable scene entity ids (turn_on + extras; off excluded)."""
@@ -1150,7 +1167,10 @@ class RoomController:
             if changed:
                 await self.hass.services.async_call("scene", "reload", blocking=True)
             renamed = await self.hass.async_add_executor_job(
-                self._prettify_scenes, path, self._pretty_targets()
+                self._prettify_scenes,
+                path,
+                self._pretty_targets(),
+                self._legacy_pretty_targets(),
             )
             if renamed:
                 await self.hass.services.async_call("scene", "reload", blocking=True)
@@ -1242,21 +1262,24 @@ class RoomController:
             targets[self.extra_scene_id(scene["key"])] = self._pretty_name(
                 scene["key"], scene.get("name")
             )
-        # Group scenes: HX - {room} - {group} - on / - off.
+        # Group scenes: HX - Lights - {room} - {group} scène On / Off.
         for unit in self.units:
             if unit.is_room:
                 continue
-            targets[f"homex_{unit.slug}_turn_on"] = (
-                f"HX - {self.room_name} - {unit.name} - on"
+            targets[f"homex_{unit.slug}_turn_on"] = hx_name(
+                "Lights", self.room_name, f"{unit.name} scène On"
             )
-            targets[f"homex_{unit.slug}_turn_off"] = (
-                f"HX - {self.room_name} - {unit.name} - off"
+            targets[f"homex_{unit.slug}_turn_off"] = hx_name(
+                "Lights", self.room_name, f"{unit.name} scène Off"
             )
         return targets
 
     @staticmethod
-    def _prettify_scenes(path: str, pretty: dict[str, str]) -> bool:
-        """Set pretty names for scenes still named like their id. In executor."""
+    def _prettify_scenes(
+        path: str, pretty: dict[str, str], legacy: dict[str, str] | None = None
+    ) -> bool:
+        """Set pretty names for scenes still named like their id, or still
+        carrying the former default name (not customized). In executor."""
         if not os.path.exists(path):
             return False
         scenes = load_yaml(path)
@@ -1267,7 +1290,10 @@ class RoomController:
             if not isinstance(scene, dict):
                 continue
             scene_id = scene.get("id")
-            if scene_id in pretty and scene.get("name") == scene_id:
+            if scene_id in pretty and scene.get("name") in (
+                scene_id,
+                (legacy or {}).get(scene_id),
+            ):
                 scene["name"] = pretty[scene_id]
                 changed = True
         if changed:

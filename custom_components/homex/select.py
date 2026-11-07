@@ -10,7 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DOMAIN
+from .const import DOMAIN, hx_name
 from .heating import TOLERANCE_MODES, _doc, tolerance_mode
 from .heating_zones import zones_manager
 
@@ -38,12 +38,12 @@ class ToleranceModeSelect(SelectEntity):
 
     _attr_should_poll = False
     _attr_icon = "mdi:thermometer-lines"
-    _attr_name = "Climate mode de tolérance"
     _attr_unique_id = "homex_climate_tolerance_mode"
     _attr_options = list(TOLERANCE_MODES)
 
     def __init__(self) -> None:
         self.entity_id = "select.homex_climate_tolerance_mode"
+        self._attr_name = hx_name("Climate", "Global", "Tolérance")
 
     @property
     def current_option(self) -> str:

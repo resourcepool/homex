@@ -16,7 +16,7 @@ from homeassistant.core import Event, HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_track_state_change_event
 
-from .const import CONF_METRICS, DOMAIN, HUB_DATA, METRICS, MODULE_HEATING
+from .const import CONF_METRICS, DOMAIN, HUB_DATA, METRICS, MODULE_HEATING, hx_name
 from .room import HomexHub, RoomController
 
 
@@ -69,7 +69,7 @@ class RoomMetricSensor(SensorEntity):
         ]
         device_class, label = METRICS[metric]
         self._attr_device_class = SensorDeviceClass(device_class)
-        self._attr_name = f"{controller.room_name} {label}"
+        self._attr_name = hx_name("Climate", controller.room_name, label)
         self._attr_unique_id = f"homex_{controller.room_id}_{metric}"
         self.entity_id = f"sensor.homex_{controller.room_id}_{metric}"
         self._used = 0

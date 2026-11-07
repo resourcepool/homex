@@ -1,4 +1,5 @@
-"""switch.homex_{slug}_lights_toggle - on/off state of the room and each group."""
+"""switch.homex_{slug}_lights_toggle - on/off state of the room and each group;
+switch.homex_heating - the global heating switch (Climate module)."""
 
 from __future__ import annotations
 
@@ -9,7 +10,8 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
 
-from .const import DOMAIN, HUB_DATA
+from .const import DOMAIN, HUB_DATA, hx_name
+from .heating import HEATING_SWITCH, STORE_DATA, _doc, async_set_heating_enabled
 from .room import HomexHub, Unit
 
 
@@ -19,6 +21,10 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     hub: HomexHub = hass.data[DOMAIN][HUB_DATA]
+    await _doc(hass)  # the heating switch reads the heating document
+    heating = hass.data[DOMAIN][HEATING_SWITCH] = HeatingEnabledSwitch()
+    async_add_entities([heating])
+    entry.async_on_unload(lambda: hass.data[DOMAIN].pop(HEATING_SWITCH, None))
     for room_id, controller in hub.controllers.items():
         if not controller.lights_enabled:
             continue
@@ -133,3 +139,26 @@ class RoomSwitch(SwitchEntity, RestoreEntity):
         await self._unit.apply_off()
         # Turning off a room also turns off all its sub-groups.
         await self._unit.turn_off_children()
+
+
+class HeatingEnabledSwitch(SwitchEntity):
+    """switch.homex_heating: heating on / off globally — the Heating page's
+    "Chauffage activé" toggle. Off turns every room valve off."""
+
+    _attr_should_poll = False
+    _attr_icon = "mdi:radiator"
+    _attr_unique_id = "homex_heating_enabled"
+
+    def __init__(self) -> None:
+        self.entity_id = "switch.homex_heating"
+        self._attr_name = hx_name("Climate", "Global", "Chauffage")
+
+    @property
+    def is_on(self) -> bool:
+        return self.hass.data[DOMAIN][STORE_DATA].get("enabled", True)
+
+    async def async_turn_on(self, **kwargs) -> None:
+        await async_set_heating_enabled(self.hass, True)
+
+    async def async_turn_off(self, **kwargs) -> None:
+        await async_set_heating_enabled(self.hass, False)

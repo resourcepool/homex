@@ -932,14 +932,28 @@ async def ws_heating_device_preset_apply(hass: HomeAssistant, connection, msg) -
 @websocket_api.require_admin
 @websocket_api.async_response
 async def ws_heating_enabled(hass: HomeAssistant, connection, msg) -> None:
-    """Switch heating on / off globally. Off: every room valve is turned off
-    and the periodic enforcement pauses; on: an enforcement pass runs now."""
+    await async_set_heating_enabled(hass, msg["enabled"])
+    connection.send_result(msg["id"], {"ok": True})
+
+
+HEATING_SWITCH = "_heating_switch"
+
+
+async def async_set_heating_enabled(hass: HomeAssistant, enabled: bool) -> None:
+    """Switch heating on / off globally (panel toggle and switch.homex_heating).
+
+    Off: every room valve is turned off and the periodic enforcement pauses;
+    on: an enforcement pass runs now.
+    """
     doc = await _doc(hass)
-    doc["enabled"] = msg["enabled"]
+    doc["enabled"] = enabled
     await _save(hass)
+    entity = hass.data.get(DOMAIN, {}).get(HEATING_SWITCH)
+    if entity is not None and entity.hass is not None:
+        entity.async_write_ha_state()
     enforcer: RadiatorEnforcer | None = hass.data.get(DOMAIN, {}).get(ENFORCER)
     if enforcer is not None:
-        if msg["enabled"]:
+        if enabled:
             await enforcer.async_enforce_all()
         else:
             await enforcer.async_all_off()
@@ -947,8 +961,7 @@ async def ws_heating_enabled(hass: HomeAssistant, connection, msg) -> None:
     from .heating_systems import systems_manager  # lazy: it imports us
 
     await systems_manager(hass).async_update()
-    _LOGGER.info("Homex heating: %s", "enabled" if msg["enabled"] else "disabled")
-    connection.send_result(msg["id"], {"ok": True})
+    _LOGGER.info("Homex heating: %s", "enabled" if enabled else "disabled")
 
 
 WS_COMMANDS = (

@@ -263,7 +263,7 @@ We.elementStyles = [], We.shadowRootOptions = { mode: "open" }, We[nt("elementPr
  * SPDX-License-Identifier: BSD-3-Clause
  */
 const Ut = globalThis, es = (e) => e, bt = Ut.trustedTypes, ts = bt ? bt.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, $s = "$lit$", Ce = `lit$${Math.random().toFixed(9).slice(2)}$`, ws = "?" + Ce, hi = `<${ws}>`, Te = document, dt = () => Te.createComment(""), ct = (e) => e === null || typeof e != "object" && typeof e != "function", Ft = Array.isArray, ui = (e) => Ft(e) || typeof e?.[Symbol.iterator] == "function", Et = `[ 	
-\f\r]`, rt = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, ss = /-->/g, is = />/g, ze = RegExp(`>|${Et}(?:([^\\s"'>=/]+)(${Et}*=${Et}*(?:[^ 	
+\f\r]`, rt = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, ss = /-->/g, is = />/g, Oe = RegExp(`>|${Et}(?:([^\\s"'>=/]+)(${Et}*=${Et}*(?:[^ 	
 \f\r"'\`<>=]|("|')|))|$)`, "g"), rs = /'/g, os = /"/g, ks = /^(?:script|style|textarea|title)$/i, Cs = (e) => (t, ...s) => ({ _$litType$: e, strings: t, values: s }), n = Cs(1), C = Cs(2), Ve = Symbol.for("lit-noChange"), w = Symbol.for("lit-nothing"), as = /* @__PURE__ */ new WeakMap(), Ie = Te.createTreeWalker(Te, 129);
 function Ss(e, t) {
   if (!Ft(e) || !e.hasOwnProperty("raw")) throw Error("invalid template strings array");
@@ -275,8 +275,8 @@ const mi = (e, t) => {
   for (let d = 0; d < s; d++) {
     const c = e[d];
     let h, u, m = -1, _ = 0;
-    for (; _ < c.length && (a.lastIndex = _, u = a.exec(c), u !== null); ) _ = a.lastIndex, a === rt ? u[1] === "!--" ? a = ss : u[1] !== void 0 ? a = is : u[2] !== void 0 ? (ks.test(u[2]) && (r = RegExp("</" + u[2], "g")), a = ze) : u[3] !== void 0 && (a = ze) : a === ze ? u[0] === ">" ? (a = r ?? rt, m = -1) : u[1] === void 0 ? m = -2 : (m = a.lastIndex - u[2].length, h = u[1], a = u[3] === void 0 ? ze : u[3] === '"' ? os : rs) : a === os || a === rs ? a = ze : a === ss || a === is ? a = rt : (a = ze, r = void 0);
-    const g = a === ze && e[d + 1].startsWith("/>") ? " " : "";
+    for (; _ < c.length && (a.lastIndex = _, u = a.exec(c), u !== null); ) _ = a.lastIndex, a === rt ? u[1] === "!--" ? a = ss : u[1] !== void 0 ? a = is : u[2] !== void 0 ? (ks.test(u[2]) && (r = RegExp("</" + u[2], "g")), a = Oe) : u[3] !== void 0 && (a = Oe) : a === Oe ? u[0] === ">" ? (a = r ?? rt, m = -1) : u[1] === void 0 ? m = -2 : (m = a.lastIndex - u[2].length, h = u[1], a = u[3] === void 0 ? Oe : u[3] === '"' ? os : rs) : a === os || a === rs ? a = Oe : a === ss || a === is ? a = rt : (a = Oe, r = void 0);
+    const g = a === Oe && e[d + 1].startsWith("/>") ? " " : "";
     o += a === rt ? c + hi : m >= 0 ? (i.push(h), c.slice(0, m) + $s + c.slice(m) + Ce + g) : c + Ce + (m === -2 ? d : g);
   }
   return [Ss(e, o + (e[s] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), i];
@@ -519,7 +519,7 @@ x._$litElement$ = !0, x.finalized = !0, qt.litElementHydrateSupport?.({ LitEleme
 const wi = qt.litElementPolyfillSupport;
 wi?.({ LitElement: x });
 (qt.litElementVersions ??= []).push("4.2.2");
-var ki = "M11,4H13V16L18.5,10.5L19.92,11.92L12,19.84L4.08,11.92L5.5,10.5L11,16V4Z", Ci = "M3,5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5M11,6V14.5L7.5,11L6.08,12.42L12,18.34L17.92,12.42L16.5,11L13,14.5V6H11Z", Si = "M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z", Ei = "M21,19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3H19C20.11,3 21,3.9 21,5V19M13,18V9.5L16.5,13L17.92,11.58L12,5.66L6.08,11.58L7.5,13L11,9.5V18H13Z", Ai = "M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z", Es = "M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z", Pi = "M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z", Mi = "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z", Hi = "M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z", ns = "M3 6H21V4H3C1.9 4 1 4.9 1 6V18C1 19.1 1.9 20 3 20H7V18H3V6M13 12H9V13.78C8.39 14.33 8 15.11 8 16C8 16.89 8.39 17.67 9 18.22V20H13V18.22C13.61 17.67 14 16.88 14 16S13.61 14.33 13 13.78V12M11 17.5C10.17 17.5 9.5 16.83 9.5 16S10.17 14.5 11 14.5 12.5 15.17 12.5 16 11.83 17.5 11 17.5M22 8H16C15.5 8 15 8.5 15 9V19C15 19.5 15.5 20 16 20H22C22.5 20 23 19.5 23 19V9C23 8.5 22.5 8 22 8M21 18H17V10H21V18Z", Oi = "M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z", zi = "M7,19V17H9V19H7M11,19V17H13V19H11M15,19V17H17V19H15M7,15V13H9V15H7M11,15V13H13V15H11M15,15V13H17V15H15M7,11V9H9V11H7M11,11V9H13V11H11M15,11V9H17V11H15M7,7V5H9V7H7M11,7V5H13V7H11M15,7V5H17V7H15Z", Ot = "M17.66 11.2C17.43 10.9 17.15 10.64 16.89 10.38C16.22 9.78 15.46 9.35 14.82 8.72C13.33 7.26 13 4.85 13.95 3C13 3.23 12.17 3.75 11.46 4.32C8.87 6.4 7.85 10.07 9.07 13.22C9.11 13.32 9.15 13.42 9.15 13.55C9.15 13.77 9 13.97 8.8 14.05C8.57 14.15 8.33 14.09 8.14 13.93C8.08 13.88 8.04 13.83 8 13.76C6.87 12.33 6.69 10.28 7.45 8.64C5.78 10 4.87 12.3 5 14.47C5.06 14.97 5.12 15.47 5.29 15.97C5.43 16.57 5.7 17.17 6 17.7C7.08 19.43 8.95 20.67 10.96 20.92C13.1 21.19 15.39 20.8 17.03 19.32C18.86 17.66 19.5 15 18.56 12.72L18.43 12.46C18.22 12 17.66 11.2 17.66 11.2M14.5 17.5C14.22 17.74 13.76 18 13.4 18.1C12.28 18.5 11.16 17.94 10.5 17.28C11.69 17 12.4 16.12 12.61 15.23C12.78 14.43 12.46 13.77 12.33 13C12.21 12.26 12.23 11.63 12.5 10.94C12.69 11.32 12.89 11.7 13.13 12C13.9 13 15.11 13.44 15.37 14.8C15.41 14.94 15.43 15.08 15.43 15.23C15.46 16.05 15.1 16.95 14.5 17.5H14.5Z", zt = "M22.11 21.46L2.39 1.73L1.11 3L7.09 9C5.66 10.36 4.88 12.47 5 14.47C5.06 14.97 5.12 15.47 5.29 15.97C5.43 16.57 5.7 17.17 6 17.7C7.08 19.43 8.95 20.67 10.96 20.92C13.1 21.19 15.39 20.8 17.03 19.32C17.1 19.26 17.15 19.18 17.22 19.11L20.84 22.73L22.11 21.46M8.8 14.05C8.57 14.15 8.33 14.09 8.14 13.93C8.08 13.88 8.04 13.83 8 13.76C7 12.47 6.74 10.69 7.26 9.15L8.58 10.47C8.58 11.4 8.73 12.33 9.07 13.22C9.11 13.32 9.15 13.42 9.15 13.55C9.15 13.77 9 13.97 8.8 14.05M14.5 17.5C14.22 17.74 13.76 18 13.4 18.1C12.28 18.5 11.16 17.94 10.5 17.28C11.69 17 12.4 16.12 12.61 15.23C12.66 15 12.66 14.76 12.64 14.53L15 16.88C14.85 17.11 14.69 17.33 14.5 17.5M18.92 15.72L9.65 6.46C10.12 5.65 10.72 4.92 11.46 4.32C12.17 3.75 13 3.23 13.95 3C13 4.85 13.33 7.26 14.82 8.72C15.46 9.35 16.22 9.78 16.89 10.38C17.15 10.64 17.43 10.9 17.66 11.2C17.66 11.2 18.22 12 18.43 12.46L18.56 12.72C18.96 13.69 19.06 14.72 18.92 15.72Z", Li = "M19 8C20.11 8 21 8.9 21 10V16.76C21.61 17.31 22 18.11 22 19C22 20.66 20.66 22 19 22C17.34 22 16 20.66 16 19C16 18.11 16.39 17.31 17 16.76V10C17 8.9 17.9 8 19 8M19 9C18.45 9 18 9.45 18 10V11H20V10C20 9.45 19.55 9 19 9M5 20V12H2L12 3L16.4 6.96C15.54 7.69 15 8.78 15 10V16C14.37 16.83 14 17.87 14 19L14.1 20H5Z", Di = "M10 2C13.9 2 17 5.1 17 9C17 11.4 15.8 13.5 14 14.7V17C14 17.6 13.6 18 13 18H7C6.4 18 6 17.6 6 17V14.7C4.2 13.5 3 11.4 3 9C3 5.1 6.1 2 10 2M7 21V20H13V21C13 21.6 12.6 22 12 22H8C7.4 22 7 21.6 7 21M10 4C7.2 4 5 6.2 5 9C5 11.1 6.2 12.8 8 13.6V16H12V13.6C13.8 12.8 15 11.1 15 9C15 6.2 12.8 4 10 4M19 12V7H21V13H19M19 17V15H21V17H19Z", Ii = "M12,2C9.76,2 7.78,3.05 6.5,4.68L7.93,6.11C8.84,4.84 10.32,4 12,4A5,5 0 0,1 17,9C17,10.68 16.16,12.16 14.89,13.06L16.31,14.5C17.94,13.21 19,11.24 19,9A7,7 0 0,0 12,2M3.28,4L2,5.27L5.04,8.3C5,8.53 5,8.76 5,9C5,11.38 6.19,13.47 8,14.74V17A1,1 0 0,0 9,18H14.73L18.73,22L20,20.72L3.28,4M7.23,10.5L12.73,16H10V13.58C8.68,13 7.66,11.88 7.23,10.5M9,20V21A1,1 0 0,0 10,22H14A1,1 0 0,0 15,21V20H9Z", Ti = "M12,6A6,6 0 0,1 18,12C18,14.22 16.79,16.16 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.21,16.16 6,14.22 6,12A6,6 0 0,1 12,6M14,21V22A1,1 0 0,1 13,23H11A1,1 0 0,1 10,22V21H14M20,11H23V13H20V11M1,11H4V13H1V11M13,1V4H11V1H13M4.92,3.5L7.05,5.64L5.63,7.05L3.5,4.93L4.92,3.5M16.95,5.63L19.07,3.5L20.5,4.93L18.37,7.05L16.95,5.63Z", Vi = "M20,11H23V13H20V11M1,11H4V13H1V11M13,1V4H11V1H13M4.92,3.5L7.05,5.64L5.63,7.05L3.5,4.93L4.92,3.5M16.95,5.63L19.07,3.5L20.5,4.93L18.37,7.05L16.95,5.63M12,6A6,6 0 0,1 18,12C18,14.22 16.79,16.16 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.21,16.16 6,14.22 6,12A6,6 0 0,1 12,6M14,21V22A1,1 0 0,1 13,23H11A1,1 0 0,1 10,22V21H14M11,18H13V15.87C14.73,15.43 16,13.86 16,12A4,4 0 0,0 12,8A4,4 0 0,0 8,12C8,13.86 9.27,15.43 11,15.87V18Z", ji = "M12,2A7,7 0 0,1 19,9C19,11.38 17.81,13.47 16,14.74V17A1,1 0 0,1 15,18H9A1,1 0 0,1 8,17V14.74C6.19,13.47 5,11.38 5,9A7,7 0 0,1 12,2M9,21V20H15V21A1,1 0 0,1 14,22H10A1,1 0 0,1 9,21M12,4A5,5 0 0,0 7,9C7,11.05 8.23,12.81 10,13.58V16H14V13.58C15.77,12.81 17,11.05 17,9A5,5 0 0,0 12,4Z", Ri = "M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z", As = "M19,13H5V11H19V13Z", Ni = "M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z", Bi = "M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z", Ui = "M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z", Wt = "M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z", Fi = "M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z", qi = "M20 19V3H4V19H2V21H22V19H20M6 19V13H11V14.8C10.6 15.1 10.2 15.6 10.2 16.2C10.2 17.2 11 18 12 18S13.8 17.2 13.8 16.2C13.8 15.6 13.5 15.1 13 14.8V13H18V19H6Z", ls = "M11,13.5V21.5H3V13.5H11M12,2L17.5,11H6.5L12,2M17.5,13C20,13 22,15 22,17.5C22,20 20,22 17.5,22C15,22 13,20 13,17.5C13,15 15,13 17.5,13Z", Wi = "M18,18H6V6H18V18Z", Zi = "M7.5,2C5.71,3.15 4.5,5.18 4.5,7.5C4.5,9.82 5.71,11.85 7.53,13C4.46,13 2,10.54 2,7.5A5.5,5.5 0 0,1 7.5,2M19.07,3.5L20.5,4.93L4.93,20.5L3.5,19.07L19.07,3.5M12.89,5.93L11.41,5L9.97,6L10.39,4.3L9,3.24L10.75,3.12L11.33,1.47L12,3.1L13.73,3.13L12.38,4.26L12.89,5.93M9.59,9.54L8.43,8.81L7.31,9.59L7.65,8.27L6.56,7.44L7.92,7.35L8.37,6.06L8.88,7.33L10.24,7.36L9.19,8.23L9.59,9.54M19,13.5A5.5,5.5 0 0,1 13.5,19C12.28,19 11.15,18.6 10.24,17.93L17.93,10.24C18.6,11.15 19,12.28 19,13.5M14.6,20.08L17.37,18.93L17.13,22.28L14.6,20.08M18.93,17.38L20.08,14.61L22.28,17.15L18.93,17.38M20.08,12.42L18.94,9.64L22.28,9.88L20.08,12.42M9.63,18.93L12.4,20.08L9.87,22.27L9.63,18.93Z", Gi = "M3 4H21V8H19V20H17V8H7V20H5V8H3V4M8 9H16V11H8V9M8 12H16V14H8V12M8 15H16V17H8V15M8 18H16V20H8V18Z", Ki = "M2 4H20V8H18V20H16V8H6V20H4V8H2V4M7 9H15V11H7V9M7 12H15V14H7V12M20 19V17H22V19H20M20 15V10H22V15H20Z", Yi = "M3 4H21V8H19V20H17V8H7V20H5V8H3V4M8 9H16V11H8V9Z";
+var ki = "M11,4H13V16L18.5,10.5L19.92,11.92L12,19.84L4.08,11.92L5.5,10.5L11,16V4Z", Ci = "M3,5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5M11,6V14.5L7.5,11L6.08,12.42L12,18.34L17.92,12.42L16.5,11L13,14.5V6H11Z", Si = "M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z", Ei = "M21,19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3H19C20.11,3 21,3.9 21,5V19M13,18V9.5L16.5,13L17.92,11.58L12,5.66L6.08,11.58L7.5,13L11,9.5V18H13Z", Ai = "M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z", Es = "M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z", Pi = "M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z", Mi = "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z", Hi = "M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z", ns = "M3 6H21V4H3C1.9 4 1 4.9 1 6V18C1 19.1 1.9 20 3 20H7V18H3V6M13 12H9V13.78C8.39 14.33 8 15.11 8 16C8 16.89 8.39 17.67 9 18.22V20H13V18.22C13.61 17.67 14 16.88 14 16S13.61 14.33 13 13.78V12M11 17.5C10.17 17.5 9.5 16.83 9.5 16S10.17 14.5 11 14.5 12.5 15.17 12.5 16 11.83 17.5 11 17.5M22 8H16C15.5 8 15 8.5 15 9V19C15 19.5 15.5 20 16 20H22C22.5 20 23 19.5 23 19V9C23 8.5 22.5 8 22 8M21 18H17V10H21V18Z", zi = "M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z", Oi = "M7,19V17H9V19H7M11,19V17H13V19H11M15,19V17H17V19H15M7,15V13H9V15H7M11,15V13H13V15H11M15,15V13H17V15H15M7,11V9H9V11H7M11,11V9H13V11H11M15,11V9H17V11H15M7,7V5H9V7H7M11,7V5H13V7H11M15,7V5H17V7H15Z", zt = "M17.66 11.2C17.43 10.9 17.15 10.64 16.89 10.38C16.22 9.78 15.46 9.35 14.82 8.72C13.33 7.26 13 4.85 13.95 3C13 3.23 12.17 3.75 11.46 4.32C8.87 6.4 7.85 10.07 9.07 13.22C9.11 13.32 9.15 13.42 9.15 13.55C9.15 13.77 9 13.97 8.8 14.05C8.57 14.15 8.33 14.09 8.14 13.93C8.08 13.88 8.04 13.83 8 13.76C6.87 12.33 6.69 10.28 7.45 8.64C5.78 10 4.87 12.3 5 14.47C5.06 14.97 5.12 15.47 5.29 15.97C5.43 16.57 5.7 17.17 6 17.7C7.08 19.43 8.95 20.67 10.96 20.92C13.1 21.19 15.39 20.8 17.03 19.32C18.86 17.66 19.5 15 18.56 12.72L18.43 12.46C18.22 12 17.66 11.2 17.66 11.2M14.5 17.5C14.22 17.74 13.76 18 13.4 18.1C12.28 18.5 11.16 17.94 10.5 17.28C11.69 17 12.4 16.12 12.61 15.23C12.78 14.43 12.46 13.77 12.33 13C12.21 12.26 12.23 11.63 12.5 10.94C12.69 11.32 12.89 11.7 13.13 12C13.9 13 15.11 13.44 15.37 14.8C15.41 14.94 15.43 15.08 15.43 15.23C15.46 16.05 15.1 16.95 14.5 17.5H14.5Z", Ot = "M22.11 21.46L2.39 1.73L1.11 3L7.09 9C5.66 10.36 4.88 12.47 5 14.47C5.06 14.97 5.12 15.47 5.29 15.97C5.43 16.57 5.7 17.17 6 17.7C7.08 19.43 8.95 20.67 10.96 20.92C13.1 21.19 15.39 20.8 17.03 19.32C17.1 19.26 17.15 19.18 17.22 19.11L20.84 22.73L22.11 21.46M8.8 14.05C8.57 14.15 8.33 14.09 8.14 13.93C8.08 13.88 8.04 13.83 8 13.76C7 12.47 6.74 10.69 7.26 9.15L8.58 10.47C8.58 11.4 8.73 12.33 9.07 13.22C9.11 13.32 9.15 13.42 9.15 13.55C9.15 13.77 9 13.97 8.8 14.05M14.5 17.5C14.22 17.74 13.76 18 13.4 18.1C12.28 18.5 11.16 17.94 10.5 17.28C11.69 17 12.4 16.12 12.61 15.23C12.66 15 12.66 14.76 12.64 14.53L15 16.88C14.85 17.11 14.69 17.33 14.5 17.5M18.92 15.72L9.65 6.46C10.12 5.65 10.72 4.92 11.46 4.32C12.17 3.75 13 3.23 13.95 3C13 4.85 13.33 7.26 14.82 8.72C15.46 9.35 16.22 9.78 16.89 10.38C17.15 10.64 17.43 10.9 17.66 11.2C17.66 11.2 18.22 12 18.43 12.46L18.56 12.72C18.96 13.69 19.06 14.72 18.92 15.72Z", Li = "M19 8C20.11 8 21 8.9 21 10V16.76C21.61 17.31 22 18.11 22 19C22 20.66 20.66 22 19 22C17.34 22 16 20.66 16 19C16 18.11 16.39 17.31 17 16.76V10C17 8.9 17.9 8 19 8M19 9C18.45 9 18 9.45 18 10V11H20V10C20 9.45 19.55 9 19 9M5 20V12H2L12 3L16.4 6.96C15.54 7.69 15 8.78 15 10V16C14.37 16.83 14 17.87 14 19L14.1 20H5Z", Di = "M10 2C13.9 2 17 5.1 17 9C17 11.4 15.8 13.5 14 14.7V17C14 17.6 13.6 18 13 18H7C6.4 18 6 17.6 6 17V14.7C4.2 13.5 3 11.4 3 9C3 5.1 6.1 2 10 2M7 21V20H13V21C13 21.6 12.6 22 12 22H8C7.4 22 7 21.6 7 21M10 4C7.2 4 5 6.2 5 9C5 11.1 6.2 12.8 8 13.6V16H12V13.6C13.8 12.8 15 11.1 15 9C15 6.2 12.8 4 10 4M19 12V7H21V13H19M19 17V15H21V17H19Z", Ii = "M12,2C9.76,2 7.78,3.05 6.5,4.68L7.93,6.11C8.84,4.84 10.32,4 12,4A5,5 0 0,1 17,9C17,10.68 16.16,12.16 14.89,13.06L16.31,14.5C17.94,13.21 19,11.24 19,9A7,7 0 0,0 12,2M3.28,4L2,5.27L5.04,8.3C5,8.53 5,8.76 5,9C5,11.38 6.19,13.47 8,14.74V17A1,1 0 0,0 9,18H14.73L18.73,22L20,20.72L3.28,4M7.23,10.5L12.73,16H10V13.58C8.68,13 7.66,11.88 7.23,10.5M9,20V21A1,1 0 0,0 10,22H14A1,1 0 0,0 15,21V20H9Z", Ti = "M12,6A6,6 0 0,1 18,12C18,14.22 16.79,16.16 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.21,16.16 6,14.22 6,12A6,6 0 0,1 12,6M14,21V22A1,1 0 0,1 13,23H11A1,1 0 0,1 10,22V21H14M20,11H23V13H20V11M1,11H4V13H1V11M13,1V4H11V1H13M4.92,3.5L7.05,5.64L5.63,7.05L3.5,4.93L4.92,3.5M16.95,5.63L19.07,3.5L20.5,4.93L18.37,7.05L16.95,5.63Z", Vi = "M20,11H23V13H20V11M1,11H4V13H1V11M13,1V4H11V1H13M4.92,3.5L7.05,5.64L5.63,7.05L3.5,4.93L4.92,3.5M16.95,5.63L19.07,3.5L20.5,4.93L18.37,7.05L16.95,5.63M12,6A6,6 0 0,1 18,12C18,14.22 16.79,16.16 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.21,16.16 6,14.22 6,12A6,6 0 0,1 12,6M14,21V22A1,1 0 0,1 13,23H11A1,1 0 0,1 10,22V21H14M11,18H13V15.87C14.73,15.43 16,13.86 16,12A4,4 0 0,0 12,8A4,4 0 0,0 8,12C8,13.86 9.27,15.43 11,15.87V18Z", ji = "M12,2A7,7 0 0,1 19,9C19,11.38 17.81,13.47 16,14.74V17A1,1 0 0,1 15,18H9A1,1 0 0,1 8,17V14.74C6.19,13.47 5,11.38 5,9A7,7 0 0,1 12,2M9,21V20H15V21A1,1 0 0,1 14,22H10A1,1 0 0,1 9,21M12,4A5,5 0 0,0 7,9C7,11.05 8.23,12.81 10,13.58V16H14V13.58C15.77,12.81 17,11.05 17,9A5,5 0 0,0 12,4Z", Ri = "M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z", As = "M19,13H5V11H19V13Z", Ni = "M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z", Bi = "M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z", Ui = "M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z", Wt = "M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z", Fi = "M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z", qi = "M20 19V3H4V19H2V21H22V19H20M6 19V13H11V14.8C10.6 15.1 10.2 15.6 10.2 16.2C10.2 17.2 11 18 12 18S13.8 17.2 13.8 16.2C13.8 15.6 13.5 15.1 13 14.8V13H18V19H6Z", ls = "M11,13.5V21.5H3V13.5H11M12,2L17.5,11H6.5L12,2M17.5,13C20,13 22,15 22,17.5C22,20 20,22 17.5,22C15,22 13,20 13,17.5C13,15 15,13 17.5,13Z", Wi = "M18,18H6V6H18V18Z", Zi = "M7.5,2C5.71,3.15 4.5,5.18 4.5,7.5C4.5,9.82 5.71,11.85 7.53,13C4.46,13 2,10.54 2,7.5A5.5,5.5 0 0,1 7.5,2M19.07,3.5L20.5,4.93L4.93,20.5L3.5,19.07L19.07,3.5M12.89,5.93L11.41,5L9.97,6L10.39,4.3L9,3.24L10.75,3.12L11.33,1.47L12,3.1L13.73,3.13L12.38,4.26L12.89,5.93M9.59,9.54L8.43,8.81L7.31,9.59L7.65,8.27L6.56,7.44L7.92,7.35L8.37,6.06L8.88,7.33L10.24,7.36L9.19,8.23L9.59,9.54M19,13.5A5.5,5.5 0 0,1 13.5,19C12.28,19 11.15,18.6 10.24,17.93L17.93,10.24C18.6,11.15 19,12.28 19,13.5M14.6,20.08L17.37,18.93L17.13,22.28L14.6,20.08M18.93,17.38L20.08,14.61L22.28,17.15L18.93,17.38M20.08,12.42L18.94,9.64L22.28,9.88L20.08,12.42M9.63,18.93L12.4,20.08L9.87,22.27L9.63,18.93Z", Gi = "M3 4H21V8H19V20H17V8H7V20H5V8H3V4M8 9H16V11H8V9M8 12H16V14H8V12M8 15H16V17H8V15M8 18H16V20H8V18Z", Ki = "M2 4H20V8H18V20H16V8H6V20H4V8H2V4M7 9H15V11H7V9M7 12H15V14H7V12M20 19V17H22V19H20M20 15V10H22V15H20Z", Yi = "M3 4H21V8H19V20H17V8H7V20H5V8H3V4M8 9H16V11H8V9Z";
 /**
  * @license
  * Copyright 2017 Google LLC
@@ -570,7 +570,7 @@ function p(e) {
 function l(e) {
   return p({ ...e, state: !0, attribute: !1 });
 }
-const Lt = "homex-changed", R = (e) => e.dispatchEvent(new CustomEvent(Lt, { bubbles: !0, composed: !0 })), Ps = async (e) => (await e.callWS({ type: "homex/layouts" })).layouts || [], Qi = (e, t) => e.callWS({ type: "homex/layout/save", layout: t }), er = (e, t) => e.callWS({ type: "homex/layout/delete", layout_id: t }), Ms = async (e) => (await e.callWS({ type: "homex/switches" })).switches || [], Hs = (e, t, s = !1) => e.callWS({ type: "homex/switch/save", switch: t, create: s }), tr = (e, t) => e.callWS({ type: "homex/switch/remove", switch_id: t }), Os = async (e) => (await e.callWS({ type: "homex/presets" })).presets || [], sr = (e, t) => e.callWS({ type: "homex/preset/save", preset: t }), ir = (e, t) => e.callWS({ type: "homex/preset/delete", preset_id: t }), rr = async (e) => (await e.callWS({ type: "homex/switch_models" })).models || [], zs = async (e) => (await e.callWS({ type: "homex/switch_devices" })).devices || [], or = async (e) => (await e.callWS({ type: "homex/shutter_models" })).models || [], ar = (e, t) => e.callWS({ type: "homex/z2m/state", device_id: t }), nr = async (e) => (await e.callWS({ type: "homex/shutter_presets" })).presets || [], lr = (e, t) => e.callWS({ type: "homex/shutter_preset/save", preset: t }), dr = (e, t) => e.callWS({ type: "homex/shutter_preset/delete", preset_id: t }), Je = async (e) => (await e.callWS({ type: "homex/rooms" })).rooms || [], cr = (e, t) => e.callWS({ type: "homex/room/create", ...t }), pr = (e, t, s = !0) => e.callWS({ type: "homex/room/delete", entry_id: t, delete_scenes: s }), hr = (e, t, s) => e.callWS({ type: "homex/shutter_group/add", entry_id: t, name: s }), ur = (e, t) => e.callWS({ type: "homex/shutter_group/update", ...t }), mr = (e, t, s) => e.callWS({ type: "homex/shutter_group/delete", entry_id: t, group_id: s }), Ls = async (e, t) => (await e.callWS({ type: "homex/device_triggers", device_id: t })).triggers || [], Se = (e, t) => e.callWS({ type: "homex/room/update", ...t }), _r = (e, t) => e.callWS({ type: "homex/room/sync_labels", entry_id: t }), gr = (e, t, s) => e.callWS({ type: "homex/room/dim", entry_id: t, delta: s }), vr = (e, t, s, i) => e.callWS({ type: "homex/room/shutter", entry_id: t, group_id: s, service: i }), fr = (e, t) => e.callWS({ type: "homex/group/add", ...t }), xr = (e, t) => e.callWS({ type: "homex/group/update", ...t }), br = (e, t, s) => e.callWS({ type: "homex/group/delete", entry_id: t, group_id: s }), ds = (e, t, s, i, r) => e.callWS({
+const Lt = "homex-changed", R = (e) => e.dispatchEvent(new CustomEvent(Lt, { bubbles: !0, composed: !0 })), Ps = async (e) => (await e.callWS({ type: "homex/layouts" })).layouts || [], Qi = (e, t) => e.callWS({ type: "homex/layout/save", layout: t }), er = (e, t) => e.callWS({ type: "homex/layout/delete", layout_id: t }), Ms = async (e) => (await e.callWS({ type: "homex/switches" })).switches || [], Hs = (e, t, s = !1) => e.callWS({ type: "homex/switch/save", switch: t, create: s }), tr = (e, t) => e.callWS({ type: "homex/switch/remove", switch_id: t }), zs = async (e) => (await e.callWS({ type: "homex/presets" })).presets || [], sr = (e, t) => e.callWS({ type: "homex/preset/save", preset: t }), ir = (e, t) => e.callWS({ type: "homex/preset/delete", preset_id: t }), rr = async (e) => (await e.callWS({ type: "homex/switch_models" })).models || [], Os = async (e) => (await e.callWS({ type: "homex/switch_devices" })).devices || [], or = async (e) => (await e.callWS({ type: "homex/shutter_models" })).models || [], ar = (e, t) => e.callWS({ type: "homex/z2m/state", device_id: t }), nr = async (e) => (await e.callWS({ type: "homex/shutter_presets" })).presets || [], lr = (e, t) => e.callWS({ type: "homex/shutter_preset/save", preset: t }), dr = (e, t) => e.callWS({ type: "homex/shutter_preset/delete", preset_id: t }), Je = async (e) => (await e.callWS({ type: "homex/rooms" })).rooms || [], cr = (e, t) => e.callWS({ type: "homex/room/create", ...t }), pr = (e, t, s = !0) => e.callWS({ type: "homex/room/delete", entry_id: t, delete_scenes: s }), hr = (e, t, s) => e.callWS({ type: "homex/shutter_group/add", entry_id: t, name: s }), ur = (e, t) => e.callWS({ type: "homex/shutter_group/update", ...t }), mr = (e, t, s) => e.callWS({ type: "homex/shutter_group/delete", entry_id: t, group_id: s }), Ls = async (e, t) => (await e.callWS({ type: "homex/device_triggers", device_id: t })).triggers || [], Se = (e, t) => e.callWS({ type: "homex/room/update", ...t }), _r = (e, t) => e.callWS({ type: "homex/room/sync_labels", entry_id: t }), gr = (e, t, s) => e.callWS({ type: "homex/room/dim", entry_id: t, delta: s }), vr = (e, t, s, i) => e.callWS({ type: "homex/room/shutter", entry_id: t, group_id: s, service: i }), fr = (e, t) => e.callWS({ type: "homex/group/add", ...t }), xr = (e, t) => e.callWS({ type: "homex/group/update", ...t }), br = (e, t, s) => e.callWS({ type: "homex/group/delete", entry_id: t, group_id: s }), ds = (e, t, s, i, r) => e.callWS({
   type: "homex/scene/add",
   entry_id: t,
   name: s,
@@ -582,7 +582,7 @@ const Lt = "homex-changed", R = (e) => e.dispatchEvent(new CustomEvent(Lt, { bub
   key: s,
   name: i,
   ...r ? { triggers: r } : {}
-}), v = (e) => e && (e.message || e.code) || String(e), Qe = async (e) => e.callWS({ type: "homex/heating" }), Cr = (e, t, s) => e.callWS({ type: "homex/heating/preset/save", preset: t, create: s }), Sr = (e, t) => e.callWS({ type: "homex/heating/preset/delete", preset_id: t }), Er = (e, t, s) => e.callWS({ type: "homex/heating/group/save", group: t, create: s }), Ar = (e, t) => e.callWS({ type: "homex/heating/group/delete", group_id: t }), Ds = async (e) => (await e.callWS({ type: "homex/heating/models" })).models || [], Pr = async (e, t, s) => (await e.callWS({ type: "homex/heating/device_preset/save", preset: t, create: s })).results || [], Mr = (e, t) => e.callWS({ type: "homex/heating/device_preset/delete", preset_id: t }), Hr = async (e, t) => (await e.callWS({ type: "homex/heating/device_preset/apply", preset_id: t })).results || [], Or = (e, t, s) => e.callWS({ type: "homex/heating/zone/save", zone: t, create: s }), zr = (e, t) => e.callWS({ type: "homex/heating/zone/delete", zone_id: t }), Lr = (e, t, s) => e.callWS({ type: "homex/heating/zone/set_mode", zone_id: t, mode_id: s }), Dr = (e, t, s) => e.callWS({ type: "homex/heating/room_zone", room_id: t, zone_id: s }), Is = (e, t) => e.callWS({ type: "homex/heating/enabled", enabled: t }), Ir = (e, t, s) => e.callWS({ type: "homex/heating/system/save", system: t, create: s }), Tr = (e, t) => e.callWS({ type: "homex/heating/system/delete", system_id: t });
+}), v = (e) => e && (e.message || e.code) || String(e), Qe = async (e) => e.callWS({ type: "homex/heating" }), Cr = (e, t, s) => e.callWS({ type: "homex/heating/preset/save", preset: t, create: s }), Sr = (e, t) => e.callWS({ type: "homex/heating/preset/delete", preset_id: t }), Er = (e, t, s) => e.callWS({ type: "homex/heating/group/save", group: t, create: s }), Ar = (e, t) => e.callWS({ type: "homex/heating/group/delete", group_id: t }), Ds = async (e) => (await e.callWS({ type: "homex/heating/models" })).models || [], Pr = async (e, t, s) => (await e.callWS({ type: "homex/heating/device_preset/save", preset: t, create: s })).results || [], Mr = (e, t) => e.callWS({ type: "homex/heating/device_preset/delete", preset_id: t }), Hr = async (e, t) => (await e.callWS({ type: "homex/heating/device_preset/apply", preset_id: t })).results || [], zr = (e, t, s) => e.callWS({ type: "homex/heating/zone/save", zone: t, create: s }), Or = (e, t) => e.callWS({ type: "homex/heating/zone/delete", zone_id: t }), Lr = (e, t, s) => e.callWS({ type: "homex/heating/zone/set_mode", zone_id: t, mode_id: s }), Dr = (e, t, s) => e.callWS({ type: "homex/heating/room_zone", room_id: t, zone_id: s }), Is = (e, t) => e.callWS({ type: "homex/heating/enabled", enabled: t }), Ir = (e, t, s) => e.callWS({ type: "homex/heating/system/save", system: t, create: s }), Tr = (e, t) => e.callWS({ type: "homex/heating/system/delete", system_id: t });
 let gt = null;
 const cs = () => !!customElements.get("ha-entities-picker");
 function Vr() {
@@ -649,7 +649,7 @@ function Rs(e, t) {
     (o) => o.entity_id.startsWith("select.homex_heating_")
   ), i = s.find((o) => (o.attributes?.rooms ?? []).includes(t.room_id)) ?? s.find((o) => o.attributes?.zone_id === "default");
   if (!i || i.state === "unavailable" || i.state === "unknown") return;
-  const r = String(i.attributes?.friendly_name ?? "").replace(/^Chauffage /, "");
+  const r = String(i.attributes?.zone_name ?? i.attributes?.zone_id ?? "");
   return t.heating?.enabled === !1 ? { zone: r, mode: i.attributes?.modes?.unheated ?? "Unheated", own: !0 } : { zone: r, mode: i.state, own: !1 };
 }
 const jr = {
@@ -1213,8 +1213,8 @@ const us = (e, t, s) => {
     else if (h === void 0 && (h = us(a, g, f), u = us(d, m, _)), h.has(d[m])) if (h.has(d[_])) {
       const U = u.get(a[g]), it = U !== void 0 ? r[U] : null;
       if (it === null) {
-        const Oe = ot(e, r[m]);
-        Le(Oe, o[g]), c[g] = Oe;
+        const ze = ot(e, r[m]);
+        Le(ze, o[g]), c[g] = ze;
       } else c[g] = Le(it, o[g]), ot(e, r[m], it), r[U] = null;
       g++;
     } else At(r[_]), _--;
@@ -4255,12 +4255,12 @@ tt([
 Ae = tt([
   y("homex-room-climate")
 ], Ae);
-var Ho = Object.defineProperty, Oo = Object.getOwnPropertyDescriptor, Z = (e, t, s, i) => {
-  for (var r = i > 1 ? void 0 : i ? Oo(t, s) : t, o = e.length - 1, a; o >= 0; o--)
+var Ho = Object.defineProperty, zo = Object.getOwnPropertyDescriptor, Z = (e, t, s, i) => {
+  for (var r = i > 1 ? void 0 : i ? zo(t, s) : t, o = e.length - 1, a; o >= 0; o--)
     (a = e[o]) && (r = (i ? a(t, s, r) : a(r)) || r);
   return i && r && Ho(t, s, r), r;
 };
-const zo = {
+const Oo = {
   lights: "💡 Lights",
   shutters: "🪟 Shutters",
   heating: "🔥 Climate"
@@ -4459,9 +4459,9 @@ let I = class extends x {
       <defs><clipPath id=${r}>${o}</clipPath></defs>
       ${a}
       ${(t.zones || []).map((_) => {
-      const g = d.has(_.n), f = this._mappings[e]?.[_.n], U = f ? this._itemForValue(f) : void 0, it = (g ? f ? "zone assigned" : "zone" : "zone disabled") + (g && this._dropBtn === _.n ? " drop" : ""), Oe = c(_.n), [_t, Ue] = m(
-        Oe ? Oe.x : _.x + _.w / 2,
-        Oe ? Oe.y : _.y + _.h / 2
+      const g = d.has(_.n), f = this._mappings[e]?.[_.n], U = f ? this._itemForValue(f) : void 0, it = (g ? f ? "zone assigned" : "zone" : "zone disabled") + (g && this._dropBtn === _.n ? " drop" : ""), ze = c(_.n), [_t, Ue] = m(
+        ze ? ze.x : _.x + _.w / 2,
+        ze ? ze.y : _.y + _.h / 2
       ), Kt = C`<rect class=${it} x=${_.x} y=${_.y} width=${_.w} height=${_.h}
           clip-path="url(#${r})"
           @dragover=${(ti) => {
@@ -4530,7 +4530,7 @@ let I = class extends x {
                         ${this._multi ? n`<p class="room-head">🏠 ${i.name}</p>` : ""}
                         ${r.map(
         ([o, a]) => n`
-                            <p class="mod-head">${zo[o] ?? o}</p>
+                            <p class="mod-head">${Oo[o] ?? o}</p>
                             ${a.map((d) => this._actionRow(d, s))}
                           `
       )}
@@ -4849,7 +4849,7 @@ Z([
 I = Z([
   y("homex-switch-mapping")
 ], I);
-var Do = Object.defineProperty, Io = Object.getOwnPropertyDescriptor, O = (e, t, s, i) => {
+var Do = Object.defineProperty, Io = Object.getOwnPropertyDescriptor, z = (e, t, s, i) => {
   for (var r = i > 1 ? void 0 : i ? Io(t, s) : t, o = e.length - 1, a; o >= 0; o--)
     (a = e[o]) && (r = (i ? a(t, s, r) : a(r)) || r);
   return i && r && Do(t, s, r), r;
@@ -4944,7 +4944,7 @@ let P = class extends x {
     return n`
       <div class="scene-row">
         ${e.orderable ? n`<span class="handle" title="Glisser pour réordonner">
-              <svg viewBox="0 0 24 24"><path d=${zi}></path></svg>
+              <svg viewBox="0 0 24 24"><path d=${Oi}></path></svg>
             </span>` : n`<span class="pin" title="Toujours en dernier">
               <svg viewBox="0 0 24 24"><path d=${Ui}></path></svg>
             </span>`}
@@ -5082,7 +5082,7 @@ let P = class extends x {
       t.mode,
       t.own ? "Chauffage désactivé dans la pièce" : `Mode de la zone ${t.zone}`
     ) : ""}
-      ${e.heating?.radiators?.length ? js(this.hass, e) ? s(Ot, "Heating", "Au moins une vanne chauffe", "heating") : s(zt, "Idle", "Aucune vanne ne chauffe") : ""}
+      ${e.heating?.radiators?.length ? js(this.hass, e) ? s(zt, "Heating", "Au moins une vanne chauffe", "heating") : s(Ot, "Idle", "Aucune vanne ne chauffe") : ""}
     `;
   }
   /** Per-module counters, shown only once the room is expanded (the collapsed
@@ -5178,7 +5178,7 @@ let P = class extends x {
     try {
       [this._gswitches, this._presets, this._layouts] = await Promise.all([
         Ms(this.hass),
-        Os(this.hass),
+        zs(this.hass),
         Ps(this.hass)
       ]);
     } catch {
@@ -5819,58 +5819,58 @@ P.styles = [
       }
     `
 ];
-O([
+z([
   p({ attribute: !1 })
 ], P.prototype, "hass", 2);
-O([
+z([
   p({ attribute: !1 })
 ], P.prototype, "room", 2);
-O([
+z([
   p({ type: Boolean })
 ], P.prototype, "expanded", 2);
-O([
+z([
   l()
 ], P.prototype, "_dialog", 2);
-O([
+z([
   l()
 ], P.prototype, "_menuOpen", 2);
-O([
+z([
   l()
 ], P.prototype, "_shutterCtlOpen", 2);
-O([
+z([
   l()
 ], P.prototype, "_renameScene", 2);
-O([
+z([
   l()
 ], P.prototype, "_deleteScenes", 2);
-O([
+z([
   l()
 ], P.prototype, "_deleting", 2);
-O([
+z([
   l()
 ], P.prototype, "_syncing", 2);
-O([
+z([
   l()
 ], P.prototype, "_activeTab", 2);
-O([
+z([
   l()
 ], P.prototype, "_gswitches", 2);
-O([
+z([
   l()
 ], P.prototype, "_presets", 2);
-O([
+z([
   l()
 ], P.prototype, "_layouts", 2);
-O([
+z([
   l()
 ], P.prototype, "_mappingSwitch", 2);
-O([
+z([
   l()
 ], P.prototype, "_shutterGroupOpen", 2);
-O([
+z([
   l()
 ], P.prototype, "_shutterGroupEdit", 2);
-P = O([
+P = z([
   y("homex-room-card")
 ], P);
 var To = Object.defineProperty, Vo = Object.getOwnPropertyDescriptor, Ct = (e, t, s, i) => {
@@ -5979,7 +5979,7 @@ Ct([
 Ke = Ct([
   y("homex-export-dialog")
 ], Ke);
-var Ro = Object.defineProperty, No = Object.getOwnPropertyDescriptor, z = (e, t, s, i) => {
+var Ro = Object.defineProperty, No = Object.getOwnPropertyDescriptor, O = (e, t, s, i) => {
   for (var r = i > 1 ? void 0 : i ? No(t, s) : t, o = e.length - 1, a; o >= 0; o--)
     (a = e[o]) && (r = (i ? a(t, s, r) : a(r)) || r);
   return i && r && Ro(t, s, r), r;
@@ -6537,55 +6537,55 @@ M.styles = [
       }
     `
 ];
-z([
+O([
   p({ attribute: !1 })
 ], M.prototype, "hass", 2);
-z([
+O([
   p({ attribute: !1 })
 ], M.prototype, "layout", 2);
-z([
+O([
   l()
 ], M.prototype, "_name", 2);
-z([
+O([
   l()
 ], M.prototype, "_id", 2);
-z([
+O([
   l()
 ], M.prototype, "_buttons", 2);
-z([
+O([
   l()
 ], M.prototype, "_shape", 2);
-z([
+O([
   l()
 ], M.prototype, "_bounds", 2);
-z([
+O([
   l()
 ], M.prototype, "_columns", 2);
-z([
+O([
   l()
 ], M.prototype, "_rows", 2);
-z([
+O([
   l()
 ], M.prototype, "_colLines", 2);
-z([
+O([
   l()
 ], M.prototype, "_rowLines", 2);
-z([
+O([
   l()
 ], M.prototype, "_assignments", 2);
-z([
+O([
   l()
 ], M.prototype, "_busy", 2);
-z([
+O([
   l()
 ], M.prototype, "_dragClient", 2);
-z([
+O([
   l()
 ], M.prototype, "_hoverCell", 2);
-z([
+O([
   l()
 ], M.prototype, "_overTray", 2);
-M = z([
+M = O([
   y("homex-layout-editor")
 ], M);
 var Bo = Object.defineProperty, Uo = Object.getOwnPropertyDescriptor, L = (e, t, s, i) => {
@@ -6609,7 +6609,7 @@ let E = class extends x {
   }
   async _loadDevices() {
     try {
-      this._devices = await zs(this.hass);
+      this._devices = await Os(this.hass);
     } catch {
       this._devices = [];
     }
@@ -7029,7 +7029,7 @@ let T = class extends x {
   }
   async _loadDevices() {
     try {
-      this._devices = await zs(this.hass);
+      this._devices = await Os(this.hass);
     } catch {
       this._devices = [];
     }
@@ -7383,7 +7383,7 @@ let Y = class extends x {
     try {
       [this._layouts, this._presets, this._gswitches] = await Promise.all([
         Ps(this.hass),
-        Os(this.hass),
+        zs(this.hass),
         Ms(this.hass)
       ]);
     } catch {
@@ -9249,7 +9249,7 @@ let J = class extends x {
   async _save() {
     this._busy = !0;
     try {
-      await Or(
+      await zr(
         this.hass,
         {
           id: this._id,
@@ -9267,7 +9267,7 @@ let J = class extends x {
     if (this.zone && confirm(`Supprimer la zone « ${this.zone.name} » ? Ses pièces repassent dans la zone par défaut.`)) {
       this._busy = !0;
       try {
-        await zr(this.hass, this.zone.id), this._close();
+        await Or(this.hass, this.zone.id), this._close();
       } catch (e) {
         alert("Erreur Homex : " + v(e)), this._busy = !1;
       }
@@ -9660,7 +9660,12 @@ const Mt = ["modes", "setpoints", "zones", "devices", "systems"], Ht = {
 }, ga = (e) => e == null ? "—" : `${e.toLocaleString("fr-FR")} °C`;
 let H = class extends x {
   constructor() {
-    super(...arguments), this.base = "", this.subpath = "", this._presets = [], this._groups = [], this._devicePresets = [], this._zones = [], this._systems = [], this._enabled = !0, this._switching = !1, this._rooms = [], this._loaded = !1, this._presetName = "", this._presetId = "", this._busy = !1, this._presetIdEdited = !1, this._formFor = null;
+    super(...arguments), this.base = "", this.subpath = "", this._presets = [], this._groups = [], this._devicePresets = [], this._zones = [], this._systems = [], this._enabledLocal = !0, this._switching = !1, this._rooms = [], this._loaded = !1, this._presetName = "", this._presetId = "", this._busy = !1, this._presetIdEdited = !1, this._formFor = null;
+  }
+  /** Global heating: switch.homex_heating (live), else the last loaded value. */
+  get _enabled() {
+    const e = this.hass?.states["switch.homex_heating"];
+    return e ? e.state === "on" : this._enabledLocal;
   }
   connectedCallback() {
     super.connectedCallback(), this._load();
@@ -9671,7 +9676,7 @@ let H = class extends x {
         Qe(this.hass),
         Je(this.hass)
       ]);
-      this._presets = e.presets, this._groups = e.groups, this._devicePresets = e.device_presets ?? [], this._zones = e.zones ?? [], this._systems = e.systems ?? [], this._enabled = e.enabled ?? !0, this._rooms = t;
+      this._presets = e.presets, this._groups = e.groups, this._devicePresets = e.device_presets ?? [], this._zones = e.zones ?? [], this._systems = e.systems ?? [], this._enabledLocal = e.enabled ?? !0, this._rooms = t;
     } catch {
       this._presets = [], this._groups = [], this._devicePresets = [], this._zones = [];
     }
@@ -9705,7 +9710,7 @@ let H = class extends x {
   async _setEnabled(e) {
     this._switching = !0;
     try {
-      await Is(this.hass, e), this._enabled = e;
+      await Is(this.hass, e), this._enabledLocal = e;
     } catch (t) {
       alert("Erreur Homex : " + v(t));
     } finally {
@@ -10268,7 +10273,7 @@ V([
 ], H.prototype, "_systems", 2);
 V([
   l()
-], H.prototype, "_enabled", 2);
+], H.prototype, "_enabledLocal", 2);
 V([
   l()
 ], H.prototype, "_switching", 2);
@@ -10870,7 +10875,12 @@ var wa = Object.defineProperty, ka = Object.getOwnPropertyDescriptor, He = (e, t
 const at = "select.homex_climate_tolerance_mode";
 let ve = class extends x {
   constructor() {
-    super(...arguments), this.rooms = [], this._zones = [], this._enabled = !0, this._loaded = !1, this._busy = !1, this._roomBusy = /* @__PURE__ */ new Set();
+    super(...arguments), this.rooms = [], this._zones = [], this._enabledLocal = !0, this._loaded = !1, this._busy = !1, this._roomBusy = /* @__PURE__ */ new Set();
+  }
+  /** Global heating: switch.homex_heating (live), else the last loaded value. */
+  get _enabled() {
+    const e = this.hass?.states["switch.homex_heating"];
+    return e ? e.state === "on" : this._enabledLocal;
   }
   connectedCallback() {
     super.connectedCallback(), this._load();
@@ -10878,7 +10888,7 @@ let ve = class extends x {
   async _load() {
     try {
       const e = await Qe(this.hass);
-      this._zones = e.zones ?? [], this._enabled = e.enabled ?? !0;
+      this._zones = e.zones ?? [], this._enabledLocal = e.enabled ?? !0;
     } catch {
       this._zones = [];
     }
@@ -10887,7 +10897,8 @@ let ve = class extends x {
   async _toggle() {
     this._busy = !0;
     try {
-      await Is(this.hass, !this._enabled), this._enabled = !this._enabled;
+      const e = !this._enabled;
+      await Is(this.hass, e), this._enabledLocal = e;
     } catch (e) {
       alert("Erreur Homex : " + v(e));
     } finally {
@@ -10897,7 +10908,7 @@ let ve = class extends x {
   _demandPill(e) {
     const t = this.hass.states[e]?.state === "on";
     return n`<span class="pill ${t ? "heating" : ""}" title=${e}>
-      <svg viewBox="0 0 24 24"><path d=${t ? Ot : zt}></path></svg>
+      <svg viewBox="0 0 24 24"><path d=${t ? zt : Ot}></path></svg>
       ${t ? "Heating" : "Idle"}
     </span>`;
   }
@@ -11009,7 +11020,7 @@ let ve = class extends x {
         <span title="Température actuelle">🌡 ${c}</span>
       </div>
       ${t.length ? n`<span class="pill ${u ? "heating" : ""}">
-            <svg viewBox="0 0 24 24"><path d=${u ? Ot : zt}></path></svg>
+            <svg viewBox="0 0 24 24"><path d=${u ? zt : Ot}></path></svg>
             ${u ? "Heating" : "Idle"}
           </span>` : ""}
     </div>`;
@@ -11193,7 +11204,7 @@ He([
 ], ve.prototype, "_zones", 2);
 He([
   l()
-], ve.prototype, "_enabled", 2);
+], ve.prototype, "_enabledLocal", 2);
 He([
   l()
 ], ve.prototype, "_loaded", 2);
@@ -11211,7 +11222,7 @@ var Ca = Object.defineProperty, Sa = Object.getOwnPropertyDescriptor, ne = (e, t
     (a = e[o]) && (r = (i ? a(t, s, r) : a(r)) || r);
   return i && r && Ca(t, s, r), r;
 };
-const Ea = "160";
+const Ea = "162";
 let W = class extends x {
   constructor() {
     super(...arguments), this.narrow = !1, this._rooms = null, this._error = null, this._createOpen = !1, this._exportOpen = !1, this._menuOpen = !1, this._dashTab = localStorage.getItem("homex_dash_tab") === "climate" ? "climate" : "general", this._expanded = localStorage.getItem("homex_expanded") || null, this._loaded = !1, this._onToggleExpand = (e) => {
@@ -11404,7 +11415,7 @@ let W = class extends x {
       this._menuOpen = !1, this._exportOpen = !0;
     }}
                       >
-                        <svg class="ico" viewBox="0 0 24 24"><path d=${Oi}></path></svg>
+                        <svg class="ico" viewBox="0 0 24 24"><path d=${zi}></path></svg>
                         Exporter
                       </button>
                       <div class="menu-sep"></div>
