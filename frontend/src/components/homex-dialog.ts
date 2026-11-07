@@ -10,6 +10,8 @@ import { customElement, property } from "lit/decorators.js";
 export class HomexDialog extends LitElement {
   @property({ type: Boolean }) open = false;
   @property() heading = "";
+  /** Small, content-sized modal (quick controls) instead of a full editor. */
+  @property({ type: Boolean, reflect: true }) compact = false;
 
   static styles = css`
     .backdrop {
@@ -65,6 +67,11 @@ export class HomexDialog extends LitElement {
       gap: 8px;
       padding: 12px 20px;
       border-top: 1px solid var(--divider-color, #e0e0e0);
+    }
+    :host([compact]) .dialog {
+      max-width: 440px;
+      height: auto;
+      max-height: 96vh;
     }
     @media (max-width: 600px) {
       .content {

@@ -8,36 +8,33 @@ import type {
 } from "../types";
 import { fetchGlobalSwitches, fetchLayouts, fetchPresets } from "../api";
 import { resolveSwitchPreset } from "../lib/device";
+import { goBack, joinPath, navigate, segments } from "../lib/router";
 import { sharedStyles } from "../lib/styles";
 import "./homex-layout-editor";
 import "./homex-preset-editor";
 import "./homex-gswitch-editor";
 
 type Section = "layouts" | "presets" | "switches";
+const SECTIONS: Section[] = ["switches", "presets", "layouts"];
 
 /** Switch Manager: Switch Layouts, Device Presets and Switch Management. */
 @customElement("homex-switch-manager")
 export class HomexSwitchManager extends LitElement {
   @property({ attribute: false }) hass!: HomeAssistant;
-  @property({ type: Boolean }) startAdd = false;
-  @property({ attribute: false }) startAddRoom: string | null = null;
+  /** URL of the manager (the Switches tab). */
+  @property({ attribute: false }) base = "";
+  /** Sub-page below `base`: "<section>[/new | /edit/<id>]". */
+  @property({ attribute: false }) subpath = "";
 
-  @state() private _section: Section = "switches";
   @state() private _addRooms: string[] = [];
-  private _startAddHandled = false;
   @state() private _layouts: SwitchLayout[] = [];
   @state() private _presets: DevicePreset[] = [];
   @state() private _gswitches: GlobalSwitch[] = [];
   @state() private _loaded = false;
 
-  @state() private _editingLayout = false;
-  @state() private _editLayout: SwitchLayout | null = null;
-  @state() private _editingPreset = false;
-  @state() private _editPreset: DevicePreset | null = null;
   @state() private _prefillDevice = "";
-  @state() private _editingSwitch = false;
-  @state() private _editSwitch: GlobalSwitch | null = null;
-  private _fromSwitchFlow = false;
+  // Switch editor URL left to create a preset, returned to when it closes.
+  private _switchFlowFrom: string | null = null;
   // Switch form left to create a preset, restored when the preset closes.
   @state() private _switchDraft: Partial<GlobalSwitch> | null = null;
 
@@ -167,16 +164,40 @@ export class HomexSwitchManager extends LitElement {
     this._load();
   }
 
-  willUpdate() {
-    // Opened from a room card's "＋ Interrupteur": jump straight to adding a
-    // switch, pre-associating the originating room.
-    if (this.startAdd && !this._startAddHandled) {
-      this._startAddHandled = true;
-      this._section = "switches";
-      this._editSwitch = null;
+  private get _route(): { section: Section; editing: boolean; id?: string } {
+    const [section, mode, id] = segments(this.subpath);
+    return {
+      section: SECTIONS.includes(section as Section) ? (section as Section) : "switches",
+      editing: mode === "new" || (mode === "edit" && !!id),
+      id: mode === "edit" ? id : undefined,
+    };
+  }
+  private get _section(): Section {
+    return this._route.section;
+  }
+
+  /** URL of a section list, or of its editor ("new" / "edit", id). */
+  private _url(section: Section, ...rest: string[]): string {
+    return section === "switches" && !rest.length
+      ? this.base
+      : joinPath(this.base, section, ...rest);
+  }
+  private _openEditor(section: Section, id?: string) {
+    navigate(this._url(section, ...(id ? ["edit", id] : ["new"])));
+  }
+
+  willUpdate(changed: Map<string, unknown>) {
+    if (!changed.has("subpath")) return;
+    const { section, editing, id } = this._route;
+    if (!editing) {
+      // Back on a list: the switch → preset round trip is over.
       this._switchDraft = null;
-      this._addRooms = this.startAddRoom ? [this.startAddRoom] : [];
-      this._editingSwitch = true;
+      this._switchFlowFrom = null;
+    } else if (section === "switches" && !id && !this._switchDraft) {
+      // A room card's "＋ Interrupteur" links here with ?room=<room_id> to
+      // pre-associate the originating room.
+      const room = new URLSearchParams(location.search).get("room");
+      this._addRooms = room ? [room] : [];
     }
   }
 
@@ -199,54 +220,43 @@ export class HomexSwitchManager extends LitElement {
     this.dispatchEvent(new CustomEvent("close"));
   }
   private _onLayoutClosed() {
-    this._editingLayout = false;
     this._load();
+    goBack(this._url("layouts"));
   }
   private _onPresetClosed(e?: CustomEvent) {
-    this._editingPreset = false;
     this._prefillDevice = "";
     this._load();
-    if (this._fromSwitchFlow) {
-      this._fromSwitchFlow = false;
-      this._section = "switches";
+    const from = this._switchFlowFrom;
+    if (from) {
       // Back to the switch being edited, on the preset just created (if any).
       const savedId = e?.detail?.preset_id;
       if (savedId && this._switchDraft) {
         this._switchDraft = { ...this._switchDraft, preset_id: savedId };
       }
-      this._editingSwitch = true;
+      this._switchFlowFrom = null;
+      goBack(from);
+    } else {
+      goBack(this._url("presets"));
     }
   }
   private _onSwitchClosed() {
-    this._editingSwitch = false;
     this._switchDraft = null;
     this._load();
+    goBack(this._url("switches"));
   }
   private _onCreatePreset(e: CustomEvent) {
     // From the switch editor: no preset for the device model — create one.
     this._switchDraft = e.detail.draft ?? null;
-    this._editingSwitch = false;
     this._prefillDevice = e.detail.device_id || "";
-    this._editPreset = null;
-    this._editingPreset = true;
-    this._fromSwitchFlow = true;
-    this._section = "presets";
+    this._switchFlowFrom = location.pathname;
+    this._openEditor("presets");
   }
 
   private _add() {
-    if (this._section === "layouts") {
-      this._editLayout = null;
-      this._editingLayout = true;
-    } else if (this._section === "presets") {
-      this._editPreset = null;
-      this._prefillDevice = "";
-      this._editingPreset = true;
-    } else {
-      this._editSwitch = null;
-      this._switchDraft = null;
-      this._addRooms = [];
-      this._editingSwitch = true;
-    }
+    this._prefillDevice = "";
+    this._switchDraft = null;
+    this._addRooms = [];
+    this._openEditor(this._section);
   }
 
   private _preview(l: SwitchLayout) {
@@ -273,30 +283,61 @@ export class HomexSwitchManager extends LitElement {
     </svg>`;
   }
 
+  /** The item an "edit/<id>" sub-page points to, or a placeholder page while
+   * loading / when the id is unknown (deep link to a deleted item). */
+  private _editTarget<T extends { id: string }>(
+    items: T[],
+    back: () => void,
+    backLabel: string
+  ): { item: T | null } | { page: unknown } {
+    const id = this._route.id;
+    if (!id) return { item: null };
+    const item = items.find((x) => x.id === id);
+    if (item) return { item };
+    return {
+      page: html`
+        <div class="head">
+          <button @click=${back}>← ${backLabel}</button>
+          <h2></h2>
+        </div>
+        <div class="msg">
+          ${this._loaded ? `« ${id} » introuvable.` : "Chargement…"}
+        </div>
+      `,
+    };
+  }
+
   render() {
-    if (this._editingLayout) {
+    const { section, editing } = this._route;
+    if (editing && section === "layouts") {
+      const back = () => this._onLayoutClosed();
+      const t = this._editTarget(this._layouts, back, "Layouts");
+      if ("page" in t) return t.page;
       return html`
         <div class="head">
-          <button @click=${this._onLayoutClosed}>← Layouts</button>
-          <h2>${this._editLayout ? "Modifier le layout" : "Nouveau layout"}</h2>
+          <button @click=${back}>← Layouts</button>
+          <h2>${t.item ? "Modifier le layout" : "Nouveau layout"}</h2>
         </div>
         <homex-layout-editor
           .hass=${this.hass}
-          .layout=${this._editLayout}
+          .layout=${t.item}
           @layout-closed=${this._onLayoutClosed}
         ></homex-layout-editor>
       `;
     }
-    if (this._editingPreset) {
+    if (editing && section === "presets") {
+      const back = () => this._onPresetClosed();
+      const t = this._editTarget(this._presets, back, "Presets");
+      if ("page" in t) return t.page;
       return html`
         <div class="head">
-          <button @click=${() => this._onPresetClosed()}>← Presets</button>
-          <h2>${this._editPreset ? "Modifier le preset" : "Nouveau device preset"}</h2>
+          <button @click=${back}>← Presets</button>
+          <h2>${t.item ? "Modifier le preset" : "Nouveau device preset"}</h2>
         </div>
         <div class="editor">
           <homex-preset-editor
             .hass=${this.hass}
-            .preset=${this._editPreset}
+            .preset=${t.item}
             .layouts=${this._layouts}
             .prefillDevice=${this._prefillDevice}
             @preset-closed=${this._onPresetClosed}
@@ -304,16 +345,19 @@ export class HomexSwitchManager extends LitElement {
         </div>
       `;
     }
-    if (this._editingSwitch) {
+    if (editing) {
+      const back = () => this._onSwitchClosed();
+      const t = this._editTarget(this._gswitches, back, "Switches");
+      if ("page" in t) return t.page;
       return html`
         <div class="head">
-          <button @click=${this._onSwitchClosed}>← Switches</button>
-          <h2>${this._editSwitch ? "Modifier le switch" : "Nouveau switch"}</h2>
+          <button @click=${back}>← Switches</button>
+          <h2>${t.item ? "Modifier le switch" : "Nouveau switch"}</h2>
         </div>
         <div class="editor">
           <homex-gswitch-editor
             .hass=${this.hass}
-            .sw=${this._editSwitch}
+            .sw=${t.item}
             .presets=${this._presets}
             .initialRooms=${this._addRooms}
             .draft=${this._switchDraft}
@@ -346,7 +390,9 @@ export class HomexSwitchManager extends LitElement {
         ).map(
           ([key, label]) => html`<span
             class="tab ${this._section === key ? "active" : ""}"
-            @click=${() => (this._section = key)}
+            @click=${() => {
+              if (key !== this._section) navigate(this._url(key), true);
+            }}
             >${label}</span
           >`
         )}
@@ -369,10 +415,7 @@ export class HomexSwitchManager extends LitElement {
       ${this._layouts.map(
         (l) => html`<div
           class="card"
-          @click=${() => {
-            this._editLayout = l;
-            this._editingLayout = true;
-          }}
+          @click=${() => this._openEditor("layouts", l.id)}
         >
           ${this._preview(l)}
           <div class="info">
@@ -397,8 +440,8 @@ export class HomexSwitchManager extends LitElement {
         return html`<div
           class="card"
           @click=${() => {
-            this._editPreset = p;
-            this._editingPreset = true;
+            this._prefillDevice = "";
+            this._openEditor("presets", p.id);
           }}
         >
           ${layout ? this._preview(layout) : html`<div class="icon">🎚</div>`}
@@ -423,11 +466,7 @@ export class HomexSwitchManager extends LitElement {
           : undefined;
         return html`<div
           class="card"
-          @click=${() => {
-            this._editSwitch = s;
-            this._switchDraft = null;
-            this._editingSwitch = true;
-          }}
+          @click=${() => this._openEditor("switches", s.id)}
         >
           ${layout ? this._preview(layout) : html`<div class="icon">🎛</div>`}
           <div class="info">

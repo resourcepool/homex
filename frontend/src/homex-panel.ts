@@ -5,6 +5,7 @@ import type { HomeAssistant, Room } from "./types";
 import { HOMEX_CHANGED } from "./types";
 import { errorMessage, fetchRooms } from "./api";
 import { loadHaComponents } from "./lib/ha-elements";
+import { goBack, joinPath, navigate, segments, type PanelRoute } from "./lib/router";
 import "./components/homex-room-card";
 import "./components/homex-room-dialog";
 import "./components/homex-export-dialog";
@@ -13,25 +14,21 @@ import "./components/homex-shutter-manager";
 
 // Bump together with PANEL_VERSION in panel.py. Shown in the header so you can
 // confirm a full page reload picked up the latest build.
-const BUILD = "102";
+const BUILD = "110";
 
 /** Homex sidebar panel: lists rooms and orchestrates loading / reloading. */
 @customElement("homex-panel")
 export class HomexPanel extends LitElement {
   @property({ attribute: false }) hass!: HomeAssistant;
   @property({ attribute: false }) narrow = false;
-  @property({ attribute: false }) route: any;
+  @property({ attribute: false }) route?: PanelRoute;
   @property({ attribute: false }) panel: any;
 
   @state() private _rooms: Room[] | null = null;
   @state() private _error: string | null = null;
   @state() private _createOpen = false;
   @state() private _exportOpen = false;
-  @state() private _view: "rooms" | "switches" | "shutters" = "rooms";
   @state() private _menuOpen = false;
-  // When navigating to the Switch Manager to add a switch from a room card.
-  @state() private _switchStartAdd = false;
-  @state() private _switchAddRoom: string | null = null;
   // entry_id of the single expanded room (accordion), persisted in localStorage.
   @state() private _expanded: string | null =
     localStorage.getItem("homex_expanded") || null;
@@ -207,11 +204,34 @@ export class HomexPanel extends LitElement {
     else localStorage.removeItem("homex_expanded");
   };
 
+  /** Sub-page path segments: [] (rooms), ["switches", ...], ["shutters", ...]. */
+  private get _segs(): string[] {
+    return segments(this.route?.path);
+  }
+  private get _view(): "rooms" | "switches" | "shutters" {
+    const first = this._segs[0];
+    return first === "switches" || first === "shutters" ? first : "rooms";
+  }
+  private get _prefix(): string {
+    return this.route?.prefix || "/homex";
+  }
+
   updated(changed: Map<string, unknown>) {
     if (changed.has("hass") && this.hass && !this._loaded) {
       this._loaded = true;
       // Pull HA's native form elements into the registry, then load data.
       loadHaComponents().then(() => this.requestUpdate());
+      this._reload();
+    }
+    // Back from a manager: switches/presets changed there feed the room cards
+    // (switch action counts), so reload the rooms.
+    const prev = changed.get("route") as PanelRoute | undefined;
+    if (
+      prev &&
+      this._loaded &&
+      this._view === "rooms" &&
+      segments(prev.path).length
+    ) {
       this._reload();
     }
   }
@@ -225,12 +245,7 @@ export class HomexPanel extends LitElement {
     }
   };
 
-  /** Leaving a manager: switches/presets changed there feed the room cards
-   * (switch action counts), so reload the rooms. */
-  private _backToRooms = () => {
-    this._view = "rooms";
-    this._reload();
-  };
+  private _backToRooms = () => goBack(this._prefix);
 
   private _toggleSidebar() {
     this.dispatchEvent(
@@ -239,9 +254,11 @@ export class HomexPanel extends LitElement {
   }
 
   private _onOpenSwitchAdd = (e: CustomEvent) => {
-    this._switchAddRoom = e.detail?.room_id ?? null;
-    this._switchStartAdd = true;
-    this._view = "switches";
+    const room = e.detail?.room_id;
+    navigate(
+      joinPath(this._prefix, "switches", "switches", "new") +
+        (room ? `?room=${encodeURIComponent(room)}` : "")
+    );
   };
 
   private _roomCard(room: Room) {
@@ -308,8 +325,8 @@ export class HomexPanel extends LitElement {
         <div class="wrap">
           <homex-switch-manager
             .hass=${this.hass}
-            .startAdd=${this._switchStartAdd}
-            .startAddRoom=${this._switchAddRoom}
+            .base=${joinPath(this._prefix, "switches")}
+            .subpath=${this._segs.slice(1).join("/")}
             @close=${this._backToRooms}
           ></homex-switch-manager>
         </div>
@@ -320,6 +337,8 @@ export class HomexPanel extends LitElement {
         <div class="wrap">
           <homex-shutter-manager
             .hass=${this.hass}
+            .base=${joinPath(this._prefix, "shutters")}
+            .subpath=${this._segs.slice(1).join("/")}
             @close=${this._backToRooms}
           ></homex-shutter-manager>
         </div>
@@ -374,9 +393,7 @@ export class HomexPanel extends LitElement {
                       <button
                         @click=${() => {
                           this._menuOpen = false;
-                          this._switchStartAdd = false;
-                          this._switchAddRoom = null;
-                          this._view = "switches";
+                          navigate(joinPath(this._prefix, "switches"));
                         }}
                       >
                         🎛 Switch Manager
@@ -384,7 +401,7 @@ export class HomexPanel extends LitElement {
                       <button
                         @click=${() => {
                           this._menuOpen = false;
-                          this._view = "shutters";
+                          navigate(joinPath(this._prefix, "shutters"));
                         }}
                       >
                         🪟 Shutter Manager

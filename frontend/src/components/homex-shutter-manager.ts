@@ -2,6 +2,7 @@ import { LitElement, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type { HomeAssistant, ShutterPreset } from "../types";
 import { fetchShutterPresets } from "../api";
+import { goBack, joinPath, navigate, segments } from "../lib/router";
 import { sharedStyles } from "../lib/styles";
 import "./homex-shutter-preset-editor";
 
@@ -12,8 +13,10 @@ export class HomexShutterManager extends LitElement {
 
   @state() private _presets: ShutterPreset[] = [];
   @state() private _loaded = false;
-  @state() private _editing = false;
-  @state() private _edit: ShutterPreset | null = null;
+  /** URL of the manager (the presets list). */
+  @property({ attribute: false }) base = "";
+  /** Sub-page below `base`: "" | "new" | "edit/<id>". */
+  @property({ attribute: false }) subpath = "";
 
   static styles = [
     sharedStyles,
@@ -108,21 +111,37 @@ export class HomexShutterManager extends LitElement {
     this.dispatchEvent(new CustomEvent("close"));
   }
   private _onClosed() {
-    this._editing = false;
     this._load();
+    goBack(this.base);
+  }
+  private _openEditor(id?: string) {
+    navigate(joinPath(this.base, ...(id ? ["edit", id] : ["new"])));
   }
 
   render() {
-    if (this._editing) {
+    const [mode, id] = segments(this.subpath);
+    if (mode === "new" || (mode === "edit" && id)) {
+      const edit = id ? this._presets.find((p) => p.id === id) : null;
+      if (id && !edit) {
+        return html`
+          <div class="head">
+            <button @click=${this._onClosed}>← Presets</button>
+            <h2></h2>
+          </div>
+          <div class="msg">
+            ${this._loaded ? `« ${id} » introuvable.` : "Chargement…"}
+          </div>
+        `;
+      }
       return html`
         <div class="head">
           <button @click=${this._onClosed}>← Presets</button>
-          <h2>${this._edit ? "Modifier le preset" : "Nouveau shutter device preset"}</h2>
+          <h2>${edit ? "Modifier le preset" : "Nouveau shutter device preset"}</h2>
         </div>
         <div class="editor">
           <homex-shutter-preset-editor
             .hass=${this.hass}
-            .preset=${this._edit}
+            .preset=${edit ?? null}
             @shutter-preset-closed=${this._onClosed}
           ></homex-shutter-preset-editor>
         </div>
@@ -134,10 +153,7 @@ export class HomexShutterManager extends LitElement {
         <h2>Shutter Manager</h2>
         <button
           class="primary"
-          @click=${() => {
-            this._edit = null;
-            this._editing = true;
-          }}
+          @click=${() => this._openEditor()}
         >
           ＋ Preset
         </button>
@@ -153,10 +169,7 @@ export class HomexShutterManager extends LitElement {
               ${this._presets.map(
                 (p) => html`<div
                   class="card"
-                  @click=${() => {
-                    this._edit = p;
-                    this._editing = true;
-                  }}
+                  @click=${() => this._openEditor(p.id)}
                 >
                   <div class="icon">🪟</div>
                   <div class="info">

@@ -146,6 +146,14 @@ export const syncLabels = (
 export const dimRoom = (hass: HomeAssistant, entry_id: string, delta: number) =>
   hass.callWS({ type: "homex/room/dim", entry_id, delta });
 
+export type ShutterService = "open_cover" | "close_cover" | "stop_cover";
+export const roomShutter = (
+  hass: HomeAssistant,
+  entry_id: string,
+  group_id: string,
+  service: ShutterService
+) => hass.callWS({ type: "homex/room/shutter", entry_id, group_id, service });
+
 export interface GroupPayload {
   entry_id: string;
   group_id: string;

@@ -1,6 +1,10 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import { mdiLightbulb, mdiLightbulbOutline } from "@mdi/js";
+import {
+  mdiLightbulbAlertOutline,
+  mdiLightbulbOnOutline,
+  mdiLightbulbOutline,
+} from "@mdi/js";
 import type { HomeAssistant, Unit } from "../types";
 import { sharedStyles } from "../lib/styles";
 
@@ -87,14 +91,6 @@ export class HomexUnitControls extends LitElement {
         font-size: 15px;
         font-weight: 500;
       }
-      .active-scene {
-        font-size: 12px;
-        font-weight: 500;
-        color: var(--primary-color);
-        background: color-mix(in srgb, var(--primary-color) 14%, transparent);
-        border-radius: 12px;
-        padding: 2px 10px;
-      }
       .rid {
         font-size: 12px;
         color: var(--secondary-text-color);
@@ -112,6 +108,19 @@ export class HomexUnitControls extends LitElement {
 
   private _isOn(entityId: string): boolean {
     return this.hass.states[entityId]?.state === "on";
+  }
+  /** Lit (a Homex scene applies) vs. stray (should be off, yet some light is
+   * on — turned on outside Homex). A room's switch turns on with any of its
+   * parts, so for a room "should be off" means no active scene. */
+  private _lightState(on: boolean): "lit" | "stray" | "off" {
+    const u = this.unit;
+    if (!u.group_id && on) {
+      const active = this.hass.states[u.switch]?.attributes?.active_scene;
+      return active != null ? "lit" : "stray";
+    }
+    if (on) return "lit";
+    const anyOn = (u.devices ?? []).some((id) => this._isOn(id)) || this._isOn(u.light);
+    return anyOn ? "stray" : "off";
   }
   private _toggle(e: Event) {
     e.stopPropagation(); // don't trigger card expand/collapse
@@ -133,17 +142,32 @@ export class HomexUnitControls extends LitElement {
   render() {
     const u = this.unit;
     const on = this._isOn(u.switch);
+    // The bulb's icon alone tells the state: a Homex scene is lit, lights are
+    // on outside of one (stray), or all off.
+    const light = this._lightState(on);
+    const title =
+      light === "lit"
+        ? `Allumée${this.activeScene ? ` · ${this.activeScene}` : ""} — éteindre`
+        : light === "stray"
+          ? "Éteinte, mais au moins une lumière est allumée — allumer"
+          : "Allumer";
     return html`
       <div class="controls">
         ${this.hideToggle
           ? ""
           : html`<button
               class="bulb ${on ? "on" : ""}"
-              title=${on ? "Éteindre" : "Allumer"}
+              title=${title}
               @click=${this._toggle}
             >
               <svg viewBox="0 0 24 24">
-                <path d=${on ? mdiLightbulb : mdiLightbulbOutline}></path>
+                <path
+                  d=${light === "lit"
+                    ? mdiLightbulbOnOutline
+                    : light === "stray"
+                      ? mdiLightbulbAlertOutline
+                      : mdiLightbulbOutline}
+                ></path>
               </svg>
             </button>`}
         ${this.areaIcon
@@ -152,9 +176,6 @@ export class HomexUnitControls extends LitElement {
         <div class="title">
           <div class="line1">
             <strong>${u.name}</strong>
-            ${on && this.activeScene
-              ? html`<span class="active-scene">${this.activeScene}</span>`
-              : ""}
           </div>
           <div class="line2">
             <span class="rid">${u.group_id || u.room_id}</span>

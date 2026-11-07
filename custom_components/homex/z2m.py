@@ -71,18 +71,25 @@ def flatten_fields(state: dict, prefix: str = "") -> dict[str, Any]:
 ACCESS_GET = 0b100
 
 
-def _gettable_property(exposes) -> str | None:
-    """First property of a Z2M device definition that supports /get."""
+def _gettable_properties(exposes, out: list | None = None) -> list[tuple[str, str]]:
+    """(property, category) of every Z2M expose that supports /get."""
+    out = [] if out is None else out
     for expose in exposes or []:
         if not isinstance(expose, dict):
             continue
         prop = expose.get("property")
         if prop and int(expose.get("access") or 0) & ACCESS_GET:
-            return prop
-        nested = _gettable_property(expose.get("features"))
-        if nested:
-            return nested
-    return None
+            out.append((prop, expose.get("category") or ""))
+        _gettable_properties(expose.get("features"), out)
+    return out
+
+
+def _gettable_property(exposes) -> str | None:
+    """A property to /get, preferring plain state over config/diagnostic ones
+    (reading any of them makes Z2M republish the whole state)."""
+    props = _gettable_properties(exposes)
+    plain = [p for p, category in props if not category]
+    return (plain or [p for p, _ in props] or [None])[0]
 
 
 class Z2MBridge:

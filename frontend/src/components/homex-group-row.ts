@@ -2,6 +2,7 @@ import { LitElement, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { mdiLightbulbOn, mdiLightbulbOffOutline } from "@mdi/js";
 import type { Group, HomeAssistant, Room } from "../types";
+import { openHaPage } from "../lib/router";
 import { sharedStyles } from "../lib/styles";
 import "./homex-unit-controls";
 import "./homex-group-dialog";
@@ -52,6 +53,9 @@ export class HomexGroupRow extends LitElement {
     return `${this.room.room_id}_${this.group.group_id}`;
   }
 
+  private _openScene = (e: MouseEvent) =>
+    openHaPage((e.currentTarget as HTMLAnchorElement).getAttribute("href")!, e);
+
   render() {
     const slug = this._slug;
     return html`
@@ -60,8 +64,7 @@ export class HomexGroupRow extends LitElement {
         <a
           class="scene-link"
           href="/config/scene/edit/homex_${slug}_turn_on"
-          target="_blank"
-          rel="noopener"
+          @click=${this._openScene}
           title="Éditer la scène « allumé » du groupe"
         >
           <svg viewBox="0 0 24 24"><path d=${mdiLightbulbOn}></path></svg>
@@ -69,8 +72,7 @@ export class HomexGroupRow extends LitElement {
         <a
           class="scene-link"
           href="/config/scene/edit/homex_${slug}_turn_off"
-          target="_blank"
-          rel="noopener"
+          @click=${this._openScene}
           title="Éditer la scène « éteint » du groupe"
         >
           <svg viewBox="0 0 24 24"><path d=${mdiLightbulbOffOutline}></path></svg>

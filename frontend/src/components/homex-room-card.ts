@@ -35,6 +35,8 @@ import {
   syncLabels,
 } from "../api";
 import { resolveSwitchPreset } from "../lib/device";
+import { openHaPage } from "../lib/router";
+import { defaultShutterGroup, shutterSummary } from "../lib/shutter";
 import { sharedStyles } from "../lib/styles";
 import "./homex-unit-controls";
 import "./homex-group-row";
@@ -43,6 +45,7 @@ import "./homex-triggers-dialog";
 import "./homex-group-dialog";
 import "./homex-scene-dialog";
 import "./homex-shutter-group-dialog";
+import "./homex-shutter-control-dialog";
 import "./homex-switch-mapping";
 
 type DialogKind = "" | "room" | "triggers" | "addgroup" | "addscene" | "delete";
@@ -56,6 +59,7 @@ export class HomexRoomCard extends LitElement {
 
   @state() private _dialog: DialogKind = "";
   @state() private _menuOpen = false;
+  @state() private _shutterCtlOpen = false;
   @state() private _renameScene: Scene | null = null;
   @state() private _deleteScenes = true;
   @state() private _deleting = false;
@@ -75,6 +79,16 @@ export class HomexRoomCard extends LitElement {
         position: relative;
         padding: 16px;
         margin-bottom: 16px;
+      }
+      /* Collapsed rooms: a compact one-line header. */
+      ha-card:not(.selected) {
+        padding: 8px 16px;
+        margin-bottom: 8px;
+      }
+      /* The expanded (selected) room: blue outline, without shifting layout. */
+      ha-card.selected {
+        --ha-card-border-color: var(--primary-color);
+        box-shadow: 0 0 0 1px var(--primary-color);
       }
       .head {
         display: flex;
@@ -117,6 +131,13 @@ export class HomexRoomCard extends LitElement {
         width: 22px;
         height: 22px;
         fill: currentColor;
+      }
+      /* Shutters letting light in (or moving) stand out like a lit room. */
+      .shutter-btn.open,
+      .shutter-btn.partial,
+      .shutter-btn.opening,
+      .shutter-btn.closing {
+        color: var(--primary-color);
       }
       .kebab {
         min-height: 0;
@@ -191,7 +212,7 @@ export class HomexRoomCard extends LitElement {
         font-size: 14px;
         font-weight: 500;
         color: var(--secondary-text-color);
-        cursor: default;
+        cursor: pointer;
       }
       .tab.active {
         color: var(--primary-color);
@@ -503,8 +524,8 @@ export class HomexRoomCard extends LitElement {
     }
   };
 
-  private _openHa(scene: Scene) {
-    window.open(`/config/scene/edit/${scene.config_id}`, "_blank", "noopener");
+  private _openHa(scene: Scene, e: MouseEvent) {
+    openHaPage(`/config/scene/edit/${scene.config_id}`, e);
   }
 
   private _sceneNext = async (e?: Event) => {
@@ -561,7 +582,7 @@ export class HomexRoomCard extends LitElement {
   private _iconBtn(
     path: string,
     label: string,
-    onClick: () => void,
+    onClick: (e: MouseEvent) => void,
     disabled = false
   ) {
     return html`<button
@@ -590,8 +611,8 @@ export class HomexRoomCard extends LitElement {
           ? html`<span class="active-tag">active</span>`
           : ""}
         <span class="btn-group">
-          ${this._iconBtn(mdiOpenInNew, "Voir dans Home Assistant", () =>
-            this._openHa(sc)
+          ${this._iconBtn(mdiOpenInNew, "Voir dans Home Assistant", (e) =>
+            this._openHa(sc, e)
           )}
           ${this._iconBtn(mdiPencil, "Renommer", () => (this._renameScene = sc))}
           ${this._iconBtn(
@@ -627,7 +648,7 @@ export class HomexRoomCard extends LitElement {
     const shuttersOn = r.modules?.includes("shutters") ?? false;
     const hasDim = !!(r.dim_up_triggers?.length || r.dim_down_triggers?.length);
     return html`
-      <ha-card>
+      <ha-card class=${this.expanded ? "selected" : ""}>
         <div class="head" @click=${this._toggleExpand} title="Plier / déplier">
           <svg class="chevron" viewBox="0 0 24 24">
             <path d=${this.expanded ? mdiChevronUp : mdiChevronDown}></path>
@@ -668,6 +689,7 @@ export class HomexRoomCard extends LitElement {
                   <svg viewBox="0 0 24 24"><path d=${mdiThemeLightDark}></path></svg>
                 </button>`
               : ""}
+            ${shuttersOn ? this._renderShutterButton(r) : ""}
             <button
               class="kebab"
               title="Actions"
@@ -709,36 +731,7 @@ export class HomexRoomCard extends LitElement {
             `
           : ""}
 
-        ${lightsOn
-          ? html`
-              <div class="module-title">Lights</div>
-              <div class="stats">
-                <span class="stat">🔌 ${r.devices.length} lumière(s)</span>
-                <span class="stat">🎬 ${r.scenes.length} scène(s)</span>
-                ${r.groups.length
-                  ? html`<span class="stat">📦 ${r.groups.length} groupe(s)</span>`
-                  : ""}
-              </div>
-            `
-          : ""}
-        ${switchesOn
-          ? html`
-              <div class="module-title">Switches</div>
-              <div class="stats">
-                <span class="stat">🎛 ${this._roomSwitches().length} interrupteur(s)</span>
-                <span class="stat">⚡ ${this._switchActionCount(r)} action(s)</span>
-              </div>
-            `
-          : ""}
-        ${shuttersOn
-          ? html`
-              <div class="module-title">Shutters</div>
-              <div class="stats">
-                <span class="stat">📦 ${(r.shutter_groups ?? []).length} groupe(s)</span>
-                <span class="stat">🪟 ${this._shutterCount(r)} volet(s)</span>
-              </div>
-            `
-          : ""}
+        ${this.expanded ? this._renderStats(r, lightsOn, switchesOn, shuttersOn) : ""}
         ${this.expanded
           ? this._renderBody(
               r,
@@ -753,6 +746,48 @@ export class HomexRoomCard extends LitElement {
       </ha-card>
 
       ${this._renderDialogs(r)}
+    `;
+  }
+
+  /** Per-module counters, shown only once the room is expanded (the collapsed
+   * card stays a compact one-line header). */
+  private _renderStats(
+    r: Room,
+    lightsOn: boolean,
+    switchesOn: boolean,
+    shuttersOn: boolean
+  ) {
+    return html`
+      ${lightsOn
+        ? html`
+            <div class="module-title">Lights</div>
+            <div class="stats">
+              <span class="stat">🔌 ${r.devices.length} lumière(s)</span>
+              <span class="stat">🎬 ${r.scenes.length} scène(s)</span>
+              ${r.groups.length
+                ? html`<span class="stat">📦 ${r.groups.length} groupe(s)</span>`
+                : ""}
+            </div>
+          `
+        : ""}
+      ${switchesOn
+        ? html`
+            <div class="module-title">Switches</div>
+            <div class="stats">
+              <span class="stat">🎛 ${this._roomSwitches().length} interrupteur(s)</span>
+              <span class="stat">⚡ ${this._switchActionCount(r)} action(s)</span>
+            </div>
+          `
+        : ""}
+      ${shuttersOn
+        ? html`
+            <div class="module-title">Shutters</div>
+            <div class="stats">
+              <span class="stat">📦 ${(r.shutter_groups ?? []).length} groupe(s)</span>
+              <span class="stat">🪟 ${this._shutterCount(r)} volet(s)</span>
+            </div>
+          `
+        : ""}
     `;
   }
 
@@ -960,8 +995,34 @@ export class HomexRoomCard extends LitElement {
     );
   }
 
+  /** Round quick button showing the default shutter group's state; opens the
+   * shutter control modal. Hidden when the room has no shutter. */
+  private _renderShutterButton(r: Room) {
+    const group = defaultShutterGroup(r);
+    if (!group) return "";
+    const sum = shutterSummary(this.hass, group.devices);
+    return html`<button
+      class="round shutter-btn ${sum.state}"
+      title=${`Volets (${group.name}) : ${sum.label}${
+        sum.position !== null ? ` · ${sum.position} %` : ""
+      }`}
+      @click=${(e: Event) => {
+        e.stopPropagation();
+        this._shutterCtlOpen = true;
+      }}
+    >
+      <svg viewBox="0 0 24 24"><path d=${sum.icon}></path></svg>
+    </button>`;
+  }
+
   private _renderDialogs(r: Room) {
     return html`
+      <homex-shutter-control-dialog
+        .hass=${this.hass}
+        .room=${r}
+        .open=${this._shutterCtlOpen}
+        @dialog-closed=${() => (this._shutterCtlOpen = false)}
+      ></homex-shutter-control-dialog>
       <homex-room-dialog
         .hass=${this.hass}
         .room=${r}

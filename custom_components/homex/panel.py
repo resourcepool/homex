@@ -62,7 +62,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "102"
+PANEL_VERSION = "110"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -172,6 +172,7 @@ async def async_register_homex_panel(hass: HomeAssistant) -> None:
         ws_room_delete,
         ws_room_sync_labels,
         ws_room_dim,
+        ws_room_shutter,
         ws_group_add,
         ws_group_update,
         ws_group_delete,
@@ -863,6 +864,32 @@ async def ws_room_dim(hass: HomeAssistant, connection, msg) -> None:
         live.controllers.get(msg["entry_id"]) if live else None
     ) or _controller(hass, hub, dict(sub.data))
     await controller.async_dim(msg["delta"])
+    connection.send_result(msg["id"], {"ok": True})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/room/shutter",
+        vol.Required("entry_id"): str,
+        vol.Required("group_id"): str,
+        vol.Required("service"): vol.In(["open_cover", "close_cover", "stop_cover"]),
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_room_shutter(hass: HomeAssistant, connection, msg) -> None:
+    """Open / close / stop one shutter group of the room, like a switch would
+    (so the smart toggle remembers the direction)."""
+    hub = _hub_entry(hass)
+    sub = _find_subentry(hub, msg["entry_id"]) if hub else None
+    if hub is None or sub is None:
+        connection.send_error(msg["id"], "not_found", "Unknown room")
+        return
+    live = hass.data.get(DOMAIN, {}).get(HUB_DATA)
+    controller = (
+        live.controllers.get(msg["entry_id"]) if live else None
+    ) or _controller(hass, hub, dict(sub.data))
+    await controller.async_shutter(msg["group_id"], msg["service"])
     connection.send_result(msg["id"], {"ok": True})
 
 
