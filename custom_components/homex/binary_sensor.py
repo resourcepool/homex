@@ -7,6 +7,9 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
+from functools import partial
+
+from .heating_systems import systems_manager
 from .heating_zones import zones_manager
 
 
@@ -18,3 +21,7 @@ async def async_setup_entry(
     manager = zones_manager(hass)
     await manager.async_setup_needed(async_add_entities, entry)
     entry.async_on_unload(manager.unload_needed)
+
+    systems = systems_manager(hass)
+    await systems.async_setup_platform("binary_sensor", async_add_entities)
+    entry.async_on_unload(partial(systems.unload_platform, "binary_sensor"))

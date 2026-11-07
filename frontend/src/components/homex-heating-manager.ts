@@ -536,13 +536,14 @@ export class HomexHeatingManager extends LitElement {
     if (!this._systems.length) {
       return html`<div class="msg">
         Aucun système. Clique sur « ＋ Système » pour déclarer une chaudière (Boiler)
-        ou une pompe à chaleur (Heat Pump).
+        ou un ballon tampon (Buffer Tank).
       </div>`;
     }
     const zoneName = (id: string) =>
       id === "global" ? "Global" : this._zones.find((z) => z.id === id)?.name ?? id;
     return html`<div class="grid">
       ${this._systems.map((sys) => {
+        if (sys.type === "buffer_tank") return this._renderTankCard(sys);
         const contact = sys.contact ? this.hass.states[sys.contact] : undefined;
         return html`<div class="card" @click=${() => this._openEditor("systems", sys.id)}>
           <div class="card-head">
@@ -551,7 +552,7 @@ export class HomexHeatingManager extends LitElement {
               <div class="name">${sys.name}</div>
               <div class="meta">
                 ${sys.type === "boiler" ? "Boiler" : "Heat Pump"} ·
-                ${sys.zones.map(zoneName).join(", ")}
+                ${(sys.zones ?? ["global"]).map(zoneName).join(", ")}
               </div>
             </div>
           </div>
@@ -567,6 +568,50 @@ export class HomexHeatingManager extends LitElement {
             : ""}
         </div>`;
       })}
+    </div>`;
+  }
+
+  private _renderTankCard(sys: HeatingSystem) {
+    const zoneName = (id: string) =>
+      id === "global" ? "Global" : this._zones.find((z) => z.id === id)?.name ?? id;
+    const temp = (id?: string) => {
+      const st = id ? this.hass.states[id] : undefined;
+      const v = parseFloat(st?.state ?? "");
+      return Number.isNaN(v) ? "—" : `${v} °C`;
+    };
+    const circ = sys.circulator ? this.hass.states[sys.circulator] : undefined;
+    const rules = sys.rules ?? [];
+    return html`<div class="card" @click=${() => this._openEditor("systems", sys.id)}>
+      <div class="card-head">
+        <div class="icon">🛢️</div>
+        <div>
+          <div class="name">${sys.name}</div>
+          <div class="meta">
+            Buffer Tank · ${(sys.zones ?? ["global"]).map(zoneName).join(", ")} ·
+            ${rules.length} règle(s) · min ${sys.min_runtime ?? 0} min
+          </div>
+        </div>
+      </div>
+      <div class="temps">
+        <span class="temp" title="Consigne">🎯 ${temp(sys.setpoint_sensor)}</span>
+        ${sys.tank_sensor ? html`<span class="temp" title="Ballon">🛢 ${temp(sys.tank_sensor)}</span>` : ""}
+        ${sys.flow_sensor ? html`<span class="temp" title="Départ">↗ ${temp(sys.flow_sensor)}</span>` : ""}
+        <span class="temp" title="Retour">↘ ${temp(sys.return_sensor)}</span>
+        ${sys.aggressive ? html`<span class="temp">Agressif</span>` : ""}
+        ${sys.force && this.hass.states[sys.force]?.state === "on"
+          ? html`<span class="temp" title=${this.hass.states[sys.force]?.attributes?.friendly_name ?? sys.force}>Forcé</span>`
+          : ""}
+        ${(() => {
+          const rt = parseFloat(this.hass.states[`sensor.homex_system_${sys.id}_runtime_today`]?.state ?? "");
+          if (Number.isNaN(rt)) return "";
+          const m = Math.round(rt);
+          const txt = m >= 60 ? `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, "0")}` : `${m} min`;
+          return html`<span class="temp" title="Durée d'activité du circulateur aujourd'hui">⏱ ${txt}</span>`;
+        })()}
+        <span class="temp" title=${circ?.attributes?.friendly_name ?? sys.circulator ?? ""}>
+          Circulateur : ${circ ? (circ.state === "on" ? "en marche" : circ.state === "off" ? "arrêté" : circ.state) : "—"}
+        </span>
+      </div>
     </div>`;
   }
 

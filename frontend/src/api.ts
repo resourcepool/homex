@@ -6,6 +6,7 @@ import type {
   HeatingModel,
   HeatingPreset,
   HeatingSystem,
+  TankStatus,
   HeatingZone,
   HomeAssistant,
   Room,
@@ -323,5 +324,9 @@ export const saveHeatingSystem = (
   system: HeatingSystem,
   create: boolean
 ) => hass.callWS({ type: "homex/heating/system/save", system, create });
+export const heatingSystemStatus = (
+  hass: HomeAssistant,
+  system_id: string
+): Promise<TankStatus> => hass.callWS({ type: "homex/heating/system/status", system_id });
 export const deleteHeatingSystem = (hass: HomeAssistant, system_id: string) =>
   hass.callWS({ type: "homex/heating/system/delete", system_id });

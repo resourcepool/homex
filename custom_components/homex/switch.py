@@ -13,6 +13,9 @@ from homeassistant.helpers.restore_state import RestoreEntity
 from .const import DOMAIN, HUB_DATA, hx_name
 from .heating import HEATING_SWITCH, STORE_DATA, _doc, async_set_heating_enabled
 from .room import HomexHub, Unit
+from functools import partial
+
+from .heating_systems import systems_manager
 
 
 async def async_setup_entry(
@@ -31,6 +34,10 @@ async def async_setup_entry(
         hass.data[DOMAIN].pop(HEATING_SWITCH, None)
 
     entry.async_on_unload(_forget_switch)
+
+    systems = systems_manager(hass)
+    await systems.async_setup_platform("switch", async_add_entities)
+    entry.async_on_unload(partial(systems.unload_platform, "switch"))
     for room_id, controller in hub.controllers.items():
         if not controller.lights_enabled:
             continue

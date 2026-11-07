@@ -18,6 +18,9 @@ from homeassistant.helpers.event import async_track_state_change_event
 
 from .const import CONF_METRICS, DOMAIN, HUB_DATA, METRICS, MODULE_HEATING, hx_name
 from .room import HomexHub, RoomController
+from functools import partial
+
+from .heating_systems import systems_manager
 
 
 async def async_setup_entry(
@@ -37,6 +40,10 @@ async def async_setup_entry(
         ]
         if entities:
             async_add_entities(entities, config_subentry_id=hub.subentry_id(room_id))
+
+    systems = systems_manager(hass)
+    await systems.async_setup_platform("sensor", async_add_entities)
+    entry.async_on_unload(partial(systems.unload_platform, "sensor"))
 
 
 def combine(values: list[tuple[float, float]], rule: str) -> float | None:

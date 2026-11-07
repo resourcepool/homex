@@ -337,11 +337,40 @@ export interface HeatingZone {
 
 /** A heating system: a boiler drives its dry contact (switch) from the heating
  * demand of its scope (global or zones); a heat pump has no behaviour yet. */
+/** Buffer tank circulation rule on a temperature gap (setpoint - tank, or
+ * flow - return): circulate once gap >= delta, stop once gap < tolerance. */
+export interface CirculationRule {
+  type: "setpoint_tank" | "flow_return";
+  delta: number;
+  tolerance: number;
+}
+
 export interface HeatingSystem {
   id: string;
   name: string;
-  type: "boiler" | "heat_pump";
-  contact: string; // dry contact entity (switch.* / input_boolean.*)
-  zones: string[]; // ["global"] or zone ids
-  aggressive: boolean; // tolerance "agressive" while the contact is on
+  type: "boiler" | "heat_pump" | "buffer_tank";
+  contact?: string; // boiler: dry contact entity (switch.* / input_boolean.*)
+  zones?: string[]; // boiler: ["global"] or zone ids
+  aggressive?: boolean; // boiler: tolerance "agressive" while the contact is on
+  // Buffer tank
+  setpoint_sensor?: string;
+  tank_sensor?: string;
+  flow_sensor?: string;
+  return_sensor?: string;
+  circulator?: string;
+  force?: string; // manual force (switch.* / input_boolean.*), optional
+  min_runtime?: number; // minutes
+  rules?: CirculationRule[];
+}
+
+/** A buffer tank's live readings and each rule's circulation demand. */
+export interface TankStatus {
+  running: boolean;
+  setpoint: number | null;
+  tank: number | null;
+  flow: number | null;
+  return: number | null;
+  rules: boolean[];
+  demand: boolean; // heating enabled and some radiator needs heat
+  forced: boolean; // manual force on (heating enabled)
 }

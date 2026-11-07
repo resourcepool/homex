@@ -227,6 +227,32 @@ class HeatingZones:
         if enforcer is not None:
             await enforcer.async_enforce_all()
 
+    async def async_apply_tolerances(
+        self, global_mode: str | None, zone_modes: dict[str, str]
+    ) -> None:
+        """Set the global tolerance mode (None: leave it) and some zones' in
+        one write; no-op (no save, no enforcement) when nothing changes."""
+        doc = await _doc(self.hass)
+        zones = ensure_zones(doc)
+        changed = False
+        if global_mode in TOLERANCE_MODES and doc.get("tolerance_mode", "normal") != global_mode:
+            doc["tolerance_mode"] = global_mode
+            changed = True
+        for zone in zones:
+            mode = zone_modes.get(zone["id"])
+            if mode in TOLERANCE_MODES and zone.get("tolerance_mode", "normal") != mode:
+                zone["tolerance_mode"] = mode
+                changed = True
+        if not changed:
+            return
+        await _save(self.hass)
+        for entity in [self.tolerance_global, *self._tol_entities.values()]:
+            if entity is not None and entity.hass is not None:
+                entity.async_write_ha_state()
+        enforcer = self.hass.data.get(DOMAIN, {}).get(ENFORCER)
+        if enforcer is not None:
+            await enforcer.async_enforce_all()
+
     async def async_sync_entities(self) -> None:
         """One select entity per zone: add new zones', remove deleted ones'."""
         if self._add_entities is None:
