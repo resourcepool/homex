@@ -4,7 +4,6 @@ binary_sensor.homex_system_<id>_<key>: demand, contact (boiler),
 circulation / rule_<type> (buffer tank);
 sensor.homex_system_<id>_<key>: gap_<type> (°C), min_runtime_left (s),
 runtime_today (min: circulator on-time since midnight, restored on restart);
-switch.homex_system_<id>_aggressive: the system's agressive mode;
 switch.homex_system_<id>_force: a buffer tank's manual force.
 
 They read the systems manager's last computed status (heating_systems.py),
@@ -42,7 +41,6 @@ ICONS = {
     "contact": "mdi:electric-switch",
     "circulation": "mdi:pump",
     "force": "mdi:hand-back-right",
-    "aggressive": "mdi:speedometer",
     "min_runtime_left": "mdi:timer-sand",
     "runtime_today": "mdi:timer-outline",
 }
@@ -219,20 +217,17 @@ def _sensor(manager, system_id: str, key: str, label: str):
 
 
 class SystemSwitch(_SystemEntity, SwitchEntity):
-    """A system setting stored by Homex: its agressive mode, or a buffer
-    tank's manual force."""
+    """A buffer tank's manual force, stored by Homex. (The agressive mode is
+    only set in the system's editor.)"""
 
     _domain = "switch"
 
     @property
     def is_on(self) -> bool:
-        return bool(self._system.get("forced" if self.key == "force" else "aggressive"))
+        return bool(self._system.get("forced"))
 
     async def _async_set(self, on: bool) -> None:
-        if self.key == "force":
-            await self._manager.async_set_forced(self.system_id, on)
-        else:
-            await self._manager.async_set_aggressive(self.system_id, on)
+        await self._manager.async_set_forced(self.system_id, on)
         self.async_write_ha_state()
 
     async def async_turn_on(self, **kwargs) -> None:

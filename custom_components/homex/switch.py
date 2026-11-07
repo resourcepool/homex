@@ -1,5 +1,7 @@
 """switch.homex_{slug}_lights_toggle - on/off state of the room and each group;
-switch.homex_heating - the global heating switch (Climate module)."""
+switch.homex_heating - the global heating switch (Climate module);
+switch.homex_{slug}_heating - a room's own heating (off = Unheated), for each
+room with radiators."""
 
 from __future__ import annotations
 
@@ -10,7 +12,9 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
 
-from .const import DOMAIN, HUB_DATA, hx_name
+from homeassistant.helpers import entity_registry as er
+
+from .const import CONF_HEATING, DOMAIN, HUB_DATA, hx_name
 from .heating import HEATING_SWITCH, STORE_DATA, _doc, async_set_heating_enabled
 from .room import HomexHub, Unit
 from functools import partial
@@ -38,6 +42,26 @@ async def async_setup_entry(
     systems = systems_manager(hass)
     await systems.async_setup_platform("switch", async_add_entities)
     entry.async_on_unload(partial(systems.unload_platform, "switch"))
+    # A room's own heating switch, for rooms with radiators.
+    heated = {
+        room_id
+        for room_id, controller in hub.controllers.items()
+        if (controller._cfg(CONF_HEATING) or {}).get("radiators")
+    }
+    ent_reg = er.async_get(hass)
+    for reg in list(ent_reg.entities.values()):
+        if (
+            reg.platform == DOMAIN
+            and reg.domain == "switch"
+            and reg.unique_id.startswith(ROOM_HEATING_PREFIX)
+            and reg.unique_id.removeprefix(ROOM_HEATING_PREFIX) not in heated
+        ):
+            ent_reg.async_remove(reg.entity_id)
+    for room_id in heated:
+        async_add_entities(
+            [RoomHeatingSwitch(hub, hub.controllers[room_id])],
+            config_subentry_id=hub.subentry_id(room_id),
+        )
     for room_id, controller in hub.controllers.items():
         if not controller.lights_enabled:
             continue
@@ -45,6 +69,50 @@ async def async_setup_entry(
             [RoomSwitch(unit) for unit in controller.units],
             config_subentry_id=hub.subentry_id(room_id),
         )
+
+
+ROOM_HEATING_PREFIX = "homex_room_heating_"
+
+
+class RoomHeatingSwitch(SwitchEntity):
+    """switch.homex_<room>_heating: the room's own heating — the Climate
+    page's per-room toggle. Off = Unheated, whatever its zone's mode."""
+
+    _attr_should_poll = False
+    _attr_icon = "mdi:radiator"
+
+    def __init__(self, hub: HomexHub, controller) -> None:
+        self._hub = hub
+        self._room_id = controller.room_id
+        self._heating = dict(controller._cfg(CONF_HEATING) or {})
+        self._attr_unique_id = f"{ROOM_HEATING_PREFIX}{self._room_id}"
+        self.entity_id = f"switch.homex_{self._room_id}_heating"
+        self._attr_name = hx_name("Climate", controller.room_name, "Chauffage")
+
+    @property
+    def is_on(self) -> bool:
+        return self._heating.get("enabled", True) is not False
+
+    async def _async_set(self, on: bool) -> None:
+        entry = self._hub.entry
+        sub = entry.subentries.get(self._hub.subentry_id(self._room_id) or "")
+        if sub is None:
+            return
+        data = dict(sub.data)
+        heating = dict(data.get(CONF_HEATING) or {})
+        heating["enabled"] = on
+        data[CONF_HEATING] = heating
+        self._heating = heating
+        self.async_write_ha_state()
+        # Same as the panel: saving the room reloads Homex, which re-applies
+        # the room's valves (Unheated / its zone's mode).
+        self.hass.config_entries.async_update_subentry(entry, sub, data=data)
+
+    async def async_turn_on(self, **kwargs) -> None:
+        await self._async_set(True)
+
+    async def async_turn_off(self, **kwargs) -> None:
+        await self._async_set(False)
 
 
 class RoomSwitch(SwitchEntity, RestoreEntity):

@@ -94,8 +94,7 @@ def system_entity_keys(system: dict) -> dict[str, list[tuple[str, str]]]:
     return {
         "binary_sensor": binary,
         "sensor": sensors,
-        "switch": [("aggressive", "Mode agressif")]
-        + ([("force", "Forçage manuel")] if stype == "buffer_tank" else []),
+        "switch": [("force", "Forçage manuel")] if stype == "buffer_tank" else [],
     }
 
 
@@ -241,19 +240,6 @@ class HeatingSystems:
             return 0
         min_s = float(system.get("min_runtime") or 0) * 60
         return max(0.0, round(min_s - (time.monotonic() - self._started[sid])))
-
-    async def async_set_aggressive(self, sid: str, on: bool) -> None:
-        """The system's agressive mode switch: persist it, then re-drive (off:
-        its scope goes back to the normal tolerance)."""
-        doc = await _doc(self.hass)
-        system = next((s for s in doc.get("systems", []) if s.get("id") == sid), None)
-        if system is None:
-            return
-        system["aggressive"] = bool(on)
-        await _save(self.hass)
-        if not on:
-            await self._async_tolerance(system, "normal")
-        await self.async_update()
 
     async def async_set_forced(self, sid: str, on: bool) -> None:
         """The buffer tank's manual force switch: persist it, then re-drive."""

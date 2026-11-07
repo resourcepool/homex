@@ -20,7 +20,7 @@ interface Day {
 
 /** Heating systems stats for the dashboard Climate tab: per boiler / buffer
  * tank, its live state, readings, rules against their thresholds, quick
- * switches (force, agressive mode) and its daily run time over 7 days (from
+ * switch (buffer tank force) and its daily run time over 7 days (from
  * the history of its dry contact / circulator). */
 @customElement("homex-heating-systems-card")
 export class HomexHeatingSystemsCard extends LitElement {
@@ -450,10 +450,7 @@ export class HomexHeatingSystemsCard extends LitElement {
             })}
           </div>`
         : nothing}
-      <div class="switches">
-        ${this._toggle(sys, "force", "Forçage manuel")}
-        ${this._toggle(sys, "aggressive", "Mode agressif")}
-      </div>
+      <div class="switches">${this._toggle(sys, "force", "Forçage manuel")}</div>
       ${this._renderChart(sys)}
     `;
   }
@@ -487,7 +484,6 @@ export class HomexHeatingSystemsCard extends LitElement {
           <div class="value">${Number.isNaN(today) ? "—" : this._dur(today)}</div>
         </div>
       </div>
-      <div class="switches">${this._toggle(sys, "aggressive", "Mode agressif")}</div>
       ${this._renderChart(sys)}
     `;
   }
