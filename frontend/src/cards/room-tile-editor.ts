@@ -57,6 +57,7 @@ export class HomexRoomTileEditor extends LitElement {
     const entity = this._config.entity || `switch.homex_${id}_lights_toggle`;
     const scenes = (room?.scenes ?? []).filter((s) => s.key !== "turn_off");
     const shown = this._config.scenes;
+    const climate = this._config.mode === "climate";
     return html`
       <label>
         Pièce Homex
@@ -65,7 +66,24 @@ export class HomexRoomTileEditor extends LitElement {
           ${this._rooms.map((r) => html`<option value=${r.room_id} ?selected=${r.room_id === id}>${r.name}</option>`)}
         </select>
       </label>
-      ${switches.length > 1
+      <label>
+        Variante
+        <select
+          @change=${(e: Event) => {
+            const v = (e.target as HTMLSelectElement).value;
+            // Climate: the heating switch; its own scenes / switch settings drop.
+            this._set(
+              v === "climate"
+                ? { mode: "climate", entity: undefined, show_scenes: undefined, scenes: undefined, scene_names: undefined }
+                : { mode: undefined, entity: undefined }
+            );
+          }}
+        >
+          <option value="default" ?selected=${!climate}>Défaut — lumières, qualité de l'air, volets, scènes</option>
+          <option value="climate" ?selected=${climate}>Climat — chauffage et consigne</option>
+        </select>
+      </label>
+      ${!climate && switches.length > 1
         ? html`<label>
             Interrupteur de la tuile
             <select
@@ -86,7 +104,7 @@ export class HomexRoomTileEditor extends LitElement {
           @change=${(e: Event) => this._set({ name: (e.target as HTMLInputElement).value })}
         />
       </label>
-      ${scenes.length > 1
+      ${!climate && scenes.length > 1
         ? html`<div class="toggle-row">
               <span>Afficher les scènes</span>
               <label class="switch">

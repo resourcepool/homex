@@ -20,6 +20,11 @@
  *                                        # with 2+ scenes only)
  *   scenes: [turn_on, film]              # optional: scene keys shown
  *   scene_names: { turn_on: Normal }     # optional: scene labels
+ *   mode: climate                        # optional variant (default: default)
+ *
+ * The "climate" variant toggles the room's heating (switch.homex_<room>_
+ * heating) instead of its lights, shows the radiators' setpoint, and leaves
+ * out air quality, shutters and scenes.
  */
 import { LitElement, css, html, nothing } from "lit";
 import { property, state } from "lit/decorators.js";
@@ -32,6 +37,9 @@ import {
   mdiLightbulbOnOutline,
   mdiLightbulbOutline,
   mdiPalette,
+  mdiRadiator,
+  mdiRadiatorOff,
+  mdiThermostat,
   mdiWindowShutter,
   mdiWindowShutterOpen,
 } from "@mdi/js";
@@ -60,6 +68,9 @@ export interface RoomTileConfig {
   scenes?: string[];
   /** Optional labels per scene key (default: the scene's name). */
   scene_names?: Record<string, string>;
+  /** Variant: "default" (lights, air, shutters, scenes) or "climate"
+   * (heating toggle and setpoint). */
+  mode?: "default" | "climate";
 }
 
 // A shutter half-way: frame + slats on the top half only.
@@ -110,8 +121,22 @@ export class HomexRoomTile extends LitElement {
     return { columns: "full", rows: "auto", min_columns: 6 };
   }
 
+  private get _climate() {
+    return this._config?.mode === "climate";
+  }
+
   private get _entity() {
-    return this._config!.entity || `switch.homex_${this._config!.room}_lights_toggle`;
+    return (
+      this._config!.entity ||
+      `switch.homex_${this._config!.room}_${this._climate ? "heating" : "lights_toggle"}`
+    );
+  }
+
+  /** The radiators' target temperature (the first valve's). */
+  private _setpoint(): number | undefined {
+    const valves = roomValves(this.hass, this._room).filter((v) => this.hass.states[v]);
+    const t = valves.length ? this.hass.states[valves[0]].attributes.temperature : undefined;
+    return typeof t === "number" ? t : undefined;
   }
 
   private get _isLights() {
@@ -183,7 +208,7 @@ export class HomexRoomTile extends LitElement {
   /** Air quality pills: CO₂, and the worst of PM2.5 / PM10 (vs. its
    * guideline). */
   private _air() {
-    if (!this.hass || !this._config) return [];
+    if (!this.hass || !this._config || this._climate) return [];
     const pill = (key: AirKey, label: string, path: string, tag = "") => {
       const m = roomMetric(this.hass, this._config!.room, key);
       return m && { key, label, path, tag, ...m, ...airLevel(key, m.value) };
@@ -195,7 +220,7 @@ export class HomexRoomTile extends LitElement {
   }
 
   private _scenes() {
-    if (!this._room || this._config?.show_scenes !== true) return [];
+    if (!this._room || this._climate || this._config?.show_scenes !== true) return [];
     if (!this._room.modules?.includes("lights")) return [];
     const all = (this._room.scenes ?? []).filter((s) => s.key !== "turn_off");
     if (all.length < 2) return []; // a single scene: the toggle is enough
@@ -218,6 +243,7 @@ export class HomexRoomTile extends LitElement {
   }
 
   private _shutterStatus() {
+    if (this._climate) return nothing;
     const covers = roomCovers(this._room)
       .map((c) => this.hass.states[c])
       .filter((st) => st && st.state !== "unavailable" && st.state !== "unknown");
@@ -240,8 +266,11 @@ export class HomexRoomTile extends LitElement {
     const on = st?.state === "on";
     const heating = this._entity.endsWith("_heating");
     const light = this._isLights ? this._lightState() : undefined;
-    const path =
-      light === "lit"
+    const path = this._climate
+      ? on
+        ? mdiRadiator
+        : mdiRadiatorOff
+      : light === "lit"
         ? mdiLightbulbOnOutline
         : light === "stray"
           ? mdiLightbulbAlertOutline
@@ -252,7 +281,11 @@ export class HomexRoomTile extends LitElement {
       ? "Introuvable"
       : st.state === "unavailable"
         ? "Indisponible"
-        : light === "lit"
+        : this._climate
+          ? on
+            ? "Pièce chauffée — ne plus chauffer"
+            : "Pièce non chauffée — chauffer"
+          : light === "lit"
           ? "Allumée — éteindre"
           : light === "stray"
             ? "Éteinte, mais au moins une lumière est allumée — allumer"
@@ -264,6 +297,7 @@ export class HomexRoomTile extends LitElement {
     const h = roomMetric(this.hass, this._config.room, "humidity");
     const air = this._air();
     const scenes = this._scenes();
+    const setpoint = this._climate && on && !missing ? this._setpoint() : undefined;
     const active =
       this._lightState() === "lit"
         ? this.hass.states[`switch.homex_${this._config.room}_lights_toggle`]?.attributes.active_scene
@@ -284,6 +318,15 @@ export class HomexRoomTile extends LitElement {
         <div class="info">
           <div class="name">${this._name()}</div>
           ${missing ? html`<div class="sub">${title}</div>` : nothing}
+          ${this._climate && !missing
+            ? html`<div class="sub setpoint">
+                ${on
+                  ? setpoint !== undefined
+                    ? html`${icon(mdiThermostat)}<span>Consigne ${fmt(this.hass, setpoint, 1, 1)} °C</span>`
+                    : "Pièce chauffée"
+                  : "Pièce non chauffée"}
+              </div>`
+            : nothing}
           ${air.length
             ? html`<div class="pills">
                 ${air.map(
@@ -390,6 +433,17 @@ export class HomexRoomTile extends LitElement {
       font-size: 12px;
       line-height: 16px;
       color: var(--secondary-text-color);
+    }
+    .setpoint {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 600;
+    }
+    .setpoint svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
     }
     .pills {
       display: flex;
