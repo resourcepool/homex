@@ -1,10 +1,10 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { mdiFire, mdiFireOff } from "@mdi/js";
+import { mdiAlert, mdiFire, mdiFireOff } from "@mdi/js";
 import type { HeatingZone, HomeAssistant, Room } from "../types";
 import { fireChanged } from "../types";
 import { errorMessage, fetchHeating, setHeatingEnabled, updateRoom } from "../api";
-import { radiatorClimate, roomIsHeating, roomZoneMode } from "../lib/climate";
+import { radiatorClimate, roomIsHeating, roomZoneMode, stuckWarning } from "../lib/climate";
 import { toggleSwitch } from "../lib/fields";
 import { sharedStyles } from "../lib/styles";
 import "./homex-select";
@@ -81,6 +81,11 @@ export class HomexClimateDashboard extends LitElement {
         width: 14px;
         height: 14px;
         fill: currentColor;
+      }
+      .pill.warning {
+        color: var(--warning-color, #ffa600);
+        background: color-mix(in srgb, var(--warning-color, #ffa600) 16%, transparent);
+        cursor: help;
       }
       .pill.heating {
         color: var(--state-climate-heat-color, #ff8100);
@@ -346,6 +351,10 @@ export class HomexClimateDashboard extends LitElement {
     const num = (v: unknown) => (typeof v === "number" ? [v] : []);
     // Setpoint: the valves' targets (off valves have none).
     const targets = valves.filter((st) => st.state !== "off").flatMap((st) => num(st.attributes.temperature));
+    // "coupé" only when the valves are actually off (Unheated without a
+    // setpoint, heating disabled…); an Unheated setpoint shows its value.
+    const cut = valves.length > 0 && valves.every((st) => st.state === "off");
+    const setpoint = targets.length ? this._fmt(targets) : cut ? "coupé" : "—";
     // Current temperature: the room's reference sensor, else the valves'.
     const ref = this.hass.states[`sensor.homex_${r.room_id}_temperature`];
     const refValue = parseFloat(ref?.state);
@@ -354,6 +363,7 @@ export class HomexClimateDashboard extends LitElement {
       : `${refValue} °C`;
     const zm = roomZoneMode(this.hass, r);
     const heating = roomIsHeating(this.hass, r);
+    const stuck = stuckWarning(this.hass, r);
     const busy = this._roomBusy.has(r.room_id);
     return html`<div class="room ${on ? "" : "off"}">
       <label class="room-switch" title=${radiators.length ? "Chauffage de la pièce" : "Aucun radiateur"}>
@@ -366,13 +376,18 @@ export class HomexClimateDashboard extends LitElement {
         </div>
       </div>
       <div class="temps">
-        <span title="Consigne">🎯 ${on && targets.length ? this._fmt(targets) : on ? "—" : "coupé"}</span>
+        <span title="Consigne">🎯 ${setpoint}</span>
         <span title="Température actuelle">🌡 ${current}</span>
       </div>
       ${radiators.length
         ? html`<span class="pill ${heating ? "heating" : ""}">
             <svg viewBox="0 0 24 24"><path d=${heating ? mdiFire : mdiFireOff}></path></svg>
             ${heating ? "Heating" : "Idle"}
+          </span>`
+        : ""}
+      ${stuck
+        ? html`<span class="pill warning" title=${stuck}>
+            <svg viewBox="0 0 24 24"><path d=${mdiAlert}></path></svg>Vanne ?
           </span>`
         : ""}
     </div>`;

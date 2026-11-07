@@ -8,7 +8,7 @@ import type {
 } from "../types";
 import { fireChanged } from "../types";
 import { errorMessage, fetchHeating, updateRoom } from "../api";
-import { radiatorClimate } from "../lib/climate";
+import { radiatorClimate, valveStuck } from "../lib/climate";
 import { navigate } from "../lib/router";
 import { sharedStyles } from "../lib/styles";
 import "./homex-radiator-dialog";
@@ -148,6 +148,10 @@ export class HomexRoomClimate extends LitElement {
         font-size: 14px;
         white-space: nowrap;
       }
+      .warning {
+        color: var(--warning-color, #ffa600);
+        cursor: help;
+      }
       .heating {
         color: var(--state-climate-heat-color, #ff8100);
         font-weight: 500;
@@ -280,6 +284,13 @@ export class HomexRoomClimate extends LitElement {
       </div>
       <span class=${action === "heating" ? "heating" : "muted"}>
         ${!st || st.state === "unavailable" ? "Indisponible" : ACTION_LABELS[action] ?? action}
+        ${valveStuck(st)
+          ? html`<span
+              class="warning"
+              title="Chauffe alors que la température dépasse la consigne : vanne bloquée ouverte ou état non rafraîchi — vérifie le radiateur."
+              >⚠</span
+            >`
+          : ""}
       </span>
       <div class="temps">
         <span title="Température de consigne">🎯 ${fmt(a.temperature)}</span>

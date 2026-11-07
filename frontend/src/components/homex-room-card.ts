@@ -13,6 +13,7 @@ import {
   mdiThemeLightDark,
   mdiFire,
   mdiFireOff,
+  mdiAlert,
   mdiHomeThermometer,
 } from "@mdi/js";
 import type {
@@ -38,7 +39,7 @@ import {
   syncLabels,
 } from "../api";
 import { resolveSwitchPreset } from "../lib/device";
-import { roomIsHeating, roomZoneMode } from "../lib/climate";
+import { roomIsHeating, roomZoneMode, stuckWarning } from "../lib/climate";
 import { openHaPage } from "../lib/router";
 import { defaultShutterGroup, shutterSummary } from "../lib/shutter";
 import { sharedStyles } from "../lib/styles";
@@ -310,6 +311,11 @@ export class HomexRoomCard extends LitElement {
         width: 15px;
         height: 15px;
         fill: currentColor;
+      }
+      .icon-stat.warning {
+        color: var(--warning-color, #ffa600);
+        background: color-mix(in srgb, var(--warning-color, #ffa600) 16%, transparent);
+        cursor: help;
       }
       .icon-stat.heating {
         color: var(--state-climate-heat-color, #ff8100);
@@ -787,6 +793,7 @@ export class HomexRoomCard extends LitElement {
    * one valve heats (Idle otherwise; none without radiators). */
   private _climatePills(r: Room) {
     const zm = roomZoneMode(this.hass, r);
+    const stuck = stuckWarning(this.hass, r);
     const pill = (icon: string, value: string, title: string, cls = "") =>
       html`<span class="stat icon-stat ${cls}" title=${title}>
         <svg viewBox="0 0 24 24"><path d=${icon}></path></svg>${value}
@@ -804,6 +811,7 @@ export class HomexRoomCard extends LitElement {
           ? pill(mdiFire, "Heating", "Au moins une vanne chauffe", "heating")
           : pill(mdiFireOff, "Idle", "Aucune vanne ne chauffe")
         : ""}
+      ${stuck ? pill(mdiAlert, "Vanne ?", stuck, "warning") : ""}
     `;
   }
 

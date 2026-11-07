@@ -8,6 +8,45 @@ export function radiatorClimate(hass: HomeAssistant, deviceId: string): string |
     .sort((a, b) => a.length - b.length)[0];
 }
 
+/** Margin above the setpoint past which a heating valve is suspicious. */
+const STUCK_MARGIN = 0.5;
+
+/** A valve that reports heating while its (reference) temperature is
+ * already above its setpoint: stuck valve or stale running state. */
+export function valveStuck(st: any): boolean {
+  const a = st?.attributes ?? {};
+  const target = Number(a.temperature);
+  const current = Number(a.current_temperature);
+  return (
+    a.hvac_action === "heating" &&
+    a.temperature != null &&
+    a.current_temperature != null &&
+    !Number.isNaN(target) &&
+    !Number.isNaN(current) &&
+    current >= target + STUCK_MARGIN
+  );
+}
+
+/** Names of the room's valves heating above their setpoint. */
+export function roomStuckValves(hass: HomeAssistant, room: Room): string[] {
+  return (room.heating?.radiators ?? []).flatMap((rad) => {
+    const climate = radiatorClimate(hass, rad.device_id);
+    const st = climate ? hass.states[climate] : undefined;
+    if (!valveStuck(st)) return [];
+    const dev = (hass as any).devices?.[rad.device_id];
+    return [dev?.name_by_user || dev?.name || st.attributes?.friendly_name || climate!];
+  });
+}
+
+/** Warning tooltip for the room's stuck valves ("" when none). */
+export function stuckWarning(hass: HomeAssistant, room: Room): string {
+  const names = roomStuckValves(hass, room);
+  return names.length
+    ? `Chauffe alors que la température dépasse la consigne : ${names.join(", ")}. ` +
+        "Vanne bloquée ouverte ou état non rafraîchi — vérifie le radiateur."
+    : "";
+}
+
 /** A room heats as soon as one of its valves does. */
 export function roomIsHeating(hass: HomeAssistant, room: Room): boolean {
   return (room.heating?.radiators ?? []).some((rad) => {

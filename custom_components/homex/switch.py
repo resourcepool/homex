@@ -24,7 +24,13 @@ async def async_setup_entry(
     await _doc(hass)  # the heating switch reads the heating document
     heating = hass.data[DOMAIN][HEATING_SWITCH] = HeatingEnabledSwitch()
     async_add_entities([heating])
-    entry.async_on_unload(lambda: hass.data[DOMAIN].pop(HEATING_SWITCH, None))
+
+    @callback
+    def _forget_switch() -> None:
+        # Must return None: HA schedules any returned value as a coroutine.
+        hass.data[DOMAIN].pop(HEATING_SWITCH, None)
+
+    entry.async_on_unload(_forget_switch)
     for room_id, controller in hub.controllers.items():
         if not controller.lights_enabled:
             continue
