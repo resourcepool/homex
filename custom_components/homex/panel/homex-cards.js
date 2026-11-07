@@ -1218,12 +1218,11 @@ et = Z, et.styles = o`
     ha-card {
       height: 100%;
       box-sizing: border-box;
-      padding: 10px 6px 10px 10px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      gap: 8px;
+      overflow: hidden;
     }
     ha-card.empty {
       padding: 16px;
@@ -1234,6 +1233,7 @@ et = Z, et.styles = o`
       align-items: center;
       gap: 10px;
       min-width: 0;
+      padding: 10px 6px 10px 10px;
     }
     .icon {
       flex: none;
@@ -1375,16 +1375,18 @@ et = Z, et.styles = o`
       line-height: 16px;
       color: var(--secondary-text-color);
     }
+    /* The scenes row: past a divider, flush with the card's right and bottom
+       edges (the button group ends where the card does). */
     .scenes {
       display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 6px;
+      align-items: stretch;
+      border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
       cursor: default;
     }
     .scenes-icon {
       flex: none;
-      width: 36px;
+      width: 56px;
+      align-items: center;
       display: flex;
       justify-content: center;
       color: var(--secondary-text-color);
@@ -1398,15 +1400,12 @@ et = Z, et.styles = o`
       flex: 1;
       min-width: 0;
       display: flex;
-      margin-right: 4px;
-      border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.35));
-      border-radius: 10px;
-      overflow: hidden;
+      border-left: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
     }
     .scene {
       flex: 1 1 0;
       min-width: 0;
-      min-height: 38px;
+      min-height: 42px;
       padding: 4px 6px;
       font: inherit;
       font-size: 13px;
@@ -1415,7 +1414,7 @@ et = Z, et.styles = o`
       overflow: hidden;
       text-overflow: ellipsis;
       border: none;
-      border-left: 1px solid var(--divider-color, rgba(127, 127, 127, 0.35));
+      border-left: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
       background: none;
       color: var(--primary-text-color);
       cursor: pointer;
