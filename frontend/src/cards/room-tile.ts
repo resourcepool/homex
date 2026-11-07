@@ -292,7 +292,7 @@ export class HomexRoomTile extends LitElement {
         </div>
         ${hasRight
           ? html`<button class="right" title="État de la pièce" @click=${this._openDetail}>
-              <span class="statuses">${heatingS}${shutterS}</span>
+              <span class="statuses">${shutterS}${heatingS}</span>
               ${t || h
                 ? html`<span class="readings">
                     ${t ? html`<span class="temp">${fmt(this.hass, t.value, 1, 1)} ${t.unit ?? "°C"}</span>` : nothing}
@@ -303,7 +303,7 @@ export class HomexRoomTile extends LitElement {
           : nothing}
       </div>
       ${scenes.length
-        ? html`<div class="scenes">
+        ? html`<div class="scenes" @click=${(e: Event) => e.stopPropagation()}>
             <span class="scenes-icon" title="Scènes">${icon(mdiPalette)}</span>
             <div class="group">
             ${scenes.map(
@@ -490,6 +490,8 @@ export class HomexRoomTile extends LitElement {
       display: flex;
       align-items: center;
       gap: 10px;
+      margin-top: 6px;
+      cursor: default;
     }
     .scenes-icon {
       flex: none;

@@ -251,6 +251,13 @@ class RoomSwitch(SwitchEntity, RestoreEntity):
         self._active_scene = key
         self.async_write_ha_state()
 
+    @callback
+    def set_on_scene(self, key: str | None) -> None:
+        """On with this active scene, in one state write."""
+        self._attr_is_on = True
+        self._active_scene = key
+        self.async_write_ha_state()
+
     async def async_turn_on(self, **kwargs) -> None:
         self._attr_is_on = True
         self.async_write_ha_state()

@@ -1189,14 +1189,14 @@ var et, tt = "M3 4H21V6H20V20H18V6H6V20H4V6H3V4M7 7H17V9H7V7M7 10H17V12H7V10M7 1
               </div>` : j}
         </div>
         ${ee ? k`<button class="right" title="État de la pièce" @click=${this._openDetail}>
-              <span class="statuses">${f}${p}</span>
+              <span class="statuses">${p}${f}</span>
               ${s || c ? k`<span class="readings">
                     ${s ? k`<span class="temp">${K(this.hass, s.value, 1, 1)} ${s.unit ?? "°C"}</span>` : j}
                     ${c ? k`<span class="hum">${K(this.hass, c.value, 0)} %</span>` : j}
                   </span>` : j}
             </button>` : j}
       </div>
-      ${u.length ? k`<div class="scenes">
+      ${u.length ? k`<div class="scenes" @click=${(e) => e.stopPropagation()}>
             <span class="scenes-icon" title="Scènes">${q(ze)}</span>
             <div class="group">
             ${u.map((e) => k`<button
@@ -1379,6 +1379,8 @@ et = Z, et.styles = o`
       display: flex;
       align-items: center;
       gap: 10px;
+      margin-top: 6px;
+      cursor: default;
     }
     .scenes-icon {
       flex: none;

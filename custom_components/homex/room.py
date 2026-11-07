@@ -747,11 +747,16 @@ class RoomController:
         if active_key and self._active_scene_key is None:
             self._update_active(active_key)
 
-    def _update_active(self, key: str | None) -> None:
-        """Record the active scene and expose it on the room switch."""
+    def _update_active(self, key: str | None, on: bool = False) -> None:
+        """Record the active scene and expose it on the room switch (on: also
+        reflect the room on, in the same state write — no "on without a
+        scene" step)."""
         self._active_scene_key = key
         if self._room_switch is not None:
-            self._room_switch.set_active_scene(key)
+            if on:
+                self._room_switch.set_on_scene(key)
+            else:
+                self._room_switch.set_active_scene(key)
 
     async def async_room_on(self) -> None:
         """Room turned on → apply the scene chosen by the strategy.
@@ -949,9 +954,7 @@ class RoomController:
 
         self._last_scene_key = keys[index]
         # Reflect "on" on the room switch without re-applying the on scene.
-        if self._room_switch is not None:
-            self._room_switch.set_is_on(True)
-        self._update_active(keys[index])
+        self._update_active(keys[index], on=True)
         _LOGGER.debug("[%s] scene switch -> %s", self.room_id, scenes[index])
         await self.hass.services.async_call(
             "scene",
@@ -995,9 +998,7 @@ class RoomController:
             return
         entity_id = self.scene_entities()[keys.index(key)]
         self._last_scene_key = key
-        if self._room_switch is not None:
-            self._room_switch.set_is_on(True)
-        self._update_active(key)
+        self._update_active(key, on=True)
         _LOGGER.debug("[%s] scene trigger -> %s", self.room_id, entity_id)
         await self.hass.services.async_call(
             "scene",
