@@ -1,5 +1,19 @@
 // Thin client over the Homex WebSocket API.
-import type { HomeAssistant, Room, SwitchLayout, TriggerSpec } from "./types";
+import type {
+  HeatingApplyResult,
+  HeatingDevicePreset,
+  HeatingGroup,
+  HeatingModel,
+  HeatingPreset,
+  HeatingSystem,
+  HeatingZone,
+  HomeAssistant,
+  Room,
+  RoomHeating,
+  RoomMetrics,
+  SwitchLayout,
+  TriggerSpec,
+} from "./types";
 
 export const fetchLayouts = async (
   hass: HomeAssistant
@@ -73,6 +87,8 @@ export interface RoomCreate {
   room_id: string;
   area_id?: string | null;
   modules?: string[];
+  heating?: RoomHeating;
+  metrics?: RoomMetrics;
   devices?: string[];
   scene_strategy?: "recall_first" | "recall_last";
 }
@@ -91,6 +107,8 @@ export interface RoomUpdate {
   room_id?: string;
   area_id?: string | null;
   modules?: string[];
+  heating?: RoomHeating;
+  metrics?: RoomMetrics;
   devices?: string[];
   // Triggers: {entity_id} (state change) or {device_id} (device action).
   triggers?: TriggerSpec[];
@@ -236,3 +254,74 @@ export const renameScene = (
 
 export const errorMessage = (err: any): string =>
   (err && (err.message || err.code)) || String(err);
+
+export const fetchHeating = async (
+  hass: HomeAssistant
+): Promise<{
+  presets: HeatingPreset[];
+  groups: HeatingGroup[];
+  device_presets: HeatingDevicePreset[];
+  zones: HeatingZone[];
+  enabled: boolean; // global heating switch
+  systems: HeatingSystem[];
+}> =>
+  hass.callWS({ type: "homex/heating" });
+export const saveHeatingPreset = (
+  hass: HomeAssistant,
+  preset: Pick<HeatingPreset, "id" | "name">,
+  create: boolean
+) => hass.callWS({ type: "homex/heating/preset/save", preset, create });
+export const deleteHeatingPreset = (hass: HomeAssistant, preset_id: string) =>
+  hass.callWS({ type: "homex/heating/preset/delete", preset_id });
+export const saveHeatingGroup = (
+  hass: HomeAssistant,
+  group: Omit<HeatingGroup, "builtin">,
+  create: boolean
+) => hass.callWS({ type: "homex/heating/group/save", group, create });
+export const deleteHeatingGroup = (hass: HomeAssistant, group_id: string) =>
+  hass.callWS({ type: "homex/heating/group/delete", group_id });
+export const fetchHeatingModels = async (
+  hass: HomeAssistant
+): Promise<HeatingModel[]> =>
+  (await hass.callWS({ type: "homex/heating/models" })).models || [];
+export const saveHeatingDevicePreset = async (
+  hass: HomeAssistant,
+  preset: HeatingDevicePreset,
+  create: boolean
+): Promise<HeatingApplyResult[]> =>
+  (await hass.callWS({ type: "homex/heating/device_preset/save", preset, create }))
+    .results || [];
+export const deleteHeatingDevicePreset = (hass: HomeAssistant, preset_id: string) =>
+  hass.callWS({ type: "homex/heating/device_preset/delete", preset_id });
+export const applyHeatingDevicePreset = async (
+  hass: HomeAssistant,
+  preset_id: string
+): Promise<HeatingApplyResult[]> =>
+  (await hass.callWS({ type: "homex/heating/device_preset/apply", preset_id }))
+    .results || [];
+export const saveHeatingZone = (
+  hass: HomeAssistant,
+  zone: Pick<HeatingZone, "id" | "name" | "rooms" | "triggers">,
+  create: boolean
+) => hass.callWS({ type: "homex/heating/zone/save", zone, create });
+export const deleteHeatingZone = (hass: HomeAssistant, zone_id: string) =>
+  hass.callWS({ type: "homex/heating/zone/delete", zone_id });
+export const setHeatingZoneMode = (
+  hass: HomeAssistant,
+  zone_id: string,
+  mode_id: string
+) => hass.callWS({ type: "homex/heating/zone/set_mode", zone_id, mode_id });
+export const setRoomHeatingZone = (
+  hass: HomeAssistant,
+  room_id: string,
+  zone_id: string
+) => hass.callWS({ type: "homex/heating/room_zone", room_id, zone_id });
+export const setHeatingEnabled = (hass: HomeAssistant, enabled: boolean) =>
+  hass.callWS({ type: "homex/heating/enabled", enabled });
+export const saveHeatingSystem = (
+  hass: HomeAssistant,
+  system: HeatingSystem,
+  create: boolean
+) => hass.callWS({ type: "homex/heating/system/save", system, create });
+export const deleteHeatingSystem = (hass: HomeAssistant, system_id: string) =>
+  hass.callWS({ type: "homex/heating/system/delete", system_id });

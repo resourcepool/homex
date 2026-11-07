@@ -21,6 +21,8 @@ export class HomexUnitControls extends LitElement {
   @property({ attribute: false }) activeScene?: string;
   // Hide the on/off bulb (e.g. a room whose lights module is disabled).
   @property({ type: Boolean }) hideToggle = false;
+  // Short live readings shown right of the name, stacked (e.g. 21.5 °C, 48 %).
+  @property({ attribute: false }) info: string[] = [];
 
   static styles = [
     sharedStyles,
@@ -70,6 +72,15 @@ export class HomexUnitControls extends LitElement {
         flex-direction: column;
         gap: 2px;
         min-width: 0;
+      }
+      .info {
+        display: flex;
+        flex-direction: column;
+        flex: none;
+        font-size: 11px;
+        line-height: 1.3;
+        color: var(--secondary-text-color);
+        white-space: nowrap;
       }
       .line1 {
         display: flex;
@@ -184,6 +195,9 @@ export class HomexUnitControls extends LitElement {
               : ""}
           </div>
         </div>
+        ${this.info.length
+          ? html`<div class="info">${this.info.map((v) => html`<span>${v}</span>`)}</div>`
+          : ""}
       </div>
     `;
   }

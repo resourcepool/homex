@@ -6,6 +6,7 @@ import type { DeviceTrigger } from "../api";
 import { fetchDeviceTriggers } from "../api";
 import { TRIGGER_DOMAINS } from "../lib/domains";
 import "./homex-device-field";
+import "./homex-select";
 
 /**
  * Trigger list styled after Home Assistant's automation editor: an
@@ -88,7 +89,6 @@ export class HomexTriggerSelector extends LitElement {
       display: block;
       width: 100%;
     }
-    select.native,
     input.native {
       width: 100%;
       box-sizing: border-box;
@@ -100,8 +100,7 @@ export class HomexTriggerSelector extends LitElement {
       background: var(--input-fill-color, rgba(225, 225, 225, 0.06));
       color: var(--primary-text-color);
     }
-    input.native:focus,
-    select.native:focus {
+    input.native:focus {
       outline: none;
       border-bottom: 2px solid var(--primary-color, #009ac7);
     }
@@ -302,27 +301,30 @@ export class HomexTriggerSelector extends LitElement {
     const ids = Object.keys(this.hass.states)
       .filter((id) => TRIGGER_DOMAINS.includes(id.split(".")[0]))
       .sort();
-    return html`<select class="native" @change=${(e: Event) => onChange((e.target as HTMLSelectElement).value)}>
-      <option value="">Sélectionnez une entité</option>
-      ${ids.map(
-        (id) => html`<option value=${id} ?selected=${id === value}>
-          ${this.hass.states[id]?.attributes?.friendly_name || id}
-        </option>`
-      )}
-    </select>`;
+    return html`<homex-select
+      placeholder="Sélectionnez une entité"
+      .value=${value ?? ""}
+      .options=${ids.map((id) => ({
+        value: id,
+        label: this.hass.states[id]?.attributes?.friendly_name || id,
+        secondary: id,
+      }))}
+      @value-changed=${(e: CustomEvent) => onChange(e.detail.value)}
+    ></homex-select>`;
   }
 
   private _entityTypeField(cfg: TriggerSpec, i: number) {
     const t = this._entityType(cfg);
     return html`<label class="field"><span>Type</span>
-      <select
-        class="native"
-        @change=${(e: Event) =>
-          this._setEntityType(i, cfg, (e.target as HTMLSelectElement).value as "state" | "numeric")}
-      >
-        <option value="state" ?selected=${t === "state"}>État</option>
-        <option value="numeric" ?selected=${t === "numeric"}>État numérique</option>
-      </select>
+      <homex-select
+        .value=${t}
+        .options=${[
+          { value: "state", label: "État" },
+          { value: "numeric", label: "État numérique" },
+        ]}
+        @value-changed=${(e: CustomEvent) =>
+          this._setEntityType(i, cfg, e.detail.value as "state" | "numeric")}
+      ></homex-select>
     </label>`;
   }
 
@@ -331,14 +333,12 @@ export class HomexTriggerSelector extends LitElement {
     const attrs = Object.keys(this.hass.states[id]?.attributes || {});
     const cur = cfg.attribute || "";
     return html`<label class="field"><span>Attribut (facultatif)</span>
-      <select
-        class="native"
-        @change=${(e: Event) =>
-          this._setKey(i, cfg, "attribute", (e.target as HTMLSelectElement).value)}
-      >
-        <option value="" ?selected=${!cur}>(état de l'entité)</option>
-        ${attrs.map((a) => html`<option value=${a} ?selected=${a === cur}>${a}</option>`)}
-      </select>
+      <homex-select
+        placeholder="(état de l'entité)"
+        .value=${cur}
+        .options=${attrs.map((a) => ({ value: a, label: a }))}
+        @value-changed=${(e: CustomEvent) => this._setKey(i, cfg, "attribute", e.detail.value)}
+      ></homex-select>
     </label>`;
   }
 
@@ -451,19 +451,15 @@ export class HomexTriggerSelector extends LitElement {
   private _actionField(cfg: TriggerSpec, i: number) {
     const list = this._devTriggers[cfg.device_id] || [];
     const current = this._deviceTriggerIndex(cfg);
-    return html`<select
-      class="native"
-      @change=${(e: Event) => {
-        const idx = Number((e.target as HTMLSelectElement).value);
-        const chosen = (this._devTriggers[cfg.device_id] || [])[idx];
+    return html`<homex-select
+      placeholder="Sélectionnez une action"
+      .value=${current >= 0 ? String(current) : ""}
+      .options=${list.map((d, idx) => ({ value: String(idx), label: d.label }))}
+      @value-changed=${(e: CustomEvent) => {
+        const chosen = (this._devTriggers[cfg.device_id] || [])[Number(e.detail.value)];
         if (chosen) this._update(i, { ...chosen.trigger });
       }}
-    >
-      <option value="-1" ?selected=${current < 0}>Sélectionnez une action</option>
-      ${list.map(
-        (d, idx) => html`<option value=${idx} ?selected=${idx === current}>${d.label}</option>`
-      )}
-    </select>`;
+    ></homex-select>`;
   }
 
   private _card(cfg: TriggerSpec, i: number) {

@@ -3,6 +3,43 @@ import { css } from "lit";
 // Styles shared across Homex panel components (buttons, edit blocks, fields).
 // Sizing follows Material Design density (comfortable touch targets, spacing).
 export const sharedStyles = css`
+  /* On/off toggle switch (see toggleSwitch in lib/fields). */
+  .toggle {
+    position: relative;
+    display: inline-block;
+    flex: 0 0 auto;
+    width: 42px;
+    height: 24px;
+    border-radius: 12px;
+    background: var(--switch-unchecked-track-color, #bdbdbd);
+    transition: background 0.2s;
+    vertical-align: middle;
+  }
+  .toggle.on {
+    background: var(--switch-checked-track-color, var(--primary-color));
+  }
+  .toggle input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .toggle .knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s;
+    pointer-events: none;
+  }
+  .toggle.on .knob {
+    transform: translateX(18px);
+  }
   button {
     cursor: pointer;
     border: none;

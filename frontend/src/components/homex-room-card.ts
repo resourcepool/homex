@@ -11,6 +11,9 @@ import {
   mdiPencil,
   mdiPin,
   mdiThemeLightDark,
+  mdiFire,
+  mdiFireOff,
+  mdiHomeThermometer,
 } from "@mdi/js";
 import type {
   DevicePreset,
@@ -35,6 +38,7 @@ import {
   syncLabels,
 } from "../api";
 import { resolveSwitchPreset } from "../lib/device";
+import { roomIsHeating, roomZoneMode } from "../lib/climate";
 import { openHaPage } from "../lib/router";
 import { defaultShutterGroup, shutterSummary } from "../lib/shutter";
 import { sharedStyles } from "../lib/styles";
@@ -46,6 +50,7 @@ import "./homex-group-dialog";
 import "./homex-scene-dialog";
 import "./homex-shutter-group-dialog";
 import "./homex-shutter-control-dialog";
+import "./homex-room-climate";
 import "./homex-switch-mapping";
 
 type DialogKind = "" | "room" | "triggers" | "addgroup" | "addscene" | "delete";
@@ -295,6 +300,20 @@ export class HomexRoomCard extends LitElement {
         background: var(--secondary-background-color, #f0f0f0);
         border-radius: 14px;
         padding: 4px 12px;
+      }
+      .icon-stat {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .icon-stat svg {
+        width: 15px;
+        height: 15px;
+        fill: currentColor;
+      }
+      .icon-stat.heating {
+        color: var(--state-climate-heat-color, #ff8100);
+        background: color-mix(in srgb, var(--state-climate-heat-color, #ff8100) 16%, transparent);
       }
       .section-row {
         display: flex;
@@ -646,6 +665,7 @@ export class HomexRoomCard extends LitElement {
     const lightsOn = r.modules?.includes("lights") ?? true;
     const switchesOn = r.modules?.includes("switches") ?? false;
     const shuttersOn = r.modules?.includes("shutters") ?? false;
+    const climateOn = r.modules?.includes("heating") ?? false; // Climate module
     const hasDim = !!(r.dim_up_triggers?.length || r.dim_down_triggers?.length);
     return html`
       <ha-card class=${this.expanded ? "selected" : ""}>
@@ -660,6 +680,7 @@ export class HomexRoomCard extends LitElement {
             .floorName=${floorName}
             .activeScene=${activeScene}
             .hideToggle=${!lightsOn}
+            .info=${climateOn ? this._climateReadings(r) : []}
           ></homex-unit-controls>
           <div class="head-actions">
             ${lightsOn && hasDim
@@ -731,7 +752,9 @@ export class HomexRoomCard extends LitElement {
             `
           : ""}
 
-        ${this.expanded ? this._renderStats(r, lightsOn, switchesOn, shuttersOn) : ""}
+        ${this.expanded
+          ? this._renderStats(r, lightsOn, switchesOn, shuttersOn, climateOn)
+          : ""}
         ${this.expanded
           ? this._renderBody(
               r,
@@ -740,12 +763,49 @@ export class HomexRoomCard extends LitElement {
               pinned,
               lightsOn,
               switchesOn,
-              shuttersOn
+              shuttersOn,
+              climateOn
             )
           : ""}
       </ha-card>
 
       ${this._renderDialogs(r)}
+    `;
+  }
+
+  /** The room's reference temperature and humidity (Climate metrics). */
+  private _climateReadings(r: Room): string[] {
+    return (["temperature", "humidity"] as const)
+      .filter((m) => r.metrics?.[m]?.sensors?.length)
+      .map((m) => {
+        const st = this.hass.states[`sensor.homex_${r.room_id}_${m}`];
+        if (!st || st.state === "unknown" || st.state === "unavailable") return "—";
+        const unit = st.attributes?.unit_of_measurement ?? "";
+        return `${st.state}${unit === "%" ? "" : " "}${unit}`;
+      });
+  }
+
+  /** Heating status pills: the zone's active mode, and Heating as soon as
+   * one valve heats (Idle otherwise; none without radiators). */
+  private _climatePills(r: Room) {
+    const zm = roomZoneMode(this.hass, r);
+    const pill = (icon: string, value: string, title: string, cls = "") =>
+      html`<span class="stat icon-stat ${cls}" title=${title}>
+        <svg viewBox="0 0 24 24"><path d=${icon}></path></svg>${value}
+      </span>`;
+    return html`
+      ${zm
+        ? pill(
+            mdiHomeThermometer,
+            zm.mode,
+            zm.own ? "Chauffage désactivé dans la pièce" : `Mode de la zone ${zm.zone}`
+          )
+        : ""}
+      ${r.heating?.radiators?.length
+        ? roomIsHeating(this.hass, r)
+          ? pill(mdiFire, "Heating", "Au moins une vanne chauffe", "heating")
+          : pill(mdiFireOff, "Idle", "Aucune vanne ne chauffe")
+        : ""}
     `;
   }
 
@@ -755,8 +815,10 @@ export class HomexRoomCard extends LitElement {
     r: Room,
     lightsOn: boolean,
     switchesOn: boolean,
-    shuttersOn: boolean
+    shuttersOn: boolean,
+    climateOn: boolean
   ) {
+    const metrics = Object.values(r.metrics ?? {}).filter((m) => m?.sensors?.length).length;
     return html`
       ${lightsOn
         ? html`
@@ -788,6 +850,16 @@ export class HomexRoomCard extends LitElement {
             </div>
           `
         : ""}
+      ${climateOn
+        ? html`
+            <div class="module-title">Climate</div>
+            <div class="stats">
+              <span class="stat">📈 ${metrics} métrique(s)</span>
+              <span class="stat">🔥 ${r.heating?.radiators?.length ?? 0} radiateur(s)</span>
+              ${this._climatePills(r)}
+            </div>
+          `
+        : ""}
     `;
   }
 
@@ -798,12 +870,14 @@ export class HomexRoomCard extends LitElement {
     pinned: Scene[],
     lightsOn: boolean,
     switchesOn: boolean,
-    shuttersOn: boolean
+    shuttersOn: boolean,
+    climateOn: boolean
   ) {
     const tabs: { key: string; label: string }[] = [];
     if (lightsOn) tabs.push({ key: "lights", label: "Lights" });
     if (switchesOn) tabs.push({ key: "switches", label: "Switches" });
     if (shuttersOn) tabs.push({ key: "shutters", label: "Shutters" });
+    if (climateOn) tabs.push({ key: "climate", label: "Climate" });
     if (!tabs.length) {
       return html`<div class="empty-body">Aucun module actif sur cette pièce.</div>`;
     }
@@ -825,7 +899,9 @@ export class HomexRoomCard extends LitElement {
           ? this._renderLightsTab(r, activeKey, orderable, pinned)
           : active === "switches"
             ? this._renderSwitchesTab(r)
-            : this._renderShuttersTab(r)}
+            : active === "climate"
+              ? html`<homex-room-climate .hass=${this.hass} .room=${r}></homex-room-climate>`
+              : this._renderShuttersTab(r)}
       </div>
     `;
   }

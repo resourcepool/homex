@@ -16,3 +16,19 @@ export const textField = (
     @input=${(e: Event) => onInput((e.target as HTMLInputElement).value)}
   />
 </div>`;
+
+/** An on/off toggle switch (styled by sharedStyles' .toggle). Put it inside a
+ * <label> so clicking the label text toggles it too. */
+export const toggleSwitch = (
+  checked: boolean,
+  onChange: (checked: boolean) => void,
+  disabled = false
+) => html`<span class="toggle ${checked ? "on" : ""}">
+  <input
+    type="checkbox"
+    .checked=${checked}
+    ?disabled=${disabled}
+    @change=${(e: Event) => onChange((e.target as HTMLInputElement).checked)}
+  />
+  <span class="knob"></span>
+</span>`;

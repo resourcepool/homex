@@ -16,6 +16,9 @@ from .const import (
     SHUTTER_MOTION,
     Z2M_BRIDGE,
 )
+from .heating import ENFORCER, RadiatorEnforcer
+from .heating_systems import systems_manager
+from .heating_zones import zones_manager
 from .room import HomexHub
 from .shutter import ShutterMotion
 from .z2m import Z2MBridge
@@ -52,6 +55,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Seed scenes and wire each room's trigger automations.
     await hub.async_start()
+    # Heating zones: per-mode triggers.
+    await zones_manager(hass).async_wire_triggers()
+    # Heating rooms: keep their radiators on their device preset.
+    enforcer = RadiatorEnforcer(hass, entry)
+    enforcer.start()
+    domain_data[ENFORCER] = enforcer
+    entry.async_on_unload(enforcer.stop)
+    # Heating systems: boilers' dry contacts follow the heating demand.
+    systems = systems_manager(hass)
+    systems.start()
+    entry.async_on_unload(systems.stop)
+    await systems.async_update()
 
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
     return True
@@ -62,6 +77,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hub: HomexHub | None = hass.data[DOMAIN].get(HUB_DATA)
     if hub is not None:
         await hub.async_stop()
+    await zones_manager(hass).async_stop()
 
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:

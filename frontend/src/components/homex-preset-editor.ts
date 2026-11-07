@@ -19,6 +19,7 @@ import {
 } from "../api";
 import { deviceModelKey, deviceModelLabel } from "../lib/device";
 import { sharedStyles } from "../lib/styles";
+import "./homex-select";
 import { textField } from "../lib/fields";
 import { slugify } from "../lib/slug";
 
@@ -54,17 +55,6 @@ export class HomexPresetEditor extends LitElement {
   static styles = [
     sharedStyles,
     css`
-      select {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 12px 14px;
-        font-size: 15px;
-        border: 1px solid var(--divider-color, #ccc);
-        border-radius: 8px;
-        background: var(--card-background-color, #fff);
-        color: var(--primary-text-color);
-        margin: 6px 0;
-      }
       .hint {
         font-size: 12px;
         color: var(--secondary-text-color);
@@ -187,20 +177,6 @@ export class HomexPresetEditor extends LitElement {
       this._ensureTaps();
       if (this._deviceId) this._loadActions();
     }
-  }
-
-  updated() {
-    // A <select>'s .value binding is applied before its (tab-dependent)
-    // <option>s render, so Lit alone loses the selection when switching tap-mode
-    // tabs. Reconcile each select with the state after the options exist.
-    this.renderRoot
-      .querySelectorAll<HTMLSelectElement>(".bind-select")
-      .forEach((s) => {
-        const mode = s.dataset.mode ?? "";
-        const btn = Number(s.dataset.btn);
-        const want = this._bindings[mode]?.[btn]?.[0] ?? "";
-        if (s.value !== want) s.value = want;
-      });
   }
 
   private _selectedLayout(): SwitchLayout | undefined {
@@ -380,18 +356,15 @@ export class HomexPresetEditor extends LitElement {
         const used = this._usedActions(active, btn);
         return html`<div class="bind-row">
           <div class="btn-lbl">Bouton ${btn}</div>
-          <select
+          <homex-select
             class="bind-select"
-            data-mode=${active}
-            data-btn=${btn}
-            @change=${(e: Event) =>
-              this._setBind(active, btn, (e.target as HTMLSelectElement).value)}
-          >
-            <option value="">— aucune action —</option>
-            ${this._actions
+            placeholder="Aucune action"
+            .value=${current}
+            .options=${this._actions
               .filter((a) => !used.has(a.label) || a.label === current)
-              .map((a) => html`<option value=${a.label}>${a.label}</option>`)}
-          </select>
+              .map((a) => ({ value: a.label, label: a.label }))}
+            @value-changed=${(e: CustomEvent) => this._setBind(active, btn, e.detail.value)}
+          ></homex-select>
         </div>`;
       })}
     `;
@@ -407,18 +380,16 @@ export class HomexPresetEditor extends LitElement {
 
       <div class="section">Modèle d'interrupteur</div>
       ${this._models.length
-        ? html`<select
+        ? html`<homex-select
+            placeholder="Choisir un modèle…"
             .value=${this._modelKey}
-            @change=${(e: Event) =>
-              this._onModel((e.target as HTMLSelectElement).value)}
-          >
-            <option value="">— Choisir un modèle —</option>
-            ${this._models.map(
-              (m) => html`<option value=${m.model} ?selected=${m.model === this._modelKey}>
-                ${m.label} (${m.count})
-              </option>`
-            )}
-          </select>`
+            .options=${this._models.map((m) => ({
+              value: m.model,
+              label: m.label,
+              tertiary: `${m.count} appareil(s)`,
+            }))}
+            @value-changed=${(e: CustomEvent) => this._onModel(e.detail.value)}
+          ></homex-select>`
         : html`<p class="hint">
             Aucun interrupteur détecté (appareil exposant des actions).
           </p>`}
@@ -430,21 +401,15 @@ export class HomexPresetEditor extends LitElement {
               modèle peut exposer des actions différentes selon l'appareil.
             </p>
             ${this._devicesForModel().length
-              ? html`<select
+              ? html`<homex-select
+                  placeholder="Choisir un appareil…"
                   .value=${this._deviceId}
-                  @change=${(e: Event) =>
-                    this._onRefDevice((e.target as HTMLSelectElement).value)}
-                >
-                  <option value="">— Choisir un appareil —</option>
-                  ${this._devicesForModel().map(
-                    (d) => html`<option
-                      value=${d.device_id}
-                      ?selected=${d.device_id === this._deviceId}
-                    >
-                      ${d.name}
-                    </option>`
-                  )}
-                </select>`
+                  .options=${this._devicesForModel().map((d) => ({
+                    value: d.device_id,
+                    label: d.name,
+                  }))}
+                  @value-changed=${(e: CustomEvent) => this._onRefDevice(e.detail.value)}
+                ></homex-select>`
               : html`<p class="hint">
                   Aucun appareil détecté pour ce modèle.
                 </p>`}`
@@ -452,18 +417,16 @@ export class HomexPresetEditor extends LitElement {
 
       <div class="section">Layout</div>
       ${this.layouts.length
-        ? html`<select
+        ? html`<homex-select
+            placeholder="Choisir un layout…"
             .value=${this._layoutId}
-            @change=${(e: Event) =>
-              this._onLayout((e.target as HTMLSelectElement).value)}
-          >
-            <option value="">— Choisir un layout —</option>
-            ${this.layouts.map(
-              (l) => html`<option value=${l.id} ?selected=${l.id === this._layoutId}>
-                ${l.name} (${l.buttons} bouton(s))
-              </option>`
-            )}
-          </select>`
+            .options=${this.layouts.map((l) => ({
+              value: l.id,
+              label: l.name,
+              tertiary: `${l.buttons} bouton(s)`,
+            }))}
+            @value-changed=${(e: CustomEvent) => this._onLayout(e.detail.value)}
+          ></homex-select>`
         : html`<p class="hint">Aucun layout. Crée-en un dans « Switch Layouts ».</p>`}
 
       ${this._selectedLayout()

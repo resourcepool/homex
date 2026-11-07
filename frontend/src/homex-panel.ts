@@ -11,10 +11,12 @@ import "./components/homex-room-dialog";
 import "./components/homex-export-dialog";
 import "./components/homex-switch-manager";
 import "./components/homex-shutter-manager";
+import "./components/homex-climate-manager";
+import "./components/homex-climate-dashboard";
 
 // Bump together with PANEL_VERSION in panel.py. Shown in the header so you can
 // confirm a full page reload picked up the latest build.
-const BUILD = "110";
+const BUILD = "146";
 
 /** Homex sidebar panel: lists rooms and orchestrates loading / reloading. */
 @customElement("homex-panel")
@@ -29,6 +31,9 @@ export class HomexPanel extends LitElement {
   @state() private _createOpen = false;
   @state() private _exportOpen = false;
   @state() private _menuOpen = false;
+  // Dashboard tab (General: rooms; Climate: heating context), remembered.
+  @state() private _dashTab: "general" | "climate" =
+    localStorage.getItem("homex_dash_tab") === "climate" ? "climate" : "general";
   // entry_id of the single expanded room (accordion), persisted in localStorage.
   @state() private _expanded: string | null =
     localStorage.getItem("homex_expanded") || null;
@@ -159,6 +164,34 @@ export class HomexPanel extends LitElement {
     .menu button:hover {
       background: var(--secondary-background-color, #f0f0f0);
     }
+    .menu button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .menu-sep {
+      height: 1px;
+      margin: 4px 6px;
+      background: var(--divider-color, #e0e0e0);
+    }
+    .dash-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--divider-color, #e0e0e0);
+    }
+    .dash-tab {
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--secondary-text-color);
+      cursor: pointer;
+    }
+    .dash-tab.active {
+      color: var(--primary-color);
+      border-bottom: 2px solid var(--primary-color);
+      margin-bottom: -1px;
+    }
     .floor-header {
       display: flex;
       align-items: center;
@@ -208,9 +241,11 @@ export class HomexPanel extends LitElement {
   private get _segs(): string[] {
     return segments(this.route?.path);
   }
-  private get _view(): "rooms" | "switches" | "shutters" {
+  private get _view(): "rooms" | "switches" | "shutters" | "climate" {
     const first = this._segs[0];
-    return first === "switches" || first === "shutters" ? first : "rooms";
+    return first === "switches" || first === "shutters" || first === "climate"
+      ? first
+      : "rooms";
   }
   private get _prefix(): string {
     return this.route?.prefix || "/homex";
@@ -222,6 +257,11 @@ export class HomexPanel extends LitElement {
       // Pull HA's native form elements into the registry, then load data.
       loadHaComponents().then(() => this.requestUpdate());
       this._reload();
+    }
+    // Former Heating Manager URLs (/heating/...) now live under /climate.
+    if (this._segs[0] === "heating") {
+      navigate(joinPath(this._prefix, "climate", ...this._segs), true);
+      return;
     }
     // Back from a manager: switches/presets changed there feed the room cards
     // (switch action counts), so reload the rooms.
@@ -246,6 +286,37 @@ export class HomexPanel extends LitElement {
   };
 
   private _backToRooms = () => goBack(this._prefix);
+
+  /** General (rooms) and, once a room has the Climate module, Climate tabs. */
+  private _renderDashboard(general: unknown) {
+    const climate = (this._rooms ?? []).some((r) => (r.modules ?? []).includes("heating"));
+    if (!climate) return general;
+    const tab = this._dashTab;
+    const pick = (t: "general" | "climate") => {
+      this._dashTab = t;
+      try {
+        localStorage.setItem("homex_dash_tab", t);
+      } catch {
+        /* private mode: not remembered */
+      }
+    };
+    return html`
+      <div class="dash-tabs">
+        <span class="dash-tab ${tab === "general" ? "active" : ""}" @click=${() => pick("general")}
+          >General</span
+        >
+        <span class="dash-tab ${tab === "climate" ? "active" : ""}" @click=${() => pick("climate")}
+          >Climate</span
+        >
+      </div>
+      ${tab === "climate"
+        ? html`<homex-climate-dashboard
+            .hass=${this.hass}
+            .rooms=${this._rooms ?? []}
+          ></homex-climate-dashboard>`
+        : general}
+    `;
+  }
 
   private _toggleSidebar() {
     this.dispatchEvent(
@@ -332,6 +403,18 @@ export class HomexPanel extends LitElement {
         </div>
       `;
     }
+    if (this._view === "climate") {
+      return html`
+        <div class="wrap">
+          <homex-climate-manager
+            .hass=${this.hass}
+            .base=${joinPath(this._prefix, "climate")}
+            .subpath=${this._segs.slice(1).join("/")}
+            @close=${this._backToRooms}
+          ></homex-climate-manager>
+        </div>
+      `;
+    }
     if (this._view === "shutters") {
       return html`
         <div class="wrap">
@@ -360,18 +443,6 @@ export class HomexPanel extends LitElement {
             <h1>Homex <span class="ver">v${BUILD}</span></h1>
           </div>
           <div class="header-actions">
-            <button title="Rafraîchir" @click=${this._reload}>
-              <svg class="ico" viewBox="0 0 24 24"><path d=${mdiRefresh}></path></svg
-              ><span class="lbl">Rafraîchir</span>
-            </button>
-            <button
-              title="Exporter"
-              ?disabled=${!this._rooms?.length}
-              @click=${() => (this._exportOpen = true)}
-            >
-              <svg class="ico" viewBox="0 0 24 24"><path d=${mdiDownload}></path></svg
-              ><span class="lbl">Exporter</span>
-            </button>
             <button class="primary" @click=${() => (this._createOpen = true)}>
               ＋ Nouvelle pièce
             </button>
@@ -393,6 +464,26 @@ export class HomexPanel extends LitElement {
                       <button
                         @click=${() => {
                           this._menuOpen = false;
+                          this._reload();
+                        }}
+                      >
+                        <svg class="ico" viewBox="0 0 24 24"><path d=${mdiRefresh}></path></svg>
+                        Rafraîchir
+                      </button>
+                      <button
+                        ?disabled=${!this._rooms?.length}
+                        @click=${() => {
+                          this._menuOpen = false;
+                          this._exportOpen = true;
+                        }}
+                      >
+                        <svg class="ico" viewBox="0 0 24 24"><path d=${mdiDownload}></path></svg>
+                        Exporter
+                      </button>
+                      <div class="menu-sep"></div>
+                      <button
+                        @click=${() => {
+                          this._menuOpen = false;
                           navigate(joinPath(this._prefix, "switches"));
                         }}
                       >
@@ -406,13 +497,21 @@ export class HomexPanel extends LitElement {
                       >
                         🪟 Shutter Manager
                       </button>
+                      <button
+                        @click=${() => {
+                          this._menuOpen = false;
+                          navigate(joinPath(this._prefix, "climate"));
+                        }}
+                      >
+                        🌡 Climate Manager
+                      </button>
                     </div>
                   `
                 : ""}
             </div>
           </div>
         </header>
-        ${body}
+        ${this._renderDashboard(body)}
       </div>
       <homex-room-dialog
         .hass=${this.hass}

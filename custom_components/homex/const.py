@@ -20,7 +20,26 @@ CONF_MODULES = "modules"
 MODULE_LIGHTS = "lights"
 MODULE_SWITCHES = "switches"
 MODULE_SHUTTERS = "shutters"
+MODULE_HEATING = "heating"
 DEFAULT_MODULES = [MODULE_LIGHTS]
+
+# Heating module: the room's radiators {"radiators": [{device_id, preset_id}]};
+# each radiator's heating device preset is continuously enforced.
+CONF_HEATING = "heating"
+
+# Climate module metrics: per metric, the sensors and the rule combining them
+# into the room's reference value {metric: {"sensors": [{entity_id, weight}],
+# "rule": "mean" | "max" | "min"}}; exposed as sensor.homex_{room}_{metric}.
+CONF_METRICS = "metrics"
+METRIC_RULES = ("mean", "max", "min")
+# metric -> (sensor device_class, label)
+METRICS = {
+    "temperature": ("temperature", "Température"),
+    "humidity": ("humidity", "Humidité"),
+    "pm25": ("pm25", "PM2.5"),
+    "pm10": ("pm10", "PM10"),
+    "co2": ("carbon_dioxide", "CO₂"),
+}
 
 # Shutters module: roller shutters organized in groups. Each shutter group is a
 # dict {id, name, devices:[cover ids], toggle/open/close/stop _triggers}. A
@@ -90,4 +109,4 @@ TRIGGER_DOMAINS = [
     "sensor",
 ]
 
-PLATFORMS = ["switch", "light"]
+PLATFORMS = ["switch", "light", "select", "sensor", "binary_sensor"]

@@ -1,9 +1,16 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import type { HomeAssistant, Room, SceneStrategy } from "../types";
+import type { HeatingZone, HomeAssistant, Room, SceneStrategy } from "../types";
 import { fireChanged } from "../types";
-import { createRoom, errorMessage, updateRoom } from "../api";
+import {
+  createRoom,
+  errorMessage,
+  fetchHeating,
+  setRoomHeatingZone,
+  updateRoom,
+} from "../api";
 import { sharedStyles } from "../lib/styles";
+import "./homex-select";
 import { textField } from "../lib/fields";
 import { slugify } from "../lib/slug";
 import { DEVICE_DOMAINS } from "../lib/domains";
@@ -24,23 +31,16 @@ export class HomexRoomDialog extends LitElement {
   @state() private _devices: string[] = [];
   @state() private _strategy: SceneStrategy = "recall_first";
   @state() private _busy = false;
+  // Climate module: the room's heating zone.
+  @state() private _zones: HeatingZone[] = [];
+  @state() private _zoneId = "default";
+  private _initialZone = "default";
   // Once the user edits the id by hand, stop deriving it from the name.
   private _idEdited = false;
 
   static styles = [
     sharedStyles,
     css`
-      select {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 12px 14px;
-        font-size: 15px;
-        border: 1px solid var(--divider-color, #ccc);
-        border-radius: 8px;
-        background: var(--card-background-color, #fff);
-        color: var(--primary-text-color);
-        margin: 6px 0;
-      }
       .hint {
         font-size: 12px;
         color: var(--secondary-text-color);
@@ -117,7 +117,20 @@ export class HomexRoomDialog extends LitElement {
       this._strategy = this.room?.scene_strategy ?? "recall_first";
       this._busy = false;
       this._idEdited = !!this.room; // editing: keep existing id untouched
+      this._loadZones();
     }
+  }
+
+  private async _loadZones() {
+    try {
+      this._zones = (await fetchHeating(this.hass)).zones ?? [];
+    } catch {
+      this._zones = [];
+    }
+    const roomId = this.room?.room_id;
+    this._initialZone =
+      (roomId && this._zones.find((z) => z.rooms.includes(roomId))?.id) || "default";
+    this._zoneId = this._initialZone;
   }
 
   private get _areas(): { area_id: string; name: string }[] {
@@ -197,6 +210,9 @@ export class HomexRoomDialog extends LitElement {
           scene_strategy: this._strategy,
         });
       }
+      if (this._hasModule("heating") && this._zoneId !== this._initialZone) {
+        await setRoomHeatingZone(this.hass, room_id, this._zoneId);
+      }
       fireChanged(this);
       this._close();
     } catch (err) {
@@ -216,16 +232,12 @@ export class HomexRoomDialog extends LitElement {
         ${textField("Nom", this._name, (v) => this._onName(v), "Chambre")}
         ${textField("Id", this._id, (v) => this._onId(v), "bedroom")}
         <div class="section">Pièce Home Assistant (optionnel)</div>
-        <select
+        <homex-select
+          placeholder="Aucune"
           .value=${this._areaId}
-          @change=${(e: Event) =>
-            (this._areaId = (e.target as HTMLSelectElement).value)}
-        >
-          <option value="">— Aucune —</option>
-          ${this._areas.map(
-            (a) => html`<option value=${a.area_id}>${a.name}</option>`
-          )}
-        </select>
+          .options=${this._areas.map((a) => ({ value: a.area_id, label: a.name }))}
+          @value-changed=${(e: CustomEvent) => (this._areaId = e.detail.value)}
+        ></homex-select>
 
         <div class="section">Modules</div>
         ${this._moduleRow(
@@ -246,6 +258,12 @@ export class HomexRoomDialog extends LitElement {
           "Shutters",
           "Le module Shutters gère les volets roulants de la pièce."
         )}
+        ${this._moduleRow(
+          "heating",
+          "🔥",
+          "Climate",
+          "Le module Climate gère les capteurs et les radiateurs de la pièce (onglet Climate)."
+        )}
 
         ${this._hasModule("lights")
           ? html`
@@ -260,19 +278,38 @@ export class HomexRoomDialog extends LitElement {
               ></homex-entity-picker>
 
               <div class="section">Scene switching strategy</div>
-              <select
+              <homex-select
                 .value=${this._strategy}
-                @change=${(e: Event) =>
-                  (this._strategy = (e.target as HTMLSelectElement)
-                    .value as SceneStrategy)}
-              >
-                <option value="recall_first">Repart de zéro</option>
-                <option value="recall_last">Dernière utilisée</option>
-              </select>
+                .options=${[
+                  { value: "recall_first", label: "Repart de zéro", secondary: "Première scène" },
+                  { value: "recall_last", label: "Dernière utilisée", secondary: "Reprend la dernière scène" },
+                ]}
+                @value-changed=${(e: CustomEvent) =>
+                  (this._strategy = e.detail.value as SceneStrategy)}
+              ></homex-select>
               <p class="hint">
                 Quand un trigger scene-switching change de scène et que la pièce
                 était éteinte : repartir de la première scène, ou reprendre la
                 dernière utilisée.
+              </p>
+            `
+          : ""}
+
+        ${this._hasModule("heating")
+          ? html`
+              <div class="tab">Climate</div>
+              <div class="section">Zone de chauffage</div>
+              <homex-select
+                .value=${this._zoneId}
+                .options=${this._zones.map((z) => ({
+                  value: z.id,
+                  label: z.name,
+                  secondary: z.id === "default" ? "Toutes les autres pièces" : undefined,
+                }))}
+                @value-changed=${(e: CustomEvent) => (this._zoneId = e.detail.value)}
+              ></homex-select>
+              <p class="hint">
+                Capteurs et radiateurs se configurent dans l'onglet Climate de la pièce.
               </p>
             `
           : ""}

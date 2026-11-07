@@ -19,7 +19,8 @@ import {
   resolveSwitchPreset,
 } from "../lib/device";
 import { sharedStyles } from "../lib/styles";
-import { textField } from "../lib/fields";
+import "./homex-select";
+import { textField, toggleSwitch } from "../lib/fields";
 import { slugify } from "../lib/slug";
 
 /** Editor for a global switch: name + device + rooms. The layout/actions come
@@ -46,17 +47,6 @@ export class HomexGswitchEditor extends LitElement {
   static styles = [
     sharedStyles,
     css`
-      select {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 12px 14px;
-        font-size: 15px;
-        border: 1px solid var(--divider-color, #ccc);
-        border-radius: 8px;
-        background: var(--card-background-color, #fff);
-        color: var(--primary-text-color);
-        margin: 6px 0;
-      }
       details.multi {
         position: relative;
         margin: 6px 0;
@@ -318,17 +308,11 @@ export class HomexGswitchEditor extends LitElement {
     }
     return html`<div class="preset-box ${preset ? "ok" : ""}">
       <div class="section">Preset</div>
-      <select
+      <homex-select
         .value=${preset?.id ?? ""}
-        @change=${(e: Event) =>
-          (this._presetId = (e.target as HTMLSelectElement).value)}
-      >
-        ${ofModel.map(
-          (p) => html`<option value=${p.id} ?selected=${p.id === preset?.id}>
-            ${p.name}
-          </option>`
-        )}
-      </select>
+        .options=${ofModel.map((p) => ({ value: p.id, label: p.name }))}
+        @value-changed=${(e: CustomEvent) => (this._presetId = e.detail.value)}
+      ></homex-select>
       <div class="row">
         <span class="hint">Modèle : ${modelLabel}</span>
         <button @click=${this._createPreset}>＋ Nouveau preset</button>
@@ -354,11 +338,7 @@ export class HomexGswitchEditor extends LitElement {
       <div class="options">
         ${this._allRooms.map(
           (r) => html`<label>
-            <input
-              type="checkbox"
-              .checked=${this._rooms.includes(r.room_id)}
-              @change=${() => this._toggleRoom(r.room_id)}
-            />
+            ${toggleSwitch(this._rooms.includes(r.room_id), () => this._toggleRoom(r.room_id))}
             ${r.name}
           </label>`
         )}
@@ -375,18 +355,16 @@ export class HomexGswitchEditor extends LitElement {
 
       <div class="section">Interrupteur (appareil)</div>
       ${this._devices.length
-        ? html`<select
+        ? html`<homex-select
+            placeholder="Choisir un interrupteur…"
             .value=${this._deviceId}
-            @change=${(e: Event) =>
-              this._onDevice((e.target as HTMLSelectElement).value)}
-          >
-            <option value="">— Choisir un interrupteur —</option>
-            ${this._devices.map(
-              (d) => html`<option value=${d.device_id} ?selected=${d.device_id === this._deviceId}>
-                ${d.name} · ${d.model_label}
-              </option>`
-            )}
-          </select>`
+            .options=${this._devices.map((d) => ({
+              value: d.device_id,
+              label: d.name,
+              secondary: d.model_label,
+            }))}
+            @value-changed=${(e: CustomEvent) => this._onDevice(e.detail.value)}
+          ></homex-select>`
         : html`<p class="hint">
             Aucun interrupteur détecté (appareil exposant des actions).
           </p>`}

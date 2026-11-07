@@ -15,6 +15,7 @@ import {
   saveShutterPreset,
 } from "../api";
 import { sharedStyles } from "../lib/styles";
+import "./homex-select";
 import { textField } from "../lib/fields";
 import { slugify } from "../lib/slug";
 
@@ -93,17 +94,6 @@ export class HomexShutterPresetEditor extends LitElement {
   static styles = [
     sharedStyles,
     css`
-      select {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 12px 14px;
-        font-size: 15px;
-        border: 1px solid var(--divider-color, #ccc);
-        border-radius: 8px;
-        background: var(--card-background-color, #fff);
-        color: var(--primary-text-color);
-        margin: 6px 0;
-      }
       .hint {
         font-size: 12px;
         color: var(--secondary-text-color);
@@ -167,11 +157,6 @@ export class HomexShutterPresetEditor extends LitElement {
         margin: 6px 0;
       }
       /* Sensor + value side by side, stacked when too narrow. */
-      .cond-row select {
-        flex: 2 1 180px;
-        min-width: 0;
-        margin: 0;
-      }
       .cond-row input.field-name {
         flex: 2 1 180px;
       }
@@ -377,42 +362,33 @@ export class HomexShutterPresetEditor extends LitElement {
                 field: (e.target as HTMLInputElement).value.trim(),
               })}
           />`
-        : html`<select
+        : html`<homex-select
+        placeholder="Champ Zigbee2MQTT…"
         .value=${cond.field ?? ""}
-        @change=${(e: Event) =>
-          onChange({ ...cond, field: (e.target as HTMLSelectElement).value })}
-      >
-        <option value="">— Champ Zigbee2MQTT —</option>
-        ${cond.field && !known
-          ? html`<option value=${cond.field} selected>${cond.field}</option>`
-          : ""}
-        ${fields.map(
-          (f) => html`<option value=${f.field} ?selected=${f.field === cond.field}>
-            ${f.field} (${String(f.value)})
-          </option>`
-        )}
-      </select>`;
+        .options=${[
+          ...(cond.field && !known ? [{ value: cond.field, label: cond.field }] : []),
+          ...fields.map((f) => ({ value: f.field, label: f.field, tertiary: String(f.value) })),
+        ]}
+        @value-changed=${(e: CustomEvent) => onChange({ ...cond, field: e.detail.value })}
+      ></homex-select>`;
       const current = cond.field ? this._z2mValue(cond.field) : "";
       suggestions = current ? [current] : [];
     } else {
       const selected =
         cond.domain && cond.suffix ? `${cond.domain}|${cond.suffix}` : "";
-      picker = html`<select
+      picker = html`<homex-select
+        placeholder="Capteur…"
         .value=${selected}
-        @change=${(e: Event) => {
-          const [domain = "", suffix = ""] = (
-            e.target as HTMLSelectElement
-          ).value.split("|");
+        .options=${this._refSensors().map((s) => ({
+          value: s.key,
+          label: s.suffix,
+          secondary: s.entity_id,
+        }))}
+        @value-changed=${(e: CustomEvent) => {
+          const [domain = "", suffix = ""] = String(e.detail.value).split("|");
           onChange({ ...cond, domain, suffix });
         }}
-      >
-        <option value="">— Capteur —</option>
-        ${this._refSensors().map(
-          (s) => html`<option value=${s.key} ?selected=${s.key === selected}>
-            ${s.suffix}
-          </option>`
-        )}
-      </select>`;
+      ></homex-select>`;
       suggestions = this._sensorValues(this._condEntityId(cond));
     }
     return html`<div class="cond">
@@ -525,39 +501,32 @@ export class HomexShutterPresetEditor extends LitElement {
 
       <div class="section">Modèle de volet</div>
       ${this._models.length
-        ? html`<select
+        ? html`<homex-select
+            placeholder="Choisir un modèle…"
             .value=${this._modelKey}
-            @change=${(e: Event) =>
-              this._onModel((e.target as HTMLSelectElement).value)}
-          >
-            <option value="">— Choisir un modèle —</option>
-            ${this._models.map(
-              (m) => html`<option value=${m.model} ?selected=${m.model === this._modelKey}>
-                ${m.label} (${m.count})
-              </option>`
-            )}
-          </select>`
+            .options=${this._models.map((m) => ({
+              value: m.model,
+              label: m.label,
+              tertiary: `${m.count} appareil(s)`,
+            }))}
+            @value-changed=${(e: CustomEvent) => this._onModel(e.detail.value)}
+          ></homex-select>`
         : html`<p class="hint">Aucun volet (device avec entité cover) détecté.</p>`}
 
       ${model
         ? html`
             <div class="section">Device de référence</div>
             <p class="hint">Les capteurs/actions sont tirés de ce device.</p>
-            <select
+            <homex-select
               .value=${this._deviceId}
-              @change=${(e: Event) => {
-                this._deviceId = (e.target as HTMLSelectElement).value;
+              .options=${model.devices.map((d) => ({ value: d.device_id, label: d.name }))}
+              @value-changed=${(e: CustomEvent) => {
+                this._deviceId = e.detail.value;
                 this._up = { ...HomexShutterPresetEditor.EMPTY };
                 this._down = { ...HomexShutterPresetEditor.EMPTY };
                 this._stopped = { ...HomexShutterPresetEditor.EMPTY };
               }}
-            >
-              ${model.devices.map(
-                (d) => html`<option value=${d.device_id} ?selected=${d.device_id === this._deviceId}>
-                  ${d.name}
-                </option>`
-              )}
-            </select>
+            ></homex-select>
 
             <label class="toggle-row">
               <span>Implémenter la permutation intelligente</span>

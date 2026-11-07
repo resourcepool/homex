@@ -2,6 +2,7 @@ import { LitElement, css, html, svg } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type {
   GlobalSwitch,
+  HeatingPreset,
   HomeAssistant,
   HomexAction,
   Room,
@@ -10,7 +11,7 @@ import type {
   TapMode,
 } from "../types";
 import { fireChanged } from "../types";
-import { errorMessage, fetchRooms, saveGlobalSwitch } from "../api";
+import { errorMessage, fetchHeating, fetchRooms, saveGlobalSwitch } from "../api";
 import { sharedStyles } from "../lib/styles";
 import "./homex-dialog";
 
@@ -29,6 +30,7 @@ interface ActionItem {
 const MODULE_LABELS: Record<string, string> = {
   lights: "💡 Lights",
   shutters: "🪟 Shutters",
+  heating: "🔥 Climate",
 };
 
 const TAP_LABELS: Record<TapMode, string> = {
@@ -42,6 +44,7 @@ function actionKey(a: HomexAction): string {
   if (a.kind === "scene") return `scene:${a.scene_key}`;
   if (a.kind.startsWith("shutter_"))
     return `${a.kind}:${(a as { group_id: string }).group_id}`;
+  if (a.kind === "heating_mode") return `heating_mode:${a.mode_id}`;
   return a.kind;
 }
 
@@ -56,6 +59,8 @@ export class HomexSwitchMapping extends LitElement {
   @property({ attribute: false }) taps: Record<string, TapMode[]> = {};
 
   @state() private _rooms: Room[] = []; // the switch's associated rooms
+  // Heating modes (heating actions act on the zone of the button's room).
+  @state() private _heatingModes: HeatingPreset[] = [];
   // tapMode -> button -> { room, action }
   @state() private _mappings: Record<string, Record<string, SwitchButtonAction>> = {};
   @state() private _tapTab: TapMode = "single";
@@ -328,6 +333,11 @@ export class HomexSwitchMapping extends LitElement {
     } catch {
       this._rooms = [];
     }
+    try {
+      this._heatingModes = (await fetchHeating(this.hass)).presets;
+    } catch {
+      this._heatingModes = [];
+    }
   }
 
   private get _multi(): boolean {
@@ -400,6 +410,21 @@ export class HomexSwitchMapping extends LitElement {
           })
         );
       }
+    }
+    // Heating actions — on the heating zone the room belongs to (any room).
+    if (this._heatingModes.length) {
+      list.push(
+        mk("heating", "Chauffage — mode suivant", "Mode →", "🔥", {
+          kind: "heating_mode_next",
+        })
+      );
+      for (const m of this._heatingModes)
+        list.push(
+          mk("heating", `Chauffage — ${m.name}`, m.name, "🌡", {
+            kind: "heating_mode",
+            mode_id: m.id,
+          })
+        );
     }
     return list;
   }

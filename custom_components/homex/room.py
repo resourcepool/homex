@@ -998,6 +998,19 @@ class RoomController:
         target room may not have Lights (or Shutters) either.
         """
         kind = (action or {}).get("kind")
+        # Heating actions drive the heating zone this room belongs to.
+        if kind in ("heating_mode", "heating_mode_next"):
+            from .heating_zones import zones_manager  # lazy: avoid import cycle
+
+            zones = zones_manager(self.hass)
+            zone = await zones.zone_for_room(self.room_id)
+            if zone is None:
+                return
+            if kind == "heating_mode":
+                await zones.async_set_mode(zone["id"], action.get("mode_id", ""))
+            else:
+                await zones.async_next_mode(zone["id"])
+            return
         # Shutters actions target a shutter group (independent of lights).
         shutter_services = {
             "shutter_toggle": "toggle",
@@ -1457,7 +1470,12 @@ class HomexHub:
                     if not isinstance(entry, dict):
                         continue
                     controller = self.controllers.get(entry.get("room"))
-                    if controller is None or not controller.lights_enabled:
+                    kind = (entry.get("action") or {}).get("kind", "")
+                    # Heating actions drive the room's zone: no Lights needed.
+                    if controller is None or (
+                        not controller.lights_enabled
+                        and not kind.startswith("heating_")
+                    ):
                         continue
                     labels = (bindings.get(tap_mode) or {}).get(btn) or []
                     raw = await _resolve_device_triggers(self.hass, device_id, labels)

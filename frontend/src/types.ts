@@ -149,7 +149,10 @@ export type HomexAction =
   | { kind: "shutter_toggle"; group_id: string }
   | { kind: "shutter_open"; group_id: string }
   | { kind: "shutter_close"; group_id: string }
-  | { kind: "shutter_stop"; group_id: string };
+  | { kind: "shutter_stop"; group_id: string }
+  // Heating: act on the heating zone the room belongs to.
+  | { kind: "heating_mode"; mode_id: string }
+  | { kind: "heating_mode_next" };
 
 /** A global switch (Switch Management): a name, a device, and assigned rooms.
  * Its layout/taps/actions come from the Device Preset of the device's model. */
@@ -212,6 +215,36 @@ export interface Room extends Unit {
   switch_triggers?: SwitchTriggers;
   groups: Group[];
   shutter_groups?: ShutterGroup[];
+  heating?: RoomHeating;
+  metrics?: RoomMetrics;
+}
+
+/** Climate metrics of a room: per metric, its sensors and the rule giving the
+ * room's reference value (sensor.homex_<room>_<metric>). */
+export type MetricKey = "temperature" | "humidity" | "pm25" | "pm10" | "co2";
+export type MetricRule = "mean" | "max" | "min";
+export interface MetricSensor {
+  entity_id: string;
+  weight: number;
+}
+export interface MetricConfig {
+  sensors: MetricSensor[];
+  rule: MetricRule;
+}
+export type RoomMetrics = Partial<Record<MetricKey, MetricConfig>>;
+
+/** A radiator of a room (Heating module) and the device preset enforced on it. */
+export interface Radiator {
+  device_id: string;
+  preset_id: string; // heating device preset id ("" = none)
+  /** Temperature sensor written to the valve (external-sensor presets). */
+  external_sensor?: string;
+}
+export interface RoomHeating {
+  radiators: Radiator[];
+  /** The room's own heating switch (default on). Off: the room is Unheated,
+   * whatever its zone's mode, and its valves are kept off. */
+  enabled?: boolean;
 }
 
 /** A group of roller shutters (covers) in a room, with its own triggers. */
@@ -231,3 +264,84 @@ export const HOMEX_CHANGED = "homex-changed";
 
 export const fireChanged = (el: HTMLElement) =>
   el.dispatchEvent(new CustomEvent(HOMEX_CHANGED, { bubbles: true, composed: true }));
+
+/** A heating mode (Normal, Night, ...); built-in ones cannot be deleted. */
+export interface HeatingPreset {
+  id: string;
+  name: string;
+  builtin: boolean;
+  unheated?: boolean; // "Non chauffé": no setpoint, heating off
+}
+
+/** Temperature setpoints (°C, per heating preset) for a set of rooms. The
+ * built-in "default" group covers every room not in another group. */
+export interface HeatingGroup {
+  id: string;
+  name: string;
+  rooms: string[]; // room_id
+  setpoints: Record<string, number>; // preset id → °C
+  builtin: boolean;
+}
+
+/** A setting a heating device preset can fix. */
+export type HeatingParamKey = "tolerance" | "mode" | "lock" | "sensor";
+
+/** One fixed setting: the device's entity (domain + suffix after the device
+ * slug, valid for every device of the model) and the value to set. */
+export interface HeatingParam {
+  domain: string;
+  suffix: string;
+  value: string | number; // tolerance: its "normal" tolerance mode value
+  value_agressive?: number; // tolerance only: the "agressive" mode value
+}
+
+/** Settings fixed on every device of a thermostat model. */
+export interface HeatingDevicePreset {
+  id: string;
+  name: string;
+  model: string; // "manufacturer|model"
+  device_id: string; // reference device
+  params: Partial<Record<HeatingParamKey, HeatingParam>>;
+  /** The device's number entity receiving an external temperature: set when
+   * the preset makes the valve use an external sensor. */
+  external_input?: { domain: "number"; suffix: string } | null;
+}
+
+/** A thermostat model (devices owning a climate entity). */
+export interface HeatingModel {
+  model: string;
+  label: string;
+  count: number;
+  devices: { device_id: string; name: string }[];
+}
+
+/** Outcome of applying a device preset, per device. */
+export interface HeatingApplyResult {
+  device_id: string;
+  name: string;
+  applied: HeatingParamKey[];
+  failed: { param: HeatingParamKey; error: string }[];
+}
+
+/** A heating zone: rooms running their own heating mode, changed by its
+ * select entity, its per-mode triggers or Switch Manager actions. The
+ * built-in "default" zone holds every room not in another zone. */
+export interface HeatingZone {
+  id: string;
+  name: string;
+  rooms: string[]; // room_id
+  mode: string; // active heating mode id
+  triggers: Record<string, TriggerSpec[]>; // mode id → triggers
+  builtin: boolean;
+}
+
+/** A heating system: a boiler drives its dry contact (switch) from the heating
+ * demand of its scope (global or zones); a heat pump has no behaviour yet. */
+export interface HeatingSystem {
+  id: string;
+  name: string;
+  type: "boiler" | "heat_pump";
+  contact: string; // dry contact entity (switch.* / input_boolean.*)
+  zones: string[]; // ["global"] or zone ids
+  aggressive: boolean; // tolerance "agressive" while the contact is on
+}

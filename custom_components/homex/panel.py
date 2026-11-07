@@ -22,6 +22,10 @@ from homeassistant.setup import async_setup_component
 from homeassistant.util.yaml import load_yaml, save_yaml
 
 from .const import (
+    CONF_HEATING,
+    CONF_METRICS,
+    METRIC_RULES,
+    METRICS,
     CONF_AREA_ID,
     CONF_DEVICES,
     CONF_DIM,
@@ -51,6 +55,11 @@ from .const import (
     STRATEGY_RECALL_LAST,
     Z2M_BRIDGE,
 )
+from .heating import WS_COMMANDS as HEATING_WS_COMMANDS
+from .heating import async_forget_room as async_forget_heating_room
+from .heating import async_rename_room as async_rename_heating_room
+from .heating_systems import WS_COMMANDS as HEATING_SYSTEM_WS_COMMANDS
+from .heating_zones import WS_COMMANDS as HEATING_ZONE_WS_COMMANDS
 from .room import (
     RoomController,
     device_action_label,
@@ -62,7 +71,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "110"
+PANEL_VERSION = "146"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -203,6 +212,9 @@ async def async_register_homex_panel(hass: HomeAssistant) -> None:
         ws_scene_reorder,
         ws_scene_rename,
         ws_scene_next,
+        *HEATING_WS_COMMANDS,
+        *HEATING_ZONE_WS_COMMANDS,
+        *HEATING_SYSTEM_WS_COMMANDS,
     ):
         websocket_api.async_register_command(hass, command)
 
@@ -393,6 +405,8 @@ async def ws_list_rooms(hass: HomeAssistant, connection, msg) -> None:
                 "room_id": controller.room_id,
                 "area_id": controller.area_id,
                 "modules": controller.modules,
+                "heating": _clean_heating(room.get(CONF_HEATING)),
+                "metrics": _clean_metrics(room.get(CONF_METRICS)),
                 **_serialize_unit(units[0]),
                 "triggers": controller.trigger_specs,
                 "scene_triggers": controller.scene_trigger_specs,
@@ -441,6 +455,49 @@ def _find_subentry(hub: ConfigEntry, room_id: str):
         ),
         None,
     )
+
+
+def _clean_metrics(raw) -> dict:
+    """Climate metrics config: per known metric, sensors (unique, weight > 0)
+    and a rule; metrics without sensors are dropped."""
+    out = {}
+    for metric in METRICS:
+        cfg = (raw or {}).get(metric) or {}
+        sensors, seen = [], set()
+        for sensor in cfg.get("sensors", []) or []:
+            entity_id = str((sensor or {}).get("entity_id") or "")
+            if not entity_id or entity_id in seen:
+                continue
+            seen.add(entity_id)
+            try:
+                weight = float(sensor.get("weight") or 1)
+            except (TypeError, ValueError):
+                weight = 1.0
+            sensors.append({"entity_id": entity_id, "weight": max(weight, 0.0)})
+        if sensors:
+            rule = cfg.get("rule") if cfg.get("rule") in METRIC_RULES else "mean"
+            out[metric] = {"sensors": sensors, "rule": rule}
+    return out
+
+
+def _clean_heating(raw) -> dict:
+    """The Heating module config: radiators {device_id, preset_id} (unique)."""
+    radiators, seen = [], set()
+    for rad in (raw or {}).get("radiators", []) or []:
+        device_id = str((rad or {}).get("device_id") or "")
+        if not device_id or device_id in seen:
+            continue
+        seen.add(device_id)
+        radiators.append(
+            {
+                "device_id": device_id,
+                "preset_id": str(rad.get("preset_id") or ""),
+                # Temperature sensor fed to the valve (external-sensor presets).
+                "external_sensor": str(rad.get("external_sensor") or ""),
+            }
+        )
+    # The room's own heating switch: off = Unheated, whatever its zone's mode.
+    return {"radiators": radiators, "enabled": (raw or {}).get("enabled", True) is not False}
 
 
 def _controller(hass: HomeAssistant, hub: ConfigEntry, room: dict) -> RoomController:
@@ -657,6 +714,8 @@ async def _attach_existing_scene(
         vol.Optional("devices"): [str],
         vol.Optional("area_id"): vol.Any(str, None),
         vol.Optional("modules"): [str],
+        vol.Optional("heating"): dict,
+        vol.Optional("metrics"): dict,
         vol.Optional("scene_strategy"): vol.In(
             [STRATEGY_RECALL_FIRST, STRATEGY_RECALL_LAST]
         ),
@@ -682,6 +741,8 @@ async def ws_room_create(hass: HomeAssistant, connection, msg) -> None:
         CONF_ROOM_NAME: msg["name"],
         CONF_AREA_ID: msg.get("area_id") or None,
         CONF_MODULES: msg.get("modules", list(DEFAULT_MODULES)),
+        CONF_HEATING: _clean_heating(msg.get("heating")),
+        CONF_METRICS: _clean_metrics(msg.get("metrics")),
         CONF_DEVICES: msg.get("devices", []),
         CONF_TRIGGERS: [],
         CONF_SCENE_TRIGGERS: [],
@@ -729,6 +790,7 @@ async def ws_room_delete(hass: HomeAssistant, connection, msg) -> None:
     _remove_room_entities(hass, controller)
 
     hass.config_entries.async_remove_subentry(hub, sub.subentry_id)
+    await async_forget_heating_room(hass, sub.data.get(CONF_ROOM_ID, ""))
     connection.send_result(msg["id"], {"ok": True})
 
 
@@ -749,6 +811,8 @@ def _remove_room_entities(hass: HomeAssistant, controller: RoomController) -> No
         vol.Optional("room_id"): str,
         vol.Optional("area_id"): vol.Any(str, None),
         vol.Optional("modules"): [str],
+        vol.Optional("heating"): dict,
+        vol.Optional("metrics"): dict,
         vol.Optional("devices"): [str],
         vol.Optional("triggers"): list,
         vol.Optional("scene_triggers"): list,
@@ -780,6 +844,7 @@ async def ws_room_update(hass: HomeAssistant, connection, msg) -> None:
 
     if new_id != old_id:
         await _rename_room(hass, old_id, new_id, hub.entry_id)
+        await async_rename_heating_room(hass, old_id, new_id)
 
     room[CONF_ROOM_ID] = new_id
     if "name" in msg:
@@ -798,6 +863,10 @@ async def ws_room_update(hass: HomeAssistant, connection, msg) -> None:
         room[CONF_DIM_DOWN_TRIGGERS] = msg["dim_down_triggers"]
     if "scene_strategy" in msg:
         room[CONF_SCENE_STRATEGY] = msg["scene_strategy"]
+    if "heating" in msg:
+        room[CONF_HEATING] = _clean_heating(msg["heating"])
+    if "metrics" in msg:
+        room[CONF_METRICS] = _clean_metrics(msg["metrics"])
 
     # Modules: when the lights module is turned off, tear down its entities and
     # scenes (they are recreated if it is turned back on).

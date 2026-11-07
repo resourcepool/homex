@@ -4,6 +4,7 @@ import type { HomeAssistant, Room, Scene, TriggerSpec } from "../types";
 import { fireChanged } from "../types";
 import { addScene, errorMessage, renameScene } from "../api";
 import { sharedStyles } from "../lib/styles";
+import "./homex-select";
 import { textField } from "../lib/fields";
 import { slugify } from "../lib/slug";
 import "./homex-dialog";
@@ -50,17 +51,6 @@ export class HomexSceneDialog extends LitElement {
         color: var(--error-color, #db4437);
         font-size: 12px;
         margin: -4px 0 8px;
-      }
-      select {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 12px 14px;
-        font-size: 15px;
-        border: 1px solid var(--divider-color, #ccc);
-        border-radius: 8px;
-        background: var(--card-background-color, #fff);
-        color: var(--primary-text-color);
-        margin: 6px 0;
       }
     `,
   ];
@@ -207,16 +197,16 @@ export class HomexSceneDialog extends LitElement {
             <div class="section">
               Scène existante à adopter (elle sera renommée, son contenu conservé)
             </div>
-            <select
+            <homex-select
+              placeholder="Choisir une scène…"
               .value=${this._attachId}
-              @change=${(e: Event) =>
-                this._onPickScene((e.target as HTMLSelectElement).value)}
-            >
-              <option value="">— Choisir une scène —</option>
-              ${this._availableScenes.map(
-                (s) => html`<option value=${s.config_id}>${s.name}</option>`
-              )}
-            </select>
+              .options=${this._availableScenes.map((s) => ({
+                value: s.config_id,
+                label: s.name,
+                secondary: s.config_id,
+              }))}
+              @value-changed=${(e: CustomEvent) => this._onPickScene(e.detail.value)}
+            ></homex-select>
           `}
     `;
   }
