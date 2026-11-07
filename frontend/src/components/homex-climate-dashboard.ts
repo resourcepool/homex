@@ -2,7 +2,10 @@ import { LitElement, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { mdiFire, mdiFireOff } from "@mdi/js";
 import type { HeatingZone, HomeAssistant, Room } from "../types";
-import { errorMessage, fetchHeating, setHeatingEnabled } from "../api";
+import { fireChanged } from "../types";
+import { errorMessage, fetchHeating, setHeatingEnabled, updateRoom } from "../api";
+import { radiatorClimate, roomIsHeating, roomZoneMode } from "../lib/climate";
+import { toggleSwitch } from "../lib/fields";
 import { sharedStyles } from "../lib/styles";
 import "./homex-select";
 
@@ -77,6 +80,38 @@ export class HomexClimateDashboard extends LitElement {
       .pill.heating {
         color: var(--state-climate-heat-color, #ff8100);
         background: color-mix(in srgb, var(--state-climate-heat-color, #ff8100) 16%, transparent);
+      }
+      .room {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px 14px;
+        padding: 10px 0;
+        border-top: 1px solid var(--divider-color, #e0e0e0);
+      }
+      .card-title + .room {
+        border-top: none;
+      }
+      .room.off .info,
+      .room.off .temps {
+        opacity: 0.55;
+      }
+      .room .info {
+        flex: 1;
+        min-width: 140px;
+      }
+      .room .name {
+        font-weight: 500;
+      }
+      .room .temps {
+        display: flex;
+        gap: 12px;
+        font-size: 14px;
+        white-space: nowrap;
+      }
+      .room-switch {
+        display: flex;
+        cursor: pointer;
       }
       .zone {
         display: flex;
@@ -270,6 +305,90 @@ export class HomexClimateDashboard extends LitElement {
         <div class="card-title">Zones</div>
         ${this._zones.map((z) => this._renderZone(z))}
       </div>
+      ${this._renderRooms()}
     `;
+  }
+
+  // --- Rooms ---------------------------------------------------------------
+
+  /** Rooms with the Climate module: heating switch, mode, setpoint, current
+   * temperature, radiators and heating demand. */
+  private _renderRooms() {
+    const rooms = this.rooms.filter((r) => (r.modules ?? []).includes("heating"));
+    if (!rooms.length) return "";
+    return html`<div class="card">
+      <div class="card-title">Pièces</div>
+      ${rooms.map((r) => this._renderRoom(r))}
+    </div>`;
+  }
+
+  private _fmt(values: number[]): string {
+    if (!values.length) return "—";
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const f = (v: number) => `${Math.round(v * 10) / 10}`;
+    return min === max ? `${f(min)} °C` : `${f(min)}–${f(max)} °C`;
+  }
+
+  private _renderRoom(r: Room) {
+    const radiators = r.heating?.radiators ?? [];
+    const on = r.heating?.enabled !== false;
+    const valves = radiators
+      .map((rad) => radiatorClimate(this.hass, rad.device_id))
+      .map((id) => (id ? this.hass.states[id] : undefined))
+      .filter((st) => st && !["unknown", "unavailable"].includes(st.state));
+    const num = (v: unknown) => (typeof v === "number" ? [v] : []);
+    // Setpoint: the valves' targets (off valves have none).
+    const targets = valves.filter((st) => st.state !== "off").flatMap((st) => num(st.attributes.temperature));
+    // Current temperature: the room's reference sensor, else the valves'.
+    const ref = this.hass.states[`sensor.homex_${r.room_id}_temperature`];
+    const refValue = parseFloat(ref?.state);
+    const current = Number.isNaN(refValue)
+      ? this._fmt(valves.flatMap((st) => num(st.attributes.current_temperature)))
+      : `${refValue} °C`;
+    const zm = roomZoneMode(this.hass, r);
+    const heating = roomIsHeating(this.hass, r);
+    const busy = this._roomBusy.has(r.room_id);
+    return html`<div class="room ${on ? "" : "off"}">
+      <label class="room-switch" title=${radiators.length ? "Chauffage de la pièce" : "Aucun radiateur"}>
+        ${toggleSwitch(on, (v) => this._setRoomHeating(r, v), busy || !radiators.length)}
+      </label>
+      <div class="info">
+        <div class="name">${r.name}</div>
+        <div class="muted">
+          ${radiators.length} radiateur(s)${zm ? html` · ${zm.mode}` : ""}
+        </div>
+      </div>
+      <div class="temps">
+        <span title="Consigne">🎯 ${on && targets.length ? this._fmt(targets) : on ? "—" : "coupé"}</span>
+        <span title="Température actuelle">🌡 ${current}</span>
+      </div>
+      ${radiators.length
+        ? html`<span class="pill ${heating ? "heating" : ""}">
+            <svg viewBox="0 0 24 24"><path d=${heating ? mdiFire : mdiFireOff}></path></svg>
+            ${heating ? "Heating" : "Idle"}
+          </span>`
+        : ""}
+    </div>`;
+  }
+
+  @state() private _roomBusy = new Set<string>();
+
+  /** The room's own heating: off = Unheated, on = its zone's mode. */
+  private async _setRoomHeating(r: Room, enabled: boolean) {
+    this._roomBusy = new Set([...this._roomBusy, r.room_id]);
+    try {
+      await updateRoom(this.hass, {
+        entry_id: r.entry_id,
+        heating: { radiators: r.heating?.radiators ?? [], enabled },
+      });
+      fireChanged(this); // the panel reloads the rooms
+    } catch (err) {
+      alert("Erreur Homex : " + errorMessage(err));
+    } finally {
+      const next = new Set(this._roomBusy);
+      next.delete(r.room_id);
+      this._roomBusy = next;
+    }
   }
 }

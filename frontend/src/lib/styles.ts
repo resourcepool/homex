@@ -40,6 +40,12 @@ export const sharedStyles = css`
   .toggle.on .knob {
     transform: translateX(18px);
   }
+  .toggle:has(input:disabled) {
+    opacity: 0.4;
+  }
+  .toggle input:disabled {
+    cursor: default;
+  }
   button {
     cursor: pointer;
     border: none;
