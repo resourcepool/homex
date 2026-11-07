@@ -18,6 +18,9 @@ import { property, state } from "lit/decorators.js";
 import {
   mdiFire,
   mdiFireOff,
+  mdiLightbulbAlertOutline,
+  mdiLightbulbOnOutline,
+  mdiLightbulbOutline,
   mdiRadiatorOff,
   mdiWindowShutter,
   mdiWindowShutterOpen,
@@ -181,10 +184,26 @@ class HomexRoomTile extends LitElement {
     return fn?.split(" - ")[2] ?? this._config!.room;
   }
 
+  private get _isLights() {
+    return this._entity.endsWith("_lights_toggle");
+  }
+
+  /** As on the Homex dashboard: lit (a Homex scene applies), stray (some
+   * light is on outside of a scene) or off. A room's switch is on as soon as
+   * one of its parts is. */
+  private _lightState(): "lit" | "stray" | "off" {
+    const st = this.hass.states[this._entity];
+    if (st?.state !== "on") return "off";
+    return st.attributes.active_scene != null ? "lit" : "stray";
+  }
+
   private _toggle() {
     const st = this.hass.states[this._entity];
     if (!st) return;
-    this.hass.callService("switch", st.state === "on" ? "turn_off" : "turn_on", {
+    // Lights, as on the Homex dashboard: turn the room on (apply its scene)
+    // unless a room scene is active — never turn stray lights' parts off.
+    const off = this._isLights ? this._lightState() === "lit" : st.state === "on";
+    this.hass.callService("switch", off ? "turn_off" : "turn_on", {
       entity_id: this._entity,
     });
   }
@@ -205,27 +224,45 @@ class HomexRoomTile extends LitElement {
     const st = this.hass.states[this._entity];
     const on = st?.state === "on";
     const heating = this._entity.endsWith("_heating");
-    const icon =
-      this._config.icon || (heating ? "mdi:radiator" : on ? "mdi:lightbulb-group" : "mdi:lightbulb-group-off");
-    const stateLabel = !st
+    const light = this._isLights ? this._lightState() : undefined;
+    const path =
+      light === "lit"
+        ? mdiLightbulbOnOutline
+        : light === "stray"
+          ? mdiLightbulbAlertOutline
+          : light === "off"
+            ? mdiLightbulbOutline
+            : undefined;
+    const icon = this._config.icon || "mdi:radiator";
+    const title = !st
       ? "Introuvable"
       : st.state === "unavailable"
         ? "Indisponible"
-        : this.hass.formatEntityState?.(st) ?? st.state;
+        : light === "lit"
+          ? "Allumée — éteindre"
+          : light === "stray"
+            ? "Éteinte, mais au moins une lumière est allumée — allumer"
+            : light === "off"
+              ? "Éteinte — allumer"
+              : this.hass.formatEntityState?.(st) ?? st.state;
+    const missing = !st || st.state === "unavailable";
     const t = this._metric("temperature");
     const h = this._metric("humidity");
     const air = this._air();
     return html`<ha-card
       class=${on ? "on" : ""}
       style=${heating ? "--tile-color: var(--state-climate-heat-color, #ff8100)" : ""}
+      title=${title}
       @click=${this._toggle}
     >
       <div class="icon" @click=${this._moreInfo} title="Détails">
-        <ha-icon .icon=${icon}></ha-icon>
+        ${path && !this._config.icon
+          ? html`<svg viewBox="0 0 24 24">${svg`<path d=${path}></path>`}</svg>`
+          : html`<ha-icon .icon=${icon}></ha-icon>`}
       </div>
       <div class="info">
         <div class="name">${this._name()}</div>
-        <div class="sub">${stateLabel}</div>
+        ${missing ? html`<div class="sub">${title}</div>` : nothing}
         ${air.length
           ? html`<div class="pills">
               ${air.map(
@@ -310,6 +347,11 @@ class HomexRoomTile extends LitElement {
       background: rgba(127, 127, 127, 0.15);
       color: var(--state-inactive-color, var(--secondary-text-color));
       --mdc-icon-size: 22px;
+    }
+    .icon svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
     }
     .on .icon {
       color: var(--tile-color);
