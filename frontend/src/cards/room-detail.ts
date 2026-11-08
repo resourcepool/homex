@@ -8,6 +8,8 @@ import {
   mdiArrowCollapseDown,
   mdiArrowCollapseUp,
   mdiChartBubble,
+  mdiChevronLeft,
+  mdiChevronRight,
   mdiClose,
   mdiCloud,
   mdiFire,
@@ -54,6 +56,11 @@ export class HomexRoomDetail extends LitElement {
   @property() heading = "";
   @state() private _heating?: HeatingStatus;
   @state() private _busy = false;
+  /** Phones: one shutter control at a time (index among "All" + shutters). */
+  @state() private _narrow = false;
+  @state() private _coverIdx = 0;
+  private _mq?: MediaQueryList;
+  private _onMq = () => (this._narrow = !!this._mq?.matches);
   private _lastHeatingSwitch?: string;
   private _unlisten?: () => void;
 
@@ -62,12 +69,16 @@ export class HomexRoomDetail extends LitElement {
     this._keydown = this._keydown.bind(this);
     window.addEventListener("keydown", this._keydown);
     this._unlisten = onLanguageChange(() => this.requestUpdate());
+    this._mq = window.matchMedia("(max-width: 600px)");
+    this._mq.addEventListener("change", this._onMq);
+    this._onMq();
     this._loadHeating();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     window.removeEventListener("keydown", this._keydown);
+    this._mq?.removeEventListener("change", this._onMq);
     this._unlisten?.();
     this._unlisten = undefined;
   }
@@ -257,10 +268,15 @@ export class HomexRoomDetail extends LitElement {
         entity: c as string | string[],
       })),
     ];
-    return html`<section>
+    // Phones: a single control, browsed with the arrows below.
+    const paged = this._narrow && columns.length > 1;
+    const idx = Math.min(this._coverIdx, columns.length - 1);
+    const shown = paged ? [columns[idx]] : columns;
+    const go = (d: number) => (this._coverIdx = (idx + d + columns.length) % columns.length);
+    return html`<section class="shutters">
       <h3>${t("cardRoomDetail.shutters")}</h3>
       <div class="covers">
-        ${columns.map(
+        ${shown.map(
           (col) => html`<div class="cover ${col.state ? "" : "all"}">
             ${col.title ? html`<div class="ctitle">${col.title}</div>` : nothing}
             <div class="cstate">${col.state || "\u00a0"}</div>
@@ -276,6 +292,17 @@ export class HomexRoomDetail extends LitElement {
           </div>`
         )}
       </div>
+      ${paged
+        ? html`<div class="pager">
+            <button class="round" title=${t("cardRoomDetail.previous")} @click=${() => go(-1)}>
+              ${icon(mdiChevronLeft)}
+            </button>
+            <span class="page">${idx + 1} / ${columns.length}</span>
+            <button class="round" title=${t("cardRoomDetail.next")} @click=${() => go(1)}>
+              ${icon(mdiChevronRight)}
+            </button>
+          </div>`
+        : nothing}
     </section>`;
   }
 
@@ -623,6 +650,23 @@ export class HomexRoomDetail extends LitElement {
     }
     .switch input:checked + span::before {
       transform: translateX(18px);
+    }
+    .pager {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .pager .page {
+      font-size: 12px;
+      color: var(--secondary-text-color);
+      min-width: 36px;
+      text-align: center;
+    }
+    .shutters .covers .cover.all:only-child {
+      border-right: none;
+      padding-right: 0;
     }
     /* Phones: shutters and heating stay side by side, everything smaller. */
     @media (max-width: 600px) {

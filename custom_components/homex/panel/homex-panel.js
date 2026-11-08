@@ -2416,6 +2416,8 @@ var Vt = {
 	},
 	cardRoomDetail: {
 		en: {
+			previous: "Previous shutter",
+			next: "Next shutter",
 			temperature: "Temperature",
 			humidity: "Humidity",
 			climate: "Climate",
@@ -2447,6 +2449,8 @@ var Vt = {
 			no_data: "No climate, heating or shutter data for this room."
 		},
 		fr: {
+			previous: "Volet précédent",
+			next: "Volet suivant",
 			temperature: "Température",
 			humidity: "Humidité",
 			climate: "Climat",
@@ -13756,7 +13760,7 @@ var Ua = class extends v {
   `, Ua);
 k([b({ attribute: !1 })], Q.prototype, "hass", void 0), k([b({ attribute: !1 })], Q.prototype, "rooms", void 0), k([x()], Q.prototype, "_step", void 0), k([x()], Q.prototype, "_switchPlan", void 0), k([x()], Q.prototype, "_createPresets", void 0), k([x()], Q.prototype, "_presetsCreated", void 0), k([x()], Q.prototype, "_withLights", void 0), k([x()], Q.prototype, "_withShutters", void 0), k([x()], Q.prototype, "_covers", void 0), k([x()], Q.prototype, "_plan", void 0), k([x()], Q.prototype, "_smart", void 0), k([x()], Q.prototype, "_selected", void 0), k([x()], Q.prototype, "_busy", void 0), k([x()], Q.prototype, "_created", void 0), Q = Wa = k([y("homex-setup-wizard")], Q);
 // src/homex-panel.ts
-var Ga, Ka = "212", $ = (Ga = class extends v {
+var Ga, Ka = "213", $ = (Ga = class extends v {
 	constructor(...e) {
 		super(...e), this.narrow = !1, this._rooms = null, this._error = null, this._createOpen = !1, this._exportOpen = !1, this._menuOpen = !1, this._dashTab = localStorage.getItem("homex_dash_tab") === "climate" ? "climate" : "general", this._expanded = localStorage.getItem("homex_expanded") || null, this._loaded = !1, this._onToggleExpand = (e) => {
 			let t = e.detail.entry_id;

@@ -1,6 +1,8 @@
 /** Strings of cards/room-detail.ts. */
 export default {
   en: {
+    previous: "Previous shutter",
+    next: "Next shutter",
     temperature: "Temperature",
     humidity: "Humidity",
     climate: "Climate",
@@ -32,6 +34,8 @@ export default {
     no_data: "No climate, heating or shutter data for this room.",
   },
   fr: {
+    previous: "Volet précédent",
+    next: "Volet suivant",
     temperature: "Température",
     humidity: "Humidité",
     climate: "Climat",
