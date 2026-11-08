@@ -77,7 +77,7 @@ type Orient =
   | "goes-down";
 
 type Tool = "select" | "draw" | "rect" | OpeningType | "stairs";
-const OPENING_TOOLS: Tool[] = ["door", "sliding_door", "window", "glass_door"];
+const OPENING_TOOLS: Tool[] = ["door", "sliding_door", "window", "glass_door", "opening"];
 /** Openings with a direction (rotate / mirror). */
 const directed = (type: OpeningType) => type === "door" || type === "sliding_door";
 const isOpeningTool = (tool: Tool): tool is OpeningType => OPENING_TOOLS.includes(tool);
@@ -150,6 +150,7 @@ export class HomexBuilder extends LitElement {
     window: { width: OPENING_WIDTH.window, flip: false, out: false },
     glass_door: { width: OPENING_WIDTH.glass_door, flip: false, out: false },
     sliding_door: { width: OPENING_WIDTH.sliding_door, flip: false, out: false },
+    opening: { width: OPENING_WIDTH.opening, flip: false, out: false },
   };
   @state() private _stairDir: PlanStair["dir"] = "up";
   /** Next stairs go up to the floor above, or down to the one below. */
@@ -1352,6 +1353,9 @@ export class HomexBuilder extends LitElement {
       case "c":
         this._setTool("sliding_door");
         break;
+      case "x":
+        this._setTool("opening");
+        break;
       case "s":
         this._setTool("stairs");
         break;
@@ -1623,6 +1627,19 @@ export class HomexBuilder extends LitElement {
         ${poly(pocket ? leaf(shift(a, dir * w), shift(b, dir * w), -3, 3) : leaf(shift(a, dir * w), shift(b, dir * w), side * 3, side * 8), "slide-open")}
         ${line(from, to, "slide-arrow")}
         ${poly(head, "slide-head")}`;
+    } else if (o.type === "opening") {
+      // No joinery: the wall stops at two jambs. Full height: a dashed line
+      // where the wall was; doorway: the lintel above (two dashed lines);
+      // low wall: a thin wall left below.
+      const j = 6;
+      const jambs = svg`${line(off(a, -j), off(a, j), "jamb")}${line(off(b, -j), off(b, j), "jamb")}`;
+      body = svg`${jambs}${
+        style === "doorway"
+          ? svg`${line(off(a, -j), off(b, -j), "open-line")}${line(off(a, j), off(b, j), "open-line")}`
+          : style === "low_wall"
+            ? poly([off(a, 2), off(b, 2), off(b, -2), off(a, -2)], "low-wall")
+            : line(a, b, "open-line")
+      }`;
     } else {
       const t = 6;
       const frame = poly([off(a, t), off(b, t), off(b, -t), off(a, -t)], "frame");
@@ -1875,7 +1892,7 @@ export class HomexBuilder extends LitElement {
         ? html`${tool("select", "🖐", "V")} ${tool("draw", "✏️", "D")} ${tool("rect", "▭", "R")}
             <span class="sep"></span>
             ${tool("door", "🚪", "O")} ${tool("sliding_door", "⇿", "C")} ${tool("window", "🪟", "W")}
-            ${tool("glass_door", "◫", "G")} ${tool("stairs", "🪜", "S")}
+            ${tool("glass_door", "◫", "G")} ${tool("opening", "⬚", "X")} ${tool("stairs", "🪜", "S")}
             <span class="sep"></span>`
         : nothing}
       <button title=${t("builder.undo")} ?disabled=${!this._undo.length} @click=${() => this._undoAction()}>↶</button>
@@ -2152,7 +2169,21 @@ export class HomexBuilder extends LitElement {
     return html`${this._choice(t("builder.style"), OPENING_STYLES[type], openingStyle({ type, style: item.style }), `style_${type}`, (v) =>
         set({ style: v })
       )}
-      ${this._colorControl(item.color, FRAME_COLORS, (v) => set({ color: v }))}`;
+      ${type === "opening" ? nothing : this._colorControl(item.color, FRAME_COLORS, (v) => set({ color: v }))}`;
+  }
+
+  /** Stretch an opening over its whole wall: the partition disappears. */
+  private _fitWall(o: PlanOpening) {
+    const shape = this._level.rooms.find((s) => s.id === o.shape);
+    if (!shape) return;
+    const p = shape.points[o.edge];
+    const q = shape.points[(o.edge + 1) % shape.points.length];
+    const len = Math.hypot(q[0] - p[0], q[1] - p[1]);
+    if (!len) return;
+    this._commit(() => {
+      o.t = 0.5;
+      o.width = Math.round(len);
+    });
   }
 
   /** Shape, turn and colour of stairs. */
@@ -2463,6 +2494,9 @@ export class HomexBuilder extends LitElement {
     return html`<div class="selection">
       ${this._panelHead(t(`builder.tool_${o.type}`))}
       ${this._widthControl(o.width, (v) => this._commit(() => (o.width = v)))}
+      ${o.type === "opening"
+        ? html`<div class="row"><button @click=${() => this._fitWall(o)}>↔ ${t("builder.opening_whole_wall")}</button></div>`
+        : nothing}
       ${directed(o.type) ? this._orientButtons(false) : nothing}
       ${this._openingStyleControls(o.type, o, (patch) =>
         this._setStyle(o, { ...patch, ...(patch.style === OPENING_STYLES[o.type][0] ? { style: undefined } : {}) })
@@ -3131,6 +3165,20 @@ export class HomexBuilder extends LitElement {
       .op.selected .slide-leaf {
         stroke: var(--accent-color, #ff9800);
       }
+      .op .jamb {
+        stroke: var(--primary-text-color);
+        stroke-width: 2;
+      }
+      .op .open-line {
+        stroke: var(--secondary-text-color);
+        stroke-width: 1;
+        stroke-dasharray: 6 4;
+        vector-effect: non-scaling-stroke;
+      }
+      .op .low-wall {
+        fill: color-mix(in srgb, var(--primary-text-color) 35%, transparent);
+        stroke: none;
+      }
       .op .hit {
         stroke: transparent;
         stroke-width: 16;
@@ -3471,6 +3519,7 @@ export class HomexBuilder extends LitElement {
       svg.tool-door,
       svg.tool-window,
       svg.tool-glass_door,
+      svg.tool-opening,
       svg.tool-stairs {
         cursor: crosshair;
       }

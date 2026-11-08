@@ -707,6 +707,9 @@ var Ne = {
 			style_glass_door_casement: "Casement",
 			style_glass_door_sliding: "Sliding",
 			style_glass_door_fixed: "Fixed",
+			style_opening_full: "Full height",
+			style_opening_doorway: "Doorway",
+			style_opening_low_wall: "Low wall",
 			stairs_shape: "Shape",
 			stairs_shape_straight: "Straight",
 			stairs_shape_l: "Quarter turn",
@@ -804,6 +807,8 @@ var Ne = {
 			tool_sliding_door: "Sliding door",
 			tool_window: "Window",
 			tool_glass_door: "Glass door",
+			tool_opening: "Opening",
+			opening_whole_wall: "Whole wall",
 			tool_stairs: "Stairs",
 			opening_type: "Type",
 			width_cm: "Width (cm)",
@@ -924,6 +929,9 @@ var Ne = {
 			style_glass_door_casement: "Battante",
 			style_glass_door_sliding: "Coulissante",
 			style_glass_door_fixed: "Fixe",
+			style_opening_full: "Toute hauteur",
+			style_opening_doorway: "Baie (linteau)",
+			style_opening_low_wall: "Muret",
 			stairs_shape: "Forme",
 			stairs_shape_straight: "Droit",
 			stairs_shape_l: "Quart tournant (90°)",
@@ -1021,6 +1029,8 @@ var Ne = {
 			tool_sliding_door: "Porte coulissante",
 			tool_window: "Fenêtre",
 			tool_glass_door: "Porte vitrée",
+			tool_opening: "Ouverture",
+			opening_whole_wall: "Toute la cloison",
 			tool_stairs: "Escalier",
 			opening_type: "Type",
 			width_cm: "Largeur (cm)",
@@ -3186,7 +3196,8 @@ var Z = (e, t) => J(e, t), nt = (e) => `${e}_${Date.now().toString(36)}${Math.ra
 	door: 90,
 	sliding_door: 90,
 	window: 120,
-	glass_door: 240
+	glass_door: 240,
+	opening: 120
 }, it = (e, t, n) => {
 	let r = e.rooms.find((e) => e.id === t);
 	return !r || n < 0 || n >= r.points.length ? null : [r.points[n], r.points[(n + 1) % r.points.length]];
@@ -3335,6 +3346,11 @@ var Q = {
 		"casement",
 		"sliding",
 		"fixed"
+	],
+	opening: [
+		"full",
+		"doorway",
+		"low_wall"
 	]
 }, yt = (e) => e.style && Q[e.type].includes(e.style) ? e.style : Q[e.type][0], bt = [
 	"straight",

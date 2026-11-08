@@ -388,7 +388,8 @@ export interface PlanShape {
   points: PlanPoint[];
 }
 
-export type OpeningType = "door" | "sliding_door" | "window" | "glass_door";
+/** opening: a gap in the wall (no joinery), to take out a partition or part of it. */
+export type OpeningType = "door" | "sliding_door" | "window" | "glass_door" | "opening";
 
 /** A door / sliding door / window / glass door set in a room's wall (edge `edge` of room
  * outline `shape`), centred at ratio `t` along it, `width` cm wide. */

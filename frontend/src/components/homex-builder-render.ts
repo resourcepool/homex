@@ -73,11 +73,18 @@ const LIGHT_OFF = "#2a2a28";
 const HEAT = "#ff7a2f";
 
 /** Opening heights (m above the floor): sill and top. */
-const HEIGHTS: Record<PlanOpening["type"], [number, number]> = {
+const HEIGHTS: Record<Exclude<PlanOpening["type"], "opening">, [number, number]> = {
   door: [0, 2.1],
   sliding_door: [0, 2.1],
   glass_door: [0, 2.15],
   window: [0.95, 2.15],
+};
+/** Heights of an opening's hole; a plain opening by its style: the whole
+ * wall gone, a doorway under a lintel, or a low wall left below. */
+const heights = (o: PlanOpening): [number, number] => {
+  if (o.type !== "opening") return HEIGHTS[o.type];
+  const style = openingStyle(o);
+  return style === "doorway" ? [0, 2.1] : style === "low_wall" ? [1.0, WALL_H] : [0, WALL_H];
 };
 
 const m = (cm: number) => cm / 100;
@@ -384,15 +391,18 @@ export class HomexBuilderRender extends LitElement {
       const t0 = Math.max(0, Math.min(along(geo.a), along(geo.b)));
       const t1 = Math.min(1, Math.max(along(geo.a), along(geo.b)));
       if ((t1 - t0) * len < 1) continue;
-      holes.push([t0, t1, ...HEIGHTS[o.type]]);
+      holes.push([t0, t1, ...heights(o)]);
     }
     holes.sort((x, y) => x[0] - y[0]);
     const out: [number, number, number, number][] = [];
     let at = 0;
-    for (const [t0, t1, sill, top] of holes) {
+    for (const [h0, t1, sill, top] of holes) {
+      // Overlapping holes (a door within a wider opening): the first one wins.
+      const t0 = Math.max(h0, at);
+      if (t1 <= t0) continue;
       if (t0 > at) out.push([at, t0, 0, WALL_H]);
       if (sill > 0) out.push([t0, t1, 0, sill]);
-      out.push([t0, t1, top, WALL_H]);
+      if (top < WALL_H) out.push([t0, t1, top, WALL_H]);
       at = Math.max(at, t1);
     }
     if (at < 1) out.push([at, 1, 0, WALL_H]);
@@ -400,6 +410,8 @@ export class HomexBuilderRender extends LitElement {
   }
 
   private _buildOpening(level_g: THREE.Group, level: PlanLevel, o: PlanOpening) {
+    // A plain opening is only a hole in the wall (see _wallPieces).
+    if (o.type === "opening") return;
     const geo = openingGeometry(level, o);
     if (!geo) return;
     // Everything of the opening (frame, glass, leaf, shutters) fades with its wall.
@@ -407,7 +419,7 @@ export class HomexBuilderRender extends LitElement {
     level_g.add(g);
     const { a, b, c, n, u } = geo;
     const w = Math.hypot(b[0] - a[0], b[1] - a[1]);
-    const [sill, top] = HEIGHTS[o.type];
+    const [sill, top] = heights(o);
     const style = openingStyle(o);
     const off = (x: PlanPoint, d: number): PlanPoint => [x[0] + n[0] * d, x[1] + n[1] * d];
     const shift = (x: PlanPoint, d: number): PlanPoint => [x[0] + u[0] * d, x[1] + u[1] * d];

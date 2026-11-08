@@ -17,6 +17,7 @@ export const OPENING_WIDTH: Record<OpeningType, number> = {
   sliding_door: 90,
   window: 120,
   glass_door: 240,
+  opening: 120,
 };
 
 export interface WallSpot {
@@ -272,6 +273,8 @@ export const OPENING_STYLES: Record<OpeningType, string[]> = {
   sliding_door: ["plain", "glazed", "pocket"],
   window: ["casement", "tilt", "fixed", "sliding"],
   glass_door: ["casement", "sliding", "fixed"],
+  // full: no wall at all; doorway: a lintel above; low_wall: a low wall below
+  opening: ["full", "doorway", "low_wall"],
 };
 
 export const openingStyle = (o: { type: OpeningType; style?: string }) =>
