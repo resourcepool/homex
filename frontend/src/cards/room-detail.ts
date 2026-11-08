@@ -161,21 +161,14 @@ export class HomexRoomDetail extends LitElement {
     const step = (a?.target_temp_step as number) || 0.5;
     const min = (a?.min_temp as number) ?? 5;
     const max = (a?.max_temp as number) ?? 30;
-    const current = valves
-      .map((v) => this.hass.states[v].attributes.current_temperature)
-      .filter((t): t is number => typeof t === "number");
-    return html`<section>
-      <h3>Chauffage</h3>
-      <div class="line">
-        <span
-          class="status ${!roomOn ? "off" : demand ? "heat" : ""}"
-          title=${!roomOn ? "" : demand ? "En chauffe" : "Pas de demande de chauffe"}
-          >${icon(!roomOn ? mdiFireOff : mdiFire)}</span
-        >
-        <span class="grow">
-          ${roomOn ? "Pièce chauffée" : "Pièce non chauffée"}
-          ${h ? html`<span class="muted"> · mode ${h.mode_name}${h.enabled ? "" : " · chauffage global coupé"}</span>` : nothing}
-        </span>
+    const status = !roomOn
+      ? { cls: "off", path: mdiFireOff, text: "Les radiateurs restent éteints" }
+      : demand
+        ? { cls: "heat", path: mdiFire, text: "Radiateurs en chauffe" }
+        : { cls: "", path: mdiFire, text: "Radiateurs inactifs — consigne atteinte" };
+    return html`<section class="heating">
+      <div class="head">
+        <h3>Chauffage</h3>
         ${sw
           ? html`<label class="switch" title=${roomOn ? "Ne plus chauffer la pièce" : "Chauffer la pièce"}>
               <input
@@ -190,25 +183,17 @@ export class HomexRoomDetail extends LitElement {
             </label>`
           : nothing}
       </div>
+      <div class="hstate">${roomOn ? "Pièce chauffée" : "Pièce non chauffée"}</div>
+      <div class="hstatus">
+        <span class="status ${status.cls}">${icon(status.path)}</span>
+        <span>
+          ${status.text}
+          ${h && roomOn ? html`<span class="muted"><br />Mode ${h.mode_name}${h.enabled ? "" : " · chauffage global coupé"}</span>` : nothing}
+        </span>
+      </div>
       ${roomOn && target !== undefined
-        ? html`<div class="line setpoint">
-            <span class="grow" title="Gardée jusqu'au prochain changement de mode">
-              Consigne des radiateurs
-              ${current.length
-                ? html`<span class="muted">
-                    · mesurée ${fmt(this.hass, current.reduce((x, y) => x + y, 0) / current.length)} °C</span
-                  >`
-                : nothing}
-            </span>
-            <button
-              class="round"
-              title="Baisser"
-              ?disabled=${this._busy || target - step < min}
-              @click=${() => this._setpoint(valves, target - step)}
-            >
-              ${icon(mdiMinus)}
-            </button>
-            <span class="big">${fmt(this.hass, target, 1, 1)} °C</span>
+        ? html`<div class="setpoint" title="Gardée jusqu'au prochain changement de mode">
+            <span class="muted">Consigne</span>
             <button
               class="round"
               title="Monter"
@@ -216,6 +201,15 @@ export class HomexRoomDetail extends LitElement {
               @click=${() => this._setpoint(valves, target + step)}
             >
               ${icon(mdiPlus)}
+            </button>
+            <span class="big">${fmt(this.hass, target, 1, 1)} °C</span>
+            <button
+              class="round"
+              title="Baisser"
+              ?disabled=${this._busy || target - step < min}
+              @click=${() => this._setpoint(valves, target - step)}
+            >
+              ${icon(mdiMinus)}
             </button>
           </div>`
         : nothing}
@@ -263,9 +257,15 @@ export class HomexRoomDetail extends LitElement {
 
   render() {
     if (!this.hass || !this.room) return nothing;
-    const body = [this._climate(), this._shutters(), this._heatingSection()].filter((s) => s !== nothing);
+    const climate = this._climate();
+    // Shutters and heating side by side (stacked on narrow screens).
+    const cols = [this._shutters(), this._heatingSection()].filter((s) => s !== nothing);
+    const body = [
+      ...(climate !== nothing ? [climate] : []),
+      ...(cols.length ? [html`<div class="cols ${cols.length > 1 ? "two" : ""}">${cols}</div>`] : []),
+    ];
     return html`<div class="backdrop" @click=${this.close}></div>
-      <div class="dialog" role="dialog" aria-modal="true" aria-label=${this.heading}>
+      <div class="dialog ${cols.length > 1 ? "wide" : ""}" role="dialog" aria-modal="true" aria-label=${this.heading}>
         <header>
           <h2>${this.heading}</h2>
           <button class="round" title="Fermer" @click=${this.close}>${icon(mdiClose)}</button>
@@ -301,6 +301,59 @@ export class HomexRoomDetail extends LitElement {
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       overflow: hidden;
     }
+    .dialog.wide {
+      width: min(680px, calc(100vw - 32px));
+    }
+    .cols {
+      border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
+    }
+    .body > .cols:first-child {
+      border-top: none;
+    }
+    .cols.two {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+    .cols.two > section + section {
+      border-top: none;
+      border-left: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
+      padding-left: 20px;
+      margin-left: 20px;
+    }
+    @media (max-width: 600px) {
+      .cols.two {
+        display: block;
+      }
+      .cols.two > section + section {
+        border-left: none;
+        border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
+        padding-left: 0;
+        margin-left: 0;
+      }
+    }
+    .heating .head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .hstate {
+      font-weight: 500;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+    .hstatus {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 14px;
+    }
+    .setpoint {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+    }
     header {
       display: flex;
       align-items: center;
@@ -316,6 +369,7 @@ export class HomexRoomDetail extends LitElement {
       overflow-y: auto;
       padding: 0 24px 20px;
     }
+    .body > section + .cols,
     section + section {
       border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
     }

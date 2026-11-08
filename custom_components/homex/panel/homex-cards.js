@@ -709,19 +709,22 @@ var nt, rt = [
 	}
 	_heatingSection() {
 		if (!this.room.heating?.radiators?.length) return M;
-		let e = this.hass.states[this._heatingSwitch], t = this._heating, n = J(this.hass, this.room).filter((e) => this.hass.states[e]), r = n.some((e) => this.hass.states[e]?.attributes.hvac_action === "heating"), i = e ? e.state === "on" : t?.room_enabled !== !1, a = n.length ? this.hass.states[n[0]].attributes : void 0, o = typeof a?.temperature == "number" ? a.temperature : void 0, s = a?.target_temp_step || .5, c = a?.min_temp ?? 5, l = a?.max_temp ?? 30, u = n.map((e) => this.hass.states[e].attributes.current_temperature).filter((e) => typeof e == "number");
-		return A`<section>
-      <h3>Chauffage</h3>
-      <div class="line">
-        <span
-          class="status ${i ? r ? "heat" : "" : "off"}"
-          title=${i ? r ? "En chauffe" : "Pas de demande de chauffe" : ""}
-          >${K(i ? U : Pe)}</span
-        >
-        <span class="grow">
-          ${i ? "Pièce chauffée" : "Pièce non chauffée"}
-          ${t ? A`<span class="muted"> · mode ${t.mode_name}${t.enabled ? "" : " · chauffage global coupé"}</span>` : M}
-        </span>
+		let e = this.hass.states[this._heatingSwitch], t = this._heating, n = J(this.hass, this.room).filter((e) => this.hass.states[e]), r = n.some((e) => this.hass.states[e]?.attributes.hvac_action === "heating"), i = e ? e.state === "on" : t?.room_enabled !== !1, a = n.length ? this.hass.states[n[0]].attributes : void 0, o = typeof a?.temperature == "number" ? a.temperature : void 0, s = a?.target_temp_step || .5, c = a?.min_temp ?? 5, l = a?.max_temp ?? 30, u = i ? r ? {
+			cls: "heat",
+			path: U,
+			text: "Radiateurs en chauffe"
+		} : {
+			cls: "",
+			path: U,
+			text: "Radiateurs inactifs — consigne atteinte"
+		} : {
+			cls: "off",
+			path: Pe,
+			text: "Les radiateurs restent éteints"
+		};
+		return A`<section class="heating">
+      <div class="head">
+        <h3>Chauffage</h3>
         ${e ? A`<label class="switch" title=${i ? "Ne plus chauffer la pièce" : "Chauffer la pièce"}>
               <input
                 type="checkbox"
@@ -731,22 +734,16 @@ var nt, rt = [
               <span></span>
             </label>` : M}
       </div>
-      ${i && o !== void 0 ? A`<div class="line setpoint">
-            <span class="grow" title="Gardée jusqu'au prochain changement de mode">
-              Consigne des radiateurs
-              ${u.length ? A`<span class="muted">
-                    · mesurée ${G(this.hass, u.reduce((e, t) => e + t, 0) / u.length)} °C</span
-                  >` : M}
-            </span>
-            <button
-              class="round"
-              title="Baisser"
-              ?disabled=${this._busy || o - s < c}
-              @click=${() => this._setpoint(n, o - s)}
-            >
-              ${K(ze)}
-            </button>
-            <span class="big">${G(this.hass, o, 1, 1)} °C</span>
+      <div class="hstate">${i ? "Pièce chauffée" : "Pièce non chauffée"}</div>
+      <div class="hstatus">
+        <span class="status ${u.cls}">${K(u.path)}</span>
+        <span>
+          ${u.text}
+          ${t && i ? A`<span class="muted"><br />Mode ${t.mode_name}${t.enabled ? "" : " · chauffage global coupé"}</span>` : M}
+        </span>
+      </div>
+      ${i && o !== void 0 ? A`<div class="setpoint" title="Gardée jusqu'au prochain changement de mode">
+            <span class="muted">Consigne</span>
             <button
               class="round"
               title="Monter"
@@ -754,6 +751,15 @@ var nt, rt = [
               @click=${() => this._setpoint(n, o + s)}
             >
               ${K(Ve)}
+            </button>
+            <span class="big">${G(this.hass, o, 1, 1)} °C</span>
+            <button
+              class="round"
+              title="Baisser"
+              ?disabled=${this._busy || o - s < c}
+              @click=${() => this._setpoint(n, o - s)}
+            >
+              ${K(ze)}
             </button>
           </div>` : M}
     </section>`;
@@ -796,18 +802,14 @@ var nt, rt = [
 	}
 	render() {
 		if (!this.hass || !this.room) return M;
-		let e = [
-			this._climate(),
-			this._shutters(),
-			this._heatingSection()
-		].filter((e) => e !== M);
+		let e = this._climate(), t = [this._shutters(), this._heatingSection()].filter((e) => e !== M), n = [...e === M ? [] : [e], ...t.length ? [A`<div class="cols ${t.length > 1 ? "two" : ""}">${t}</div>`] : []];
 		return A`<div class="backdrop" @click=${this.close}></div>
-      <div class="dialog" role="dialog" aria-modal="true" aria-label=${this.heading}>
+      <div class="dialog ${t.length > 1 ? "wide" : ""}" role="dialog" aria-modal="true" aria-label=${this.heading}>
         <header>
           <h2>${this.heading}</h2>
           <button class="round" title="Fermer" @click=${this.close}>${K(Me)}</button>
         </header>
-        <div class="body">${e.length ? e : A`<p class="muted">Aucune donnée de climat, de chauffage ni de volet pour cette pièce.</p>`}</div>
+        <div class="body">${n.length ? n : A`<p class="muted">Aucune donnée de climat, de chauffage ni de volet pour cette pièce.</p>`}</div>
       </div>`;
 	}
 };
@@ -838,6 +840,59 @@ nt = X, nt.styles = o`
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       overflow: hidden;
     }
+    .dialog.wide {
+      width: min(680px, calc(100vw - 32px));
+    }
+    .cols {
+      border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
+    }
+    .body > .cols:first-child {
+      border-top: none;
+    }
+    .cols.two {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+    .cols.two > section + section {
+      border-top: none;
+      border-left: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
+      padding-left: 20px;
+      margin-left: 20px;
+    }
+    @media (max-width: 600px) {
+      .cols.two {
+        display: block;
+      }
+      .cols.two > section + section {
+        border-left: none;
+        border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
+        padding-left: 0;
+        margin-left: 0;
+      }
+    }
+    .heating .head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .hstate {
+      font-weight: 500;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+    .hstatus {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 14px;
+    }
+    .setpoint {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+    }
     header {
       display: flex;
       align-items: center;
@@ -853,6 +908,7 @@ nt = X, nt.styles = o`
       overflow-y: auto;
       padding: 0 24px 20px;
     }
+    .body > section + .cols,
     section + section {
       border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
     }
