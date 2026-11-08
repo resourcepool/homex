@@ -1,8 +1,23 @@
 # Homex
 
-Intégration Home Assistant pour créer rapidement des **automatisations
-d'éclairage par pièce**. Tout se gère depuis un **panneau dédié** dans la barre
-latérale — pas de YAML à écrire.
+**Le framework Home Assistant génial et opinionated.** *(The awesome,
+opinionated Home Assistant framework.)*
+
+Homex gère la maison **pièce par pièce**. Lumières, interrupteurs muraux, volets
+roulants, chauffage et qualité de l'air sont des **modules** qu'on active par
+pièce, qu'on configure depuis **un seul panneau** dans la barre latérale, et
+qu'on affiche sur ses dashboards avec **une seule carte**. Pas de YAML, pas
+d'automatisations de colle.
+
+| Module | Rôle |
+| --- | --- |
+| 💡 **Lumières** | Un interrupteur de pièce, un groupe de lumières et des scènes natives. Des groupes pour une partie de la pièce, des déclencheurs pour allumer / éteindre, faire défiler les scènes ou varier l'intensité. |
+| 🎛 **Interrupteurs** | On dessine un interrupteur mural ou une télécommande une fois par modèle, puis on associe chaque bouton et chaque type d'appui à une action de la pièce. |
+| 🪟 **Volets** | Volets roulants en groupes : ouvrir, fermer, stop, et un basculement intelligent qui sait quand un volet est en mouvement. |
+| 🌡 **Climat** | Capteurs de qualité de l'air par pièce, vannes de radiateurs pilotées par consignes et zones, et une chaudière qui ne tourne qu'à la demande. |
+
+Interface en français et en anglais (suit la langue de Home Assistant, ou se
+règle dans *Paramètres → Appareils et services → Homex → Configurer*).
 
 ## Modèle
 
