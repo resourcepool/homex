@@ -391,11 +391,13 @@ export interface PlanShape {
 export interface PlanLevel {
   id: string;
   name: string;
+  /** Level number (0 = ground floor, negative = basements). */
+  level: number;
   floor_id: string | null;
   rooms: PlanShape[];
 }
 
-/** The house plan: levels from bottom to top. */
+/** The house plan: levels sorted by level number. */
 export interface Plan {
   levels: PlanLevel[];
 }

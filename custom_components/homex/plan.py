@@ -2,8 +2,9 @@
 
 Stored as one document in the ``homex_plan`` store::
 
-    {"levels": [  # bottom to top
-        {"id": "l_...", "name": "Ground floor", "floor_id": "ground_floor" | None,
+    {"levels": [  # by level number
+        {"id": "l_...", "name": "Ground floor", "level": 0,
+         "floor_id": "ground_floor" | None,
          "rooms": [{"id": "s_...", "room_id": "<homex room id>" | None,
                     "name": "...", "points": [[x, y], ...]}]},  # cm
     ]}
@@ -36,6 +37,7 @@ _LEVEL = vol.Schema(
     {
         vol.Required("id"): str,
         vol.Optional("name", default=""): str,
+        vol.Optional("level", default=0): vol.Coerce(int),
         vol.Optional("floor_id"): vol.Any(None, str),
         vol.Optional("rooms", default=list): [_SHAPE],
     },

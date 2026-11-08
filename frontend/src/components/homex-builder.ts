@@ -4,6 +4,8 @@ import type { HomeAssistant, Plan, PlanLevel, PlanPoint, PlanShape, Room } from 
 import { errorMessage, fetchPlan, fetchRooms, savePlan } from "../api";
 import { sharedStyles } from "../lib/styles";
 import { t, locale } from "../lib/i18n";
+import "./homex-builder-level-dialog";
+import type { HaFloor } from "./homex-builder-level-dialog";
 import {
   GRID,
   areaM2,
@@ -51,7 +53,8 @@ export class HomexBuilder extends LitElement {
   @state() private _plan: Plan | null = null;
   @state() private _rooms: Room[] = [];
   @state() private _error = "";
-  @state() private _levelIdx = 0;
+  @state() private _levelId: string | null = null;
+  @state() private _dialog: { mode: "new" | "edit"; suggested: number } | null = null;
   @state() private _tool: Tool = "select";
   @state() private _selected: string | null = null;
   @state() private _draft: PlanPoint[] = [];
@@ -95,9 +98,15 @@ export class HomexBuilder extends LitElement {
   private async _load() {
     try {
       const [plan, rooms] = await Promise.all([fetchPlan(this.hass), fetchRooms(this.hass)]);
+      // Plans from before level numbers: number them bottom to top.
+      plan.levels.forEach((l, i) => {
+        if (typeof l.level !== "number") l.level = i;
+      });
+      plan.levels.sort((a, b) => a.level - b.level);
       this._plan = plan;
       this._rooms = rooms;
-      this._levelIdx = Math.min(this._levelIdx, Math.max(0, plan.levels.length - 1));
+      if (!this._level) this._levelId = this._defaultLevel()?.id ?? null;
+      if (!plan.levels.length) this._openLevelDialog("new", 0);
     } catch (err) {
       this._error = errorMessage(err);
     }
@@ -125,18 +134,32 @@ export class HomexBuilder extends LitElement {
 
   // -- Plan state -----------------------------------------------------------------
 
-  private get _level(): PlanLevel | null {
-    return this._plan?.levels[this._levelIdx] ?? null;
+  /** Levels, by level number. */
+  private get _levels(): PlanLevel[] {
+    return this._plan?.levels ?? [];
   }
 
-  /** The level that shows through: below, else above. */
+  private get _level(): PlanLevel | null {
+    return this._levels.find((l) => l.id === this._levelId) ?? null;
+  }
+
+  /** Ground floor if any, else the lowest above it, else the highest. */
+  private _defaultLevel(): PlanLevel | undefined {
+    const levels = this._levels;
+    return levels.find((l) => l.level >= 0) ?? levels[levels.length - 1];
+  }
+
+  /** The level that shows through: the one below, else the one above. */
   private get _ghost(): PlanLevel | null {
-    const levels = this._plan?.levels ?? [];
-    return levels[this._levelIdx - 1] ?? levels[this._levelIdx + 1] ?? null;
+    const levels = this._levels;
+    const i = levels.findIndex((l) => l.id === this._levelId);
+    if (i < 0) return null;
+    return levels[i - 1] ?? levels[i + 1] ?? null;
   }
 
   private get _ghostIsAbove(): boolean {
-    return !this._plan?.levels[this._levelIdx - 1] && !!this._plan?.levels[this._levelIdx + 1];
+    const g = this._ghost;
+    return !!g && !!this._level && g.level > this._level.level;
   }
 
   private _snapshot() {
@@ -176,7 +199,7 @@ export class HomexBuilder extends LitElement {
   }
 
   private _afterHistory() {
-    this._levelIdx = Math.min(this._levelIdx, Math.max(0, this._plan!.levels.length - 1));
+    if (!this._level) this._levelId = this._defaultLevel()?.id ?? null;
     if (this._selected && !this._level?.rooms.some((s) => s.id === this._selected)) this._selected = null;
     this._scheduleSave();
   }
@@ -201,65 +224,60 @@ export class HomexBuilder extends LitElement {
 
   // -- Levels -------------------------------------------------------------------------
 
-  private _floors(): { floor_id: string; name: string; level: number | null }[] {
+  private _floors(): HaFloor[] {
     return Object.values((this.hass.floors ?? {}) as Record<string, any>)
       .map((f) => ({ floor_id: f.floor_id, name: f.name, level: f.level ?? null }))
       .sort((a, b) => (a.level ?? 0) - (b.level ?? 0));
   }
 
-  /** The HA floor a new level probably is: next one up / down, unused. */
-  private _guessFloor(where: "above" | "below" | "base") {
-    const floors = this._floors();
-    const used = new Set((this._plan?.levels ?? []).map((l) => l.floor_id).filter(Boolean));
-    const free = floors.filter((f) => !used.has(f.floor_id));
-    if (where === "base") return free.find((f) => f.level === 0) ?? free[0] ?? null;
-    const levels = this._plan?.levels ?? [];
-    const edge = where === "above" ? levels[levels.length - 1] : levels[0];
-    const ref = floors.find((f) => f.floor_id === edge?.floor_id)?.level;
-    if (ref === null || ref === undefined) return null;
-    return where === "above"
-      ? free.find((f) => (f.level ?? 0) > ref) ?? null
-      : [...free].reverse().find((f) => (f.level ?? 0) < ref) ?? null;
+  private _openLevelDialog(mode: "new" | "edit", suggested = 0) {
+    this._dialog = { mode, suggested };
   }
 
-  private _addLevel(where: "above" | "below" | "base") {
-    const floor = this._guessFloor(where);
-    const levels = this._plan?.levels ?? [];
-    const level: PlanLevel = {
-      id: uid("l"),
-      name:
-        floor?.name ??
-        (where === "base"
-          ? t("builder.level_base")
-          : t("builder.level_n", { n: where === "above" ? levels.length : -1 })),
-      floor_id: floor?.floor_id ?? null,
-      rooms: [],
-    };
+  /** "+" above the highest / below the lowest floor. */
+  private _addLevelAt(where: "above" | "below") {
+    const nums = this._levels.map((l) => l.level);
+    const suggested = !nums.length ? 0 : where === "above" ? Math.max(...nums) + 1 : Math.min(...nums) - 1;
+    this._openLevelDialog("new", suggested);
+  }
+
+  private _onLevelSaved(e: CustomEvent<{ floor_id: string; name: string; level: number }>) {
+    const { floor_id, name, level } = e.detail;
+    const editing = this._dialog?.mode === "edit" ? this._level : null;
     if (!this._plan) this._plan = { levels: [] };
+    let id = editing?.id;
     this._commit((plan) => {
-      if (where === "below") plan.levels.unshift(level);
-      else plan.levels.push(level);
+      if (editing) {
+        Object.assign(editing, { floor_id, name, level });
+      } else {
+        id = uid("l");
+        plan.levels.push({ id, name, level, floor_id, rooms: [] });
+      }
+      plan.levels.sort((a, b) => a.level - b.level);
     });
-    this._levelIdx = where === "below" ? 0 : this._plan!.levels.length - 1;
-    this._selected = null;
-    this._draft = [];
-    this._tool = "draw";
+    this._dialog = null;
+    if (!editing) this._goLevel(id!);
   }
 
-  private _goLevel(idx: number) {
-    this._levelIdx = idx;
+  private _onLevelDeleted() {
+    const level = this._level;
+    this._dialog = null;
+    if (!level) return;
+    const next = this._ghost; // the neighbour shown through
+    this._commit((plan) => {
+      plan.levels = plan.levels.filter((l) => l.id !== level.id);
+    });
+    this._levelId = next?.id ?? this._defaultLevel()?.id ?? null;
+    this._selected = null;
+    if (!this._levels.length) this._openLevelDialog("new", 0);
+  }
+
+  private _goLevel(id: string) {
+    this._levelId = id;
     this._selected = null;
     this._draft = [];
     this._rect = null;
-  }
-
-  private _deleteLevel() {
-    const level = this._level;
-    if (!level) return;
-    if (level.rooms.length && !confirm(t("builder.level_delete_confirm", { name: level.name }))) return;
-    this._commit((plan) => plan.levels.splice(this._levelIdx, 1));
-    this._levelIdx = Math.max(0, this._levelIdx - 1);
-    this._selected = null;
+    this._hover = null;
   }
 
   // -- Coordinates & snapping ---------------------------------------------------------
@@ -853,8 +871,6 @@ export class HomexBuilder extends LitElement {
     >
       ${icon} <span>${t(`builder.tool_${id}`)}</span>
     </button>`;
-    const levels = this._plan!.levels;
-    const top = this._levelIdx === levels.length - 1;
     return html`<div class="toolbar">
       ${tool("select", "🖐", "V")} ${tool("draw", "✏️", "D")} ${tool("rect", "▭", "R")}
       <span class="sep"></span>
@@ -864,13 +880,6 @@ export class HomexBuilder extends LitElement {
       <button title=${t("builder.zoom_out")} @click=${() => this._zoom(1 / 1.25)}>−</button>
       <button title=${t("builder.zoom_in")} @click=${() => this._zoom(1.25)}>＋</button>
       <button title=${t("builder.fit")} @click=${() => this._fit()}>⤢</button>
-      <span class="grow"></span>
-      <button
-        class="next"
-        @click=${() => (top ? this._addLevel("above") : this._goLevel(this._levelIdx + 1))}
-      >
-        ${top ? t("builder.next_level_new") : t("builder.next_level")} ↑
-      </button>
     </div>`;
   }
 
@@ -882,92 +891,87 @@ export class HomexBuilder extends LitElement {
     return this._level?.rooms.length ? t("builder.hint_select") : t("builder.hint_empty");
   }
 
-  private _levelsPanel() {
-    const levels = this._plan!.levels;
-    const level = this._level!;
-    const floors = this._floors();
-    return html`<section>
-      <h3>${t("builder.levels")}</h3>
-      <button class="add" @click=${() => this._addLevel("above")}>＋ ${t("builder.add_above")}</button>
-      <div class="levels">
-        ${[...levels.keys()].reverse().map(
-          (i) => html`<button class="level ${i === this._levelIdx ? "active" : ""}" @click=${() => this._goLevel(i)}>
-            <span>${levels[i].name || t("builder.level_unnamed")}</span>
-            <span class="count">${levels[i].rooms.length}</span>
-          </button>`
-        )}
-      </div>
-      <button class="add" @click=${() => this._addLevel("below")}>＋ ${t("builder.add_below")}</button>
-      <label class="field">
-        <span>${t("builder.level_name")}</span>
-        <input
-          .value=${level.name}
-          @change=${(e: Event) => this._commit(() => (level.name = (e.target as HTMLInputElement).value))}
-        />
-      </label>
-      <label class="field">
-        <span>${t("builder.level_floor")}</span>
-        <select
-          @change=${(e: Event) =>
-            this._commit(() => (level.floor_id = (e.target as HTMLSelectElement).value || null))}
+  /** Google Maps style floor switcher: + above, the floors, + below. */
+  private _floorSwitcher() {
+    const levels = [...this._levels].reverse();
+    return html`<div class="floors">
+      <button class="floor-add" title=${t("builder.add_above")} @click=${() => this._addLevelAt("above")}>＋</button>
+      ${levels.map(
+        (l) => html`<button
+          class="floor ${l.id === this._levelId ? "active" : ""}"
+          title=${l.name}
+          @click=${() => (l.id === this._levelId ? this._openLevelDialog("edit") : this._goLevel(l.id))}
         >
-          <option value="" ?selected=${!level.floor_id}>${t("builder.level_floor_none")}</option>
-          ${floors.map(
-            (f) => html`<option value=${f.floor_id} ?selected=${f.floor_id === level.floor_id}>${f.name}</option>`
-          )}
-        </select>
-      </label>
-      <button class="danger-link" @click=${() => this._deleteLevel()}>${t("builder.level_delete")}</button>
-    </section>`;
+          <span class="num">${l.level}</span>
+          <span class="fname">${l.name}</span>
+          ${l.id === this._levelId ? html`<span class="edit" title=${t("builder.level_edit")}>✎</span>` : nothing}
+        </button>`
+      )}
+      <button class="floor-add" title=${t("builder.add_below")} @click=${() => this._addLevelAt("below")}>＋</button>
+    </div>`;
+  }
+
+  private _floorOf(r: Room): string | null {
+    return (r.area_id ? this.hass.areas?.[r.area_id]?.floor_id : null) ?? null;
+  }
+
+  /** Homex rooms not placed on any floor yet, that fit this floor (its HA
+   * floor, or no floor at all). */
+  private _assignable(): Room[] {
+    const level = this._level;
+    if (!level) return [];
+    const placed = new Set(this._levels.flatMap((l) => l.rooms.map((s) => s.room_id)).filter(Boolean));
+    return this._rooms
+      .filter((r) => !placed.has(r.room_id))
+      .filter((r) => {
+        const f = this._floorOf(r);
+        return !f || !level.floor_id || f === level.floor_id;
+      })
+      .sort((a, b) => a.name.localeCompare(b.name));
   }
 
   private _roomsPanel() {
-    const level = this._level!;
-    const levels = this._plan!.levels;
-    const floorOf = (r: Room) => (r.area_id ? this.hass.areas?.[r.area_id]?.floor_id : null) ?? null;
-    const placedOn = (r: Room) => levels.filter((l) => l.rooms.some((s) => s.room_id === r.room_id));
-    const rooms = [...this._rooms].sort((a, b) => {
-      const fa = level.floor_id && floorOf(a) === level.floor_id ? 0 : 1;
-      const fb = level.floor_id && floorOf(b) === level.floor_id ? 0 : 1;
-      return fa - fb || a.name.localeCompare(b.name);
-    });
-    return html`<section>
+    const rooms = this._assignable();
+    const sel = this._level?.rooms.find((s) => s.id === this._selected);
+    return html`<aside>
       <h3>${t("builder.rooms")}</h3>
-      <p class="hint">${t("builder.rooms_hint")}</p>
+      <p class="hint">${sel ? t("builder.rooms_hint_selected") : t("builder.rooms_hint")}</p>
       <div class="chips">
-        ${rooms.map((r) => {
-          const on = placedOn(r);
-          const here = on.includes(level);
-          const other = on.filter((l) => l !== level).map((l) => l.name);
-          return html`<div
-            class="chip ${here ? "placed" : ""} ${level.floor_id && floorOf(r) === level.floor_id ? "floor" : ""}"
+        ${rooms.map(
+          (r) => html`<div
+            class="chip ${sel ? "clickable" : ""}"
             draggable="true"
-            title=${other.length ? t("builder.room_on", { levels: other.join(", ") }) : ""}
             @dragstart=${(e: DragEvent) => {
               e.dataTransfer?.setData("text/homex-room", r.room_id);
               e.dataTransfer!.effectAllowed = "link";
             }}
+            @click=${() => sel && this._mapShape(sel, r.room_id)}
           >
-            <span>${here ? "✓ " : ""}${r.name}</span>
-            ${other.length ? html`<span class="on">${other.join(", ")}</span>` : nothing}
-          </div>`;
-        })}
-        ${rooms.length ? nothing : html`<p class="hint">${t("builder.no_rooms")}</p>`}
+            <span>${r.name}</span>
+            ${this._floorOf(r) ? nothing : html`<span class="nofloor">${t("builder.no_floor")}</span>`}
+          </div>`
+        )}
+        ${rooms.length ? nothing : html`<p class="hint">${t("builder.all_placed")}</p>`}
       </div>
-    </section>`;
+    </aside>`;
   }
 
   private _selectionPanel() {
     const shape = this._level?.rooms.find((s) => s.id === this._selected);
     if (!shape) return nothing;
     const perimeter = edgesOf(shape.points).reduce((s, [a, b]) => s + segLength(a, b), 0);
-    return html`<section class="selection">
-      <h3>${t("builder.selection")}</h3>
+    const current = shape.room_id ? this._rooms.find((r) => r.room_id === shape.room_id) : undefined;
+    const options = [...(current ? [current] : []), ...this._assignable()];
+    return html`<div class="selection">
+      <div class="sel-head">
+        <strong>${t("builder.selection")}</strong>
+        <button class="icon" title=${t("common.close")} @click=${() => (this._selected = null)}>✕</button>
+      </div>
       <label class="field">
         <span>${t("builder.mapped_room")}</span>
         <select @change=${(e: Event) => this._mapShape(shape, (e.target as HTMLSelectElement).value || null)}>
           <option value="" ?selected=${!shape.room_id}>${t("builder.unmapped")}</option>
-          ${this._rooms.map(
+          ${options.map(
             (r) => html`<option value=${r.room_id} ?selected=${r.room_id === shape.room_id}>${r.name}</option>`
           )}
         </select>
@@ -986,7 +990,23 @@ export class HomexBuilder extends LitElement {
         <strong>${this._len(perimeter)}</strong>
       </p>
       <button class="danger-link" @click=${() => this._deleteShape(shape.id)}>${t("builder.shape_delete")}</button>
-    </section>`;
+    </div>`;
+  }
+
+  private _levelDialog() {
+    const editing = this._dialog?.mode === "edit" ? this._level : null;
+    const others = this._levels.filter((l) => l !== editing);
+    return html`<homex-builder-level-dialog
+      .open=${!!this._dialog}
+      .level=${editing}
+      .floors=${this._floors()}
+      .usedFloors=${others.map((l) => l.floor_id).filter(Boolean)}
+      .usedLevels=${others.map((l) => l.level)}
+      .suggestedLevel=${this._dialog?.suggested ?? 0}
+      @level-saved=${this._onLevelSaved}
+      @level-deleted=${this._onLevelDeleted}
+      @dialog-closed=${() => (this._dialog = null)}
+    ></homex-builder-level-dialog>`;
   }
 
   render() {
@@ -996,43 +1016,41 @@ export class HomexBuilder extends LitElement {
       saved: t("builder.saved"),
       error: t("builder.save_error"),
     }[this._saving];
+    const level = this._level;
     return html`
       <div class="head">
         <button class="back" title=${t("builder.back")} @click=${this._close}>←</button>
         <h2>3D Builder</h2>
+        ${level ? html`<span class="cur">${level.name} · ${t("builder.level_label", { level: level.level })}</span>` : nothing}
         <span class="status ${this._saving}">${saving}</span>
       </div>
       ${this._error ? html`<p class="err">${this._error}</p>` : nothing}
       ${!this._plan
         ? html`<p class="hint">${t("common.loading")}</p>`
-        : !this._plan.levels.length
+        : !level
           ? html`<div class="empty">
               <div class="empty-icon">🏠</div>
               <h3>${t("builder.empty_title")}</h3>
               <p>${t("builder.empty_text")}</p>
-              <button class="primary" @click=${() => this._addLevel("base")}>${t("builder.create_base")}</button>
+              <button class="primary" @click=${() => this._openLevelDialog("new", 0)}>${t("builder.create_first")}</button>
             </div>`
           : html`<div class="body">
-              <aside>${this._levelsPanel()} ${this._selectionPanel()} ${this._roomsPanel()}</aside>
-              <div class="main">
-                ${this._toolbar()}
-                <div
-                  class="stage ${this._dragOver ? "dragover" : ""}"
-                  @dragover=${this._onDragOver}
-                  @dragleave=${this._onDragLeave}
-                  @drop=${this._onDrop}
-                >
-                  ${this._canvas()}
-                  ${this._ghost
-                    ? html`<div class="ghost-tag">
-                        ${this._ghostIsAbove ? "↑" : "↓"} ${this._ghost.name}
-                      </div>`
-                    : nothing}
-                  <div class="scale">${t("builder.grid", { size: "50 cm" })}</div>
-                </div>
-                <p class="hint">${this._hint()}</p>
+              ${this._roomsPanel()}
+              <div
+                class="stage ${this._dragOver ? "dragover" : ""}"
+                @dragover=${this._onDragOver}
+                @dragleave=${this._onDragLeave}
+                @drop=${this._onDrop}
+              >
+                ${this._canvas()} ${this._toolbar()} ${this._selectionPanel()}
+                ${this._ghost
+                  ? html`<div class="ghost-tag">${this._ghostIsAbove ? "↑" : "↓"} ${this._ghost.name}</div>`
+                  : nothing}
+                <div class="hint-bar">${this._hint()} · ${t("builder.grid", { size: "50 cm" })}</div>
+                ${this._floorSwitcher()}
               </div>
             </div>`}
+      ${this._levelDialog()}
     `;
   }
 
@@ -1040,18 +1058,25 @@ export class HomexBuilder extends LitElement {
     sharedStyles,
     css`
       :host {
-        display: block;
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 32px);
       }
       .head {
         display: flex;
         align-items: center;
         gap: 12px;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
+        flex: 0 0 auto;
       }
       .head h2 {
         margin: 0;
         font-size: 20px;
         font-weight: 500;
+      }
+      .cur {
+        color: var(--secondary-text-color);
+        font-size: 14px;
       }
       .status {
         margin-left: auto;
@@ -1086,6 +1111,7 @@ export class HomexBuilder extends LitElement {
         font-size: 12px;
         color: var(--secondary-text-color);
         margin: 6px 0;
+        line-height: 1.45;
       }
       .empty {
         text-align: center;
@@ -1103,57 +1129,53 @@ export class HomexBuilder extends LitElement {
         line-height: 1.5;
       }
       .body {
+        flex: 1 1 auto;
+        min-height: 0;
         display: grid;
-        grid-template-columns: 250px minmax(0, 1fr);
-        gap: 14px;
-        align-items: start;
+        grid-template-columns: 230px minmax(0, 1fr);
+        gap: 12px;
       }
       aside {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        max-height: calc(100vh - 130px);
         overflow: auto;
-      }
-      section {
         padding: 12px;
         border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
         border-radius: 12px;
         background: var(--card-background-color);
       }
-      section h3 {
-        margin: 0 0 8px;
+      aside h3 {
+        margin: 0 0 4px;
         font-size: 14px;
         font-weight: 600;
       }
-      .levels {
+      .chips {
         display: flex;
         flex-direction: column;
-        gap: 4px;
-        margin: 6px 0;
+        gap: 6px;
+        margin-top: 8px;
       }
-      .level {
+      .chip {
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.35));
+        cursor: grab;
+        font-size: 13px;
         display: flex;
         justify-content: space-between;
-        text-align: left;
-        background: transparent;
-        border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
+        align-items: center;
+        gap: 6px;
+        user-select: none;
+        background: var(--card-background-color);
       }
-      .level.active {
+      .chip:hover,
+      .chip.clickable {
         border-color: var(--primary-color);
-        background: color-mix(in srgb, var(--primary-color) 14%, transparent);
-        font-weight: 600;
       }
-      .count {
+      .chip.clickable {
+        cursor: pointer;
+      }
+      .nofloor {
+        font-size: 11px;
         color: var(--secondary-text-color);
-        font-weight: 400;
-      }
-      button.add {
-        width: 100%;
-        background: transparent;
-        color: var(--primary-color);
-        text-align: left;
-        padding: 5px 4px;
       }
       .field {
         display: flex;
@@ -1174,7 +1196,7 @@ export class HomexBuilder extends LitElement {
         color: var(--primary-text-color);
       }
       button.danger-link {
-        margin-top: 10px;
+        margin-top: 8px;
         background: transparent;
         padding: 4px 0;
         color: var(--error-color, #db4437);
@@ -1183,44 +1205,38 @@ export class HomexBuilder extends LitElement {
         font-size: 13px;
         margin: 10px 0 0;
       }
-      .chips {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-      }
-      .chip {
-        padding: 7px 10px;
-        border-radius: 8px;
-        border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.35));
-        cursor: grab;
-        font-size: 13px;
-        display: flex;
-        justify-content: space-between;
-        gap: 6px;
-        user-select: none;
-      }
-      .chip.floor {
-        border-color: color-mix(in srgb, var(--primary-color) 60%, transparent);
-      }
-      .chip.placed {
-        opacity: 0.55;
-      }
-      .chip .on {
-        font-size: 11px;
-        color: var(--secondary-text-color);
-        white-space: nowrap;
+      .stage {
+        position: relative;
+        min-height: 360px;
+        border-radius: 12px;
         overflow: hidden;
-        text-overflow: ellipsis;
+        border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
+        background: var(--card-background-color, #1c1c1c);
       }
-      .main {
-        min-width: 0;
+      .stage.dragover {
+        border-color: var(--primary-color);
+      }
+      /* Floating UI over the editor. */
+      .toolbar,
+      .selection,
+      .floors,
+      .ghost-tag,
+      .hint-bar {
+        position: absolute;
+        background: color-mix(in srgb, var(--card-background-color, #1c1c1c) 92%, transparent);
+        border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
       }
       .toolbar {
+        top: 10px;
+        left: 10px;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        gap: 6px;
-        margin-bottom: 8px;
+        gap: 4px;
+        padding: 4px;
+        max-width: calc(100% - 20px);
       }
       .tool.active {
         background: var(--primary-color);
@@ -1232,27 +1248,97 @@ export class HomexBuilder extends LitElement {
         background: var(--divider-color, rgba(127, 127, 127, 0.4));
         margin: 0 2px;
       }
-      .grow {
-        flex: 1;
+      .selection {
+        top: 10px;
+        right: 10px;
+        width: 230px;
+        padding: 10px 12px;
       }
-      button.next {
-        border: 1px solid var(--primary-color);
+      .sel-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+      }
+      button.icon {
         background: transparent;
-        color: var(--primary-color);
+        padding: 2px 6px;
       }
-      .stage {
-        position: relative;
-        height: calc(100vh - 210px);
-        min-height: 360px;
-        border-radius: 12px;
+      .ghost-tag {
+        top: 58px;
+        left: 10px;
+        font-size: 12px;
+        padding: 3px 8px;
+        color: var(--secondary-text-color);
+        pointer-events: none;
+      }
+      .hint-bar {
+        bottom: 10px;
+        left: 10px;
+        right: 90px;
+        width: fit-content;
+        max-width: calc(100% - 110px);
+        font-size: 12px;
+        padding: 5px 10px;
+        color: var(--secondary-text-color);
+        pointer-events: none;
+      }
+      .floors {
+        right: 10px;
+        bottom: 10px;
+        display: flex;
+        flex-direction: column;
         overflow: hidden;
-        border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
-        background: var(--card-background-color, #1c1c1c);
+        max-height: calc(100% - 20px);
+        overflow-y: auto;
       }
-      .stage.dragover {
-        border-color: var(--primary-color);
+      .floors button {
+        border-radius: 0;
+        background: transparent;
+        min-width: 56px;
+        padding: 8px 10px;
+      }
+      .floors button + button {
+        border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
+      }
+      .floor-add {
+        color: var(--primary-color);
+        font-size: 18px;
+        line-height: 1;
+      }
+      .floor {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-align: left;
+      }
+      .floor .num {
+        font-weight: 700;
+        min-width: 20px;
+        text-align: center;
+      }
+      .floor .fname {
+        display: none;
+        font-size: 12px;
+        max-width: 140px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .floor.active {
+        background: var(--primary-color);
+        color: var(--text-primary-color, #fff);
+      }
+      .floor.active .fname,
+      .floors:hover .fname {
+        display: inline;
+      }
+      .floor .edit {
+        opacity: 0.8;
       }
       svg.canvas {
+        position: absolute;
+        inset: 0;
         width: 100%;
         height: 100%;
         display: block;
@@ -1389,36 +1475,29 @@ export class HomexBuilder extends LitElement {
       .snap .snap-align {
         stroke: #e040fb;
       }
-      .ghost-tag,
-      .scale {
-        position: absolute;
-        font-size: 12px;
-        padding: 3px 8px;
-        border-radius: 6px;
-        background: color-mix(in srgb, var(--card-background-color, #1c1c1c) 85%, transparent);
-        color: var(--secondary-text-color);
-        pointer-events: none;
-      }
-      .ghost-tag {
-        top: 8px;
-        left: 8px;
-      }
-      .scale {
-        bottom: 8px;
-        right: 8px;
-      }
       @media (max-width: 800px) {
+        :host {
+          height: auto;
+        }
         .body {
           grid-template-columns: 1fr;
         }
         aside {
-          max-height: none;
+          max-height: 30vh;
         }
         .stage {
-          height: 60vh;
+          height: 65vh;
         }
-        .tool span {
+        .tool span,
+        .hint-bar {
           display: none;
+        }
+        .selection {
+          top: auto;
+          bottom: 10px;
+          left: 10px;
+          right: 80px;
+          width: auto;
         }
       }
     `,
