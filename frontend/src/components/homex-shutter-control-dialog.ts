@@ -97,6 +97,34 @@ export class HomexShutterControlDialog extends LitElement {
         color: var(--secondary-text-color);
         white-space: nowrap;
       }
+      /* Per-shutter controls (when the group has several). */
+      .cover .one {
+        display: flex;
+        gap: 4px;
+        flex: none;
+      }
+      .cover .one button {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .cover .one svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+      }
+      @media (max-width: 600px) {
+        .cover {
+          flex-wrap: wrap;
+        }
+        .cover .one {
+          width: 100%;
+          justify-content: flex-end;
+        }
+      }
     `,
   ];
 
@@ -119,6 +147,15 @@ export class HomexShutterControlDialog extends LitElement {
       alert(t("common.error", { message: errorMessage(err) }));
     } finally {
       this._busy = false;
+    }
+  }
+
+  /** One shutter of the group (its own open / stop / close). */
+  private async _runOne(entity_id: string, service: ShutterService) {
+    try {
+      await this.hass.callService("cover", service, { entity_id });
+    } catch (err) {
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   }
 
@@ -180,6 +217,19 @@ export class HomexShutterControlDialog extends LitElement {
               ${this.hass.states[id]?.attributes?.friendly_name || id}
             </span>
             <span class="val">${one.label}${pos !== null ? ` · ${pos} %` : ""}</span>
+            ${covers.length > 1
+              ? html`<span class="one">
+                  <button title=${t("shutterControlDialog.open")} @click=${() => this._runOne(id, "open_cover")}>
+                    <svg viewBox="0 0 24 24"><path d=${mdiArrowUp}></path></svg>
+                  </button>
+                  <button title=${t("shutterControlDialog.stop")} @click=${() => this._runOne(id, "stop_cover")}>
+                    <svg viewBox="0 0 24 24"><path d=${mdiStop}></path></svg>
+                  </button>
+                  <button title=${t("shutterControlDialog.close")} @click=${() => this._runOne(id, "close_cover")}>
+                    <svg viewBox="0 0 24 24"><path d=${mdiArrowDown}></path></svg>
+                  </button>
+                </span>`
+              : ""}
           </div>`;
         })}
         <button slot="actions" @click=${this._close}>${t("shutterControlDialog.done")}</button>

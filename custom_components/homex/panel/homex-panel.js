@@ -5310,6 +5310,13 @@ var gi = class extends v {
 			this._busy = !1;
 		}
 	}
+	async _runOne(e, t) {
+		try {
+			await this.hass.callService("cover", t, { entity_id: e });
+		} catch (e) {
+			alert(S("common.error", { message: w(e) }));
+		}
+	}
 	_close() {
 		this.dispatchEvent(new CustomEvent("dialog-closed"));
 	}
@@ -5352,13 +5359,24 @@ var gi = class extends v {
           </button>
         </div>
         ${n.map((e) => {
-			let t = Vr(this.hass, [e]), n = Br(this.hass, e);
+			let t = Vr(this.hass, [e]), r = Br(this.hass, e);
 			return h`<div class="cover">
             <svg viewBox="0 0 24 24"><path d=${t.icon}></path></svg>
             <span class="name">
               ${this.hass.states[e]?.attributes?.friendly_name || e}
             </span>
-            <span class="val">${t.label}${n === null ? "" : ` · ${n} %`}</span>
+            <span class="val">${t.label}${r === null ? "" : ` · ${r} %`}</span>
+            ${n.length > 1 ? h`<span class="one">
+                  <button title=${S("shutterControlDialog.open")} @click=${() => this._runOne(e, "open_cover")}>
+                    <svg viewBox="0 0 24 24"><path d=${$e}></path></svg>
+                  </button>
+                  <button title=${S("shutterControlDialog.stop")} @click=${() => this._runOne(e, "stop_cover")}>
+                    <svg viewBox="0 0 24 24"><path d=${Nt}></path></svg>
+                  </button>
+                  <button title=${S("shutterControlDialog.close")} @click=${() => this._runOne(e, "close_cover")}>
+                    <svg viewBox="0 0 24 24"><path d=${Ze}></path></svg>
+                  </button>
+                </span>` : ""}
           </div>`;
 		})}
         <button slot="actions" @click=${this._close}>${S("shutterControlDialog.done")}</button>
@@ -5441,6 +5459,34 @@ var gi = class extends v {
       .cover .val {
         color: var(--secondary-text-color);
         white-space: nowrap;
+      }
+      /* Per-shutter controls (when the group has several). */
+      .cover .one {
+        display: flex;
+        gap: 4px;
+        flex: none;
+      }
+      .cover .one button {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .cover .one svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+      }
+      @media (max-width: 600px) {
+        .cover {
+          flex-wrap: wrap;
+        }
+        .cover .one {
+          width: 100%;
+          justify-content: flex-end;
+        }
       }
     `], gi);
 k([b({ attribute: !1 })], _i.prototype, "hass", void 0), k([b({ type: Boolean })], _i.prototype, "open", void 0), k([b({ attribute: !1 })], _i.prototype, "room", void 0), k([x()], _i.prototype, "_groupId", void 0), k([x()], _i.prototype, "_busy", void 0), _i = k([y("homex-shutter-control-dialog")], _i);
@@ -13710,7 +13756,7 @@ var Ua = class extends v {
   `, Ua);
 k([b({ attribute: !1 })], Q.prototype, "hass", void 0), k([b({ attribute: !1 })], Q.prototype, "rooms", void 0), k([x()], Q.prototype, "_step", void 0), k([x()], Q.prototype, "_switchPlan", void 0), k([x()], Q.prototype, "_createPresets", void 0), k([x()], Q.prototype, "_presetsCreated", void 0), k([x()], Q.prototype, "_withLights", void 0), k([x()], Q.prototype, "_withShutters", void 0), k([x()], Q.prototype, "_covers", void 0), k([x()], Q.prototype, "_plan", void 0), k([x()], Q.prototype, "_smart", void 0), k([x()], Q.prototype, "_selected", void 0), k([x()], Q.prototype, "_busy", void 0), k([x()], Q.prototype, "_created", void 0), Q = Wa = k([y("homex-setup-wizard")], Q);
 // src/homex-panel.ts
-var Ga, Ka = "211", $ = (Ga = class extends v {
+var Ga, Ka = "212", $ = (Ga = class extends v {
 	constructor(...e) {
 		super(...e), this.narrow = !1, this._rooms = null, this._error = null, this._createOpen = !1, this._exportOpen = !1, this._menuOpen = !1, this._dashTab = localStorage.getItem("homex_dash_tab") === "climate" ? "climate" : "general", this._expanded = localStorage.getItem("homex_expanded") || null, this._loaded = !1, this._onToggleExpand = (e) => {
 			let t = e.detail.entry_id;
