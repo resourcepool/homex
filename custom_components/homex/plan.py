@@ -9,7 +9,9 @@ Stored as one document in the ``homex_plan`` store::
                     "name": "...", "points": [[x, y], ...]}],  # cm
          "openings": [{"id", "type": "door" | "sliding_door" | "window" | "glass_door",
                        "shape", "edge", "t", "width", "flip", "out"}],
-         "stairs": [{"id", "x", "y", "w", "h", "dir": "up" | ..., "goes": "up" | "down"}]},
+         "stairs": [{"id", "x", "y", "w", "h", "dir": "up" | ..., "goes": "up" | "down"}],
+         # Fixtures: shutters are the openings' "cover" (entity id).
+         "radiators": [{"id", "device_id", "x", "y", "angle", "length"}]},
     ]}
 """
 
@@ -46,6 +48,7 @@ _OPENING = vol.Schema(
         vol.Required("width"): vol.All(vol.Coerce(float), vol.Range(min=1)),
         vol.Optional("flip"): bool,
         vol.Optional("out"): bool,
+        vol.Optional("cover"): vol.Any(None, str),
     },
     extra=vol.ALLOW_EXTRA,
 )
@@ -61,6 +64,17 @@ _STAIR = vol.Schema(
     },
     extra=vol.ALLOW_EXTRA,
 )
+_RADIATOR = vol.Schema(
+    {
+        vol.Required("id"): str,
+        vol.Required("device_id"): str,
+        vol.Required("x"): vol.Coerce(float),
+        vol.Required("y"): vol.Coerce(float),
+        vol.Optional("angle", default=0): vol.Coerce(float),
+        vol.Optional("length", default=80): vol.All(vol.Coerce(float), vol.Range(min=10)),
+    },
+    extra=vol.ALLOW_EXTRA,
+)
 _LEVEL = vol.Schema(
     {
         vol.Required("id"): str,
@@ -70,6 +84,7 @@ _LEVEL = vol.Schema(
         vol.Optional("rooms", default=list): [_SHAPE],
         vol.Optional("openings", default=list): [_OPENING],
         vol.Optional("stairs", default=list): [_STAIR],
+        vol.Optional("radiators", default=list): [_RADIATOR],
     },
     extra=vol.ALLOW_EXTRA,
 )

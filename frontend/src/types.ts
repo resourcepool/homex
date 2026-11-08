@@ -403,6 +403,19 @@ export interface PlanOpening {
   flip?: boolean;
   /** Door: opens to the other side of the wall. */
   out?: boolean;
+  /** Window / glass door: the roller shutter (cover entity) fitted on it. */
+  cover?: string | null;
+}
+
+/** A radiator on the plan: a `length` cm long body centred at x, y (cm),
+ * turned by `angle` degrees; `device_id` is the room's radiator device. */
+export interface PlanRadiator {
+  id: string;
+  device_id: string;
+  x: number;
+  y: number;
+  angle: number;
+  length: number;
 }
 
 /** Stairs: an axis-aligned rectangle (cm), climbing towards `dir`. */
@@ -426,6 +439,7 @@ export interface PlanLevel {
   rooms: PlanShape[];
   openings?: PlanOpening[];
   stairs?: PlanStair[];
+  radiators?: PlanRadiator[];
 }
 
 /** The house plan: levels sorted by level number. */

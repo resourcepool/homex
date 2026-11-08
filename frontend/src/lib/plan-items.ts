@@ -199,3 +199,57 @@ export const OPPOSITE_DIR: Record<PlanStair["dir"], PlanStair["dir"]> = {
   left: "right",
   right: "left",
 };
+
+export const RADIATOR_DEPTH = 10; // cm
+
+/** Where a radiator dropped at p goes: along the nearest wall (within tol),
+ * inside its room, centred on a 10 cm step; null when no wall is near. */
+export function snapRadiator(
+  level: PlanLevel,
+  p: PlanPoint,
+  tol: number,
+  length: number
+): { x: number; y: number; angle: number } | null {
+  let best: { x: number; y: number; angle: number; d: number } | null = null;
+  for (const s of level.rooms) {
+    s.points.forEach((a, i) => {
+      const b = s.points[(i + 1) % s.points.length];
+      const len = segLength(a, b);
+      if (!len) return;
+      const q = projectOnSegment(p, a, b);
+      const d = segLength(p, q);
+      if (d > tol || (best && d >= best.d)) return;
+      const u: PlanPoint = [(b[0] - a[0]) / len, (b[1] - a[1]) / len];
+      const half = Math.min(length, len) / 2;
+      const along = Math.max(half, Math.min(len - half, roundTo(segLength(a, q), 10)));
+      const c: PlanPoint = [a[0] + u[0] * along, a[1] + u[1] * along];
+      let n: PlanPoint = [-u[1], u[0]];
+      if (!inside([c[0] + n[0] * 5, c[1] + n[1] * 5], s.points)) n = [u[1], -u[0]];
+      const off = RADIATOR_DEPTH / 2 + 4;
+      best = {
+        x: c[0] + n[0] * off,
+        y: c[1] + n[1] * off,
+        angle: (Math.atan2(u[1], u[0]) * 180) / Math.PI,
+        d,
+      };
+    });
+  }
+  if (!best) return null;
+  const { x, y, angle } = best;
+  return { x, y, angle };
+}
+
+/** Corners of a radiator's body. */
+export function radiatorPoints(r: { x: number; y: number; angle: number; length: number }): PlanPoint[] {
+  const a = (r.angle * Math.PI) / 180;
+  const u: PlanPoint = [Math.cos(a), Math.sin(a)];
+  const n: PlanPoint = [-u[1], u[0]];
+  const hl = r.length / 2;
+  const hd = RADIATOR_DEPTH / 2;
+  return [
+    [r.x - u[0] * hl - n[0] * hd, r.y - u[1] * hl - n[1] * hd],
+    [r.x + u[0] * hl - n[0] * hd, r.y + u[1] * hl - n[1] * hd],
+    [r.x + u[0] * hl + n[0] * hd, r.y + u[1] * hl + n[1] * hd],
+    [r.x - u[0] * hl + n[0] * hd, r.y - u[1] * hl + n[1] * hd],
+  ];
+}
