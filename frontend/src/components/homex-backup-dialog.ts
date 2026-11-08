@@ -17,6 +17,7 @@ export interface BackupSummary {
   zones: number;
   heating_systems: number;
   scenes: number;
+  plan_levels?: number;
 }
 
 /** Download a backup of Homex (configuration and data). */
@@ -110,6 +111,7 @@ export class HomexBackupDialog extends LitElement {
       ["zones", s.zones],
       ["heating_systems", s.heating_systems],
       ["scenes", s.scenes],
+      ["plan_levels", s.plan_levels ?? 0],
     ];
     const date = s.created_at ? new Date(s.created_at).toLocaleString(this.hass.locale?.language) : "?";
     return html`<p>${t("backup.from", { date, version: s.homex_version ?? "?" })}</p>

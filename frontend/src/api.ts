@@ -376,3 +376,11 @@ export const switchPlan = (
   area_ids?: string[]
 ): Promise<{ models: SwitchPlanModel[] }> =>
   hass.callWS({ type: "homex/setup/switch_plan", ...(area_ids ? { area_ids } : {}) });
+
+// -- 3D Builder plan ----------------------------------------------------------
+
+export const fetchPlan = async (hass: HomeAssistant): Promise<import("./types").Plan> =>
+  (await hass.callWS({ type: "homex/plan/get" })).plan || { levels: [] };
+
+export const savePlan = (hass: HomeAssistant, plan: import("./types").Plan) =>
+  hass.callWS({ type: "homex/plan/save", plan });

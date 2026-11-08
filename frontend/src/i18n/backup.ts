@@ -18,6 +18,7 @@ export default {
     count_zones: "heating zone(s)",
     count_heating_systems: "heating system(s)",
     count_scenes: "scene(s)",
+    count_plan_levels: "3D Builder level(s)",
     warning:
       "Restoring replaces Homex's whole configuration (rooms, presets, switches, heating, Homex scenes). A safety backup of the current state is saved first.",
     restore: "Restore",
@@ -43,6 +44,7 @@ export default {
     count_zones: "zone(s) de chauffage",
     count_heating_systems: "système(s) de chauffage",
     count_scenes: "scène(s)",
+    count_plan_levels: "étage(s) du 3D Builder",
     warning:
       "La restauration remplace toute la configuration de Homex (pièces, presets, interrupteurs, chauffage, scènes Homex). Une copie de sécurité de l'état actuel est enregistrée avant.",
     restore: "Restaurer",

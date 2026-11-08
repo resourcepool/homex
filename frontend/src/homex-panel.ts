@@ -14,6 +14,7 @@ import "./components/homex-room-dialog";
 import "./components/homex-export-dialog";
 import "./components/homex-switch-manager";
 import "./components/homex-shutter-manager";
+import "./components/homex-builder";
 import "./components/homex-climate-manager";
 import "./components/homex-climate-dashboard";
 import "./components/homex-setup-wizard";
@@ -22,7 +23,7 @@ import { downloadBackup } from "./components/homex-backup-dialog";
 
 // Bump together with PANEL_VERSION in panel.py. Shown in the header so you can
 // confirm a full page reload picked up the latest build.
-const BUILD = "217";
+const BUILD = "218";
 
 /** Homex sidebar panel: lists rooms and orchestrates loading / reloading. */
 @customElement("homex-panel")
@@ -53,6 +54,9 @@ export class HomexPanel extends LitElement {
       margin: 0 auto;
       padding: 16px;
       color: var(--primary-text-color);
+    }
+    .wrap.wide {
+      max-width: none;
     }
     header {
       display: flex;
@@ -265,9 +269,9 @@ export class HomexPanel extends LitElement {
   private get _segs(): string[] {
     return segments(this.route?.path);
   }
-  private get _view(): "rooms" | "switches" | "shutters" | "climate" {
+  private get _view(): "rooms" | "switches" | "shutters" | "climate" | "builder" {
     const first = this._segs[0];
-    return first === "switches" || first === "shutters" || first === "climate"
+    return first === "switches" || first === "shutters" || first === "climate" || first === "builder"
       ? first
       : "rooms";
   }
@@ -462,6 +466,13 @@ export class HomexPanel extends LitElement {
         </div>
       `;
     }
+    if (this._view === "builder") {
+      return html`
+        <div class="wrap wide">
+          <homex-builder .hass=${this.hass} @close=${this._backToRooms}></homex-builder>
+        </div>
+      `;
+    }
     if (this._view === "shutters") {
       return html`
         <div class="wrap">
@@ -573,6 +584,14 @@ export class HomexPanel extends LitElement {
                         }}
                       >
                         🌡 ${t("panel.climate_manager")}
+                      </button>
+                      <button
+                        @click=${() => {
+                          this._menuOpen = false;
+                          navigate(joinPath(this._prefix, "builder"));
+                        }}
+                      >
+                        🧊 3D Builder
                       </button>
                       <div class="menu-sep"></div>
                       <div class="menu-label">

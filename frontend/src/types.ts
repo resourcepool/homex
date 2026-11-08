@@ -374,3 +374,28 @@ export interface TankStatus {
   demand: boolean; // heating enabled and some radiator needs heat
   forced: boolean; // manual force on (and heating enabled)
 }
+
+// -- 3D Builder ----------------------------------------------------------------
+
+/** A point of the plan, in centimetres. */
+export type PlanPoint = [number, number];
+
+/** A room outline on a level, optionally mapped to a Homex room. */
+export interface PlanShape {
+  id: string;
+  room_id: string | null;
+  name: string;
+  points: PlanPoint[];
+}
+
+export interface PlanLevel {
+  id: string;
+  name: string;
+  floor_id: string | null;
+  rooms: PlanShape[];
+}
+
+/** The house plan: levels from bottom to top. */
+export interface Plan {
+  levels: PlanLevel[];
+}

@@ -6,7 +6,8 @@ A backup is one JSON document:
 - ``rooms``: every room subentry (title, unique id, full data);
 - ``stores``: Homex's storage documents (``homex_layouts``: layouts, switch
   and shutter presets, switches; ``homex_heating``: zones, systems, heating
-  presets and groups, applied setpoints);
+  presets and groups, applied setpoints; ``homex_plan``: the 3D Builder
+  plan);
 - ``scenes``: Homex's native scenes from scenes.yaml (ids ``homex_*``), with
   their content as edited in the scene editor.
 
@@ -41,6 +42,7 @@ SCENE_PREFIX = "homex_"
 STORES = {
     "homex_layouts": "_switch_store_data",
     "homex_heating": "_heating_store_data",
+    "homex_plan": "_plan_store_data",
 }
 
 
@@ -113,6 +115,7 @@ def summarize(backup: dict) -> dict:
         "zones": len(heating.get("zones") or []),
         "heating_systems": len(heating.get("systems") or []),
         "scenes": len(backup.get("scenes") or []),
+        "plan_levels": len(((backup.get("stores") or {}).get("homex_plan") or {}).get("levels") or []),
     }
 
 
