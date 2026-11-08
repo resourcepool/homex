@@ -388,9 +388,9 @@ export interface PlanShape {
   points: PlanPoint[];
 }
 
-export type OpeningType = "door" | "window" | "glass_door";
+export type OpeningType = "door" | "sliding_door" | "window" | "glass_door";
 
-/** A door / window / glass door set in a room's wall (edge `edge` of room
+/** A door / sliding door / window / glass door set in a room's wall (edge `edge` of room
  * outline `shape`), centred at ratio `t` along it, `width` cm wide. */
 export interface PlanOpening {
   id: string;

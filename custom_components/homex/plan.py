@@ -7,7 +7,7 @@ Stored as one document in the ``homex_plan`` store::
          "floor_id": "ground_floor" | None,
          "rooms": [{"id": "s_...", "room_id": "<homex room id>" | None,
                     "name": "...", "points": [[x, y], ...]}],  # cm
-         "openings": [{"id", "type": "door" | "window" | "glass_door",
+         "openings": [{"id", "type": "door" | "sliding_door" | "window" | "glass_door",
                        "shape", "edge", "t", "width", "flip", "out"}],
          "stairs": [{"id", "x", "y", "w", "h", "dir": "up" | ...}]},
     ]}
@@ -39,7 +39,7 @@ _SHAPE = vol.Schema(
 _OPENING = vol.Schema(
     {
         vol.Required("id"): str,
-        vol.Required("type"): vol.In(["door", "window", "glass_door"]),
+        vol.Required("type"): vol.In(["door", "sliding_door", "window", "glass_door"]),
         vol.Required("shape"): str,
         vol.Required("edge"): vol.All(vol.Coerce(int), vol.Range(min=0)),
         vol.Required("t"): vol.All(vol.Coerce(float), vol.Range(min=0, max=1)),

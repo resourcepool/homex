@@ -50,7 +50,9 @@ import {
 type Orient = "left" | "right" | "up" | "down" | "wider" | "narrower" | "rotate" | "mirror";
 
 type Tool = "select" | "draw" | "rect" | OpeningType | "stairs";
-const OPENING_TOOLS: Tool[] = ["door", "window", "glass_door"];
+const OPENING_TOOLS: Tool[] = ["door", "sliding_door", "window", "glass_door"];
+/** Openings with a direction (rotate / mirror). */
+const directed = (type: OpeningType) => type === "door" || type === "sliding_door";
 const isOpeningTool = (tool: Tool): tool is OpeningType => OPENING_TOOLS.includes(tool);
 
 interface View {
@@ -105,6 +107,7 @@ export class HomexBuilder extends LitElement {
     door: { width: OPENING_WIDTH.door, flip: false, out: false },
     window: { width: OPENING_WIDTH.window, flip: false, out: false },
     glass_door: { width: OPENING_WIDTH.glass_door, flip: false, out: false },
+    sliding_door: { width: OPENING_WIDTH.sliding_door, flip: false, out: false },
   };
   @state() private _stairDir: PlanStair["dir"] = "up";
 
@@ -455,7 +458,7 @@ export class HomexBuilder extends LitElement {
         edge: spot.edge,
         t: spot.t,
         width: opts.width,
-        ...(type === "door" ? { flip: opts.flip, out: opts.out } : {}),
+        ...(directed(type) ? { flip: opts.flip, out: opts.out } : {}),
       };
       const level = this._level;
       this._commit(() => (level.openings = [...(level.openings ?? []), o]));
@@ -864,6 +867,9 @@ export class HomexBuilder extends LitElement {
       case "g":
         this._setTool("glass_door");
         break;
+      case "c":
+        this._setTool("sliding_door");
+        break;
       case "s":
         this._setTool("stairs");
         break;
@@ -1074,7 +1080,7 @@ export class HomexBuilder extends LitElement {
   private _opening(level: PlanLevel, o: PlanOpening, preview = false) {
     const g = openingGeometry(level, o);
     if (!g) return nothing;
-    const { a, b, c, n } = g;
+    const { a, b, c, n, u } = g;
     const sel = o.id === this._selected;
     const cls = `op ${o.type} ${sel ? "selected" : ""} ${preview ? "preview" : ""}`;
     const off = (p: PlanPoint, d: number): PlanPoint => [p[0] + n[0] * d, p[1] + n[1] * d];
@@ -1090,6 +1096,26 @@ export class HomexBuilder extends LitElement {
       const cross = (other[0] - hinge[0]) * (leaf[1] - hinge[1]) - (other[1] - hinge[1]) * (leaf[0] - hinge[0]);
       body = svg`${line(hinge, leaf, "leaf")}
         <path class="swing" d="M ${other[0]} ${other[1]} A ${w} ${w} 0 0 ${cross > 0 ? 1 : 0} ${leaf[0]} ${leaf[1]}"></path>`;
+    } else if (o.type === "sliding_door") {
+      // Leaf along the wall on one side, its open position dashed, an arrow
+      // the way it slides.
+      const side = o.out ? -1 : 1;
+      const dir = o.flip ? -1 : 1;
+      const w = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      const shift = (p: PlanPoint, d: number): PlanPoint => [p[0] + u[0] * d, p[1] + u[1] * d];
+      const leaf = (p: PlanPoint, q: PlanPoint) =>
+        [off(p, side * 3), off(q, side * 3), off(q, side * 8), off(p, side * 8)].map((x) => x.join(",")).join(" ");
+      const from = off(c, side * 18);
+      const to = shift(from, dir * w * 0.45);
+      const k = this._view.k;
+      const hs = 7 / k;
+      const head = [to, off(shift(to, -dir * hs), hs * 0.6), off(shift(to, -dir * hs), -hs * 0.6)]
+        .map((x) => x.join(","))
+        .join(" ");
+      body = svg`<polygon class="slide-leaf" points=${leaf(a, b)}></polygon>
+        <polygon class="slide-open" points=${leaf(shift(a, dir * w), shift(b, dir * w))}></polygon>
+        ${line(from, to, "slide-arrow")}
+        <polygon class="slide-head" points=${head}></polygon>`;
     } else {
       const t = 6;
       body = svg`<polygon class="frame" points=${[off(a, t), off(b, t), off(b, -t), off(a, -t)].map((p) => p.join(",")).join(" ")}></polygon>
@@ -1135,7 +1161,7 @@ export class HomexBuilder extends LitElement {
     return html`<div class="toolbar">
       ${tool("select", "🖐", "V")} ${tool("draw", "✏️", "D")} ${tool("rect", "▭", "R")}
       <span class="sep"></span>
-      ${tool("door", "🚪", "O")} ${tool("window", "🪟", "W")} ${tool("glass_door", "◫", "G")}
+      ${tool("door", "🚪", "O")} ${tool("sliding_door", "⇿", "C")} ${tool("window", "🪟", "W")} ${tool("glass_door", "◫", "G")}
       ${tool("stairs", "🪜", "S")}
       <span class="sep"></span>
       <button title=${t("builder.undo")} ?disabled=${!this._undo.length} @click=${() => this._undoAction()}>↶</button>
@@ -1326,7 +1352,7 @@ export class HomexBuilder extends LitElement {
       case "tool-opening": {
         const opts = { ...this._openingOpts[target.type] };
         if (step) opts.width = Math.max(30, opts.width + step);
-        else if (target.type === "door") door(opts);
+        else if (directed(target.type)) door(opts);
         this._openingOpts = { ...this._openingOpts, [target.type]: opts };
         break;
       }
@@ -1336,7 +1362,7 @@ export class HomexBuilder extends LitElement {
       case "opening": {
         const o = target.item;
         if (step) this._commit(() => (o.width = Math.max(30, o.width + step)));
-        else if (o.type === "door") this._commit(() => door(o));
+        else if (directed(o.type)) this._commit(() => door(o));
         break;
       }
       case "stair": {
@@ -1384,8 +1410,8 @@ export class HomexBuilder extends LitElement {
         ${this._widthControl(opts.width, (v) =>
           (this._openingOpts = { ...this._openingOpts, [target.type]: { ...opts, width: v } })
         )}
-        ${target.type === "door" ? this._orientButtons(false) : nothing}
-        <p class="keys">${target.type === "door" ? t("builder.keys_door") : t("builder.keys_width")}</p>
+        ${directed(target.type) ? this._orientButtons(false) : nothing}
+        <p class="keys">${directed(target.type) ? t("builder.keys_door") : t("builder.keys_width")}</p>
       </div>`;
     }
     if (target?.kind === "tool-stairs") {
@@ -1403,8 +1429,8 @@ export class HomexBuilder extends LitElement {
     return html`<div class="selection">
       ${this._panelHead(t(`builder.tool_${o.type}`))}
       ${this._widthControl(o.width, (v) => this._commit(() => (o.width = v)))}
-      ${o.type === "door" ? this._orientButtons(false) : nothing}
-      <p class="keys">${o.type === "door" ? t("builder.keys_door") : t("builder.keys_width")}</p>
+      ${directed(o.type) ? this._orientButtons(false) : nothing}
+      <p class="keys">${directed(o.type) ? t("builder.keys_door") : t("builder.keys_width")}</p>
       <button class="danger-link" @click=${() => this._deleteSelected()}>${t("builder.item_delete")}</button>
     </div>`;
   }
@@ -1959,6 +1985,27 @@ export class HomexBuilder extends LitElement {
       .op .pane {
         stroke: #4fc3f7;
         stroke-width: 1.5;
+      }
+      .op .slide-leaf {
+        stroke: var(--primary-text-color);
+        stroke-width: 1.5;
+        fill: rgba(127, 127, 127, 0.35);
+      }
+      .op .slide-open {
+        stroke: var(--secondary-text-color);
+        stroke-width: 1;
+        stroke-dasharray: 4 3;
+      }
+      .op .slide-arrow {
+        stroke: var(--secondary-text-color);
+        stroke-width: 1.5;
+      }
+      .op .slide-head {
+        fill: var(--secondary-text-color);
+        stroke: none;
+      }
+      .op.selected .slide-leaf {
+        stroke: var(--accent-color, #ff9800);
       }
       .op .hit {
         stroke: transparent;

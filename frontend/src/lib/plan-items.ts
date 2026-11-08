@@ -4,6 +4,7 @@ import { projectOnSegment, roundTo, segLength } from "./plan-geometry";
 
 export const OPENING_WIDTH: Record<OpeningType, number> = {
   door: 90,
+  sliding_door: 90,
   window: 120,
   glass_door: 240,
 };
