@@ -6,9 +6,11 @@ motion — moving up, moving down, stopped — each as one condition:
 - ``{"source": "entity", "domain", "suffix", "state"}``: a HA sensor of the
   cover's device (entity id = ``<domain>.<device slug>_<suffix>``);
 - ``{"source": "z2m", "field", "state"}``: a field of the device's
-  Zigbee2MQTT JSON state (e.g. ``motor_run_status``), see :mod:`.z2m`.
+  Zigbee2MQTT JSON state (e.g. ``motor_run_status``), see :mod:`.z2m`;
+- ``{"source": "cover", "state"}``: the cover entity's own state
+  (``opening`` / ``closing`` / ``open|closed``), for any integration.
 
-Values are compared case-insensitively. With smart toggle enabled, "toggle"
+Values are compared case-insensitively; ``a|b`` matches either. With smart toggle enabled, "toggle"
 becomes: moving → stop; stopped → move the opposite way of the last motion
 (an end position wins: fully open → close, fully closed → open).
 """
@@ -63,6 +65,8 @@ def _source(cond: dict) -> str:
 def _configured(cond: dict) -> bool:
     if not cond or not str(cond.get("state", "")).strip():
         return False
+    if _source(cond) == "cover":
+        return True
     if _source(cond) == "z2m":
         return bool(cond.get("field"))
     return bool(cond.get("entity_id") or (cond.get("domain") and cond.get("suffix")))
@@ -85,6 +89,18 @@ def condition_entity(hass: HomeAssistant, device_id: str, cond: dict) -> str | N
         if object_id.endswith("_" + suffix):
             best = best or entry.entity_id
     return best
+
+
+def device_cover(hass: HomeAssistant, device_id: str) -> str | None:
+    """The cover entity of a device (the first one)."""
+    return next(
+        (
+            e.entity_id
+            for e in er.async_entries_for_device(er.async_get(hass), device_id)
+            if e.domain == "cover"
+        ),
+        None,
+    )
 
 
 class ShutterMotion:
@@ -124,7 +140,10 @@ class ShutterMotion:
     def _value(self, device_id: str, cond: dict):
         if _source(cond) == "z2m":
             return get_field(self.bridge.state(device_id), cond.get("field", ""))
-        entity_id = condition_entity(self.hass, device_id, cond)
+        if _source(cond) == "cover":
+            entity_id = device_cover(self.hass, device_id)
+        else:
+            entity_id = condition_entity(self.hass, device_id, cond)
         state = self.hass.states.get(entity_id) if entity_id else None
         return state.state if state else None
 
@@ -132,9 +151,10 @@ class ShutterMotion:
         if not _configured(cond):
             return False
         value = self._value(device_id, cond)
-        return value is not None and str(value).strip().lower() == str(
-            cond["state"]
-        ).strip().lower()
+        if value is None:
+            return False
+        wanted = {v.strip().lower() for v in str(cond["state"]).split("|")}
+        return str(value).strip().lower() in wanted
 
     def motion(self, device_id: str, preset: dict) -> str | None:
         """UP / DOWN / STOPPED from the preset's conditions, None if unknown."""
@@ -165,6 +185,8 @@ class ShutterMotion:
                 if _source(c) == "entity"
                 and (e := condition_entity(self.hass, device_id, c))
             ]
+            if any(_source(c) == "cover" for c in conds):
+                entities.append(cover)
             if entities:
                 handler = self._on_change(cover, device_id, preset)
                 self._unsubs.append(

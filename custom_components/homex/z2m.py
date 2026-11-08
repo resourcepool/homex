@@ -67,6 +67,18 @@ def flatten_fields(state: dict, prefix: str = "") -> dict[str, Any]:
     return out
 
 
+def _enum_exposes(exposes, out: dict | None = None) -> dict[str, list[str]]:
+    """{property: values} of every enum expose (features included)."""
+    out = {} if out is None else out
+    for expose in exposes or []:
+        if not isinstance(expose, dict):
+            continue
+        if expose.get("type") == "enum" and expose.get("property"):
+            out[expose["property"]] = [str(v) for v in expose.get("values") or []]
+        _enum_exposes(expose.get("features"), out)
+    return out
+
+
 # Z2M expose "access" bit meaning the property can be read with /get.
 ACCESS_GET = 0b100
 
@@ -99,6 +111,8 @@ class Z2MBridge:
         self.hass = hass
         self._topics: dict[str, str] = {}  # ieee -> "<base>/<friendly_name>"
         self._gettable: dict[str, str] = {}  # ieee -> a property Z2M can /get
+        # ieee -> {property: enum values} of the device's enum exposes
+        self._enums: dict[str, dict[str, list[str]]] = {}
         self._states: dict[str, dict] = {}  # device_id -> last JSON state
         self._subs: dict[str, Callable[[], None]] = {}  # device_id -> unsub
         self._listeners: dict[str, list[StateListener]] = {}
@@ -146,10 +160,19 @@ class Z2MBridge:
             name = device.get("friendly_name")
             if ieee and name:
                 self._topics[ieee] = f"{base}/{name}"
-                prop = _gettable_property((device.get("definition") or {}).get("exposes"))
+                exposes = (device.get("definition") or {}).get("exposes")
+                prop = _gettable_property(exposes)
                 if prop:
                     self._gettable[ieee] = prop
+                self._enums[ieee] = _enum_exposes(exposes)
         self._ready.set()
+
+    async def async_enum_fields(self, device_id: str) -> dict[str, list[str]] | None:
+        """{property: values} of a Z2M device's enum exposes (e.g. a shutter's
+        ``moving``: UP / DOWN / STOP), None when not a Z2M device."""
+        if await self.async_topic(device_id) is None:
+            return None
+        return dict(self._enums.get(_ieee(self.hass, device_id) or "", {}))
 
     async def async_topic(self, device_id: str) -> str | None:
         """State topic of a Z2M device, or None (not a Z2M device / no MQTT)."""

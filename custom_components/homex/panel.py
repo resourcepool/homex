@@ -47,6 +47,7 @@ from .const import (
     CONF_TRIGGERS,
     DEFAULT_MODULES,
     DEFAULT_SHUTTER_GROUP,
+    DEFAULT_SHUTTER_GROUP_NAME,
     DOMAIN,
     HOLD_RELOAD,
     HUB_DATA,
@@ -138,7 +139,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "209"
+PANEL_VERSION = "210"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -245,6 +246,7 @@ async def async_register_homex_panel(hass: HomeAssistant) -> None:
         ws_device_triggers,
         ws_room_create,
         ws_rooms_import,
+        ws_setup_shutter_plan,
         ws_room_update,
         ws_room_delete,
         ws_room_sync_labels,
@@ -908,6 +910,115 @@ def _new_room_data(
     }
 
 
+# Zigbee2MQTT motion fields worth a smart toggle, by preference, and the
+# patterns of their up / down / stopped values.
+_Z2M_MOTION_FIELDS = ("moving", "motor_state", "motor_run_status", "running_state")
+_MOTION_PATTERNS = {
+    "moving_up": re.compile(r"^(up|open|opening|rising)$", re.I),
+    "moving_down": re.compile(r"^(down|close|closing|falling)$", re.I),
+    "stopped": re.compile(r"^(stop|stopped|idle|pause|paused|stopping)$", re.I),
+}
+
+
+def _z2m_motion(fields: dict[str, list[str]] | None) -> dict | None:
+    """Smart-toggle conditions from a Z2M device's enum exposes, when one of
+    them tells up / down / stopped apart."""
+    candidates = [f for f in _Z2M_MOTION_FIELDS if f in (fields or {})]
+    candidates += [f for f in (fields or {}) if f not in candidates]
+    for field in candidates:
+        values = fields[field]
+        conds = {}
+        for motion, pattern in _MOTION_PATTERNS.items():
+            value = next((v for v in values if pattern.match(v)), None)
+            if value is None:
+                break
+            conds[motion] = {"source": "z2m", "field": field, "state": value}
+        else:
+            return conds
+    return None
+
+
+# Smart toggle from the cover entity's own state: works with any integration.
+_COVER_MOTION = {
+    "moving_up": {"source": "cover", "state": "opening"},
+    "moving_down": {"source": "cover", "state": "closing"},
+    "stopped": {"source": "cover", "state": "open|closed"},
+}
+
+
+@websocket_api.websocket_command(
+    {vol.Required("type"): "homex/setup/shutter_plan", vol.Required("covers"): [str]}
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_setup_shutter_plan(hass: HomeAssistant, connection, msg) -> None:
+    """Setup wizard: the models of these covers, each with its existing
+    shutter preset or a suggested one (smart toggle from a Zigbee2MQTT motion
+    field when the model exposes one, else from the cover's own state)."""
+    from .shutter import cover_device, model_key
+
+    dev_reg = dr.async_get(hass)
+    bridge = hass.data[DOMAIN][Z2M_BRIDGE]
+    presets = await _get_shutter_presets(hass)
+    models: dict[str, dict] = {}
+    for cover in dict.fromkeys(msg["covers"]):
+        device_id = cover_device(hass, cover)
+        key = model_key(hass, device_id)
+        dev = dev_reg.async_get(device_id) if device_id else None
+        if not key or dev is None:
+            continue
+        model = models.get(key)
+        if model is None:
+            label = " ".join(p for p in (dev.manufacturer, dev.model) if p) or tr(
+                hass, _STRINGS, "unknown_model"
+            )
+            existing = next(
+                (p for p in presets if p.get("model") == key and p.get("smart_toggle")),
+                None,
+            ) or next((p for p in presets if p.get("model") == key), None)
+            model = models[key] = {
+                "model": key,
+                "label": label,
+                "device_id": device_id,
+                "covers": [],
+                "existing": (
+                    {"id": existing["id"], "name": existing.get("name"),
+                     "smart_toggle": bool(existing.get("smart_toggle"))}
+                    if existing
+                    else None
+                ),
+                "suggested": None,
+            }
+            if existing is None:
+                conds = _z2m_motion(await bridge.async_enum_fields(device_id))
+                source = "z2m" if conds else "cover"
+                base = _slugify(label) or "shutter"
+                taken = {p.get("id") for p in presets} | {
+                    m["suggested"]["id"] for m in models.values() if m["suggested"]
+                }
+                pid, i = base, 2
+                while pid in taken:
+                    pid, i = f"{base}_{i}", i + 1
+                model["suggested"] = {
+                    "id": pid,
+                    "name": label,
+                    "model": key,
+                    "model_label": label,
+                    "device_id": device_id,
+                    "smart_toggle": True,
+                    **(conds or _COVER_MOTION),
+                }
+                model["detection"] = (
+                    {"source": "z2m", "field": conds["moving_up"]["field"]}
+                    if conds
+                    else {"source": source}
+                )
+        model["covers"].append(cover)
+    connection.send_result(
+        msg["id"], {"models": sorted(models.values(), key=lambda m: m["label"].lower())}
+    )
+
+
 @websocket_api.websocket_command(
     {
         vol.Required("type"): "homex/rooms/import",
@@ -918,6 +1029,8 @@ def _new_room_data(
                 vol.Optional("area_id"): vol.Any(str, None),
                 # Modules to enable (none by default) and the lights module's
                 # devices (light entity ids).
+                # Covers of the shutters module's default group.
+                vol.Optional("shutters"): [str],
                 vol.Optional("modules"): [
                     vol.In([MODULE_LIGHTS, MODULE_SWITCHES, MODULE_SHUTTERS, MODULE_HEATING])
                 ],
@@ -955,6 +1068,7 @@ async def ws_rooms_import(hass: HomeAssistant, connection, msg) -> None:
                 room.get("area_id"),
                 room.get("modules", []),
                 room.get("devices", []),
+                room.get("shutters", []),
             )
         )
     if not rooms:
@@ -963,11 +1077,26 @@ async def ws_rooms_import(hass: HomeAssistant, connection, msg) -> None:
     domain_data = hass.data.setdefault(DOMAIN, {})
     domain_data[HOLD_RELOAD] = True
     try:
-        for room_id, name, area_id, modules, devices in rooms:
+        for room_id, name, area_id, modules, devices, shutters in rooms:
+            data = _new_room_data(room_id, name, area_id, modules, devices)
+            if shutters:
+                if MODULE_SHUTTERS not in data[CONF_MODULES]:
+                    data[CONF_MODULES].append(MODULE_SHUTTERS)
+                data[CONF_SHUTTER_GROUPS] = [
+                    {
+                        "id": DEFAULT_SHUTTER_GROUP,
+                        "name": DEFAULT_SHUTTER_GROUP_NAME,
+                        "devices": list(dict.fromkeys(shutters)),
+                        "toggle_triggers": [],
+                        "open_triggers": [],
+                        "close_triggers": [],
+                        "stop_triggers": [],
+                    }
+                ]
             hass.config_entries.async_add_subentry(
                 hub,
                 ConfigSubentry(
-                    data=_new_room_data(room_id, name, area_id, modules, devices),
+                    data=data,
                     subentry_type="room",
                     title=name,
                     unique_id=room_id,

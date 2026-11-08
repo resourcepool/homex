@@ -100,11 +100,14 @@ class Device:
                 {"type": "cover", "features": [
                     {"name": "state", "property": "state", "access": 7, "type": "enum"},
                     {"name": "position", "property": "position", "access": 7, "type": "numeric"}]},
-                {"type": "enum", "name": "moving", "property": "moving", "access": 1,
-                 "values": ["UP", "DOWN", "STOP"]},
-                {"type": "enum", "name": "motor_state", "property": "motor_state", "access": 5,
-                 "values": ["opening", "closing", "stopped"]},
             ]
+            if self.model.get("motion_exposes", True):
+                exposes += [
+                    {"type": "enum", "name": "moving", "property": "moving", "access": 1,
+                     "values": ["UP", "DOWN", "STOP"]},
+                    {"type": "enum", "name": "motor_state", "property": "motor_state", "access": 5,
+                     "values": ["opening", "closing", "stopped"]},
+                ]
         elif self.kind == "switch":
             exposes = [{"type": "enum", "name": "action", "property": "action", "access": 1,
                         "values": self.model["actions"]}]
@@ -165,7 +168,8 @@ class Device:
                 out.append(self._sensor("energy", "Energy", "kWh", "energy"))
         elif k == "cover":
             out.append(self._cfg("cover", "cover", {
-                "name": None, "device_class": "shutter", "command_topic": f"{t}/set",
+                "name": None, "device_class": self.model.get("device_class", "shutter"),
+                "command_topic": f"{t}/set",
                 "state_topic": t,
                 "value_template": "{% if 'moving' in value_json and value_json.moving %}"
                                   " {{ value_json.moving }} {% else %} STOP {% endif %}",

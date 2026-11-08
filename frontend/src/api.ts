@@ -105,6 +105,7 @@ export const importRooms = (
     area_id?: string | null;
     modules?: string[];
     devices?: string[];
+    shutters?: string[];
   }[]
 ): Promise<{ created: string[] }> => hass.callWS({ type: "homex/rooms/import", rooms });
 
@@ -342,3 +343,19 @@ export const heatingSystemStatus = (
 ): Promise<TankStatus> => hass.callWS({ type: "homex/heating/system/status", system_id });
 export const deleteHeatingSystem = (hass: HomeAssistant, system_id: string) =>
   hass.callWS({ type: "homex/heating/system/delete", system_id });
+
+/** A shutter model of the setup wizard: its covers, and its existing shutter
+ * preset or a suggested one (smart toggle detection). */
+export interface ShutterPlanModel {
+  model: string;
+  label: string;
+  device_id: string;
+  covers: string[];
+  existing: { id: string; name: string; smart_toggle: boolean } | null;
+  suggested: import("./types").ShutterPreset | null;
+  detection?: { source: "z2m" | "cover"; field?: string };
+}
+export const shutterPlan = (
+  hass: HomeAssistant,
+  covers: string[]
+): Promise<{ models: ShutterPlanModel[] }> => hass.callWS({ type: "homex/setup/shutter_plan", covers });

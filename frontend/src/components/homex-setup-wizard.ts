@@ -2,7 +2,7 @@ import { LitElement, css, html, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { mdiCheckCircle, mdiHomeImportOutline, mdiHomePlusOutline } from "@mdi/js";
 import type { HomeAssistant, Room } from "../types";
-import { errorMessage, importRooms } from "../api";
+import { errorMessage, importRooms, saveShutterPreset, shutterPlan, type ShutterPlanModel } from "../api";
 import { fireChanged } from "../types";
 import { t } from "../lib/i18n";
 import { logo } from "../lib/logo";
@@ -29,9 +29,16 @@ export class HomexSetupWizard extends LitElement {
 
   /** choose: import or create; import: pick the areas; options: what to
    * import with them (lights, shutters); done: summary. */
-  @state() private _step: "choose" | "import" | "options" | "done" = "choose";
+  @state() private _step: "choose" | "import" | "options" | "shutters" | "done" = "choose";
   /** What to bring along with the rooms (step "options"). */
   @state() private _withLights = true;
+  @state() private _withShutters = true;
+  /** Covers checked for import (step "options"). */
+  @state() private _covers = new Set<string>();
+  /** Shutter models of the checked covers, and the smart toggle choice per
+   * model without a preset yet (step "shutters"). */
+  @state() private _plan: ShutterPlanModel[] = [];
+  @state() private _smart = new Set<string>();
   @state() private _selected = new Set<string>();
   @state() private _busy = false;
   @state() private _created = 0;
@@ -110,6 +117,63 @@ export class HomexSetupWizard extends LitElement {
     return out;
   }
 
+  /** Cover entities by area, with their device class. */
+  private _coversByArea(): Map<string, { entity_id: string; name: string; dc?: string }[]> {
+    const devices = (this.hass.devices ?? {}) as Record<string, any>;
+    const out = new Map<string, { entity_id: string; name: string; dc?: string }[]>();
+    for (const e of Object.values((this.hass.entities ?? {}) as Record<string, any>)) {
+      if (!e.entity_id.startsWith("cover.") || e.hidden || e.entity_category) continue;
+      const area = e.area_id || (e.device_id && devices[e.device_id]?.area_id);
+      if (!area) continue;
+      const st = this.hass.states[e.entity_id];
+      const name = (st?.attributes.friendly_name as string) || e.entity_id;
+      (out.get(area) ?? out.set(area, []).get(area)!).push({
+        entity_id: e.entity_id,
+        name,
+        dc: st?.attributes.device_class as string | undefined,
+      });
+    }
+    for (const list of out.values()) list.sort((a, b) => a.name.localeCompare(b.name));
+    return out;
+  }
+
+  /** Shutter-like covers are checked by default; garage doors, gates,
+   * doors, windows, awnings and dampers are listed but not checked. */
+  private static NOT_SHUTTERS = new Set(["garage", "gate", "door", "window", "awning", "damper"]);
+
+  private _goOptions() {
+    const covers = this._coversByArea();
+    this._covers = new Set(
+      this._selectedAreas()
+        .flatMap((a) => covers.get(a.area_id) ?? [])
+        .filter((c) => !HomexSetupWizard.NOT_SHUTTERS.has(c.dc ?? ""))
+        .map((c) => c.entity_id)
+    );
+    this._step = "options";
+  }
+
+  private _checkedCovers(): string[] {
+    if (!this._withShutters) return [];
+    const covers = this._coversByArea();
+    return this._selectedAreas()
+      .flatMap((a) => covers.get(a.area_id) ?? [])
+      .map((c) => c.entity_id)
+      .filter((id) => this._covers.has(id));
+  }
+
+  private async _goShutters() {
+    this._busy = true;
+    try {
+      this._plan = (await shutterPlan(this.hass, this._checkedCovers())).models;
+      this._smart = new Set(this._plan.filter((m) => m.suggested).map((m) => m.model));
+      this._step = "shutters";
+    } catch (err) {
+      alert(t("common.error", { message: errorMessage(err) }));
+    } finally {
+      this._busy = false;
+    }
+  }
+
   private _selectedAreas() {
     return this._areas().filter((a) => this._selected.has(a.area_id) && !a.imported);
   }
@@ -119,18 +183,22 @@ export class HomexSetupWizard extends LitElement {
   private _roomIds(areas: AreaRow[]) {
     const taken = new Set(this.rooms.map((r) => r.room_id));
     const lights = this._lightsByArea();
+    const covers = this._coversByArea();
+    const checked = new Set(this._checkedCovers());
     return areas.map((a) => {
       const base = /^[a-z0-9_]+$/.test(a.area_id) ? a.area_id : slugify(a.name) || "room";
       let id = base;
       for (let n = 2; taken.has(id); n++) id = `${base}_${n}`;
       taken.add(id);
       const devices = this._withLights ? lights.get(a.area_id) ?? [] : [];
+      const shutters = (covers.get(a.area_id) ?? []).map((c) => c.entity_id).filter((c) => checked.has(c));
       return {
         name: a.name,
         room_id: id,
         area_id: a.area_id,
         modules: devices.length ? ["lights"] : [],
         devices,
+        shutters,
       };
     });
   }
@@ -140,6 +208,12 @@ export class HomexSetupWizard extends LitElement {
     if (!areas.length) return;
     this._busy = true;
     try {
+      // Shutter presets first (smart toggle), for the models that need one.
+      if (this._step === "shutters") {
+        for (const m of this._plan) {
+          if (m.suggested && this._smart.has(m.model)) await saveShutterPreset(this.hass, m.suggested);
+        }
+      }
       const res = await importRooms(this.hass, this._roomIds(areas));
       this._created = res.created.length;
       this._step = "done";
@@ -237,7 +311,7 @@ export class HomexSetupWizard extends LitElement {
       })}
       <div class="actions">
         <button class="secondary" @click=${() => (this._step = "choose")}>${t("setupWizard.back")}</button>
-        <button class="primary" ?disabled=${!count} @click=${() => (this._step = "options")}>
+        <button class="primary" ?disabled=${!count} @click=${this._goOptions}>
           ${t("setupWizard.next")}
         </button>
       </div>
@@ -272,24 +346,125 @@ export class HomexSetupWizard extends LitElement {
           <span></span>
         </span>
       </label>
-      <label class="option disabled">
-        <span class="option-text">
-          <span class="option-title">${t("setupWizard.shutters_title")}</span>
-          <span class="option-desc">${t("setupWizard.shutters_soon")}</span>
-        </span>
-        <span class="switch">
-          <input type="checkbox" disabled />
-          <span></span>
-        </span>
-      </label>
+      ${this._shuttersOption(areas)}
       <p class="hint">${t("setupWizard.options_hint")}</p>
       <div class="actions">
         <button class="secondary" @click=${() => (this._step = "import")}>${t("setupWizard.back")}</button>
-        <button class="primary" ?disabled=${!count || this._busy} @click=${this._import}>
-          ${this._busy
-            ? t("setupWizard.importing")
-            : t(count === 1 ? "setupWizard.import_button_one" : "setupWizard.import_button_other", { count })}
-        </button>
+        ${this._checkedCovers().length
+          ? html`<button class="primary" ?disabled=${this._busy} @click=${this._goShutters}>
+              ${t("setupWizard.next")}
+            </button>`
+          : this._importButton(count)}
+      </div>
+    `;
+  }
+
+  private _importButton(count: number) {
+    return html`<button class="primary" ?disabled=${!count || this._busy} @click=${this._import}>
+      ${this._busy
+        ? t("setupWizard.importing")
+        : t(count === 1 ? "setupWizard.import_button_one" : "setupWizard.import_button_other", { count })}
+    </button>`;
+  }
+
+  /** "Import the shutters": the toggle, then the covers of each room. */
+  private _shuttersOption(areas: AreaRow[]) {
+    const covers = this._coversByArea();
+    // Same order as the room selection: by floor, then by name.
+    const order = this._byFloor(areas).flatMap((g) => g.areas);
+    const rooms = order.filter((a) => covers.get(a.area_id)?.length);
+    const total = rooms.reduce((n, a) => n + covers.get(a.area_id)!.length, 0);
+    const checked = this._checkedCovers().length;
+    const on = this._withShutters && total > 0;
+    return html`<div class="option-block ${on ? "open" : ""}">
+      <label class="option">
+        <span class="option-text">
+          <span class="option-title">${t("setupWizard.shutters_title")}</span>
+          <span class="option-desc">
+            ${total
+              ? t("setupWizard.shutters_desc", { checked, total, rooms: rooms.length })
+              : t("setupWizard.shutters_none")}
+          </span>
+        </span>
+        <span class="switch">
+          <input
+            type="checkbox"
+            .checked=${on}
+            ?disabled=${!total}
+            @change=${(e: Event) => (this._withShutters = (e.target as HTMLInputElement).checked)}
+          />
+          <span></span>
+        </span>
+      </label>
+      ${on
+        ? html`<div class="covers">
+            ${rooms.map(
+              (a) => html`<div class="cover-room">${a.name}</div>
+                ${covers.get(a.area_id)!.map((c) => {
+                  const other = HomexSetupWizard.NOT_SHUTTERS.has(c.dc ?? "");
+                  return html`<label class="cover">
+                    <input
+                      type="checkbox"
+                      .checked=${this._covers.has(c.entity_id)}
+                      @change=${(e: Event) => {
+                        const next = new Set(this._covers);
+                        if ((e.target as HTMLInputElement).checked) next.add(c.entity_id);
+                        else next.delete(c.entity_id);
+                        this._covers = next;
+                      }}
+                    />
+                    <span class="area-name">${c.name}</span>
+                    ${other ? html`<span class="tag">${t("setupWizard.not_a_shutter", { type: t(`setupWizard.dc_${c.dc}`) })}</span>` : nothing}
+                  </label>`;
+                })}`
+            )}
+          </div>`
+        : nothing}
+    </div>`;
+  }
+
+  /** Shutter models: reuse a preset, or create one with smart toggle. */
+  private _shutters() {
+    const count = this._selectedAreas().length;
+    return html`
+      <p class="lead">${t("setupWizard.models_intro")}</p>
+      ${this._plan.map((m) => {
+        const n = m.covers.length;
+        return html`<div class="option model">
+          <span class="option-text">
+            <span class="option-title">${m.label} <span class="count">× ${n}</span></span>
+            <span class="option-desc">
+              ${m.existing
+                ? t("setupWizard.model_existing", { name: m.existing.name })
+                : m.detection?.source === "z2m"
+                  ? t("setupWizard.model_z2m", { field: m.detection.field ?? "" })
+                  : t("setupWizard.model_cover")}
+            </span>
+          </span>
+          ${m.suggested
+            ? html`<label class="smart">
+                <span>${t("setupWizard.smart_toggle")}</span>
+                <span class="switch">
+                  <input
+                    type="checkbox"
+                    .checked=${this._smart.has(m.model)}
+                    @change=${(e: Event) => {
+                      const next = new Set(this._smart);
+                      if ((e.target as HTMLInputElement).checked) next.add(m.model);
+                      else next.delete(m.model);
+                      this._smart = next;
+                    }}
+                  />
+                  <span></span>
+                </span>
+              </label>`
+            : nothing}
+        </div>`;
+      })}
+      <p class="hint">${t("setupWizard.smart_hint")}</p>
+      <div class="actions">
+        <button class="secondary" @click=${() => (this._step = "options")}>${t("setupWizard.back")}</button>
+        ${this._importButton(count)}
       </div>
     `;
   }
@@ -328,7 +503,9 @@ export class HomexSetupWizard extends LitElement {
             ? this._importList()
             : this._step === "options"
               ? this._options()
-              : this._done()}
+              : this._step === "shutters"
+                ? this._shutters()
+                : this._done()}
       </div>
     `;
   }
@@ -519,12 +696,56 @@ export class HomexSetupWizard extends LitElement {
       border-color: var(--divider-color, rgba(127, 127, 127, 0.4));
     }
     .option {
+      display: flex;
+      align-items: center;
       justify-content: space-between;
       gap: 16px;
       padding: 14px 16px;
       border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
       border-radius: 12px;
       margin-bottom: 10px;
+    }
+    .option-block {
+      border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+    .option-block .option {
+      border: none;
+      margin: 0;
+    }
+    .covers {
+      border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.15));
+      padding: 6px 16px 12px;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+    .cover-room {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--secondary-text-color);
+      margin: 10px 0 4px;
+    }
+    .cover {
+      padding: 4px 0 4px 8px;
+    }
+    .tag {
+      font-size: 12px;
+      color: var(--warning-color, #ffa600);
+      white-space: nowrap;
+    }
+    .model {
+      cursor: default;
+    }
+    .count {
+      color: var(--secondary-text-color);
+      font-weight: 400;
+    }
+    .smart {
+      gap: 10px;
+      font-size: 13px;
+      color: var(--secondary-text-color);
+      white-space: nowrap;
     }
     .option.disabled {
       cursor: default;

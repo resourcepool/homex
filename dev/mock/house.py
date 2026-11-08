@@ -82,7 +82,13 @@ MODELS = {
     "ts130f": dict(kind="cover", vendor="Tuya", model="TS130F",
                    description="Curtain/blind switch", travel_s=18),
     "legrand_shutter": dict(kind="cover", vendor="Legrand", model="067776",
-                            description="Netatmo wired shutter switch", travel_s=24),
+                            description="Netatmo wired shutter switch", travel_s=24,
+                            # No motion field in its Z2M definition: Homex falls
+                            # back on the cover state (opening / closing).
+                            motion_exposes=False),
+    "garage_opener": dict(kind="cover", vendor="Tuya", model="TS0601_garage_door_opener",
+                          description="Garage door opener", travel_s=15, device_class="garage",
+                          motion_exposes=False),
     # Radiator valves
     "trvzb": dict(kind="trv", vendor="SONOFF", model="TRVZB",
                   description="Zigbee thermostatic radiator valve"),
@@ -258,6 +264,7 @@ DEVICES = {
         ("Garage Workbench Light", "tradfri_e27_ws", {}),
         ("Garage Switch", "aqara_single", {}),
         ("Garage Door", "aqara_contact", {}),
+        ("Garage Door Opener", "garage_opener", {"position": 0}),
         ("Garage Motion", "aqara_motion", {}),
     ],
     "Laundry Room": [

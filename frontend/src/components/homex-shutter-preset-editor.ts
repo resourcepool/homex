@@ -55,6 +55,9 @@ export class HomexShutterPresetEditor extends LitElement {
   private _cond(v: unknown): ShutterCondition {
     const c: any = Array.isArray(v) ? v[0] : v;
     if (!c) return { ...HomexShutterPresetEditor.EMPTY };
+    if (c.source === "cover") {
+      return { ...HomexShutterPresetEditor.EMPTY, source: "cover", state: c.state ?? "" };
+    }
     if (c.source === "z2m") {
       return {
         ...HomexShutterPresetEditor.EMPTY,
@@ -172,7 +175,13 @@ export class HomexShutterPresetEditor extends LitElement {
         background: var(--card-background-color, #fff);
         color: var(--primary-text-color);
       }
-      .sources {
+      .cover-src {
+      flex: 1;
+      align-self: center;
+      color: var(--secondary-text-color);
+      font-size: 13px;
+    }
+    .sources {
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
@@ -345,10 +354,15 @@ export class HomexShutterPresetEditor extends LitElement {
   ) {
     const listId = `dl-${key}`;
     const z2m = cond.source === "z2m";
+    const coverSrc = cond.source === "cover";
     const z2mAvailable = !!this._z2m?.available;
     let picker;
     let suggestions: string[];
-    if (z2m) {
+    if (coverSrc) {
+      // The cover entity's own state: opening / closing / open|closed.
+      picker = html`<span class="cover-src">${t("shutterPresetEditor.cover_state")}</span>`;
+      suggestions = ["opening", "closing", "open|closed"];
+    } else if (z2m) {
       const fields = this._z2m?.fields ?? [];
       const known = fields.some((f) => f.field === cond.field);
       // No state received yet (Z2M publishes on change): type the field name.
@@ -395,10 +409,9 @@ export class HomexShutterPresetEditor extends LitElement {
     return html`<div class="cond">
       <div class="section">${title}</div>
       <p class="hint">${hint}</p>
-      ${z2mAvailable || z2m
-        ? html`<div class="sources">
+      <div class="sources">
             <button
-              class="src ${z2m ? "" : "on"}"
+              class="src ${z2m || coverSrc ? "" : "on"}"
               @click=${() =>
                 onChange({ ...HomexShutterPresetEditor.EMPTY, state: cond.state })}
             >
@@ -416,8 +429,18 @@ export class HomexShutterPresetEditor extends LitElement {
             >
               ${t("shutterPresetEditor.source_z2m")}
             </button>
-          </div>`
-        : ""}
+            <button
+              class="src ${coverSrc ? "on" : ""}"
+              @click=${() =>
+                onChange({
+                  ...HomexShutterPresetEditor.EMPTY,
+                  source: "cover",
+                  state: cond.state,
+                })}
+            >
+              ${t("shutterPresetEditor.source_cover")}
+            </button>
+          </div>
       <div class="cond-row">
         ${picker}
         <input

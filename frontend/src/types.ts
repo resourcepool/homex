@@ -82,7 +82,7 @@ export interface ShutterModel {
  * - source "z2m": a field of the device's Zigbee2MQTT JSON state (dot path).
  * The value is matched case-insensitively. */
 export interface ShutterCondition {
-  source?: "entity" | "z2m"; // absent = "entity" (older presets)
+  source?: "entity" | "z2m" | "cover"; // absent = "entity" (older presets); cover = the cover's own state
   domain: string; // "sensor" | "binary_sensor" (entity source)
   suffix: string; // entity object-id part after the device slug (entity source)
   field?: string; // Z2M state field, e.g. "motor_run_status" (z2m source)
