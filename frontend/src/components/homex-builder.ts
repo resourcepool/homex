@@ -1993,6 +1993,10 @@ export class HomexBuilder extends LitElement {
     </div>`;
   }
 
+  private _toolClose() {
+    return html`<button class="icon" title=${t("common.close")} @click=${() => this._setTool("select")}>✕</button>`;
+  }
+
   private _panelHead(title: string) {
     return html`<div class="sel-head">
       <strong>${title}</strong>
@@ -2172,7 +2176,7 @@ export class HomexBuilder extends LitElement {
     if (target?.kind === "tool-opening") {
       const opts = this._openingOpts[target.type];
       return html`<div class="selection">
-        <div class="sel-head"><strong>${t(`builder.tool_${target.type}`)}</strong></div>
+        <div class="sel-head"><strong>${t(`builder.tool_${target.type}`)}</strong>${this._toolClose()}</div>
         ${this._widthControl(opts.width, (v) =>
           (this._openingOpts = { ...this._openingOpts, [target.type]: { ...opts, width: v } })
         )}
@@ -2187,7 +2191,7 @@ export class HomexBuilder extends LitElement {
     }
     if (target?.kind === "tool-stairs") {
       return html`<div class="selection">
-        <div class="sel-head"><strong>${t("builder.tool_stairs")}</strong></div>
+        <div class="sel-head"><strong>${t("builder.tool_stairs")}</strong>${this._toolClose()}</div>
         ${this._goesControl(this._stairGoes)}
         <p class="stats">${t("builder.stairs_climb")} <strong class="dir">${ARROW[this._stairDir]}</strong></p>
         ${this._orientButtons(true)}
@@ -2458,6 +2462,15 @@ export class HomexBuilder extends LitElement {
     ></homex-builder-level-dialog>`;
   }
 
+  /** Left column: the active tool's settings or the selection, in place of
+   * the rooms / fixtures list (back to the list once closed). */
+  private _sidePanel() {
+    const tool = this._toolPanel();
+    const panel = tool !== nothing ? tool : this._selectionPanel();
+    if (panel !== nothing) return html`<aside class="side">${panel}</aside>`;
+    return this._mode === "fixtures" ? this._fixturesPanel() : this._roomsPanel();
+  }
+
   render() {
     const saving = {
       idle: "",
@@ -2494,14 +2507,14 @@ export class HomexBuilder extends LitElement {
               <button class="primary" @click=${() => this._openLevelDialog("new", 0)}>${t("builder.create_first")}</button>
             </div>`
           : html`<div class="body">
-              ${this._mode === "fixtures" ? this._fixturesPanel() : this._roomsPanel()}
+              ${this._sidePanel()}
               <div
                 class="stage ${this._dragOver ? "dragover" : ""}"
                 @dragover=${this._onDragOver}
                 @dragleave=${this._onDragLeave}
                 @drop=${this._onDrop}
               >
-                ${this._canvas()} ${this._toolbar()} ${this._toolPanel()} ${this._selectionPanel()}
+                ${this._canvas()} ${this._toolbar()}
                 ${this._ghost
                   ? html`<div class="ghost-tag">${this._ghostIsAbove ? "↑" : "↓"} ${this._ghost.name}</div>`
                   : nothing}
@@ -2591,7 +2604,7 @@ export class HomexBuilder extends LitElement {
         flex: 1 1 auto;
         min-height: 0;
         display: grid;
-        grid-template-columns: 230px minmax(0, 1fr);
+        grid-template-columns: 250px minmax(0, 1fr);
         gap: 12px;
       }
       aside {
@@ -2677,7 +2690,6 @@ export class HomexBuilder extends LitElement {
       }
       /* Floating UI over the editor. */
       .toolbar,
-      .selection,
       .floors,
       .ghost-tag,
       .hint-bar {
@@ -2707,11 +2719,8 @@ export class HomexBuilder extends LitElement {
         background: var(--divider-color, rgba(127, 127, 127, 0.4));
         margin: 0 2px;
       }
-      .selection {
-        top: 10px;
-        right: 10px;
-        width: 230px;
-        padding: 10px 12px;
+      aside.side .selection {
+        padding: 0;
       }
       .sel-head {
         display: flex;
@@ -3368,13 +3377,6 @@ export class HomexBuilder extends LitElement {
         .tool span,
         .hint-bar {
           display: none;
-        }
-        .selection {
-          top: auto;
-          bottom: 10px;
-          left: 10px;
-          right: 80px;
-          width: auto;
         }
       }
     `,

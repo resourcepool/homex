@@ -11987,6 +11987,9 @@ var Ha, Ua = [
       <button class="danger-link" @click=${() => this._deleteShape(t.id)}>${T("builder.shape_delete")}</button>
     </div>`;
 	}
+	_toolClose() {
+		return v`<button class="icon" title=${T("common.close")} @click=${() => this._setTool("select")}>✕</button>`;
+	}
 	_panelHead(e) {
 		return v`<div class="sel-head">
       <strong>${e}</strong>
@@ -12133,7 +12136,7 @@ var Ha, Ua = [
 		if (e?.kind === "tool-opening") {
 			let t = this._openingOpts[e.type];
 			return v`<div class="selection">
-        <div class="sel-head"><strong>${T(`builder.tool_${e.type}`)}</strong></div>
+        <div class="sel-head"><strong>${T(`builder.tool_${e.type}`)}</strong>${this._toolClose()}</div>
         ${this._widthControl(t.width, (n) => this._openingOpts = {
 				...this._openingOpts,
 				[e.type]: {
@@ -12156,7 +12159,7 @@ var Ha, Ua = [
       </div>`;
 		}
 		return e?.kind === "tool-stairs" ? v`<div class="selection">
-        <div class="sel-head"><strong>${T("builder.tool_stairs")}</strong></div>
+        <div class="sel-head"><strong>${T("builder.tool_stairs")}</strong>${this._toolClose()}</div>
         ${this._goesControl(this._stairGoes)}
         <p class="stats">${T("builder.stairs_climb")} <strong class="dir">${qa[this._stairDir]}</strong></p>
         ${this._orientButtons(!0)}
@@ -12374,6 +12377,10 @@ var Ha, Ua = [
       @dialog-closed=${() => this._dialog = null}
     ></homex-builder-level-dialog>`;
 	}
+	_sidePanel() {
+		let e = this._toolPanel(), t = e === b ? this._selectionPanel() : e;
+		return t === b ? this._mode === "fixtures" ? this._fixturesPanel() : this._roomsPanel() : v`<aside class="side">${t}</aside>`;
+	}
 	render() {
 		let e = {
 			idle: "",
@@ -12398,14 +12405,14 @@ var Ha, Ua = [
       </div>
       ${this._error ? v`<p class="err">${this._error}</p>` : b}
       ${this._plan ? t ? v`<div class="body">
-              ${this._mode === "fixtures" ? this._fixturesPanel() : this._roomsPanel()}
+              ${this._sidePanel()}
               <div
                 class="stage ${this._dragOver ? "dragover" : ""}"
                 @dragover=${this._onDragOver}
                 @dragleave=${this._onDragLeave}
                 @drop=${this._onDrop}
               >
-                ${this._canvas()} ${this._toolbar()} ${this._toolPanel()} ${this._selectionPanel()}
+                ${this._canvas()} ${this._toolbar()}
                 ${this._ghost ? v`<div class="ghost-tag">${this._ghostIsAbove ? "↑" : "↓"} ${this._ghost.name}</div>` : b}
                 <div class="hint-bar">${this._hint()} · ${T("builder.grid", { size: "50 cm" })}</div>
                 ${this._floorSwitcher()}
@@ -12495,7 +12502,7 @@ var Ha, Ua = [
         flex: 1 1 auto;
         min-height: 0;
         display: grid;
-        grid-template-columns: 230px minmax(0, 1fr);
+        grid-template-columns: 250px minmax(0, 1fr);
         gap: 12px;
       }
       aside {
@@ -12581,7 +12588,6 @@ var Ha, Ua = [
       }
       /* Floating UI over the editor. */
       .toolbar,
-      .selection,
       .floors,
       .ghost-tag,
       .hint-bar {
@@ -12611,11 +12617,8 @@ var Ha, Ua = [
         background: var(--divider-color, rgba(127, 127, 127, 0.4));
         margin: 0 2px;
       }
-      .selection {
-        top: 10px;
-        right: 10px;
-        width: 230px;
-        padding: 10px 12px;
+      aside.side .selection {
+        padding: 0;
       }
       .sel-head {
         display: flex;
@@ -13272,13 +13275,6 @@ var Ha, Ua = [
         .tool span,
         .hint-bar {
           display: none;
-        }
-        .selection {
-          top: auto;
-          bottom: 10px;
-          left: 10px;
-          right: 80px;
-          width: auto;
         }
       }
     `], Ha);
@@ -17519,7 +17515,7 @@ var ts = ($o = class extends x {
   `, $o);
 j([C({ attribute: !1 })], ts.prototype, "hass", void 0), j([C({ type: Boolean })], ts.prototype, "open", void 0), j([w()], ts.prototype, "_backup", void 0), j([w()], ts.prototype, "_summary", void 0), j([w()], ts.prototype, "_fileName", void 0), j([w()], ts.prototype, "_error", void 0), j([w()], ts.prototype, "_busy", void 0), j([w()], ts.prototype, "_done", void 0), ts = j([S("homex-backup-dialog")], ts);
 // src/homex-panel.ts
-var ns, rs = "226", $ = (ns = class extends x {
+var ns, rs = "227", $ = (ns = class extends x {
 	constructor(...e) {
 		super(...e), this.narrow = !1, this._rooms = null, this._error = null, this._createOpen = !1, this._exportOpen = !1, this._restoreOpen = !1, this._menuOpen = !1, this._dashTab = localStorage.getItem("homex_dash_tab") === "climate" ? "climate" : "general", this._expanded = localStorage.getItem("homex_expanded") || null, this._loaded = !1, this._onToggleExpand = (e) => {
 			let t = e.detail.entry_id;
