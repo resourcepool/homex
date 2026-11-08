@@ -16,6 +16,7 @@ import {
 import type { SwitchLayout } from "../types";
 import { fireChanged } from "../types";
 import { t } from "../lib/i18n";
+import { lightsByArea } from "../lib/area-lights";
 import { logo } from "../lib/logo";
 import { slugify } from "../lib/slug";
 
@@ -128,17 +129,7 @@ export class HomexSetupWizard extends LitElement {
   /** Light entities by area (the entity's area, else its device's), minus
    * Homex's own, hidden and configuration / diagnostic ones. */
   private _lightsByArea(): Map<string, string[]> {
-    const devices = (this.hass.devices ?? {}) as Record<string, any>;
-    const out = new Map<string, string[]>();
-    for (const e of Object.values((this.hass.entities ?? {}) as Record<string, any>)) {
-      if (!e.entity_id.startsWith("light.") || e.entity_id.startsWith("light.homex_")) continue;
-      if (e.hidden || e.entity_category) continue;
-      const area = e.area_id || (e.device_id && devices[e.device_id]?.area_id);
-      if (!area) continue;
-      (out.get(area) ?? out.set(area, []).get(area)!).push(e.entity_id);
-    }
-    for (const list of out.values()) list.sort();
-    return out;
+    return lightsByArea(this.hass);
   }
 
   /** Cover entities by area, with their device class. */

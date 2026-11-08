@@ -15,6 +15,7 @@ import "./homex-select";
 import { textField } from "../lib/fields";
 import { slugify } from "../lib/slug";
 import { DEVICE_DOMAINS } from "../lib/domains";
+import { areaLights } from "../lib/area-lights";
 import "./homex-dialog";
 import "./homex-entity-picker";
 
@@ -32,6 +33,7 @@ export class HomexRoomDialog extends LitElement {
   @state() private _devices: string[] = [];
   @state() private _strategy: SceneStrategy = "recall_first";
   @state() private _busy = false;
+  @state() private _importNote = "";
   // Climate module: the room's heating zone.
   @state() private _zones: HeatingZone[] = [];
   @state() private _zoneId = "default";
@@ -95,6 +97,21 @@ export class HomexRoomDialog extends LitElement {
       .toggle.on .knob {
         transform: translateX(18px);
       }
+      .section-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .section-row .section {
+        flex: 1 1 auto;
+      }
+      button.import {
+        flex: 0 0 auto;
+        margin-top: 12px;
+        padding: 5px 12px;
+        font-size: 13px;
+      }
       .tab {
         display: inline-block;
         margin: 14px 0 2px;
@@ -117,6 +134,7 @@ export class HomexRoomDialog extends LitElement {
       this._devices = this.room?.devices ?? [];
       this._strategy = this.room?.scene_strategy ?? "recall_first";
       this._busy = false;
+      this._importNote = "";
       this._idEdited = !!this.room; // editing: keep existing id untouched
       this._loadZones();
     }
@@ -166,6 +184,16 @@ export class HomexRoomDialog extends LitElement {
       </label>
       <p class="hint">${hint}</p>
     `;
+  }
+
+  /** Add the lights Home Assistant places in the room's area. */
+  private _importLights() {
+    const found = areaLights(this.hass, this._areaId);
+    const added = found.filter((e) => !this._devices.includes(e));
+    this._devices = [...this._devices, ...added];
+    this._importNote = added.length
+      ? t("roomDialog.import_added", { count: added.length })
+      : t("roomDialog.import_none");
   }
 
   private _onName(v: string) {
@@ -269,7 +297,19 @@ export class HomexRoomDialog extends LitElement {
         ${this._hasModule("lights")
           ? html`
               <div class="tab">${t("roomDialog.module_lights")}</div>
-              <div class="section">${t("roomDialog.lights_devices")}</div>
+              <div class="section-row">
+                <div class="section">${t("roomDialog.lights_devices")}</div>
+                <button
+                  class="import"
+                  ?disabled=${!this._areaId}
+                  title=${this._areaId ? t("roomDialog.import_hint") : t("roomDialog.import_no_area")}
+                  @click=${this._importLights}
+                >
+                  ${t("roomDialog.import_lights")}
+                </button>
+              </div>
+              ${this._importNote ? html`<p class="hint">${this._importNote}</p>` : ""}
+              ${!this._areaId ? html`<p class="hint">${t("roomDialog.import_no_area")}</p>` : ""}
               <homex-entity-picker
                 .hass=${this.hass}
                 .includeDomains=${DEVICE_DOMAINS}
