@@ -162,7 +162,7 @@ export class HomexRoomDetail extends LitElement {
     const min = (a?.min_temp as number) ?? 5;
     const max = (a?.max_temp as number) ?? 30;
     const status = !roomOn
-      ? { cls: "off", path: mdiFireOff, text: "Les radiateurs restent éteints" }
+      ? { cls: "off", path: mdiFireOff, text: "Radiateurs éteints" }
       : demand
         ? { cls: "heat", path: mdiFire, text: "Radiateurs en chauffe" }
         : { cls: "", path: mdiFire, text: "Radiateurs inactifs — consigne atteinte" };
@@ -183,12 +183,12 @@ export class HomexRoomDetail extends LitElement {
             </label>`
           : nothing}
       </div>
-      <div class="hstate">${roomOn ? "Pièce chauffée" : "Pièce non chauffée"}</div>
       <div class="hstatus">
-        <span class="status ${status.cls}">${icon(status.path)}</span>
-        <span>
-          ${status.text}
-          ${h && roomOn ? html`<span class="muted"><br />Mode ${h.mode_name}${h.enabled ? "" : " · chauffage global coupé"}</span>` : nothing}
+        <span class="status big-icon ${status.cls}">${icon(status.path)}</span>
+        <span class="htext">
+          <span class="hstate">${roomOn ? "Pièce chauffée" : "Pièce non chauffée"}</span>
+          <span>${status.text}</span>
+          ${h && roomOn ? html`<span class="muted">Mode ${h.mode_name}${h.enabled ? "" : " · chauffage global coupé"}</span>` : nothing}
         </span>
       </div>
       ${roomOn && target !== undefined
@@ -336,15 +336,24 @@ export class HomexRoomDetail extends LitElement {
       align-items: center;
       justify-content: space-between;
     }
-    .hstate {
-      font-weight: 500;
-      font-size: 16px;
-      margin-bottom: 8px;
-    }
     .hstatus {
       display: flex;
-      align-items: flex-start;
-      gap: 8px;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+    }
+    .big-icon svg {
+      width: 36px;
+      height: 36px;
+    }
+    .htext {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .hstate {
+      font-weight: 500;
       font-size: 14px;
     }
     .setpoint {

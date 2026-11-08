@@ -720,7 +720,7 @@ var nt, rt = [
 		} : {
 			cls: "off",
 			path: Pe,
-			text: "Les radiateurs restent éteints"
+			text: "Radiateurs éteints"
 		};
 		return A`<section class="heating">
       <div class="head">
@@ -734,12 +734,12 @@ var nt, rt = [
               <span></span>
             </label>` : M}
       </div>
-      <div class="hstate">${i ? "Pièce chauffée" : "Pièce non chauffée"}</div>
       <div class="hstatus">
-        <span class="status ${u.cls}">${K(u.path)}</span>
-        <span>
-          ${u.text}
-          ${t && i ? A`<span class="muted"><br />Mode ${t.mode_name}${t.enabled ? "" : " · chauffage global coupé"}</span>` : M}
+        <span class="status big-icon ${u.cls}">${K(u.path)}</span>
+        <span class="htext">
+          <span class="hstate">${i ? "Pièce chauffée" : "Pièce non chauffée"}</span>
+          <span>${u.text}</span>
+          ${t && i ? A`<span class="muted">Mode ${t.mode_name}${t.enabled ? "" : " · chauffage global coupé"}</span>` : M}
         </span>
       </div>
       ${i && o !== void 0 ? A`<div class="setpoint" title="Gardée jusqu'au prochain changement de mode">
@@ -875,15 +875,24 @@ nt = X, nt.styles = o`
       align-items: center;
       justify-content: space-between;
     }
-    .hstate {
-      font-weight: 500;
-      font-size: 16px;
-      margin-bottom: 8px;
-    }
     .hstatus {
       display: flex;
-      align-items: flex-start;
-      gap: 8px;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+    }
+    .big-icon svg {
+      width: 36px;
+      height: 36px;
+    }
+    .htext {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .hstate {
+      font-weight: 500;
       font-size: 14px;
     }
     .setpoint {
