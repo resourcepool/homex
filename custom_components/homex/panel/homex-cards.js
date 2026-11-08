@@ -712,15 +712,15 @@ var nt, rt = [
 		let e = this.hass.states[this._heatingSwitch], t = this._heating, n = J(this.hass, this.room).filter((e) => this.hass.states[e]), r = n.some((e) => this.hass.states[e]?.attributes.hvac_action === "heating"), i = e ? e.state === "on" : t?.room_enabled !== !1, a = n.length ? this.hass.states[n[0]].attributes : void 0, o = typeof a?.temperature == "number" ? a.temperature : void 0, s = a?.target_temp_step || .5, c = a?.min_temp ?? 5, l = a?.max_temp ?? 30, u = i ? r ? {
 			cls: "heat",
 			path: U,
-			text: "Radiateurs en chauffe"
+			text: "En chauffe"
 		} : {
 			cls: "",
 			path: U,
-			text: "Radiateurs inactifs"
+			text: "Inactif"
 		} : {
 			cls: "off",
 			path: Pe,
-			text: "Radiateurs éteints"
+			text: "Éteint"
 		};
 		return A`<section class="heating">
       <div class="head">

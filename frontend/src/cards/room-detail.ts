@@ -162,10 +162,10 @@ export class HomexRoomDetail extends LitElement {
     const min = (a?.min_temp as number) ?? 5;
     const max = (a?.max_temp as number) ?? 30;
     const status = !roomOn
-      ? { cls: "off", path: mdiFireOff, text: "Radiateurs éteints" }
+      ? { cls: "off", path: mdiFireOff, text: "Éteint" }
       : demand
-        ? { cls: "heat", path: mdiFire, text: "Radiateurs en chauffe" }
-        : { cls: "", path: mdiFire, text: "Radiateurs inactifs" };
+        ? { cls: "heat", path: mdiFire, text: "En chauffe" }
+        : { cls: "", path: mdiFire, text: "Inactif" };
     return html`<section class="heating">
       <div class="head">
         <h3>Chauffage</h3>
