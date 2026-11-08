@@ -11,7 +11,10 @@ Stored as one document in the ``homex_plan`` store::
                        "shape", "edge", "t", "width", "flip", "out"}],
          "stairs": [{"id", "x", "y", "w", "h", "dir": "up" | ..., "goes": "up" | "down"}],
          # Fixtures: shutters are the openings' "cover" (entity id).
-         "radiators": [{"id", "device_id", "x", "y", "angle", "length"}]},
+         "radiators": [{"id", "device_id", "x", "y", "angle", "length"}],
+         "lights": [{"id", "entity_id", "kind": "point" | "linear",
+                     "mount": "ceiling" | "furniture" | "wall",
+                     "points": [[x, y]], "lines": [[[x, y], [x, y]]]}]},
     ]}
 """
 
@@ -75,6 +78,17 @@ _RADIATOR = vol.Schema(
     },
     extra=vol.ALLOW_EXTRA,
 )
+_LIGHT = vol.Schema(
+    {
+        vol.Required("id"): str,
+        vol.Required("entity_id"): str,
+        vol.Required("kind"): vol.In(["point", "linear"]),
+        vol.Required("mount"): vol.In(["ceiling", "furniture", "wall"]),
+        vol.Optional("points", default=list): [_POINT],
+        vol.Optional("lines", default=list): [vol.All([_POINT], vol.Length(min=2, max=2))],
+    },
+    extra=vol.ALLOW_EXTRA,
+)
 _LEVEL = vol.Schema(
     {
         vol.Required("id"): str,
@@ -85,6 +99,7 @@ _LEVEL = vol.Schema(
         vol.Optional("openings", default=list): [_OPENING],
         vol.Optional("stairs", default=list): [_STAIR],
         vol.Optional("radiators", default=list): [_RADIATOR],
+        vol.Optional("lights", default=list): [_LIGHT],
     },
     extra=vol.ALLOW_EXTRA,
 )

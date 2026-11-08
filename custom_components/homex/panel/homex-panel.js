@@ -718,6 +718,31 @@ var Ht = {
 	},
 	builder: {
 		en: {
+			fx_lights: "Lights",
+			fx_lights_hint: "Drag a light onto the plan, or click it, then click to place its spots or strips.",
+			fx_no_lights: "Every light of this floor's rooms is placed (or none is in their Lights module).",
+			fx_on: "On",
+			fx_off: "Off",
+			light_kind: "Type",
+			light_kind_point: "Point",
+			light_kind_linear: "Linear",
+			light_mount: "Mounted on",
+			light_mount_ceiling: "Ceiling",
+			light_mount_furniture: "Furniture",
+			light_mount_wall: "Wall",
+			light_points: "{count} spot(s)",
+			light_lines: "{count} strip(s)",
+			light_hint_point: "Click to place each spot.",
+			light_hint_line_start: "Click the start of a strip.",
+			light_hint_line_end: "Click the end of the strip.",
+			light_hint_wall: "Wall lights go on the walls.",
+			light_done: "Done",
+			light_add_points: "Add spots",
+			light_add_lines: "Add strips",
+			keys_light_placing: "Keys: Enter / Esc done · Backspace removes the last one · Alt: no snap",
+			keys_light: "Drag a spot or strip to move it, its ends to stretch it; double-click removes it.",
+			hint_fx_light_placing: "Drawing the light: spots and strips snap to a 10 cm grid and line up with the other lights (wall lights onto the walls).",
+			hint_fx_light: "Drag its spots / strips (they snap), double-click one to remove it, Delete removes the light from the plan.",
 			mode_structure: "Structure",
 			mode_fixtures: "Fixtures",
 			fx_shutters: "Shutters",
@@ -832,6 +857,31 @@ var Ht = {
 			hint_rect: "Drag to draw a rectangular room (snapped to the grid and walls)."
 		},
 		fr: {
+			fx_lights: "Lumières",
+			fx_lights_hint: "Glissez une lumière sur le plan, ou cliquez-la, puis cliquez pour placer ses points ou ses lignes.",
+			fx_no_lights: "Toutes les lumières des pièces de cet étage sont placées (ou aucune n'est dans leur module Lumières).",
+			fx_on: "Allumée",
+			fx_off: "Éteinte",
+			light_kind: "Type",
+			light_kind_point: "Ponctuelle",
+			light_kind_linear: "Linéaire",
+			light_mount: "Fixation",
+			light_mount_ceiling: "Plafond",
+			light_mount_furniture: "Meuble",
+			light_mount_wall: "Murale",
+			light_points: "{count} point(s)",
+			light_lines: "{count} ligne(s)",
+			light_hint_point: "Cliquez pour placer chaque point.",
+			light_hint_line_start: "Cliquez le début d'une ligne.",
+			light_hint_line_end: "Cliquez la fin de la ligne.",
+			light_hint_wall: "Une lumière murale se place sur les murs.",
+			light_done: "Terminer",
+			light_add_points: "Ajouter des points",
+			light_add_lines: "Ajouter des lignes",
+			keys_light_placing: "Clavier : Entrée / Échap pour terminer · Retour arrière retire le dernier · Alt : sans aimantage",
+			keys_light: "Glissez un point ou une ligne pour le déplacer, ses extrémités pour l'étirer ; double-clic pour le retirer.",
+			hint_fx_light_placing: "Tracé de la lumière : points et lignes s'aimantent à une grille de 10 cm et s'alignent sur les autres lumières (sur les murs pour une murale).",
+			hint_fx_light: "Glissez ses points / lignes (ils s'aimantent), double-cliquez-en un pour le retirer, Suppr retire la lumière du plan.",
 			mode_structure: "Bâti",
 			mode_fixtures: "Équipements",
 			fx_shutters: "Volets",
@@ -10396,7 +10446,7 @@ var Pa, Fa = [
 				flip: !1,
 				out: !1
 			}
-		}, this._stairDir = "up", this._stairGoes = "up", this._mode = "structure", this._undo = [], this._redo = [], this._drag = null, this._fitted = !1, this._space = !1, this._alt = !1, this._onWheel = (e) => {
+		}, this._stairDir = "up", this._stairGoes = "up", this._mode = "structure", this._placing = null, this._lineStart = null, this._lightKind = "point", this._lightMount = "ceiling", this._undo = [], this._redo = [], this._drag = null, this._fitted = !1, this._space = !1, this._alt = !1, this._onWheel = (e) => {
 			e.preventDefault();
 			let t = this._svgRect();
 			e.ctrlKey || Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? this._zoom(Math.exp(-e.deltaY * (e.ctrlKey ? .01 : .0015)), e.clientX - t.left, e.clientY - t.top) : this._view = {
@@ -10458,15 +10508,49 @@ var Pa, Fa = [
 			}
 			let a = t.closest("[data-kind]"), o = a?.dataset.kind;
 			if (this._mode === "fixtures") {
+				let t = this._placingLight();
+				if (t) {
+					let e = this._snapLight(r, t.mount, this._lineStart ?? void 0);
+					if (!e) return;
+					if (t.kind === "point") this._commit(() => t.points.push(e.p));
+					else if (!this._lineStart) this._lineStart = e.p;
+					else {
+						let n = this._lineStart;
+						this._lineStart = null, Math.hypot(e.p[0] - n[0], e.p[1] - n[1]) >= 5 && this._commit(() => t.lines.push([n, e.p]));
+					}
+					return;
+				}
+				let s = o?.startsWith("light") ? this._level.lights?.find((e) => e.id === a.dataset.id) : void 0;
+				if (s) {
+					this._selected = s.id;
+					let t = Number(a.dataset.index);
+					this._snapshot(), this._drag = o === "light-pt" ? {
+						mode: "light-pt",
+						l: s,
+						index: t
+					} : o === "light-end" ? {
+						mode: "light-end",
+						l: s,
+						index: t,
+						end: Number(a.dataset.end)
+					} : {
+						mode: "light-line",
+						l: s,
+						index: t,
+						start: r,
+						orig: s.lines[t].map((e) => [...e])
+					}, n.setPointerCapture(e.pointerId);
+					return;
+				}
 				if (o === "opening") {
 					this._selected = a.dataset.id ?? null;
 					return;
 				}
-				let t = o === "radiator" ? this._level.radiators?.find((e) => e.id === a.dataset.id) : void 0;
-				if (t) {
-					this._selected = t.id, this._snapshot(), this._drag = {
+				let c = o === "radiator" ? this._level.radiators?.find((e) => e.id === a.dataset.id) : void 0;
+				if (c) {
+					this._selected = c.id, this._snapshot(), this._drag = {
 						mode: "radiator",
-						r: t
+						r: c
 					}, n.setPointerCapture(e.pointerId);
 					return;
 				}
@@ -10520,7 +10604,17 @@ var Pa, Fa = [
 			if (!this._level) return;
 			this._alt = e.altKey;
 			let t = this._toWorld(e), n = this._drag;
-			if (!n) {
+			if (!n && this._placingLight()) this._hover = this._snapLight(t, this._placingLight().mount, this._lineStart ?? void 0);
+			else if (n?.mode === "light-pt" || n?.mode === "light-end") {
+				let e = this._snapLight(t, n.l.mount, void 0, n.mode === "light-pt" ? n.l.points[n.index] : n.l.lines[n.index][n.end]);
+				e && (this._hover = e, n.mode === "light-pt" ? n.l.points[n.index] = e.p : n.l.lines[n.index][n.end] = e.p, this.requestUpdate());
+			} else if (n?.mode === "light-line") {
+				let e = this._snapLight([n.orig[0][0] + t[0] - n.start[0], n.orig[0][1] + t[1] - n.start[1]], n.l.mount);
+				if (e) {
+					let t = e.p[0] - n.orig[0][0], r = e.p[1] - n.orig[0][1];
+					n.l.lines[n.index] = [[n.orig[0][0] + t, n.orig[0][1] + r], [n.orig[1][0] + t, n.orig[1][1] + r]], this.requestUpdate();
+				}
+			} else if (!n) {
 				if (La(this._tool)) {
 					this._hover = null, this._wallHover = Sa(this._level, t, Ba / this._view.k, this._openingOpts[this._tool].width);
 					return;
@@ -10596,9 +10690,19 @@ var Pa, Fa = [
 						[n, r],
 						[e, r]
 					]);
-				} else (e.mode === "vertex" || e.mode === "move" || e.mode === "opening" || e.mode === "stair" || e.mode === "radiator") && (this._hover = null, e.mode === "vertex" && this._dedupe(e.shape), this._changed());
+				} else (e.mode === "vertex" || e.mode === "move" || e.mode === "opening" || e.mode === "stair" || e.mode === "radiator" || e.mode.startsWith("light")) && (this._hover = null, e.mode === "vertex" && this._dedupe(e.shape), this._changed());
 			}
 		}, this._onDblClick = (e) => {
+			if (this._mode === "fixtures") {
+				if (this._placing) return;
+				let t = e.target.closest("[data-kind^='light']"), n = t ? this._level?.lights?.find((e) => e.id === t.dataset.id) : void 0;
+				if (!n || !t) return;
+				let r = Number(t.dataset.index);
+				this._commit(() => {
+					t.dataset.kind === "light-pt" ? n.points.splice(r, 1) : n.lines.splice(r, 1);
+				}), !n.points.length && !n.lines.length && this._removeLight(n.id);
+				return;
+			}
 			if (this._tool === "draw") {
 				let t = this._draft[this._draft.length - 1], n = this._snap(this._toWorld(e)).p;
 				t && Math.hypot(n[0] - t[0], n[1] - t[1]) < 1 && this._closeDraft();
@@ -10615,13 +10719,13 @@ var Pa, Fa = [
 			let t = e.dataTransfer?.types ?? [], n = this._toWorld(e);
 			if (t.includes("text/homex-room")) this._dropTarget = this._shapeAt(n)?.id ?? null;
 			else if (t.includes("text/homex-cover")) this._dropTarget = this._glazedNear(n, 48 / this._view.k)?.id ?? null;
-			else if (t.includes("text/homex-radiator")) this._dropTarget = null;
+			else if (t.includes("text/homex-radiator") || t.includes("text/homex-light")) this._dropTarget = null;
 			else return;
 			e.preventDefault(), e.dataTransfer.dropEffect = "link", this._dragOver = !0;
 		}, this._onDragLeave = () => {
 			this._dragOver = !1, this._dropTarget = null;
 		}, this._onDrop = (e) => {
-			let t = e.dataTransfer?.getData("text/homex-room"), n = e.dataTransfer?.getData("text/homex-cover"), r = e.dataTransfer?.getData("text/homex-radiator");
+			let t = e.dataTransfer?.getData("text/homex-room"), n = e.dataTransfer?.getData("text/homex-cover"), r = e.dataTransfer?.getData("text/homex-radiator"), i = e.dataTransfer?.getData("text/homex-light");
 			if (this._dragOver = !1, this._dropTarget = null, !this._level) return;
 			if (n) {
 				e.preventDefault();
@@ -10633,12 +10737,16 @@ var Pa, Fa = [
 				e.preventDefault(), this._placeRadiator(r, this._toWorld(e));
 				return;
 			}
+			if (i) {
+				e.preventDefault(), this._placing && this._stopPlacing(), this._startLight(i, this._toWorld(e));
+				return;
+			}
 			if (!t) return;
 			e.preventDefault();
-			let i = this._toWorld(e), a = this._shapeAt(i);
-			if (a) this._mapShape(a, t), this._selected = a.id;
+			let a = this._toWorld(e), o = this._shapeAt(a);
+			if (o) this._mapShape(o, t), this._selected = o.id;
 			else {
-				let e = [W(i[0], 50), W(i[1], 50)];
+				let e = [W(a[0], 50), W(a[1], 50)];
 				this._addShape([
 					[e[0] - 200, e[1] - 150],
 					[e[0] + 200, e[1] - 150],
@@ -10679,14 +10787,14 @@ var Pa, Fa = [
 						this._space = !0, e.preventDefault();
 						break;
 					case "Escape":
-						this._draft.length ? this._draft = [] : this._tool === "select" ? this._selected = null : this._setTool("select");
+						this._placing ? this._stopPlacing() : this._draft.length ? this._draft = [] : this._tool === "select" ? this._selected = null : this._setTool("select");
 						break;
 					case "Enter":
-						this._draft.length && this._closeDraft();
+						this._placing ? this._stopPlacing() : this._draft.length && this._closeDraft();
 						break;
 					case "Backspace":
 					case "Delete":
-						this._draft.length ? this._draft = this._draft.slice(0, -1) : this._selected && this._deleteSelected(), e.preventDefault();
+						this._placing ? this._undoLightPart() : this._draft.length ? this._draft = this._draft.slice(0, -1) : this._selected && this._deleteSelected(), e.preventDefault();
 						break;
 					case "v": this._setTool("select");
 				}
@@ -10835,7 +10943,7 @@ var Pa, Fa = [
 		}), this._levelId = t?.id ?? this._defaultLevel()?.id ?? null, this._selected = null, this._levels.length || this._openLevelDialog("new", 0);
 	}
 	_goLevel(e) {
-		this._levelId = e, this._selected = null, this._draft = [], this._rect = null, this._hover = null;
+		this._placing && this._stopPlacing(), this._levelId = e, this._selected = null, this._draft = [], this._rect = null, this._hover = null;
 	}
 	_svgRect() {
 		return this.renderRoot.querySelector("svg.canvas").getBoundingClientRect();
@@ -10969,16 +11077,23 @@ var Pa, Fa = [
 			item: i
 		};
 		let a = t.radiators?.find((t) => t.id === e);
-		return a ? {
+		if (a) return {
 			kind: "radiator",
 			item: a
+		};
+		let o = t.lights?.find((t) => t.id === e);
+		return o ? {
+			kind: "light",
+			item: o
 		} : null;
 	}
 	_deleteSelected() {
 		let e = this._selItem(), t = this._level;
 		if (e && t) {
-			if (this._mode === "fixtures") e.kind === "radiator" ? this._commit(() => t.radiators = (t.radiators ?? []).filter((t) => t.id !== e.item.id)) : e.kind === "opening" && e.item.cover && this._commit(() => e.item.cover = null), this._selected = null;
-			else if (e.kind !== "radiator") {
+			if (this._mode === "fixtures") {
+				if (e.kind === "light") return this._removeLight(e.item.id);
+				e.kind === "radiator" ? this._commit(() => t.radiators = (t.radiators ?? []).filter((t) => t.id !== e.item.id)) : e.kind === "opening" && e.item.cover && this._commit(() => e.item.cover = null), this._selected = null;
+			} else if (e.kind !== "radiator") {
 				if (e.kind === "shape") return this._deleteShape(e.item.id);
 				this._commit(() => {
 					e.kind === "opening" ? t.openings = (t.openings ?? []).filter((t) => t.id !== e.item.id) : t.stairs = (t.stairs ?? []).filter((t) => t.id !== e.item.id);
@@ -11003,7 +11118,7 @@ var Pa, Fa = [
 		return r;
 	}
 	_setMode(e) {
-		this._setTool("select"), this._mode = e, this._selected = null;
+		this._placing && this._stopPlacing(), this._setTool("select"), this._mode = e, this._selected = null;
 	}
 	_levelRooms() {
 		let e = new Set((this._level?.rooms ?? []).map((e) => e.room_id).filter(Boolean));
@@ -11052,6 +11167,94 @@ var Pa, Fa = [
 			for (let n of t.levels) n.radiators = (n.radiators ?? []).filter((t) => t.device_id !== e);
 			n.radiators = [...n.radiators ?? [], i];
 		}), this._selected = i.id;
+	}
+	_roomLights(e) {
+		return (e.devices ?? []).filter((e) => !e.startsWith("light.homex_"));
+	}
+	_placedLights() {
+		return new Set(this._levels.flatMap((e) => (e.lights ?? []).map((e) => e.entity_id)));
+	}
+	_placingLight() {
+		return this._placing ? this._level?.lights?.find((e) => e.id === this._placing) : void 0;
+	}
+	_startLight(e, t) {
+		let n = this._level, r = n.lights?.find((t) => t.entity_id === e);
+		if (!r) {
+			r = {
+				id: _a("li"),
+				entity_id: e,
+				kind: this._lightKind,
+				mount: this._lightMount,
+				points: [],
+				lines: []
+			};
+			let t = r;
+			this._commit((r) => {
+				for (let t of r.levels) t.lights = (t.lights ?? []).filter((t) => t.entity_id !== e);
+				n.lights = [...n.lights ?? [], t];
+			});
+		}
+		if (this._selected = r.id, this._placing = r.id, this._lineStart = null, t && r.kind === "point") {
+			let e = this._snapLight(t, r.mount);
+			if (e) {
+				let t = r;
+				this._commit(() => t.points.push(e.p));
+			}
+		} else t && (this._lineStart = this._snapLight(t, r.mount)?.p ?? null);
+	}
+	_stopPlacing() {
+		let e = this._placingLight();
+		this._placing = null, this._lineStart = null, this._hover = null, e && !e.points.length && !e.lines.length && this._removeLight(e.id);
+	}
+	_undoLightPart() {
+		let e = this._placingLight();
+		e && (this._lineStart ? this._lineStart = null : e.kind === "point" && e.points.length ? this._commit(() => e.points.pop()) : e.kind === "linear" && e.lines.length && this._commit(() => e.lines.pop()));
+	}
+	_removeLight(e) {
+		let t = this._level;
+		t && (this._commit(() => t.lights = (t.lights ?? []).filter((t) => t.id !== e)), this._selected === e && (this._selected = null), this._placing === e && (this._placing = null, this._lineStart = null));
+	}
+	_snapLight(e, t, n, r) {
+		let i = this._level;
+		if (!i) return null;
+		if (this._alt) return {
+			p: [Math.round(e[0]), Math.round(e[1])],
+			kind: "free"
+		};
+		let a = Ra / this._view.k;
+		if (t === "wall") {
+			let t = null, n = Ba * 1.5 / this._view.k;
+			for (let r of i.rooms) for (let [i, a] of ma(r.points)) {
+				let r = la(e, i, a), o = Math.hypot(e[0] - r[0], e[1] - r[1]);
+				o <= n && (n = o, t = {
+					p: [W(r[0], 1), W(r[1], 1)],
+					kind: "edge"
+				});
+			}
+			return t;
+		}
+		let o = i.rooms.flatMap((e) => e.points);
+		for (let e of i.lights ?? []) {
+			for (let t of e.points) t !== r && o.push(t);
+			for (let [t, n] of e.lines) t !== r && o.push(t), n !== r && o.push(n);
+		}
+		return ua(e, {
+			vertices: o,
+			edges: [],
+			anchors: n ? [n] : [],
+			tolerance: a,
+			grid: 10
+		});
+	}
+	_setLightOpt(e, t) {
+		e === "kind" ? this._lightKind = t : this._lightMount = t;
+		let n = this._selItem();
+		if (n?.kind === "light") {
+			let r = n.item;
+			this._commit(() => {
+				e === "kind" && r.kind !== t ? (t === "linear" ? (r.lines = r.points.map((e) => [[e[0] - 30, e[1]], [e[0] + 30, e[1]]]), r.points = []) : (r.points = r.lines.map(([e, t]) => [(e[0] + t[0]) / 2, (e[1] + t[1]) / 2]), r.lines = []), r.kind = t) : e === "mount" && (r.mount = t);
+			}), this._lineStart = null;
+		}
 	}
 	_setTool(e) {
 		this._tool = e, this._draft = [], this._rect = null, this._hover = null, this._wallHover = null, e !== "select" && (this._selected = null);
@@ -11121,6 +11324,10 @@ var Pa, Fa = [
         <g class="radiators ${this._mode === "fixtures" ? "" : "locked"}">
           ${(e.radiators ?? []).map((e) => this._radiator(e))}
         </g>
+        <g class="lights ${this._mode === "fixtures" && !this._placing ? "" : "locked"}">
+          ${(e.lights ?? []).map((e) => this._light(e))}
+          ${this._lightPreview()}
+        </g>
         <g class="openings">
           ${(e.openings ?? []).map((t) => this._opening(e, t))}
           ${this._wallHover && La(this._tool) ? this._opening(e, {
@@ -11166,7 +11373,7 @@ var Pa, Fa = [
 			this._rect[1]
 		], !1)}
             </g>` : v}
-        ${s && (this._tool !== "select" || this._drag) ? _`<g class="snap">
+        ${s && (this._tool !== "select" || this._drag || this._placing) ? _`<g class="snap">
               ${s.guideX === void 0 ? v : _`<line class="guide" x1=${s.guideX} y1=${-r / i} x2=${s.guideX} y2=${(l - r) / i}></line>`}
               ${s.guideY === void 0 ? v : _`<line class="guide" x1=${-n / i} y1=${s.guideY} x2=${(c - n) / i} y2=${s.guideY}></line>`}
               <circle class="snap-${s.kind}" cx=${s.p[0]} cy=${s.p[1]} r=${5 / i}></circle>
@@ -11240,6 +11447,47 @@ var Pa, Fa = [
 		let t = this._levels, n = t.findIndex((e) => e.id === this._levelId);
 		return (e.goes ?? "up") === "up" ? t[n + 1] : t[n - 1];
 	}
+	_lightColor(e) {
+		let t = this.hass.states[e], n = t?.state === "on", r = t?.attributes.rgb_color;
+		return {
+			on: n,
+			color: n ? r ? `rgb(${r.join(",")})` : "#ffd54f" : "#9e9e9e"
+		};
+	}
+	_light(e) {
+		let t = this._view.k, { on: n, color: r } = this._lightColor(e.entity_id), i = e.id === this._selected, a = 7 / t, o = (t, n) => {
+			let r = _`<circle class="light-hit" data-kind="light-pt" data-id=${e.id} data-index=${n} cx=${t[0]} cy=${t[1]} r=${a * 1.8}></circle>`;
+			return e.mount === "furniture" ? _`<rect class="lp" x=${t[0] - a} y=${t[1] - a} width=${a * 2} height=${a * 2} rx=${a * .4} transform="rotate(45 ${t[0]} ${t[1]})"></rect>${r}` : e.mount === "wall" ? _`<circle class="lp" cx=${t[0]} cy=${t[1]} r=${a}></circle><circle class="lp-dot" cx=${t[0]} cy=${t[1]} r=${a * .35}></circle>${r}` : _`<circle class="lp" cx=${t[0]} cy=${t[1]} r=${a}></circle>
+        <line class="lp-x" x1=${t[0] - a * .7} y1=${t[1] - a * .7} x2=${t[0] + a * .7} y2=${t[1] + a * .7}></line>
+        <line class="lp-x" x1=${t[0] - a * .7} y1=${t[1] + a * .7} x2=${t[0] + a * .7} y2=${t[1] - a * .7}></line>${r}`;
+		}, s = e.points[0] ?? e.lines[0]?.[0];
+		return _`<g class="light ${n ? "on" : ""} ${i ? "selected" : ""} m-${e.mount}" style="--lc:${r}">
+      ${n ? e.points.map((e) => _`<circle class="glow" cx=${e[0]} cy=${e[1]} r=${a * 3}></circle>`) : v}
+      ${e.lines.map(([r, a], o) => _`${n ? _`<line class="glow-line" x1=${r[0]} y1=${r[1]} x2=${a[0]} y2=${a[1]}></line>` : v}
+          <line class="ll" x1=${r[0]} y1=${r[1]} x2=${a[0]} y2=${a[1]}></line>
+          <line class="light-hit" data-kind="light-line" data-id=${e.id} data-index=${o} x1=${r[0]} y1=${r[1]} x2=${a[0]} y2=${a[1]}></line>
+          ${i && !this._placing ? _`<circle class="le" data-kind="light-end" data-id=${e.id} data-index=${o} data-end="0" cx=${r[0]} cy=${r[1]} r=${5 / t}></circle>
+                <circle class="le" data-kind="light-end" data-id=${e.id} data-index=${o} data-end="1" cx=${a[0]} cy=${a[1]} r=${5 / t}></circle>` : v}`)}
+      ${e.points.map(o)}
+      ${s && (i || this._mode === "fixtures") ? _`<text class="fx-tag" x=${s[0]} y=${s[1] - 14 / t} font-size=${10 / t} text-anchor="middle">${this._lightName(e.entity_id)}</text>` : v}
+    </g>`;
+	}
+	_lightPreview() {
+		let e = this._placingLight(), t = this._hover;
+		if (!e || !t) return v;
+		let n = this._view.k;
+		if (e.kind === "linear" && this._lineStart) {
+			let e = this._lineStart;
+			return _`<g class="light-preview">
+        <line class="ll" x1=${e[0]} y1=${e[1]} x2=${t.p[0]} y2=${t.p[1]}></line>
+        <text class="dim" x=${(e[0] + t.p[0]) / 2} y=${(e[1] + t.p[1]) / 2 - 6 / n} font-size=${11 / n} text-anchor="middle">${this._len(G(e, t.p))}</text>
+      </g>`;
+		}
+		return _`<g class="light-preview"><circle cx=${t.p[0]} cy=${t.p[1]} r=${7 / n}></circle></g>`;
+	}
+	_lightName(e) {
+		return this.hass.states[e]?.attributes.friendly_name || e;
+	}
 	_radiator(e) {
 		let t = this._view.k, n = Na(e), r = this._climateOf(e.device_id), i = r ? this.hass.states[r]?.attributes.hvac_action === "heating" : !1, a = e.id === this._selected, o = e.angle * Math.PI / 180, s = [Math.cos(o), Math.sin(o)], c = [];
 		for (let t = -e.length / 2 + 10; t < e.length / 2 - 4; t += 10) {
@@ -11291,7 +11539,7 @@ var Pa, Fa = [
 	_hint() {
 		if (this._mode === "fixtures") {
 			let e = this._selItem();
-			return e?.kind === "radiator" ? C("builder.hint_fx_radiator") : e?.kind === "opening" ? C("builder.hint_fx_opening") : C("builder.hint_fixtures");
+			return this._placing ? C("builder.hint_fx_light_placing") : e?.kind === "light" ? C("builder.hint_fx_light") : e?.kind === "radiator" ? C("builder.hint_fx_radiator") : e?.kind === "opening" ? C("builder.hint_fx_opening") : C("builder.hint_fixtures");
 		}
 		if (this._tool === "draw") return this._draft.length >= 3 ? C("builder.hint_draw_close") : C("builder.hint_draw");
 		if (this._tool === "rect") return C("builder.hint_rect");
@@ -11353,6 +11601,7 @@ var Pa, Fa = [
 		let e = this._selItem();
 		if (!e) return v;
 		if (e.kind === "radiator") return this._radiatorPanel(e.item);
+		if (e.kind === "light") return this._lightPanel(e.item);
 		if (this._mode === "fixtures") return e.kind === "opening" ? this._coverPanel(e.item) : v;
 		if (e.kind === "opening") return this._openingPanel(e.item);
 		if (e.kind === "stair") return this._stairPanel(e.item);
@@ -11518,6 +11767,9 @@ var Pa, Fa = [
 		})).filter((e) => e.items.length), o = e.map((e) => ({
 			room: e,
 			items: this._roomRadiators(e).filter((e) => !n.has(e))
+		})).filter((e) => e.items.length), s = this._placedLights(), c = e.map((e) => ({
+			room: e,
+			items: this._roomLights(e).filter((e) => !s.has(e))
 		})).filter((e) => e.items.length);
 		return g`<aside>
       <h3>🪟 ${C("builder.fx_shutters")}</h3>
@@ -11551,6 +11803,24 @@ var Pa, Fa = [
               </div>`)}
           </div>`)}
       ${o.length ? v : g`<p class="hint">${C("builder.fx_no_radiators")}</p>`}
+      <h3 class="fx-h">💡 ${C("builder.fx_lights")}</h3>
+      <p class="hint">${C("builder.fx_lights_hint")}</p>
+      ${c.map((e) => g`<div class="fx-room">${e.room.name}</div>
+          <div class="chips">
+            ${e.items.map((e) => g`<div
+                class="chip clickable"
+                draggable="true"
+                @dragstart=${(t) => {
+			t.dataTransfer?.setData("text/homex-light", e), t.dataTransfer.effectAllowed = "link";
+		}}
+                @click=${() => {
+			this._placing && this._stopPlacing(), this._startLight(e);
+		}}
+              >
+                <span>${this._lightName(e)}</span>
+              </div>`)}
+          </div>`)}
+      ${c.length ? v : g`<p class="hint">${C("builder.fx_no_lights")}</p>`}
     </aside>`;
 	}
 	_coverPanel(e) {
@@ -11569,6 +11839,37 @@ var Pa, Fa = [
             ${C("builder.fx_state")}
             <strong>${r.attributes.current_position === void 0 ? r.state : `${r.attributes.current_position} %`}</strong>
           </p>` : v}
+    </div>`;
+	}
+	_lightPanel(e) {
+		let t = this._placing === e.id, { on: n } = this._lightColor(e.entity_id), r = (e, t, n) => g`<div class="seg">
+      ${t.map((t) => g`<button class=${t === n ? "on" : ""} @click=${() => this._setLightOpt(e, t)}>
+          ${C(`builder.light_${e}_${t}`)}
+        </button>`)}
+    </div>`, i = e.kind === "point" ? e.points.length : e.lines.length;
+		return g`<div class="selection">
+      ${this._panelHead(this._lightName(e.entity_id))}
+      <p class="stats">${C(n ? "builder.fx_on" : "builder.fx_off")}</p>
+      <div class="field"><span>${C("builder.light_kind")}</span>${r("kind", ["point", "linear"], e.kind)}</div>
+      <div class="field"><span>${C("builder.light_mount")}</span>${r("mount", [
+			"ceiling",
+			"furniture",
+			"wall"
+		], e.mount)}</div>
+      <p class="stats">
+        ${C(e.kind === "point" ? "builder.light_points" : "builder.light_lines", { count: i })}
+      </p>
+      ${t ? g`<p class="hint">
+              ${e.kind === "point" ? C("builder.light_hint_point") : this._lineStart ? C("builder.light_hint_line_end") : C("builder.light_hint_line_start")}
+              ${e.mount === "wall" ? C("builder.light_hint_wall") : ""}
+            </p>
+            <div class="row">
+              <button class="primary" @click=${() => this._stopPlacing()}>✓ ${C("builder.light_done")}</button>
+            </div>` : g`<div class="row">
+            <button @click=${() => this._startLight(e.entity_id)}>＋ ${C(e.kind === "point" ? "builder.light_add_points" : "builder.light_add_lines")}</button>
+          </div>`}
+      <p class="keys">${C(t ? "builder.keys_light_placing" : "builder.keys_light")}</p>
+      <button class="danger-link" @click=${() => this._removeLight(e.id)}>${C("builder.fx_remove")}</button>
     </div>`;
 	}
 	_radiatorPanel(e) {
@@ -12292,6 +12593,93 @@ var Pa, Fa = [
         stroke: var(--accent-color, #ff9800);
         stroke-width: 3;
       }
+      .light .lp {
+        fill: var(--card-background-color, #1c1c1c);
+        stroke: var(--lc);
+        stroke-width: 2;
+        vector-effect: non-scaling-stroke;
+      }
+      .light.on .lp {
+        fill: var(--lc);
+        stroke: var(--primary-text-color);
+      }
+      .light .lp-x {
+        stroke: var(--lc);
+        stroke-width: 1.5;
+        vector-effect: non-scaling-stroke;
+      }
+      .light.on .lp-x {
+        stroke: var(--card-background-color, #1c1c1c);
+      }
+      .light .lp-dot {
+        fill: var(--lc);
+      }
+      .light.on .lp-dot {
+        fill: var(--card-background-color, #1c1c1c);
+      }
+      .light .ll {
+        stroke: var(--lc);
+        stroke-width: 4;
+        stroke-linecap: round;
+        vector-effect: non-scaling-stroke;
+      }
+      .light.m-furniture .ll {
+        stroke-dasharray: 8 4;
+      }
+      .light.m-wall .ll {
+        stroke-width: 6;
+        stroke-linecap: butt;
+      }
+      .light .glow {
+        fill: var(--lc);
+        opacity: 0.18;
+        pointer-events: none;
+      }
+      .light .glow-line {
+        stroke: var(--lc);
+        stroke-width: 16;
+        stroke-linecap: round;
+        opacity: 0.18;
+        vector-effect: non-scaling-stroke;
+        pointer-events: none;
+      }
+      .light .light-hit {
+        fill: transparent;
+        stroke: transparent;
+        stroke-width: 14;
+        vector-effect: non-scaling-stroke;
+        cursor: move;
+      }
+      .light.selected .lp,
+      .light.selected .ll {
+        stroke: var(--accent-color, #ff9800);
+      }
+      .light .le {
+        fill: var(--card-background-color, #fff);
+        stroke: var(--accent-color, #ff9800);
+        stroke-width: 2;
+        vector-effect: non-scaling-stroke;
+        cursor: grab;
+      }
+      .lights.locked {
+        pointer-events: none;
+      }
+      .light-preview circle {
+        fill: none;
+        stroke: var(--accent-color, #ff9800);
+        stroke-width: 2;
+        stroke-dasharray: 3 2;
+        vector-effect: non-scaling-stroke;
+        pointer-events: none;
+      }
+      .light-preview .ll {
+        stroke: var(--accent-color, #ff9800);
+        stroke-width: 4;
+        stroke-linecap: round;
+        opacity: 0.7;
+        vector-effect: non-scaling-stroke;
+        pointer-events: none;
+      }
       .radiators.locked {
         pointer-events: none;
       }
@@ -12378,7 +12766,7 @@ var Pa, Fa = [
         }
       }
     `], Pa);
-k([x({ attribute: !1 })], K.prototype, "hass", void 0), k([S()], K.prototype, "_plan", void 0), k([S()], K.prototype, "_rooms", void 0), k([S()], K.prototype, "_error", void 0), k([S()], K.prototype, "_levelId", void 0), k([S()], K.prototype, "_dialog", void 0), k([S()], K.prototype, "_tool", void 0), k([S()], K.prototype, "_selected", void 0), k([S()], K.prototype, "_draft", void 0), k([S()], K.prototype, "_hover", void 0), k([S()], K.prototype, "_rect", void 0), k([S()], K.prototype, "_view", void 0), k([S()], K.prototype, "_size", void 0), k([S()], K.prototype, "_saving", void 0), k([S()], K.prototype, "_dropTarget", void 0), k([S()], K.prototype, "_dragOver", void 0), k([S()], K.prototype, "_wallHover", void 0), k([S()], K.prototype, "_openingOpts", void 0), k([S()], K.prototype, "_stairDir", void 0), k([S()], K.prototype, "_stairGoes", void 0), k([S()], K.prototype, "_mode", void 0), K = k([b("homex-builder")], K);
+k([x({ attribute: !1 })], K.prototype, "hass", void 0), k([S()], K.prototype, "_plan", void 0), k([S()], K.prototype, "_rooms", void 0), k([S()], K.prototype, "_error", void 0), k([S()], K.prototype, "_levelId", void 0), k([S()], K.prototype, "_dialog", void 0), k([S()], K.prototype, "_tool", void 0), k([S()], K.prototype, "_selected", void 0), k([S()], K.prototype, "_draft", void 0), k([S()], K.prototype, "_hover", void 0), k([S()], K.prototype, "_rect", void 0), k([S()], K.prototype, "_view", void 0), k([S()], K.prototype, "_size", void 0), k([S()], K.prototype, "_saving", void 0), k([S()], K.prototype, "_dropTarget", void 0), k([S()], K.prototype, "_dragOver", void 0), k([S()], K.prototype, "_wallHover", void 0), k([S()], K.prototype, "_openingOpts", void 0), k([S()], K.prototype, "_stairDir", void 0), k([S()], K.prototype, "_stairGoes", void 0), k([S()], K.prototype, "_mode", void 0), k([S()], K.prototype, "_placing", void 0), k([S()], K.prototype, "_lineStart", void 0), k([S()], K.prototype, "_lightKind", void 0), k([S()], K.prototype, "_lightMount", void 0), K = k([b("homex-builder")], K);
 // src/components/homex-heating-group-editor.ts
 var Ka, qa = "default", Ja = 5, Ya = 30, Xa = .5, Za = 12, Qa = (e) => Math.min(Ya, Math.max(Ja, Math.round(e / Xa) * Xa)), q = (Ka = class extends y {
 	constructor(...e) {
@@ -16615,7 +17003,7 @@ var Uo = (Vo = class extends y {
   `, Vo);
 k([x({ attribute: !1 })], Uo.prototype, "hass", void 0), k([x({ type: Boolean })], Uo.prototype, "open", void 0), k([S()], Uo.prototype, "_backup", void 0), k([S()], Uo.prototype, "_summary", void 0), k([S()], Uo.prototype, "_fileName", void 0), k([S()], Uo.prototype, "_error", void 0), k([S()], Uo.prototype, "_busy", void 0), k([S()], Uo.prototype, "_done", void 0), Uo = k([b("homex-backup-dialog")], Uo);
 // src/homex-panel.ts
-var Wo, Go = "224", $ = (Wo = class extends y {
+var Wo, Go = "225", $ = (Wo = class extends y {
 	constructor(...e) {
 		super(...e), this.narrow = !1, this._rooms = null, this._error = null, this._createOpen = !1, this._exportOpen = !1, this._restoreOpen = !1, this._menuOpen = !1, this._dashTab = localStorage.getItem("homex_dash_tab") === "climate" ? "climate" : "general", this._expanded = localStorage.getItem("homex_expanded") || null, this._loaded = !1, this._onToggleExpand = (e) => {
 			let t = e.detail.entry_id;

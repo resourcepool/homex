@@ -430,6 +430,20 @@ export interface PlanStair {
   goes?: "up" | "down";
 }
 
+export type LightKind = "point" | "linear";
+export type LightMount = "ceiling" | "furniture" | "wall";
+
+/** A light on the plan: one HA light made of spots (`points`) or of strips
+ * (`lines`), mounted on the ceiling, on furniture or on a wall. */
+export interface PlanLight {
+  id: string;
+  entity_id: string;
+  kind: LightKind;
+  mount: LightMount;
+  points: PlanPoint[];
+  lines: [PlanPoint, PlanPoint][];
+}
+
 export interface PlanLevel {
   id: string;
   name: string;
@@ -440,6 +454,7 @@ export interface PlanLevel {
   openings?: PlanOpening[];
   stairs?: PlanStair[];
   radiators?: PlanRadiator[];
+  lights?: PlanLight[];
 }
 
 /** The house plan: levels sorted by level number. */
