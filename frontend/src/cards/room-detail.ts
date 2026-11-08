@@ -327,17 +327,6 @@ export class HomexRoomDetail extends LitElement {
       padding-left: 20px;
       margin-left: 20px;
     }
-    @media (max-width: 600px) {
-      .cols.two {
-        display: block;
-      }
-      .cols.two > section + section {
-        border-left: none;
-        border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
-        padding-left: 0;
-        margin-left: 0;
-      }
-    }
     .heating .head {
       display: flex;
       align-items: center;
@@ -598,6 +587,81 @@ export class HomexRoomDetail extends LitElement {
     }
     .switch input:checked + span::before {
       transform: translateX(18px);
+    }
+    /* Phones: shutters and heating stay side by side, everything smaller. */
+    @media (max-width: 600px) {
+      .body {
+        padding: 0 14px 14px;
+      }
+      header {
+        padding: 12px 12px 4px 16px;
+      }
+      h3 {
+        font-size: 11px;
+        margin: 10px 0 6px;
+      }
+      .cols.two > section + section {
+        padding-left: 10px;
+        margin-left: 10px;
+      }
+      .covers {
+        gap: 6px;
+      }
+      .cover {
+        min-width: 0;
+        gap: 5px;
+      }
+      .cover.all {
+        padding-right: 6px;
+      }
+      .ctitle {
+        font-size: 11px;
+      }
+      .cstate {
+        font-size: 10px;
+      }
+      .big-btn {
+        width: 40px;
+        height: 38px;
+        border-radius: 10px;
+      }
+      .big-btn svg {
+        width: 20px;
+        height: 20px;
+      }
+      .switch {
+        transform: scale(0.85);
+        transform-origin: right center;
+      }
+      .hstatus {
+        gap: 8px;
+        font-size: 11px;
+      }
+      .big-icon svg {
+        width: 26px;
+        height: 26px;
+      }
+      .hstate {
+        font-size: 12px;
+      }
+      .muted {
+        font-size: 11px;
+      }
+      .setpoint {
+        margin-top: 10px;
+        gap: 4px;
+      }
+      .big {
+        font-size: 17px;
+        min-width: 0;
+      }
+      .round {
+        width: 32px;
+        height: 32px;
+      }
+      .mvalue {
+        font-size: 14px;
+      }
     }
   `;
 }
