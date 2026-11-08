@@ -741,12 +741,15 @@ var nt, rt = [
           <span class="secondary">${u.text}</span>
         </span>
       </div>
-      ${i && o !== void 0 ? A`<div class="setpoint" title="Gardée jusqu'au prochain changement de mode">
+      ${o === void 0 ? M : A`<div
+            class="setpoint ${i ? "" : "inactive"}"
+            title=${i ? "Gardée jusqu'au prochain changement de mode" : "Pièce non chauffée"}
+          >
             <span class="muted">Consigne</span>
             <button
               class="round"
               title="Monter"
-              ?disabled=${this._busy || o + s > l}
+              ?disabled=${!i || this._busy || o + s > l}
               @click=${() => this._setpoint(n, o + s)}
             >
               ${K(Ve)}
@@ -755,12 +758,12 @@ var nt, rt = [
             <button
               class="round"
               title="Baisser"
-              ?disabled=${this._busy || o - s < c}
+              ?disabled=${!i || this._busy || o - s < c}
               @click=${() => this._setpoint(n, o - s)}
             >
               ${K(ze)}
             </button>
-          </div>` : M}
+          </div>`}
       ${t && i ? A`<div class="hmode muted">Mode ${t.mode_name}${t.enabled ? "" : " · chauffage global coupé"}</div>` : M}
     </section>`;
 	}
@@ -893,6 +896,9 @@ nt = X, nt.styles = o`
     }
     .secondary {
       color: var(--secondary-text-color);
+    }
+    .setpoint.inactive .big {
+      color: var(--disabled-text-color, #6f6f6f);
     }
     .hmode {
       margin-top: 12px;

@@ -190,13 +190,16 @@ export class HomexRoomDetail extends LitElement {
           <span class="secondary">${status.text}</span>
         </span>
       </div>
-      ${roomOn && target !== undefined
-        ? html`<div class="setpoint" title="Gardée jusqu'au prochain changement de mode">
+      ${target !== undefined
+        ? html`<div
+            class="setpoint ${roomOn ? "" : "inactive"}"
+            title=${roomOn ? "Gardée jusqu'au prochain changement de mode" : "Pièce non chauffée"}
+          >
             <span class="muted">Consigne</span>
             <button
               class="round"
               title="Monter"
-              ?disabled=${this._busy || target + step > max}
+              ?disabled=${!roomOn || this._busy || target + step > max}
               @click=${() => this._setpoint(valves, target + step)}
             >
               ${icon(mdiPlus)}
@@ -205,7 +208,7 @@ export class HomexRoomDetail extends LitElement {
             <button
               class="round"
               title="Baisser"
-              ?disabled=${this._busy || target - step < min}
+              ?disabled=${!roomOn || this._busy || target - step < min}
               @click=${() => this._setpoint(valves, target - step)}
             >
               ${icon(mdiMinus)}
@@ -354,6 +357,9 @@ export class HomexRoomDetail extends LitElement {
     }
     .secondary {
       color: var(--secondary-text-color);
+    }
+    .setpoint.inactive .big {
+      color: var(--disabled-text-color, #6f6f6f);
     }
     .hmode {
       margin-top: 12px;
