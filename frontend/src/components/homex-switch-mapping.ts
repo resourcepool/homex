@@ -13,6 +13,7 @@ import type {
 import { fireChanged } from "../types";
 import { errorMessage, fetchHeating, fetchRooms, saveGlobalSwitch } from "../api";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import "./homex-dialog";
 
 interface ActionItem {
@@ -27,17 +28,11 @@ interface ActionItem {
 }
 
 // Homex modules that expose assignable actions (extensible).
-const MODULE_LABELS: Record<string, string> = {
-  lights: "💡 Lights",
-  shutters: "🪟 Shutters",
-  heating: "🔥 Climate",
-};
+const MODULES = ["lights", "shutters", "heating"];
+const moduleLabel = (mod: string): string =>
+  MODULES.includes(mod) ? t(`switchMapping.module_${mod}`) : mod;
 
-const TAP_LABELS: Record<TapMode, string> = {
-  single: "Simple",
-  double: "Double",
-  long: "Long",
-};
+const tapLabel = (mode: TapMode): string => t(`switchMapping.tap_${mode}`);
 
 function actionKey(a: HomexAction): string {
   if (a.kind === "group") return `group:${a.group_id}`;
@@ -368,21 +363,21 @@ export class HomexSwitchMapping extends LitElement {
     // their own actions here and get their own group in the UI.
     if ((room.modules ?? []).includes("lights")) {
       list.push(
-        mk("lights", "Toggle pièce (on / off)", "Toggle", "⏻", { kind: "toggle" }),
-        mk("lights", "Changement de scène", "Scène →", "🎬", { kind: "scene_next" }),
-        mk("lights", "Dimmer +", "Dim +", "🔆", { kind: "dim_up" }),
-        mk("lights", "Dimmer −", "Dim −", "🔅", { kind: "dim_down" })
+        mk("lights", t("switchMapping.toggle_room"), t("switchMapping.toggle_short"), "⏻", { kind: "toggle" }),
+        mk("lights", t("switchMapping.scene_next"), t("switchMapping.scene_next_short"), "🎬", { kind: "scene_next" }),
+        mk("lights", t("switchMapping.dim_up"), t("switchMapping.dim_up_short"), "🔆", { kind: "dim_up" }),
+        mk("lights", t("switchMapping.dim_down"), t("switchMapping.dim_down_short"), "🔅", { kind: "dim_down" })
       );
       for (const g of room.groups ?? [])
         list.push(
-          mk("lights", `Groupe : ${g.name}`, g.name, "◧", {
+          mk("lights", t("switchMapping.group", { name: g.name }), g.name, "◧", {
             kind: "group",
             group_id: g.group_id,
           })
         );
       for (const s of room.scenes ?? [])
         list.push(
-          mk("lights", `Scène : ${s.name}`, s.name, "★", {
+          mk("lights", t("switchMapping.scene", { name: s.name }), s.name, "★", {
             kind: "scene",
             scene_key: s.key,
           })
@@ -392,19 +387,19 @@ export class HomexSwitchMapping extends LitElement {
     if ((room.modules ?? []).includes("shutters")) {
       for (const g of room.shutter_groups ?? []) {
         list.push(
-          mk("shutters", `${g.name} — Permuter`, `${g.name} ⇅`, "⇅", {
+          mk("shutters", t("switchMapping.shutter_toggle", { name: g.name }), `${g.name} ⇅`, "⇅", {
             kind: "shutter_toggle",
             group_id: g.id,
           }),
-          mk("shutters", `${g.name} — Ouvrir`, `${g.name} ⬆`, "⬆", {
+          mk("shutters", t("switchMapping.shutter_open", { name: g.name }), `${g.name} ⬆`, "⬆", {
             kind: "shutter_open",
             group_id: g.id,
           }),
-          mk("shutters", `${g.name} — Fermer`, `${g.name} ⬇`, "⬇", {
+          mk("shutters", t("switchMapping.shutter_close", { name: g.name }), `${g.name} ⬇`, "⬇", {
             kind: "shutter_close",
             group_id: g.id,
           }),
-          mk("shutters", `${g.name} — Stop`, `${g.name} ⏹`, "⏹", {
+          mk("shutters", t("switchMapping.shutter_stop", { name: g.name }), `${g.name} ⏹`, "⏹", {
             kind: "shutter_stop",
             group_id: g.id,
           })
@@ -414,13 +409,13 @@ export class HomexSwitchMapping extends LitElement {
     // Heating actions — on the heating zone the room belongs to (any room).
     if (this._heatingModes.length) {
       list.push(
-        mk("heating", "Chauffage — mode suivant", "Mode →", "🔥", {
+        mk("heating", t("switchMapping.heating_next"), t("switchMapping.heating_next_short"), "🔥", {
           kind: "heating_mode_next",
         })
       );
       for (const m of this._heatingModes)
         list.push(
-          mk("heating", `Chauffage — ${m.name}`, m.name, "🌡", {
+          mk("heating", t("switchMapping.heating_mode", { name: m.name }), m.name, "🌡", {
             kind: "heating_mode",
             mode_id: m.id,
           })
@@ -508,7 +503,7 @@ export class HomexSwitchMapping extends LitElement {
       this._close();
     } catch (err) {
       this._busy = false;
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   }
 
@@ -539,7 +534,7 @@ export class HomexSwitchMapping extends LitElement {
 
   private _canvas(active: TapMode) {
     const l = this.layout;
-    if (!l) return html`<p class="hint">Layout introuvable pour ce modèle.</p>`;
+    if (!l) return html`<p class="hint">${t("switchMapping.layout_not_found")}</p>`;
     const b = l.bounds;
     const round = l.shape === "round";
     const clipId = `mapclip-${l.id}`;
@@ -608,7 +603,7 @@ export class HomexSwitchMapping extends LitElement {
     const invisible = this._invisibleButtons(active);
     if (!invisible.length) return "";
     return html`<div class="tray">
-      <span class="tray-label">Boutons invisibles</span>
+      <span class="tray-label">${t("switchMapping.invisible_buttons")}</span>
       ${invisible.map((n) => {
         const v = this._mappings[active]?.[n];
         const item = v ? this._itemForValue(v) : undefined;
@@ -647,19 +642,16 @@ export class HomexSwitchMapping extends LitElement {
     return html`
       <homex-dialog
         .open=${this.open}
-        heading=${`Assignations — ${this.sw?.name ?? ""}`}
+        heading=${t("switchMapping.heading", { name: this.sw?.name ?? "" })}
         @dialog-closed=${this._close}
       >
         <div class="cols">
           <div class="left">
-            <p class="section">Actions Homex</p>
+            <p class="section">${t("switchMapping.homex_actions")}</p>
             ${this._rooms.length === 0
-              ? html`<p class="hint">Aucune pièce associée à cet interrupteur.</p>`
+              ? html`<p class="hint">${t("switchMapping.no_rooms")}</p>`
               : this._rooms.every((r) => !this._actionsByModule(r).length)
-                ? html`<p class="hint">
-                    Aucune action disponible : les pièces associées n'ont aucun
-                    module actif (ex. Lights).
-                  </p>`
+                ? html`<p class="hint">${t("switchMapping.no_actions")}</p>`
                 : this._rooms
                     .map((room) => [room, this._actionsByModule(room)] as const)
                     .filter(([, mods]) => mods.length > 0)
@@ -670,16 +662,13 @@ export class HomexSwitchMapping extends LitElement {
                           : ""}
                         ${mods.map(
                           ([mod, items]) => html`
-                            <p class="mod-head">${MODULE_LABELS[mod] ?? mod}</p>
+                            <p class="mod-head">${moduleLabel(mod)}</p>
                             ${items.map((a) => this._actionRow(a, used))}
                           `
                         )}
                       `
                     )}
-            <p class="hint">
-              Glisse une action sur un bouton du canvas (ou touche une action
-              puis un bouton). Touche un bouton assigné pour le vider.
-            </p>
+            <p class="hint">${t("switchMapping.hint")}</p>
           </div>
           <div class="right">
             ${modes.length
@@ -688,18 +677,18 @@ export class HomexSwitchMapping extends LitElement {
                       (m) => html`<span
                         class="tab ${m === active ? "active" : ""}"
                         @click=${() => (this._tapTab = m)}
-                        >${TAP_LABELS[m]}</span
+                        >${tapLabel(m)}</span
                       >`
                     )}
                   </div>
                   ${this._canvas(active)} ${this._invisibleTray(active)}`
-              : html`<p class="hint">Aucun tap mode configuré sur ce preset.</p>`}
+              : html`<p class="hint">${t("switchMapping.no_tap_modes")}</p>`}
           </div>
         </div>
         <div slot="actions">
-          <button @click=${this._close}>Annuler</button>
+          <button @click=${this._close}>${t("common.cancel")}</button>
           <button class="primary" ?disabled=${this._busy} @click=${this._save}>
-            Enregistrer
+            ${t("common.save")}
           </button>
         </div>
       </homex-dialog>

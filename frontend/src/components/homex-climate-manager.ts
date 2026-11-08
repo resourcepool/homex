@@ -3,29 +3,30 @@ import { customElement, property } from "lit/decorators.js";
 import type { HomeAssistant } from "../types";
 import { goBack, joinPath, navigate, segments } from "../lib/router";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import "./homex-heating-manager";
 import "./homex-climate-metrics";
 
 type Page = "metrics" | "heating" | "ac";
 
-const PAGES: { key: Page; icon: string; label: string; desc: string }[] = [
+const PAGES: { key: Page; icon: string; label: () => string; desc: () => string }[] = [
   {
     key: "metrics",
     icon: "📈",
-    label: "Metrics",
-    desc: "Capteurs de température, d'humidité et de qualité de l'air.",
+    label: () => t("climateManager.metrics"),
+    desc: () => t("climateManager.metrics_desc"),
   },
   {
     key: "heating",
     icon: "🔥",
-    label: "Heating",
-    desc: "Modes de chauffage, consignes, zones et presets des radiateurs.",
+    label: () => t("climateManager.heating"),
+    desc: () => t("climateManager.heating_desc"),
   },
   {
     key: "ac",
     icon: "❄️",
-    label: "Air Conditioning",
-    desc: "Climatisation — pas encore disponible.",
+    label: () => t("climateManager.ac"),
+    desc: () => t("climateManager.ac_desc"),
   },
 ];
 
@@ -117,7 +118,7 @@ export class HomexClimateManager extends LitElement {
   private _placeholder(title: string, text: string) {
     return html`
       <div class="head">
-        <button @click=${this._toLanding}>← Climate</button>
+        <button @click=${this._toLanding}>${t("climateManager.back_climate")}</button>
         <h2>${title}</h2>
       </div>
       <div class="msg">${text}</div>
@@ -143,12 +144,12 @@ export class HomexClimateManager extends LitElement {
       ></homex-climate-metrics>`;
     }
     if (page === "ac") {
-      return this._placeholder("Air Conditioning", "La climatisation n'est pas encore disponible.");
+      return this._placeholder(t("climateManager.ac"), t("climateManager.ac_unavailable"));
     }
     return html`
       <div class="head">
         <button @click=${() => this.dispatchEvent(new CustomEvent("close"))}>← Homex</button>
-        <h2>Climate Manager</h2>
+        <h2>${t("climateManager.title")}</h2>
       </div>
       <div class="pages">
         ${PAGES.map(
@@ -158,8 +159,8 @@ export class HomexClimateManager extends LitElement {
           >
             <div class="icon">${p.icon}</div>
             <div>
-              <div class="name">${p.label}</div>
-              <div class="desc">${p.desc}</div>
+              <div class="name">${p.label()}</div>
+              <div class="desc">${p.desc()}</div>
             </div>
           </div>`
         )}

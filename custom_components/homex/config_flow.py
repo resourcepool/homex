@@ -12,10 +12,17 @@ import re
 
 import voluptuous as vol
 from homeassistant.config_entries import (
+    ConfigEntry,
     ConfigFlow,
     ConfigFlowResult,
     ConfigSubentryFlow,
+    OptionsFlow,
     SubentryFlowResult,
+)
+from homeassistant.helpers.selector import (
+    SelectSelector,
+    SelectSelectorConfig,
+    SelectSelectorMode,
 )
 from homeassistant.core import callback
 
@@ -34,6 +41,7 @@ from .const import (
     HUB_UNIQUE_ID,
     STRATEGY_RECALL_FIRST,
 )
+from .i18n import CONF_LANGUAGE, LANGUAGE_AUTO, LANGUAGES, language_setting
 
 ROOM_ID_RE = re.compile(r"^[a-z0-9_]+$")
 
@@ -48,12 +56,42 @@ class HomexConfigFlow(ConfigFlow, domain=DOMAIN):
         self._abort_if_unique_id_configured()
         return self.async_create_entry(title="Homex", data={CONF_HUB: True})
 
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
+        return HomexOptionsFlow()
+
     @classmethod
     @callback
     def async_get_supported_subentry_types(
         cls, config_entry
     ) -> dict[str, type[ConfigSubentryFlow]]:
         return {"room": RoomSubentryFlow}
+
+
+class HomexOptionsFlow(OptionsFlow):
+    """Homex settings: the interface language ("auto" follows Home Assistant)."""
+
+    async def async_step_init(self, user_input=None) -> ConfigFlowResult:
+        if user_input is not None:
+            # Saving the options reloads Homex: entity and scene names follow.
+            return self.async_create_entry(
+                data={**self.config_entry.options, CONF_LANGUAGE: user_input[CONF_LANGUAGE]}
+            )
+        schema = vol.Schema(
+            {
+                vol.Required(
+                    CONF_LANGUAGE, default=language_setting(self.hass)
+                ): SelectSelector(
+                    SelectSelectorConfig(
+                        options=[LANGUAGE_AUTO, *LANGUAGES],
+                        translation_key="language",
+                        mode=SelectSelectorMode.DROPDOWN,
+                    )
+                ),
+            }
+        )
+        return self.async_show_form(step_id="init", data_schema=schema)
 
 
 class RoomSubentryFlow(ConfigSubentryFlow):

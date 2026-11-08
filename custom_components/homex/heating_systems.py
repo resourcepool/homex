@@ -51,8 +51,69 @@ from datetime import timedelta
 from .const import DOMAIN
 from .heating import STORE_DATA, _clean_id, _doc, _save, tolerance_mode
 from .heating_zones import zones_manager
+from .i18n import tr
 
 _LOGGER = logging.getLogger(__name__)
+
+# User-facing strings (see i18n.py).
+_STRINGS = {
+    "en": {
+        "entity_demand": "Demand",
+        "entity_contact": "Dry contact",
+        "entity_circulation": "Circulation",
+        "entity_rule_setpoint_tank": "Rule setpoint / tank",
+        "entity_rule_flow_return": "Rule flow / return",
+        "entity_gap_setpoint_tank": "Delta setpoint - tank",
+        "entity_gap_flow_return": "Delta flow - return",
+        "entity_min_runtime_left": "Minimum runtime left",
+        "entity_runtime_today": "Runtime today",
+        "entity_force": "Manual override",
+        "sensor_setpoint": "setpoint",
+        "sensor_tank": "tank",
+        "sensor_flow": "flow",
+        "sensor_return": "return",
+        "name_id_type_required": "Name, id and type required",
+        "contact_domain": "The dry contact must be a switch or an input_boolean",
+        "invalid_sensor": "Invalid sensor: {entity}",
+        "circulator_domain": "The circulator must be a switch or an input_boolean",
+        "invalid_min_runtime": "Invalid minimum runtime",
+        "unknown_rule_type": "Unknown rule type",
+        "rule_once": "Each rule type can only be added once",
+        "rule_sensors_required": "Sensor required by the rule: {sensors}",
+        "delta_tolerance_required": "Delta and tolerance required",
+        "delta_gt_tolerance": "Delta must be > tolerance ≥ 0",
+        "system_exists": "A system with the id “{id}” already exists.",
+        "system_not_found": "System not found",
+    },
+    "fr": {
+        "entity_demand": "Demande",
+        "entity_contact": "Contact sec",
+        "entity_circulation": "Circulation",
+        "entity_rule_setpoint_tank": "Règle consigne / ballon",
+        "entity_rule_flow_return": "Règle départ / retour",
+        "entity_gap_setpoint_tank": "Delta consigne - ballon",
+        "entity_gap_flow_return": "Delta départ - retour",
+        "entity_min_runtime_left": "Temps minimal restant",
+        "entity_runtime_today": "Durée d'activité aujourd'hui",
+        "entity_force": "Forçage manuel",
+        "sensor_setpoint": "consigne",
+        "sensor_tank": "ballon",
+        "sensor_flow": "départ",
+        "sensor_return": "retour",
+        "name_id_type_required": "Nom, id et type requis",
+        "contact_domain": "Le contact sec doit être un switch ou un input_boolean",
+        "invalid_sensor": "Capteur invalide : {entity}",
+        "circulator_domain": "Le circulateur doit être un switch ou un input_boolean",
+        "invalid_min_runtime": "Temps d'exécution minimal invalide",
+        "unknown_rule_type": "Type de règle inconnu",
+        "rule_once": "Chaque type de règle ne peut être ajouté qu'une fois",
+        "rule_sensors_required": "Capteur requis par la règle : {sensors}",
+        "delta_tolerance_required": "Delta et tolérance requis",
+        "delta_gt_tolerance": "Il faut delta > tolérance ≥ 0",
+        "system_exists": "Un système avec l'id « {id} » existe déjà.",
+        "system_not_found": "Système introuvable",
+    },
+}
 
 HEATING_SYSTEMS = "_heating_systems"
 SYSTEM_TYPES = ("boiler", "heat_pump", "buffer_tank")
@@ -69,32 +130,34 @@ GLOBAL = "global"
 NEEDED_PREFIX = "binary_sensor.homex_heating_needed"
 DRIVEN_TYPES = ("boiler", "buffer_tank")
 ENTITY_PREFIX = "homex_system_"
-RULE_LABELS = {"setpoint_tank": "consigne / ballon", "flow_return": "départ / retour"}
-GAP_LABELS = {"setpoint_tank": "consigne - ballon", "flow_return": "départ - retour"}
-
-
-def system_entity_keys(system: dict) -> dict[str, list[tuple[str, str]]]:
+def system_entity_keys(
+    hass: HomeAssistant, system: dict
+) -> dict[str, list[tuple[str, str]]]:
     """Per platform, the (key, label) of the entities a system exposes."""
     stype = system.get("type")
     if stype not in DRIVEN_TYPES:
         return {}
-    binary = [("demand", "Demande")]
+
+    def entry(key: str) -> tuple[str, str]:
+        return key, tr(hass, _STRINGS, f"entity_{key}")
+
+    binary = [entry("demand")]
     sensors: list[tuple[str, str]] = []
     if stype == "boiler":
-        binary.append(("contact", "Contact sec"))
+        binary.append(entry("contact"))
     else:
-        binary.append(("circulation", "Circulation"))
+        binary.append(entry("circulation"))
         for rule in system.get("rules") or []:
             rtype = LEGACY_RULES.get(rule.get("type"), rule.get("type"))
             if rtype in RULE_GAPS:
-                binary.append((f"rule_{rtype}", f"Règle {RULE_LABELS[rtype]}"))
-                sensors.append((f"gap_{rtype}", f"Delta {GAP_LABELS[rtype]}"))
-        sensors.append(("min_runtime_left", "Temps minimal restant"))
-        sensors.append(("runtime_today", "Durée d'activité aujourd'hui"))
+                binary.append(entry(f"rule_{rtype}"))
+                sensors.append(entry(f"gap_{rtype}"))
+        sensors.append(entry("min_runtime_left"))
+        sensors.append(entry("runtime_today"))
     return {
         "binary_sensor": binary,
         "sensor": sensors,
-        "switch": [("force", "Forçage manuel")] if stype == "buffer_tank" else [],
+        "switch": [entry("force")] if stype == "buffer_tank" else [],
     }
 
 
@@ -162,7 +225,7 @@ class HeatingSystems:
         wanted = {
             f"{ENTITY_PREFIX}{s['id']}_{key}"
             for s in self._systems()
-            for key, _ in system_entity_keys(s).get(domain, [])
+            for key, _ in system_entity_keys(self.hass, s).get(domain, [])
         }
         ent_reg = er.async_get(self.hass)
         for reg in list(ent_reg.entities.values()):
@@ -199,7 +262,7 @@ class HeatingSystems:
             wanted = {
                 (s["id"], key): label
                 for s in self._systems()
-                for key, label in system_entity_keys(s).get(domain, [])
+                for key, label in system_entity_keys(self.hass, s).get(domain, [])
             }
             for ref in [r for r in current if r not in wanted]:
                 entity = current.pop(ref)
@@ -481,17 +544,17 @@ class HeatingSystems:
                 await zones.async_set_tolerance(mode, zone_id)
 
 
-def _clean_system(raw: dict) -> dict:
+def _clean_system(hass: HomeAssistant, raw: dict) -> dict:
     sid = _clean_id(raw.get("id"))
     name = str(raw.get("name") or "").strip()
     stype = raw.get("type")
     if not sid or not name or stype not in SYSTEM_TYPES:
-        raise vol.Invalid("Nom, id et type requis")
+        raise vol.Invalid(tr(hass, _STRINGS, "name_id_type_required"))
     contact = str(raw.get("contact") or "")
     if contact and contact.split(".", 1)[0] not in CONTACT_DOMAINS:
-        raise vol.Invalid("Le contact sec doit être un switch ou un input_boolean")
+        raise vol.Invalid(tr(hass, _STRINGS, "contact_domain"))
     if stype == "buffer_tank":
-        return _clean_tank(sid, name, raw)
+        return _clean_tank(hass, sid, name, raw)
     return {
         "id": sid,
         "name": name,
@@ -502,44 +565,46 @@ def _clean_system(raw: dict) -> dict:
     }
 
 
-def _clean_tank(sid: str, name: str, raw: dict) -> dict:
+def _clean_tank(hass: HomeAssistant, sid: str, name: str, raw: dict) -> dict:
     sensors = {}
     for key in TANK_SENSORS:
         entity = str(raw.get(key) or "")
         domains = SETPOINT_DOMAINS if key == "setpoint_sensor" else ("sensor",)
         if entity and entity.split(".", 1)[0] not in domains:
-            raise vol.Invalid(f"Capteur invalide : {entity}")
+            raise vol.Invalid(tr(hass, _STRINGS, "invalid_sensor", entity=entity))
         sensors[key] = entity
     circulator = str(raw.get("circulator") or "")
     if not circulator or circulator.split(".", 1)[0] not in CONTACT_DOMAINS:
-        raise vol.Invalid("Le circulateur doit être un switch ou un input_boolean")
+        raise vol.Invalid(tr(hass, _STRINGS, "circulator_domain"))
     try:
         min_runtime = max(0.0, float(raw.get("min_runtime") or 0))
     except (TypeError, ValueError) as err:
-        raise vol.Invalid("Temps d'exécution minimal invalide") from err
+        raise vol.Invalid(tr(hass, _STRINGS, "invalid_min_runtime")) from err
     rules = []
     labels = {
-        "setpoint_sensor": "consigne",
-        "tank_sensor": "ballon",
-        "flow_sensor": "départ",
-        "return_sensor": "retour",
+        "setpoint_sensor": tr(hass, _STRINGS, "sensor_setpoint"),
+        "tank_sensor": tr(hass, _STRINGS, "sensor_tank"),
+        "flow_sensor": tr(hass, _STRINGS, "sensor_flow"),
+        "return_sensor": tr(hass, _STRINGS, "sensor_return"),
     }
     for rule in raw.get("rules") or []:
         rtype = LEGACY_RULES.get(rule.get("type"), rule.get("type"))
         if rtype not in RULE_GAPS:
-            raise vol.Invalid("Type de règle inconnu")
+            raise vol.Invalid(tr(hass, _STRINGS, "unknown_rule_type"))
         if any(r["type"] == rtype for r in rules):
-            raise vol.Invalid("Chaque type de règle ne peut être ajouté qu'une fois")
+            raise vol.Invalid(tr(hass, _STRINGS, "rule_once"))
         missing = [labels[k] for k in RULE_GAPS[rtype] if not sensors[k]]
         if missing:
-            raise vol.Invalid("Capteur requis par la règle : " + ", ".join(missing))
+            raise vol.Invalid(
+                tr(hass, _STRINGS, "rule_sensors_required", sensors=", ".join(missing))
+            )
         try:
             delta = float(rule.get("delta"))
             tolerance = float(rule.get("tolerance"))
         except (TypeError, ValueError) as err:
-            raise vol.Invalid("Delta et tolérance requis") from err
+            raise vol.Invalid(tr(hass, _STRINGS, "delta_tolerance_required")) from err
         if delta <= 0 or tolerance < 0 or tolerance >= delta:
-            raise vol.Invalid("Il faut delta > tolérance ≥ 0")
+            raise vol.Invalid(tr(hass, _STRINGS, "delta_gt_tolerance"))
         rules.append({"type": rtype, "delta": delta, "tolerance": tolerance})
     return {
         "id": sid,
@@ -574,7 +639,7 @@ def _clean_zones(raw: dict) -> list[str]:
 async def ws_heating_system_save(hass: HomeAssistant, connection, msg) -> None:
     """Create or update a heating system (upsert by id), then drive it."""
     try:
-        system = _clean_system(msg["system"])
+        system = _clean_system(hass, msg["system"])
     except vol.Invalid as err:
         connection.send_error(msg["id"], "invalid", str(err))
         return
@@ -582,7 +647,7 @@ async def ws_heating_system_save(hass: HomeAssistant, connection, msg) -> None:
     systems = doc.setdefault("systems", [])
     if msg["create"] and any(s.get("id") == system["id"] for s in systems):
         connection.send_error(
-            msg["id"], "id_exists", f"Un système avec l'id « {system['id']} » existe déjà."
+            msg["id"], "id_exists", tr(hass, _STRINGS, "system_exists", id=system["id"])
         )
         return
     previous = next((s for s in systems if s.get("id") == system["id"]), None)
@@ -628,7 +693,7 @@ async def ws_heating_system_status(hass: HomeAssistant, connection, msg) -> None
     manager = systems_manager(hass)
     system = next((s for s in manager._systems() if s.get("id") == msg["system_id"]), None)
     if system is None or system.get("type") != "buffer_tank":
-        connection.send_error(msg["id"], "not_found", "Système introuvable")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "system_not_found"))
         return
     connection.send_result(msg["id"], manager.tank_status(system))
 

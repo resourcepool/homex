@@ -2,7 +2,7 @@
  * sensors, heating (room switch, setpoint override, valves) and shutters,
  * per what the room has. Appended to document.body (outside dashboards'
  * stacking contexts). */
-import { LitElement, css, html, nothing } from "lit";
+import { LitElement, css, html, nothing, type PropertyValues } from "lit";
 import { property, state } from "lit/decorators.js";
 import {
   mdiArrowCollapseDown,
@@ -20,16 +20,17 @@ import {
 } from "@mdi/js";
 import type { HomeAssistant, Room } from "../types";
 import {
-  LEVEL_NAMES,
   airLevel,
   coverPosition,
   fmt,
   icon,
+  levelName,
   roomCovers,
   roomMetric,
   roomValves,
   type AirKey,
 } from "./shared";
+import { loadLanguageSetting, onLanguageChange, syncHass, t } from "../lib/i18n";
 
 interface HeatingStatus {
   enabled: boolean;
@@ -38,9 +39,10 @@ interface HeatingStatus {
   mode_name: string;
 }
 
+/** `label`: a translation key, or for air metrics the label itself (symbols). */
 const METRICS: { key: string; label: string; path: string; air?: AirKey; digits: number }[] = [
-  { key: "temperature", label: "Température", path: mdiThermometer, digits: 1 },
-  { key: "humidity", label: "Humidité", path: mdiWaterPercent, digits: 0 },
+  { key: "temperature", label: "cardRoomDetail.temperature", path: mdiThermometer, digits: 1 },
+  { key: "humidity", label: "cardRoomDetail.humidity", path: mdiWaterPercent, digits: 0 },
   { key: "co2", label: "CO₂", path: mdiCloud, air: "co2", digits: 0 },
   { key: "pm25", label: "PM2.5", path: mdiChartBubble, air: "pm25", digits: 1 },
   { key: "pm10", label: "PM10", path: mdiChartBubble, air: "pm10", digits: 1 },
@@ -53,17 +55,21 @@ export class HomexRoomDetail extends LitElement {
   @state() private _heating?: HeatingStatus;
   @state() private _busy = false;
   private _lastHeatingSwitch?: string;
+  private _unlisten?: () => void;
 
   connectedCallback() {
     super.connectedCallback();
     this._keydown = this._keydown.bind(this);
     window.addEventListener("keydown", this._keydown);
+    this._unlisten = onLanguageChange(() => this.requestUpdate());
     this._loadHeating();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     window.removeEventListener("keydown", this._keydown);
+    this._unlisten?.();
+    this._unlisten = undefined;
   }
 
   private _keydown(ev: KeyboardEvent) {
@@ -78,7 +84,11 @@ export class HomexRoomDetail extends LitElement {
     return `switch.homex_${this.room.room_id}_heating`;
   }
 
-  willUpdate() {
+  willUpdate(changed: PropertyValues) {
+    if (changed.has("hass") && this.hass) {
+      syncHass(this.hass);
+      loadLanguageSetting(this.hass);
+    }
     // The room heating switch flipped (here or elsewhere): refresh the status.
     const st = this.hass?.states[this._heatingSwitch]?.state;
     if (this._lastHeatingSwitch !== undefined && st !== this._lastHeatingSwitch) {
@@ -127,11 +137,12 @@ export class HomexRoomDetail extends LitElement {
       if (!val) return undefined;
       const unit = key === "humidity" ? "%" : (val.unit ?? "");
       const lvl = m.air ? airLevel(m.air, val.value).level : undefined;
-      return html`<span class="item" title=${m.label}>
+      const label = m.air ? m.label : t(m.label);
+      return html`<span class="item" title=${label}>
         <span class="micon">${icon(m.path)}</span>
         ${m.air === "pm25" || m.air === "pm10" ? html`<span class="tag">${m.label.slice(2)}</span>` : nothing}
         <span class="mvalue">${fmt(this.hass, val.value, m.digits, key === "temperature" ? 1 : 0)} ${unit}</span>
-        ${lvl !== undefined ? html`<span class="pill l${lvl}">${LEVEL_NAMES[lvl]}</span>` : nothing}
+        ${lvl !== undefined ? html`<span class="pill l${lvl}">${levelName(lvl)}</span>` : nothing}
       </span>`;
     };
     const lines = [
@@ -143,7 +154,7 @@ export class HomexRoomDetail extends LitElement {
       .filter((l) => l.length);
     if (!lines.length) return nothing;
     return html`<section>
-      <h3>Climat</h3>
+      <h3>${t("cardRoomDetail.climate")}</h3>
       ${lines.map((l) => html`<div class="mline">${l}</div>`)}
     </section>`;
   }
@@ -162,15 +173,15 @@ export class HomexRoomDetail extends LitElement {
     const min = (a?.min_temp as number) ?? 5;
     const max = (a?.max_temp as number) ?? 30;
     const status = !roomOn
-      ? { cls: "off", path: mdiFireOff, text: "Éteint" }
+      ? { cls: "off", path: mdiFireOff, text: t("cardRoomDetail.off") }
       : demand
-        ? { cls: "heat", path: mdiFire, text: "En chauffe" }
-        : { cls: "", path: mdiFire, text: "Inactif" };
+        ? { cls: "heat", path: mdiFire, text: t("cardRoomDetail.heating") }
+        : { cls: "", path: mdiFire, text: t("cardRoomDetail.idle") };
     return html`<section class="heating">
       <div class="head">
-        <h3>Chauffage</h3>
+        <h3>${t("cardRoomDetail.section_heating")}</h3>
         ${sw
-          ? html`<label class="switch" title=${roomOn ? "Ne plus chauffer la pièce" : "Chauffer la pièce"}>
+          ? html`<label class="switch" title=${roomOn ? t("cardRoomDetail.stop_heating_room") : t("cardRoomDetail.heat_room")}>
               <input
                 type="checkbox"
                 .checked=${roomOn}
@@ -187,19 +198,19 @@ export class HomexRoomDetail extends LitElement {
       <div class="hstatus">
         <span class="status big-icon ${status.cls}">${icon(status.path)}</span>
         <span class="htext">
-          <span class="hstate">${roomOn ? "Pièce chauffée" : "Pièce non chauffée"}</span>
+          <span class="hstate">${roomOn ? t("cardRoomDetail.room_heated") : t("cardRoomDetail.room_unheated")}</span>
           <span class="secondary">${status.text}</span>
         </span>
       </div>
       ${target !== undefined
         ? html`<div
             class="setpoint ${roomOn ? "" : "inactive"}"
-            title=${roomOn ? "Gardée jusqu'au prochain changement de mode" : "Pièce non chauffée"}
+            title=${roomOn ? t("cardRoomDetail.setpoint_kept") : t("cardRoomDetail.room_unheated")}
           >
-            <span class="muted">Consigne</span>
+            <span class="muted">${t("cardRoomDetail.setpoint")}</span>
             <button
               class="round"
-              title="Monter"
+              title=${t("cardRoomDetail.raise")}
               ?disabled=${!roomOn || this._busy || target + step > max}
               @click=${() => this._setpoint(valves, target + step)}
             >
@@ -208,7 +219,7 @@ export class HomexRoomDetail extends LitElement {
             <span class="big">${fmt(this.hass, target, 1, 1)} °C</span>
             <button
               class="round"
-              title="Baisser"
+              title=${t("cardRoomDetail.lower")}
               ?disabled=${!roomOn || this._busy || target - step < min}
               @click=${() => this._setpoint(valves, target - step)}
             >
@@ -218,7 +229,7 @@ export class HomexRoomDetail extends LitElement {
         : nothing}
       ${h
         ? html`<div class="hmode muted">
-            ${roomOn ? `Mode ${h.mode_name}${h.enabled ? "" : " · chauffage global coupé"}` : "—"}
+            ${roomOn ? `${t("cardRoomDetail.mode", { name: h.mode_name })}${h.enabled ? "" : t("cardRoomDetail.global_off")}` : "—"}
           </div>`
         : nothing}
       </div>
@@ -229,33 +240,37 @@ export class HomexRoomDetail extends LitElement {
     const covers = roomCovers(this.room).filter((c) => this.hass.states[c]);
     if (!covers.length) return nothing;
     const label = (st: any) => {
-      if (st.state === "opening") return "Ouverture";
-      if (st.state === "closing") return "Fermeture";
+      if (st.state === "opening") return t("cardRoomDetail.opening");
+      if (st.state === "closing") return t("cardRoomDetail.closing");
       const pos = coverPosition(st);
-      return pos === 0 ? "Fermé" : pos === 100 ? "Ouvert" : `Entrouvert · ${pos} %`;
+      return pos === 0
+        ? t("cardRoomDetail.closed")
+        : pos === 100
+          ? t("cardRoomDetail.open")
+          : t("cardRoomDetail.partial", { pos });
     };
     const columns = [
-      ...(covers.length > 1 ? [{ title: "Tous", state: "", entity: covers as string | string[] }] : []),
+      ...(covers.length > 1 ? [{ title: t("cardRoomDetail.all"), state: "", entity: covers as string | string[] }] : []),
       ...covers.map((c, i) => ({
-        title: covers.length > 1 ? `Volet ${i + 1}` : "",
+        title: covers.length > 1 ? t("cardRoomDetail.shutter_n", { n: i + 1 }) : "",
         state: label(this.hass.states[c]),
         entity: c as string | string[],
       })),
     ];
     return html`<section>
-      <h3>Volets</h3>
+      <h3>${t("cardRoomDetail.shutters")}</h3>
       <div class="covers">
         ${columns.map(
           (col) => html`<div class="cover ${col.state ? "" : "all"}">
             ${col.title ? html`<div class="ctitle">${col.title}</div>` : nothing}
             <div class="cstate">${col.state || "\u00a0"}</div>
-            <button class="big-btn" title="Ouvrir" @click=${() => this._cover("open_cover", col.entity)}>
+            <button class="big-btn" title=${t("cardRoomDetail.open_action")} @click=${() => this._cover("open_cover", col.entity)}>
               ${icon(mdiArrowCollapseUp)}
             </button>
-            <button class="big-btn" title="Stop" @click=${() => this._cover("stop_cover", col.entity)}>
+            <button class="big-btn" title=${t("cardRoomDetail.stop_action")} @click=${() => this._cover("stop_cover", col.entity)}>
               ${icon(mdiStop)}
             </button>
-            <button class="big-btn" title="Fermer" @click=${() => this._cover("close_cover", col.entity)}>
+            <button class="big-btn" title=${t("cardRoomDetail.close_action")} @click=${() => this._cover("close_cover", col.entity)}>
               ${icon(mdiArrowCollapseDown)}
             </button>
           </div>`
@@ -277,9 +292,9 @@ export class HomexRoomDetail extends LitElement {
       <div class="dialog ${cols.length > 1 ? "wide" : ""}" role="dialog" aria-modal="true" aria-label=${this.heading}>
         <header>
           <h2>${this.heading}</h2>
-          <button class="round" title="Fermer" @click=${this.close}>${icon(mdiClose)}</button>
+          <button class="round" title=${t("common.close")} @click=${this.close}>${icon(mdiClose)}</button>
         </header>
-        <div class="body">${body.length ? body : html`<p class="muted">Aucune donnée de climat, de chauffage ni de volet pour cette pièce.</p>`}</div>
+        <div class="body">${body.length ? body : html`<p class="muted">${t("cardRoomDetail.no_data")}</p>`}</div>
       </div>`;
   }
 

@@ -523,17 +523,17 @@ v._$litElement$ = !0, v.finalized = !0, Je.litElementHydrateSupport?.({ LitEleme
 var Ye = Je.litElementPolyfillSupport;
 Ye?.({ LitElement: v }), (Je.litElementVersions ??= []).push("4.2.2");
 // node_modules/@mdi/js/mdi.js
-var Xe = "M13 14H11V9H13M13 18H11V16H13M1 21H23L12 2L1 21Z", Ze = "M11,4H13V16L18.5,10.5L19.92,11.92L12,19.84L4.08,11.92L5.5,10.5L11,16V4Z", Qe = "M3,5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5M11,6V14.5L7.5,11L6.08,12.42L12,18.34L17.92,12.42L16.5,11L13,14.5V6H11Z", $e = "M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z", et = "M21,19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3H19C20.11,3 21,3.9 21,5V19M13,18V9.5L16.5,13L17.92,11.58L12,5.66L6.08,11.58L7.5,13L11,9.5V18H13Z", tt = "M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z", nt = "M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z", rt = "M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z", it = "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z", at = "M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z", ot = "M3 6H21V4H3C1.9 4 1 4.9 1 6V18C1 19.1 1.9 20 3 20H7V18H3V6M13 12H9V13.78C8.39 14.33 8 15.11 8 16C8 16.89 8.39 17.67 9 18.22V20H13V18.22C13.61 17.67 14 16.88 14 16S13.61 14.33 13 13.78V12M11 17.5C10.17 17.5 9.5 16.83 9.5 16S10.17 14.5 11 14.5 12.5 15.17 12.5 16 11.83 17.5 11 17.5M22 8H16C15.5 8 15 8.5 15 9V19C15 19.5 15.5 20 16 20H22C22.5 20 23 19.5 23 19V9C23 8.5 22.5 8 22 8M21 18H17V10H21V18Z", st = "M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z", ct = "M7,19V17H9V19H7M11,19V17H13V19H11M15,19V17H17V19H15M7,15V13H9V15H7M11,15V13H13V15H11M15,15V13H17V15H15M7,11V9H9V11H7M11,11V9H13V11H11M15,11V9H17V11H15M7,7V5H9V7H7M11,7V5H13V7H11M15,7V5H17V7H15Z", lt = "M17.66 11.2C17.43 10.9 17.15 10.64 16.89 10.38C16.22 9.78 15.46 9.35 14.82 8.72C13.33 7.26 13 4.85 13.95 3C13 3.23 12.17 3.75 11.46 4.32C8.87 6.4 7.85 10.07 9.07 13.22C9.11 13.32 9.15 13.42 9.15 13.55C9.15 13.77 9 13.97 8.8 14.05C8.57 14.15 8.33 14.09 8.14 13.93C8.08 13.88 8.04 13.83 8 13.76C6.87 12.33 6.69 10.28 7.45 8.64C5.78 10 4.87 12.3 5 14.47C5.06 14.97 5.12 15.47 5.29 15.97C5.43 16.57 5.7 17.17 6 17.7C7.08 19.43 8.95 20.67 10.96 20.92C13.1 21.19 15.39 20.8 17.03 19.32C18.86 17.66 19.5 15 18.56 12.72L18.43 12.46C18.22 12 17.66 11.2 17.66 11.2M14.5 17.5C14.22 17.74 13.76 18 13.4 18.1C12.28 18.5 11.16 17.94 10.5 17.28C11.69 17 12.4 16.12 12.61 15.23C12.78 14.43 12.46 13.77 12.33 13C12.21 12.26 12.23 11.63 12.5 10.94C12.69 11.32 12.89 11.7 13.13 12C13.9 13 15.11 13.44 15.37 14.8C15.41 14.94 15.43 15.08 15.43 15.23C15.46 16.05 15.1 16.95 14.5 17.5H14.5Z", ut = "M22.11 21.46L2.39 1.73L1.11 3L7.09 9C5.66 10.36 4.88 12.47 5 14.47C5.06 14.97 5.12 15.47 5.29 15.97C5.43 16.57 5.7 17.17 6 17.7C7.08 19.43 8.95 20.67 10.96 20.92C13.1 21.19 15.39 20.8 17.03 19.32C17.1 19.26 17.15 19.18 17.22 19.11L20.84 22.73L22.11 21.46M8.8 14.05C8.57 14.15 8.33 14.09 8.14 13.93C8.08 13.88 8.04 13.83 8 13.76C7 12.47 6.74 10.69 7.26 9.15L8.58 10.47C8.58 11.4 8.73 12.33 9.07 13.22C9.11 13.32 9.15 13.42 9.15 13.55C9.15 13.77 9 13.97 8.8 14.05M14.5 17.5C14.22 17.74 13.76 18 13.4 18.1C12.28 18.5 11.16 17.94 10.5 17.28C11.69 17 12.4 16.12 12.61 15.23C12.66 15 12.66 14.76 12.64 14.53L15 16.88C14.85 17.11 14.69 17.33 14.5 17.5M18.92 15.72L9.65 6.46C10.12 5.65 10.72 4.92 11.46 4.32C12.17 3.75 13 3.23 13.95 3C13 4.85 13.33 7.26 14.82 8.72C15.46 9.35 16.22 9.78 16.89 10.38C17.15 10.64 17.43 10.9 17.66 11.2C17.66 11.2 18.22 12 18.43 12.46L18.56 12.72C18.96 13.69 19.06 14.72 18.92 15.72Z", dt = "M13 24C9.74 24 6.81 22 5.6 19L2.57 11.37C2.26 10.58 3 9.79 3.81 10.05L4.6 10.31C5.16 10.5 5.62 10.92 5.84 11.47L7.25 15H8V3.25C8 2.56 8.56 2 9.25 2S10.5 2.56 10.5 3.25V12H11.5V1.25C11.5 .56 12.06 0 12.75 0S14 .56 14 1.25V12H15V2.75C15 2.06 15.56 1.5 16.25 1.5C16.94 1.5 17.5 2.06 17.5 2.75V12H18.5V5.75C18.5 5.06 19.06 4.5 19.75 4.5S21 5.06 21 5.75V16C21 20.42 17.42 24 13 24Z", ft = "M19 8C20.11 8 21 8.9 21 10V16.76C21.61 17.31 22 18.11 22 19C22 20.66 20.66 22 19 22C17.34 22 16 20.66 16 19C16 18.11 16.39 17.31 17 16.76V10C17 8.9 17.9 8 19 8M19 9C18.45 9 18 9.45 18 10V11H20V10C20 9.45 19.55 9 19 9M5 20V12H2L12 3L16.4 6.96C15.54 7.69 15 8.78 15 10V16C14.37 16.83 14 17.87 14 19L14.1 20H5Z", pt = "M10 2C13.9 2 17 5.1 17 9C17 11.4 15.8 13.5 14 14.7V17C14 17.6 13.6 18 13 18H7C6.4 18 6 17.6 6 17V14.7C4.2 13.5 3 11.4 3 9C3 5.1 6.1 2 10 2M7 21V20H13V21C13 21.6 12.6 22 12 22H8C7.4 22 7 21.6 7 21M10 4C7.2 4 5 6.2 5 9C5 11.1 6.2 12.8 8 13.6V16H12V13.6C13.8 12.8 15 11.1 15 9C15 6.2 12.8 4 10 4M19 12V7H21V13H19M19 17V15H21V17H19Z", mt = "M12,2C9.76,2 7.78,3.05 6.5,4.68L7.93,6.11C8.84,4.84 10.32,4 12,4A5,5 0 0,1 17,9C17,10.68 16.16,12.16 14.89,13.06L16.31,14.5C17.94,13.21 19,11.24 19,9A7,7 0 0,0 12,2M3.28,4L2,5.27L5.04,8.3C5,8.53 5,8.76 5,9C5,11.38 6.19,13.47 8,14.74V17A1,1 0 0,0 9,18H14.73L18.73,22L20,20.72L3.28,4M7.23,10.5L12.73,16H10V13.58C8.68,13 7.66,11.88 7.23,10.5M9,20V21A1,1 0 0,0 10,22H14A1,1 0 0,0 15,21V20H9Z", ht = "M12,6A6,6 0 0,1 18,12C18,14.22 16.79,16.16 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.21,16.16 6,14.22 6,12A6,6 0 0,1 12,6M14,21V22A1,1 0 0,1 13,23H11A1,1 0 0,1 10,22V21H14M20,11H23V13H20V11M1,11H4V13H1V11M13,1V4H11V1H13M4.92,3.5L7.05,5.64L5.63,7.05L3.5,4.93L4.92,3.5M16.95,5.63L19.07,3.5L20.5,4.93L18.37,7.05L16.95,5.63Z", gt = "M20,11H23V13H20V11M1,11H4V13H1V11M13,1V4H11V1H13M4.92,3.5L7.05,5.64L5.63,7.05L3.5,4.93L4.92,3.5M16.95,5.63L19.07,3.5L20.5,4.93L18.37,7.05L16.95,5.63M12,6A6,6 0 0,1 18,12C18,14.22 16.79,16.16 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.21,16.16 6,14.22 6,12A6,6 0 0,1 12,6M14,21V22A1,1 0 0,1 13,23H11A1,1 0 0,1 10,22V21H14M11,18H13V15.87C14.73,15.43 16,13.86 16,12A4,4 0 0,0 12,8A4,4 0 0,0 8,12C8,13.86 9.27,15.43 11,15.87V18Z", _t = "M12,2A7,7 0 0,1 19,9C19,11.38 17.81,13.47 16,14.74V17A1,1 0 0,1 15,18H9A1,1 0 0,1 8,17V14.74C6.19,13.47 5,11.38 5,9A7,7 0 0,1 12,2M9,21V20H15V21A1,1 0 0,1 14,22H10A1,1 0 0,1 9,21M12,4A5,5 0 0,0 7,9C7,11.05 8.23,12.81 10,13.58V16H14V13.58C15.77,12.81 17,11.05 17,9A5,5 0 0,0 12,4Z", vt = "M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z", yt = "M19,13H5V11H19V13Z", bt = "M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z", xt = "M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z", St = "M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z", Ct = "M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z", wt = "M2 21V15H3.5C3.18 14.06 3 13.05 3 12C3 7.03 7.03 3 12 3H22V9H20.5C20.82 9.94 21 10.95 21 12C21 16.97 16.97 21 12 21H2M5 12C5 13.28 5.34 14.47 5.94 15.5L9.4 13.5C9.15 13.06 9 12.55 9 12C9 11.35 9.21 10.75 9.56 10.26L6.3 7.93C5.5 9.08 5 10.5 5 12M12 19C14.59 19 16.85 17.59 18.06 15.5L14.6 13.5C14.08 14.4 13.11 15 12 15L11.71 15L11.33 18.97L12 19M12 9C13.21 9 14.26 9.72 14.73 10.76L18.37 9.1C17.27 6.68 14.83 5 12 5V9M12 11C11.45 11 11 11.45 11 12C11 12.55 11.45 13 12 13C12.55 13 13 12.55 13 12C13 11.45 12.55 11 12 11Z", Tt = "M22.1 21.5L2.4 1.7L1.1 3L4.8 6.7C3.7 8.2 3 10 3 12C3 13 3.2 14.1 3.5 15H2V21H12C14 21 15.8 20.3 17.3 19.2L20.8 22.7L22.1 21.5M5.9 15.5C5.3 14.5 5 13.3 5 12C5 10.6 5.5 9.2 6.2 8.1L9.2 11.1C9.1 11.3 9 11.7 9 12C9 12.5 9.2 13.1 9.4 13.5L5.9 15.5M12 19H11.3L11.7 15H12C12.3 15 12.6 14.9 12.9 14.8L15.9 17.8C14.8 18.5 13.4 19 12 19M12 8.8L7.4 4.2C8.8 3.5 10.3 3 12 3H22V9H20.5C20.8 9.9 21 11 21 12C21 13.7 20.5 15.2 19.8 16.6L12.2 9C13.3 9.1 14.3 9.8 14.7 10.7L18.3 9C17.3 6.7 14.8 5 12 5V8.8Z", Et = "M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z", Dt = "M20 19V3H4V19H2V21H22V19H20M6 19V13H11V14.8C10.6 15.1 10.2 15.6 10.2 16.2C10.2 17.2 11 18 12 18S13.8 17.2 13.8 16.2C13.8 15.6 13.5 15.1 13 14.8V13H18V19H6Z", Ot = "M11,13.5V21.5H3V13.5H11M12,2L17.5,11H6.5L12,2M17.5,13C20,13 22,15 22,17.5C22,20 20,22 17.5,22C15,22 13,20 13,17.5C13,15 15,13 17.5,13Z", kt = "M12,16A3,3 0 0,1 9,13C9,11.88 9.61,10.9 10.5,10.39L20.21,4.77L14.68,14.35C14.18,15.33 13.17,16 12,16M12,3C13.81,3 15.5,3.5 16.97,4.32L14.87,5.53C14,5.19 13,5 12,5A8,8 0 0,0 4,13C4,15.21 4.89,17.21 6.34,18.65H6.35C6.74,19.04 6.74,19.67 6.35,20.06C5.96,20.45 5.32,20.45 4.93,20.07V20.07C3.12,18.26 2,15.76 2,13A10,10 0 0,1 12,3M22,13C22,15.76 20.88,18.26 19.07,20.07V20.07C18.68,20.45 18.05,20.45 17.66,20.06C17.27,19.67 17.27,19.04 17.66,18.65V18.65C19.11,17.2 20,15.21 20,13C20,12 19.81,11 19.46,10.1L20.67,8C21.5,9.5 22,11.18 22,13Z", At = "M18,18H6V6H18V18Z", jt = "M7.5,2C5.71,3.15 4.5,5.18 4.5,7.5C4.5,9.82 5.71,11.85 7.53,13C4.46,13 2,10.54 2,7.5A5.5,5.5 0 0,1 7.5,2M19.07,3.5L20.5,4.93L4.93,20.5L3.5,19.07L19.07,3.5M12.89,5.93L11.41,5L9.97,6L10.39,4.3L9,3.24L10.75,3.12L11.33,1.47L12,3.1L13.73,3.13L12.38,4.26L12.89,5.93M9.59,9.54L8.43,8.81L7.31,9.59L7.65,8.27L6.56,7.44L7.92,7.35L8.37,6.06L8.88,7.33L10.24,7.36L9.19,8.23L9.59,9.54M19,13.5A5.5,5.5 0 0,1 13.5,19C12.28,19 11.15,18.6 10.24,17.93L17.93,10.24C18.6,11.15 19,12.28 19,13.5M14.6,20.08L17.37,18.93L17.13,22.28L14.6,20.08M18.93,17.38L20.08,14.61L22.28,17.15L18.93,17.38M20.08,12.42L18.94,9.64L22.28,9.88L20.08,12.42M9.63,18.93L12.4,20.08L9.87,22.27L9.63,18.93Z", Mt = "M3 4H21V8H19V20H17V8H7V20H5V8H3V4M8 9H16V11H8V9M8 12H16V14H8V12M8 15H16V17H8V15M8 18H16V20H8V18Z", Nt = "M2 4H20V8H18V20H16V8H6V20H4V8H2V4M7 9H15V11H7V9M7 12H15V14H7V12M20 19V17H22V19H20M20 15V10H22V15H20Z", Pt = "M3 4H21V8H19V20H17V8H7V20H5V8H3V4M8 9H16V11H8V9Z", y = (e) => (t, n) => {
+var Xe = "M13 14H11V9H13M13 18H11V16H13M1 21H23L12 2L1 21Z", Ze = "M11,4H13V16L18.5,10.5L19.92,11.92L12,19.84L4.08,11.92L5.5,10.5L11,16V4Z", Qe = "M3,5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5M11,6V14.5L7.5,11L6.08,12.42L12,18.34L17.92,12.42L16.5,11L13,14.5V6H11Z", $e = "M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z", et = "M21,19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3H19C20.11,3 21,3.9 21,5V19M13,18V9.5L16.5,13L17.92,11.58L12,5.66L6.08,11.58L7.5,13L11,9.5V18H13Z", tt = "M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z", nt = "M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z", rt = "M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z", it = "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z", at = "M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z", ot = "M3 6H21V4H3C1.9 4 1 4.9 1 6V18C1 19.1 1.9 20 3 20H7V18H3V6M13 12H9V13.78C8.39 14.33 8 15.11 8 16C8 16.89 8.39 17.67 9 18.22V20H13V18.22C13.61 17.67 14 16.88 14 16S13.61 14.33 13 13.78V12M11 17.5C10.17 17.5 9.5 16.83 9.5 16S10.17 14.5 11 14.5 12.5 15.17 12.5 16 11.83 17.5 11 17.5M22 8H16C15.5 8 15 8.5 15 9V19C15 19.5 15.5 20 16 20H22C22.5 20 23 19.5 23 19V9C23 8.5 22.5 8 22 8M21 18H17V10H21V18Z", st = "M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z", ct = "M7,19V17H9V19H7M11,19V17H13V19H11M15,19V17H17V19H15M7,15V13H9V15H7M11,15V13H13V15H11M15,15V13H17V15H15M7,11V9H9V11H7M11,11V9H13V11H11M15,11V9H17V11H15M7,7V5H9V7H7M11,7V5H13V7H11M15,7V5H17V7H15Z", lt = "M17.66 11.2C17.43 10.9 17.15 10.64 16.89 10.38C16.22 9.78 15.46 9.35 14.82 8.72C13.33 7.26 13 4.85 13.95 3C13 3.23 12.17 3.75 11.46 4.32C8.87 6.4 7.85 10.07 9.07 13.22C9.11 13.32 9.15 13.42 9.15 13.55C9.15 13.77 9 13.97 8.8 14.05C8.57 14.15 8.33 14.09 8.14 13.93C8.08 13.88 8.04 13.83 8 13.76C6.87 12.33 6.69 10.28 7.45 8.64C5.78 10 4.87 12.3 5 14.47C5.06 14.97 5.12 15.47 5.29 15.97C5.43 16.57 5.7 17.17 6 17.7C7.08 19.43 8.95 20.67 10.96 20.92C13.1 21.19 15.39 20.8 17.03 19.32C18.86 17.66 19.5 15 18.56 12.72L18.43 12.46C18.22 12 17.66 11.2 17.66 11.2M14.5 17.5C14.22 17.74 13.76 18 13.4 18.1C12.28 18.5 11.16 17.94 10.5 17.28C11.69 17 12.4 16.12 12.61 15.23C12.78 14.43 12.46 13.77 12.33 13C12.21 12.26 12.23 11.63 12.5 10.94C12.69 11.32 12.89 11.7 13.13 12C13.9 13 15.11 13.44 15.37 14.8C15.41 14.94 15.43 15.08 15.43 15.23C15.46 16.05 15.1 16.95 14.5 17.5H14.5Z", ut = "M22.11 21.46L2.39 1.73L1.11 3L7.09 9C5.66 10.36 4.88 12.47 5 14.47C5.06 14.97 5.12 15.47 5.29 15.97C5.43 16.57 5.7 17.17 6 17.7C7.08 19.43 8.95 20.67 10.96 20.92C13.1 21.19 15.39 20.8 17.03 19.32C17.1 19.26 17.15 19.18 17.22 19.11L20.84 22.73L22.11 21.46M8.8 14.05C8.57 14.15 8.33 14.09 8.14 13.93C8.08 13.88 8.04 13.83 8 13.76C7 12.47 6.74 10.69 7.26 9.15L8.58 10.47C8.58 11.4 8.73 12.33 9.07 13.22C9.11 13.32 9.15 13.42 9.15 13.55C9.15 13.77 9 13.97 8.8 14.05M14.5 17.5C14.22 17.74 13.76 18 13.4 18.1C12.28 18.5 11.16 17.94 10.5 17.28C11.69 17 12.4 16.12 12.61 15.23C12.66 15 12.66 14.76 12.64 14.53L15 16.88C14.85 17.11 14.69 17.33 14.5 17.5M18.92 15.72L9.65 6.46C10.12 5.65 10.72 4.92 11.46 4.32C12.17 3.75 13 3.23 13.95 3C13 4.85 13.33 7.26 14.82 8.72C15.46 9.35 16.22 9.78 16.89 10.38C17.15 10.64 17.43 10.9 17.66 11.2C17.66 11.2 18.22 12 18.43 12.46L18.56 12.72C18.96 13.69 19.06 14.72 18.92 15.72Z", dt = "M13 24C9.74 24 6.81 22 5.6 19L2.57 11.37C2.26 10.58 3 9.79 3.81 10.05L4.6 10.31C5.16 10.5 5.62 10.92 5.84 11.47L7.25 15H8V3.25C8 2.56 8.56 2 9.25 2S10.5 2.56 10.5 3.25V12H11.5V1.25C11.5 .56 12.06 0 12.75 0S14 .56 14 1.25V12H15V2.75C15 2.06 15.56 1.5 16.25 1.5C16.94 1.5 17.5 2.06 17.5 2.75V12H18.5V5.75C18.5 5.06 19.06 4.5 19.75 4.5S21 5.06 21 5.75V16C21 20.42 17.42 24 13 24Z", ft = "M19 8C20.11 8 21 8.9 21 10V16.76C21.61 17.31 22 18.11 22 19C22 20.66 20.66 22 19 22C17.34 22 16 20.66 16 19C16 18.11 16.39 17.31 17 16.76V10C17 8.9 17.9 8 19 8M19 9C18.45 9 18 9.45 18 10V11H20V10C20 9.45 19.55 9 19 9M5 20V12H2L12 3L16.4 6.96C15.54 7.69 15 8.78 15 10V16C14.37 16.83 14 17.87 14 19L14.1 20H5Z", pt = "M10 2C13.9 2 17 5.1 17 9C17 11.4 15.8 13.5 14 14.7V17C14 17.6 13.6 18 13 18H7C6.4 18 6 17.6 6 17V14.7C4.2 13.5 3 11.4 3 9C3 5.1 6.1 2 10 2M7 21V20H13V21C13 21.6 12.6 22 12 22H8C7.4 22 7 21.6 7 21M10 4C7.2 4 5 6.2 5 9C5 11.1 6.2 12.8 8 13.6V16H12V13.6C13.8 12.8 15 11.1 15 9C15 6.2 12.8 4 10 4M19 12V7H21V13H19M19 17V15H21V17H19Z", mt = "M12,2C9.76,2 7.78,3.05 6.5,4.68L7.93,6.11C8.84,4.84 10.32,4 12,4A5,5 0 0,1 17,9C17,10.68 16.16,12.16 14.89,13.06L16.31,14.5C17.94,13.21 19,11.24 19,9A7,7 0 0,0 12,2M3.28,4L2,5.27L5.04,8.3C5,8.53 5,8.76 5,9C5,11.38 6.19,13.47 8,14.74V17A1,1 0 0,0 9,18H14.73L18.73,22L20,20.72L3.28,4M7.23,10.5L12.73,16H10V13.58C8.68,13 7.66,11.88 7.23,10.5M9,20V21A1,1 0 0,0 10,22H14A1,1 0 0,0 15,21V20H9Z", ht = "M12,6A6,6 0 0,1 18,12C18,14.22 16.79,16.16 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.21,16.16 6,14.22 6,12A6,6 0 0,1 12,6M14,21V22A1,1 0 0,1 13,23H11A1,1 0 0,1 10,22V21H14M20,11H23V13H20V11M1,11H4V13H1V11M13,1V4H11V1H13M4.92,3.5L7.05,5.64L5.63,7.05L3.5,4.93L4.92,3.5M16.95,5.63L19.07,3.5L20.5,4.93L18.37,7.05L16.95,5.63Z", gt = "M20,11H23V13H20V11M1,11H4V13H1V11M13,1V4H11V1H13M4.92,3.5L7.05,5.64L5.63,7.05L3.5,4.93L4.92,3.5M16.95,5.63L19.07,3.5L20.5,4.93L18.37,7.05L16.95,5.63M12,6A6,6 0 0,1 18,12C18,14.22 16.79,16.16 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.21,16.16 6,14.22 6,12A6,6 0 0,1 12,6M14,21V22A1,1 0 0,1 13,23H11A1,1 0 0,1 10,22V21H14M11,18H13V15.87C14.73,15.43 16,13.86 16,12A4,4 0 0,0 12,8A4,4 0 0,0 8,12C8,13.86 9.27,15.43 11,15.87V18Z", _t = "M12,2A7,7 0 0,1 19,9C19,11.38 17.81,13.47 16,14.74V17A1,1 0 0,1 15,18H9A1,1 0 0,1 8,17V14.74C6.19,13.47 5,11.38 5,9A7,7 0 0,1 12,2M9,21V20H15V21A1,1 0 0,1 14,22H10A1,1 0 0,1 9,21M12,4A5,5 0 0,0 7,9C7,11.05 8.23,12.81 10,13.58V16H14V13.58C15.77,12.81 17,11.05 17,9A5,5 0 0,0 12,4Z", vt = "M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z", yt = "M19,13H5V11H19V13Z", bt = "M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z", xt = "M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z", St = "M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z", Ct = "M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z", wt = "M2 21V15H3.5C3.18 14.06 3 13.05 3 12C3 7.03 7.03 3 12 3H22V9H20.5C20.82 9.94 21 10.95 21 12C21 16.97 16.97 21 12 21H2M5 12C5 13.28 5.34 14.47 5.94 15.5L9.4 13.5C9.15 13.06 9 12.55 9 12C9 11.35 9.21 10.75 9.56 10.26L6.3 7.93C5.5 9.08 5 10.5 5 12M12 19C14.59 19 16.85 17.59 18.06 15.5L14.6 13.5C14.08 14.4 13.11 15 12 15L11.71 15L11.33 18.97L12 19M12 9C13.21 9 14.26 9.72 14.73 10.76L18.37 9.1C17.27 6.68 14.83 5 12 5V9M12 11C11.45 11 11 11.45 11 12C11 12.55 11.45 13 12 13C12.55 13 13 12.55 13 12C13 11.45 12.55 11 12 11Z", Tt = "M22.1 21.5L2.4 1.7L1.1 3L4.8 6.7C3.7 8.2 3 10 3 12C3 13 3.2 14.1 3.5 15H2V21H12C14 21 15.8 20.3 17.3 19.2L20.8 22.7L22.1 21.5M5.9 15.5C5.3 14.5 5 13.3 5 12C5 10.6 5.5 9.2 6.2 8.1L9.2 11.1C9.1 11.3 9 11.7 9 12C9 12.5 9.2 13.1 9.4 13.5L5.9 15.5M12 19H11.3L11.7 15H12C12.3 15 12.6 14.9 12.9 14.8L15.9 17.8C14.8 18.5 13.4 19 12 19M12 8.8L7.4 4.2C8.8 3.5 10.3 3 12 3H22V9H20.5C20.8 9.9 21 11 21 12C21 13.7 20.5 15.2 19.8 16.6L12.2 9C13.3 9.1 14.3 9.8 14.7 10.7L18.3 9C17.3 6.7 14.8 5 12 5V8.8Z", Et = "M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z", Dt = "M20 19V3H4V19H2V21H22V19H20M6 19V13H11V14.8C10.6 15.1 10.2 15.6 10.2 16.2C10.2 17.2 11 18 12 18S13.8 17.2 13.8 16.2C13.8 15.6 13.5 15.1 13 14.8V13H18V19H6Z", Ot = "M11,13.5V21.5H3V13.5H11M12,2L17.5,11H6.5L12,2M17.5,13C20,13 22,15 22,17.5C22,20 20,22 17.5,22C15,22 13,20 13,17.5C13,15 15,13 17.5,13Z", kt = "M12,16A3,3 0 0,1 9,13C9,11.88 9.61,10.9 10.5,10.39L20.21,4.77L14.68,14.35C14.18,15.33 13.17,16 12,16M12,3C13.81,3 15.5,3.5 16.97,4.32L14.87,5.53C14,5.19 13,5 12,5A8,8 0 0,0 4,13C4,15.21 4.89,17.21 6.34,18.65H6.35C6.74,19.04 6.74,19.67 6.35,20.06C5.96,20.45 5.32,20.45 4.93,20.07V20.07C3.12,18.26 2,15.76 2,13A10,10 0 0,1 12,3M22,13C22,15.76 20.88,18.26 19.07,20.07V20.07C18.68,20.45 18.05,20.45 17.66,20.06C17.27,19.67 17.27,19.04 17.66,18.65V18.65C19.11,17.2 20,15.21 20,13C20,12 19.81,11 19.46,10.1L20.67,8C21.5,9.5 22,11.18 22,13Z", At = "M18,18H6V6H18V18Z", jt = "M7.5,2C5.71,3.15 4.5,5.18 4.5,7.5C4.5,9.82 5.71,11.85 7.53,13C4.46,13 2,10.54 2,7.5A5.5,5.5 0 0,1 7.5,2M19.07,3.5L20.5,4.93L4.93,20.5L3.5,19.07L19.07,3.5M12.89,5.93L11.41,5L9.97,6L10.39,4.3L9,3.24L10.75,3.12L11.33,1.47L12,3.1L13.73,3.13L12.38,4.26L12.89,5.93M9.59,9.54L8.43,8.81L7.31,9.59L7.65,8.27L6.56,7.44L7.92,7.35L8.37,6.06L8.88,7.33L10.24,7.36L9.19,8.23L9.59,9.54M19,13.5A5.5,5.5 0 0,1 13.5,19C12.28,19 11.15,18.6 10.24,17.93L17.93,10.24C18.6,11.15 19,12.28 19,13.5M14.6,20.08L17.37,18.93L17.13,22.28L14.6,20.08M18.93,17.38L20.08,14.61L22.28,17.15L18.93,17.38M20.08,12.42L18.94,9.64L22.28,9.88L20.08,12.42M9.63,18.93L12.4,20.08L9.87,22.27L9.63,18.93Z", Mt = "M12.87,15.07L10.33,12.56L10.36,12.53C12.1,10.59 13.34,8.36 14.07,6H17V4H10V2H8V4H1V6H12.17C11.5,7.92 10.44,9.75 9,11.35C8.07,10.32 7.3,9.19 6.69,8H4.69C5.42,9.63 6.42,11.17 7.67,12.56L2.58,17.58L4,19L9,14L12.11,17.11L12.87,15.07M18.5,10H16.5L12,22H14L15.12,19H19.87L21,22H23L18.5,10M15.88,17L17.5,12.67L19.12,17H15.88Z", Nt = "M3 4H21V8H19V20H17V8H7V20H5V8H3V4M8 9H16V11H8V9M8 12H16V14H8V12M8 15H16V17H8V15M8 18H16V20H8V18Z", Pt = "M2 4H20V8H18V20H16V8H6V20H4V8H2V4M7 9H15V11H7V9M7 12H15V14H7V12M20 19V17H22V19H20M20 15V10H22V15H20Z", Ft = "M3 4H21V8H19V20H17V8H7V20H5V8H3V4M8 9H16V11H8V9Z", y = (e) => (t, n) => {
 	n === void 0 ? customElements.define(e, t) : n.addInitializer(() => {
 		customElements.define(e, t);
 	});
-}, Ft = {
+}, It = {
 	attribute: !0,
 	type: String,
 	converter: ae,
 	reflect: !1,
 	hasChanged: oe
-}, It = (e = Ft, t, n) => {
+}, Lt = (e = It, t, n) => {
 	let { kind: r, metadata: i } = n, a = globalThis.litPropertyMetadata.get(i);
 	if (a === void 0 && globalThis.litPropertyMetadata.set(i, a = /* @__PURE__ */ new Map()), r === "setter" && ((e = Object.create(e)).wrapped = !0), a.set(n.name, e), r === "accessor") {
 		let { name: r } = n;
@@ -557,7 +557,7 @@ var Xe = "M13 14H11V9H13M13 18H11V16H13M1 21H23L12 2L1 21Z", Ze = "M11,4H13V16L1
 	throw Error("Unsupported decorator location: " + r);
 };
 function b(e) {
-	return (t, n) => typeof n == "object" ? It(e, t, n) : ((e, t, n) => {
+	return (t, n) => typeof n == "object" ? Lt(e, t, n) : ((e, t, n) => {
 		let r = t.hasOwnProperty(n);
 		return t.constructor.createProperty(n, e), r ? Object.getOwnPropertyDescriptor(t, n) : void 0;
 	})(e, t, n);
@@ -570,159 +570,2053 @@ function x(e) {
 		attribute: !1
 	});
 }
+// node_modules/lit-html/directive.js
+var Rt = {
+	ATTRIBUTE: 1,
+	CHILD: 2,
+	PROPERTY: 3,
+	BOOLEAN_ATTRIBUTE: 4,
+	EVENT: 5,
+	ELEMENT: 6
+}, zt = (e) => (...t) => ({
+	_$litDirective$: e,
+	values: t
+}), Bt = class {
+	constructor(e) {}
+	get _$AU() {
+		return this._$AM._$AU;
+	}
+	_$AT(e, t, n) {
+		this._$Ct = e, this._$AM = t, this._$Ci = n;
+	}
+	_$AS(e, t) {
+		return this.update(e, t);
+	}
+	update(e, t) {
+		return this.render(...t);
+	}
+}, { I: Vt } = Ge, Ht = (e) => e, Ut = () => document.createComment(""), Wt = (e, t, n) => {
+	let r = e._$AA.parentNode, i = t === void 0 ? e._$AB : t._$AA;
+	if (n === void 0) n = new Vt(r.insertBefore(Ut(), i), r.insertBefore(Ut(), i), e, e.options);
+	else {
+		let t = n._$AB.nextSibling, a = n._$AM, o = a !== e;
+		if (o) {
+			let t;
+			n._$AQ?.(e), n._$AM = e, n._$AP !== void 0 && (t = e._$AU) !== a._$AU && n._$AP(t);
+		}
+		if (t !== i || o) {
+			let e = n._$AA;
+			for (; e !== t;) {
+				let t = Ht(e).nextSibling;
+				Ht(r).insertBefore(e, i), e = t;
+			}
+		}
+	}
+	return n;
+}, Gt = (e, t, n = e) => (e._$AI(t, n), e), Kt = {}, qt = (e, t = Kt) => e._$AH = t, Jt = (e) => e._$AH, Yt = (e) => {
+	e._$AR(), e._$AA.remove();
+}, Xt = zt(class extends Bt {
+	constructor() {
+		super(...arguments), this.key = _;
+	}
+	render(e, t) {
+		return this.key = e, t;
+	}
+	update(e, [t, n]) {
+		return t !== this.key && (qt(e), this.key = t), n;
+	}
+}), Zt = {
+	common: {
+		en: {
+			save: "Save",
+			cancel: "Cancel",
+			close: "Close",
+			delete: "Delete",
+			edit: "Edit",
+			add: "Add",
+			rename: "Rename",
+			create: "Create",
+			confirm: "Confirm",
+			loading: "Loading…",
+			none: "None",
+			error: "Homex error: {message}",
+			language: "Language",
+			language_auto: "Automatic (Home Assistant language)",
+			language_en: "English",
+			language_fr: "Français"
+		},
+		fr: {
+			save: "Enregistrer",
+			cancel: "Annuler",
+			close: "Fermer",
+			delete: "Supprimer",
+			edit: "Modifier",
+			add: "Ajouter",
+			rename: "Renommer",
+			create: "Créer",
+			confirm: "Confirmer",
+			loading: "Chargement…",
+			none: "Aucun",
+			error: "Erreur Homex : {message}",
+			language: "Langue",
+			language_auto: "Automatique (langue de Home Assistant)",
+			language_en: "English",
+			language_fr: "Français"
+		}
+	},
+	panel: {
+		en: {
+			tab_general: "General",
+			tab_climate: "Climate",
+			error: "Error: {message}",
+			no_rooms: "No rooms yet. Click “＋ {button}” at the top right to create one.",
+			new_room: "New room",
+			menu: "Menu",
+			refresh: "Refresh",
+			export: "Export",
+			switch_manager: "Switch Manager",
+			shutter_manager: "Shutter Manager",
+			climate_manager: "Climate Manager"
+		},
+		fr: {
+			tab_general: "Général",
+			tab_climate: "Climat",
+			error: "Erreur : {message}",
+			no_rooms: "Aucune pièce. Clique sur « ＋ {button} » en haut à droite pour en créer une.",
+			new_room: "Nouvelle pièce",
+			menu: "Menu",
+			refresh: "Rafraîchir",
+			export: "Exporter",
+			switch_manager: "Gestion des interrupteurs",
+			shutter_manager: "Gestion des volets",
+			climate_manager: "Gestion du climat"
+		}
+	},
+	climateDashboard: {
+		en: {
+			heating_status: "Heating",
+			idle: "Idle",
+			no_rooms: "No rooms",
+			zone_mode: "Zone mode",
+			zone_tolerance: "Zone tolerance",
+			heating: "Heating",
+			enabled: "Enabled",
+			disabled: "Disabled",
+			disable: "Disable",
+			enable: "Enable",
+			tolerance: "Tolerance",
+			zones: "Zones",
+			rooms: "Rooms",
+			off: "off",
+			room_heating: "Room heating",
+			no_radiator: "No radiator",
+			radiators: "{count} radiator(s)",
+			setpoint: "Setpoint",
+			current_temperature: "Current temperature",
+			valve_warning: "Valve?"
+		},
+		fr: {
+			heating_status: "Chauffe",
+			idle: "Au repos",
+			no_rooms: "Aucune pièce",
+			zone_mode: "Mode de la zone",
+			zone_tolerance: "Tolérance de la zone",
+			heating: "Chauffage",
+			enabled: "Activé",
+			disabled: "Désactivé",
+			disable: "Désactiver",
+			enable: "Activer",
+			tolerance: "Tolérance",
+			zones: "Zones",
+			rooms: "Pièces",
+			off: "coupé",
+			room_heating: "Chauffage de la pièce",
+			no_radiator: "Aucun radiateur",
+			radiators: "{count} radiateur(s)",
+			setpoint: "Consigne",
+			current_temperature: "Température actuelle",
+			valve_warning: "Vanne ?"
+		}
+	},
+	climateManager: {
+		en: {
+			title: "Climate Manager",
+			back_climate: "← Climate",
+			metrics: "Metrics",
+			metrics_desc: "Temperature, humidity and air quality sensors.",
+			heating: "Heating",
+			heating_desc: "Heating modes, setpoints, zones and radiator presets.",
+			ac: "Air Conditioning",
+			ac_desc: "Air conditioning — not available yet.",
+			ac_unavailable: "Air conditioning is not available yet."
+		},
+		fr: {
+			title: "Gestion du climat",
+			back_climate: "← Climat",
+			metrics: "Mesures",
+			metrics_desc: "Capteurs de température, d'humidité et de qualité de l'air.",
+			heating: "Chauffage",
+			heating_desc: "Modes de chauffage, consignes, zones et presets des radiateurs.",
+			ac: "Climatisation",
+			ac_desc: "Climatisation — pas encore disponible.",
+			ac_unavailable: "La climatisation n'est pas encore disponible."
+		}
+	},
+	climateMetrics: {
+		en: {
+			title: "Metrics",
+			back_climate: "← Climate",
+			back_metrics: "← Metrics",
+			temperature: "Temperature",
+			humidity: "Humidity",
+			air_quality: "Air quality",
+			rule_mean: "Weighted average",
+			rule_max: "Maximum",
+			rule_min: "Minimum",
+			enable_module: "Enable the Climate module on the room “{room}”?",
+			rule_label: "Reference value calculation",
+			weight: "Weight",
+			remove: "Remove",
+			add_sensor: "＋ Add a sensor…",
+			area: "Area: {area}",
+			others: "Others",
+			no_sensor: "No sensor",
+			module_not_enabled: "The Climate module is not enabled on this room.",
+			room_not_found: "“{room}” not found.",
+			no_ha_area: "No associated HA area",
+			module_disabled: "Climate module disabled"
+		},
+		fr: {
+			title: "Mesures",
+			back_climate: "← Climat",
+			back_metrics: "← Mesures",
+			temperature: "Température",
+			humidity: "Humidité",
+			air_quality: "Qualité de l'air",
+			rule_mean: "Moyenne pondérée",
+			rule_max: "Maximum",
+			rule_min: "Minimum",
+			enable_module: "Activer le module Climat sur la pièce « {room} » ?",
+			rule_label: "Calcul de la valeur de référence",
+			weight: "Poids",
+			remove: "Retirer",
+			add_sensor: "＋ Ajouter un capteur…",
+			area: "Pièce : {area}",
+			others: "Autres",
+			no_sensor: "Aucun capteur",
+			module_not_enabled: "Le module Climat n'est pas activé sur cette pièce.",
+			room_not_found: "« {room} » introuvable.",
+			no_ha_area: "Aucune pièce HA associée",
+			module_disabled: "Module Climat désactivé"
+		}
+	},
+	deviceField: {
+		en: {
+			clear: "Clear",
+			search: "Search for a device…",
+			no_device: "No device"
+		},
+		fr: {
+			clear: "Effacer",
+			search: "Rechercher un appareil…",
+			no_device: "Aucun appareil"
+		}
+	},
+	dialog: {
+		en: {},
+		fr: {}
+	},
+	entityPicker: {
+		en: {
+			remove: "Remove",
+			search: "Search for an entity…",
+			no_entity: "No entity"
+		},
+		fr: {
+			remove: "Retirer",
+			search: "Rechercher une entité…",
+			no_entity: "Aucune entité"
+		}
+	},
+	exportDialog: {
+		en: {
+			heading: "Expose rooms (Google Assistant)",
+			hint_before: "Paste this snippet into",
+			hint_after: "to expose each room's on/off toggle to Google Assistant.",
+			download: "Download .yaml",
+			copy: "Copy",
+			copied: "Copied ✓"
+		},
+		fr: {
+			heading: "Exposer les pièces (Google Assistant)",
+			hint_before: "Colle cet extrait dans",
+			hint_after: "pour exposer le toggle on/off de chaque pièce à Google Assistant.",
+			download: "Télécharger .yaml",
+			copy: "Copier",
+			copied: "Copié ✓"
+		}
+	},
+	groupDialog: {
+		en: {
+			name_id_required: "Group name and id are required.",
+			confirm_delete: "Delete the group \"{name}\"?",
+			heading_edit: "Edit group",
+			heading_new: "New group",
+			name: "Name",
+			name_placeholder: "Bedside table L",
+			id: "Id",
+			id_label: "Id: {id}",
+			devices: "Devices (from the room)",
+			enable_dim: "Enable group dimming",
+			triggers: "Triggers",
+			dim_up_title: "Dimmer + (raise brightness)",
+			dim_up_hint: "Each trigger adds 20 to the brightness of the group's lights.",
+			dim_down_title: "Dimmer − (lower brightness)",
+			dim_down_hint: "Each trigger removes 20 from the brightness of the group's lights.",
+			create: "Create group"
+		},
+		fr: {
+			name_id_required: "Nom et id du groupe requis.",
+			confirm_delete: "Supprimer le groupe \"{name}\" ?",
+			heading_edit: "Modifier le groupe",
+			heading_new: "Nouveau groupe",
+			name: "Nom",
+			name_placeholder: "Table de chevet L",
+			id: "Id",
+			id_label: "Id : {id}",
+			devices: "Appareils (parmi la pièce)",
+			enable_dim: "Activer le dimming du groupe",
+			triggers: "Déclencheurs",
+			dim_up_title: "Dimmer + (monter la luminosité)",
+			dim_up_hint: "Chaque déclenchement ajoute 20 à la luminosité des lumières du groupe.",
+			dim_down_title: "Dimmer − (baisser la luminosité)",
+			dim_down_hint: "Chaque déclenchement retire 20 à la luminosité des lumières du groupe.",
+			create: "Créer le groupe"
+		}
+	},
+	groupRow: {
+		en: {
+			edit_on_scene: "Edit the group's “on” scene",
+			edit_off_scene: "Edit the group's “off” scene",
+			configure: "Configure the group"
+		},
+		fr: {
+			edit_on_scene: "Éditer la scène « allumé » du groupe",
+			edit_off_scene: "Éditer la scène « éteint » du groupe",
+			configure: "Configurer le groupe"
+		}
+	},
+	gswitchEditor: {
+		en: {
+			name_id_required: "Switch name and id are required.",
+			choose_device: "Choose a device.",
+			confirm_delete: "Delete switch \"{name}\"?",
+			no_preset_for_model: "No preset for model {model}.",
+			create_preset: "＋ Create a preset",
+			preset: "Preset",
+			model: "Model: {model}",
+			new_preset: "＋ New preset",
+			no_rooms_with_module: "No rooms with the Switches module.",
+			no_room: "— No room —",
+			name: "Name",
+			name_placeholder: "Bedside switch",
+			id: "Id: {id}",
+			device: "Switch (device)",
+			choose_switch: "Choose a switch…",
+			area: "Area: {names}",
+			others: "Others",
+			no_devices: "No switch detected (device exposing actions).",
+			rooms: "Assigned Homex rooms (0..n)",
+			create_switch: "Create switch"
+		},
+		fr: {
+			name_id_required: "Nom et id du switch requis.",
+			choose_device: "Choisis un appareil.",
+			confirm_delete: "Supprimer le switch \"{name}\" ?",
+			no_preset_for_model: "Aucun preset pour le modèle {model}.",
+			create_preset: "＋ Créer un preset",
+			preset: "Preset",
+			model: "Modèle : {model}",
+			new_preset: "＋ Nouveau preset",
+			no_rooms_with_module: "Aucune pièce avec le module Interrupteurs.",
+			no_room: "— Aucune pièce —",
+			name: "Nom",
+			name_placeholder: "Interrupteur chevet",
+			id: "Id : {id}",
+			device: "Interrupteur (appareil)",
+			choose_switch: "Choisir un interrupteur…",
+			area: "Pièce : {names}",
+			others: "Autres",
+			no_devices: "Aucun interrupteur détecté (appareil exposant des actions).",
+			rooms: "Pièces Homex assignées (0..n)",
+			create_switch: "Créer le switch"
+		}
+	},
+	heatingDevicePresetEditor: {
+		en: {
+			param_tolerance: "Tolerance / accuracy",
+			param_mode: "Mode",
+			param_lock: "Lock",
+			param_sensor: "Sensor (internal / external)",
+			switch_on: "On",
+			switch_off: "Off",
+			locked: "Locked",
+			unlocked: "Unlocked",
+			delete_confirm: "Delete the device preset “{name}”?",
+			choose: "Choose…",
+			entity: "Entity ({domains})",
+			main_entity: "(main entity)",
+			value: "Value to set",
+			current: "Current: {value}",
+			mode_normal: "Normal mode",
+			mode_aggressive: "Aggressive mode",
+			current_tolerance: "Current: {value} · applied according to select.homex_climate_tolerance_mode",
+			external_sensor: "External sensor: the chosen value makes the valve read an external temperature",
+			external_input_hint: "External temperature input: the sensor chosen for each radiator (in the room) is copied to it on every update.",
+			no_device: "No device of this model found.",
+			applied_on: "Applied to {count} device(s)",
+			failed: "{param}: {error}",
+			name: "Name",
+			name_placeholder: "Thermostatic valve",
+			id: "Id",
+			id_label: "Id: {id}",
+			model: "Thermostat model",
+			choose_model: "Choose a model…",
+			device_count: "{count} device(s)",
+			reference_device: "Reference device",
+			reference_hint: "Its entities are used to choose the settings; they are then applied to the {count} device(s) of the model.",
+			settings: "Settings to enforce",
+			model_not_found: "Model not found (no devices left?).",
+			applying: "Applying…",
+			save_apply: "Save and apply",
+			apply_now: "Apply now",
+			done: "Done"
+		},
+		fr: {
+			param_tolerance: "Tolérance / précision",
+			param_mode: "Mode",
+			param_lock: "Verrouillage",
+			param_sensor: "Capteur (interne / externe)",
+			switch_on: "Activé",
+			switch_off: "Désactivé",
+			locked: "Verrouillé",
+			unlocked: "Déverrouillé",
+			delete_confirm: "Supprimer le device preset « {name} » ?",
+			choose: "Choisir…",
+			entity: "Entité ({domains})",
+			main_entity: "(entité principale)",
+			value: "Valeur à fixer",
+			current: "Actuel : {value}",
+			mode_normal: "Mode normal",
+			mode_aggressive: "Mode agressive",
+			current_tolerance: "Actuel : {value} · appliqué selon select.homex_climate_tolerance_mode",
+			external_sensor: "Capteur externe : la valeur choisie fait lire à la vanne une température externe",
+			external_input_hint: "Entrée de température externe : le capteur choisi pour chaque radiateur (dans la pièce) y est recopié à chaque mise à jour.",
+			no_device: "Aucun appareil de ce modèle trouvé.",
+			applied_on: "Appliqué sur {count} appareil(s)",
+			failed: "{param} : {error}",
+			name: "Nom",
+			name_placeholder: "Vanne thermostatique",
+			id: "Id",
+			id_label: "Id : {id}",
+			model: "Modèle de thermostat",
+			choose_model: "Choisir un modèle…",
+			device_count: "{count} appareil(s)",
+			reference_device: "Appareil de référence",
+			reference_hint: "Ses entités servent à choisir les réglages ; ils s'appliquent ensuite aux {count} appareil(s) du modèle.",
+			settings: "Réglages à fixer",
+			model_not_found: "Modèle introuvable (plus aucun appareil ?).",
+			applying: "Application…",
+			save_apply: "Enregistrer et appliquer",
+			apply_now: "Appliquer maintenant",
+			done: "Terminé"
+		}
+	},
+	heatingGroupEditor: {
+		en: {
+			minus: "−0.5 °C",
+			plus: "+0.5 °C",
+			delete_confirm: "Delete the setpoint “{name}”? Its rooms go back to the default setpoint.",
+			name: "Name",
+			name_placeholder: "Bedrooms",
+			id: "Id",
+			id_label: "Id: {id}",
+			setpoints: "Temperature setpoints",
+			heating_off: "Heating off",
+			rooms: "Rooms",
+			default_hint: "Applies to every room that is in no other setpoint.",
+			rooms_hint: "A room belongs to one setpoint only: ticking it removes it from its current setpoint."
+		},
+		fr: {
+			minus: "−0,5 °C",
+			plus: "+0,5 °C",
+			delete_confirm: "Supprimer le setpoint « {name} » ? Ses pièces repassent dans le setpoint par défaut.",
+			name: "Nom",
+			name_placeholder: "Chambres",
+			id: "Id",
+			id_label: "Id : {id}",
+			setpoints: "Consignes de température",
+			heating_off: "Chauffage coupé",
+			rooms: "Pièces",
+			default_hint: "S'applique à toutes les pièces qui ne sont dans aucun autre setpoint.",
+			rooms_hint: "Une pièce n'appartient qu'à un setpoint : la cocher la retire de son setpoint actuel."
+		}
+	},
+	heatingManager: {
+		en: {
+			title: "Heating",
+			back_climate: "← Climate",
+			section_modes: "Heating Modes",
+			section_setpoints: "Setpoints",
+			section_zones: "Zones",
+			section_devices: "Device Presets",
+			section_systems: "Heating System",
+			add_modes: "＋ Mode",
+			add_setpoints: "＋ Setpoint",
+			add_zones: "＋ Zone",
+			add_devices: "＋ Device preset",
+			add_systems: "＋ System",
+			param_tolerance: "Tolerance",
+			param_mode: "Mode",
+			param_lock: "Lock",
+			param_sensor: "Sensor",
+			delete_mode_confirm: "Delete the mode “{name}” and its setpoints?",
+			edit_mode: "Edit mode",
+			new_mode: "New heating mode",
+			name: "Name",
+			name_placeholder: "Holidays",
+			id: "Id",
+			id_label: "Id: {id}",
+			builtin_hint: "Default mode: it can be renamed, not deleted.",
+			builtin_tag: " · default",
+			unheated_tag: " · off or setpoint",
+			other_rooms: "Other rooms: {rooms}",
+			all_other_rooms: "All other rooms (none for now)",
+			no_rooms: "No rooms",
+			off: "off",
+			active_mode: "Active mode",
+			triggers: "{count} trigger(s)",
+			no_systems: "No system. Click “＋ System” to declare a boiler or a buffer tank.",
+			global: "Global",
+			boiler: "Boiler",
+			heat_pump: "Heat Pump",
+			buffer_tank: "Buffer Tank",
+			contact: "Contact:",
+			aggressive: "Aggressive",
+			rules: "{count} rule(s)",
+			setpoint: "Setpoint",
+			tank: "Tank",
+			flow: "Flow",
+			return: "Return",
+			forced_title: "Manual override enabled",
+			forced: "Forced",
+			runtime_title: "Circulator run time today",
+			circulator: "Circulator:",
+			circulator_on: "running",
+			circulator_off: "stopped",
+			no_device_presets: "No device preset. Click “＋ Device preset” to set the settings of a thermostatic valve model.",
+			no_settings: "No settings",
+			not_found: "“{id}” not found.",
+			edit_system: "Edit system",
+			new_system: "New heating system",
+			edit_zone: "Edit zone",
+			new_zone: "New zone",
+			edit_device_preset: "Edit device preset",
+			new_device_preset: "New device preset",
+			edit_setpoint: "Edit setpoint",
+			new_setpoint: "New setpoint",
+			disable_title: "Disable: every valve switches to off",
+			enable_title: "Enable: presets are re-applied",
+			heating_enabled: "Heating on",
+			heating_disabled: "Heating off"
+		},
+		fr: {
+			title: "Chauffage",
+			back_climate: "← Climat",
+			section_modes: "Modes de chauffage",
+			section_setpoints: "Consignes",
+			section_zones: "Zones",
+			section_devices: "Device presets",
+			section_systems: "Système de chauffage",
+			add_modes: "＋ Mode",
+			add_setpoints: "＋ Consigne",
+			add_zones: "＋ Zone",
+			add_devices: "＋ Device preset",
+			add_systems: "＋ Système",
+			param_tolerance: "Tolérance",
+			param_mode: "Mode",
+			param_lock: "Verrouillage",
+			param_sensor: "Capteur",
+			delete_mode_confirm: "Supprimer le mode « {name} » et ses consignes ?",
+			edit_mode: "Modifier le mode",
+			new_mode: "Nouveau mode de chauffage",
+			name: "Nom",
+			name_placeholder: "Vacances",
+			id: "Id",
+			id_label: "Id : {id}",
+			builtin_hint: "Mode par défaut : il peut être renommé, pas supprimé.",
+			builtin_tag: " · par défaut",
+			unheated_tag: " · coupé ou consigne",
+			other_rooms: "Autres pièces : {rooms}",
+			all_other_rooms: "Toutes les autres pièces (aucune pour l'instant)",
+			no_rooms: "Aucune pièce",
+			off: "coupé",
+			active_mode: "Mode actif",
+			triggers: "{count} déclencheur(s)",
+			no_systems: "Aucun système. Clique sur « ＋ Système » pour déclarer une chaudière (Boiler) ou un ballon tampon (Buffer Tank).",
+			global: "Global",
+			boiler: "Chaudière",
+			heat_pump: "Pompe à chaleur",
+			buffer_tank: "Ballon tampon",
+			contact: "Contact :",
+			aggressive: "Agressif",
+			rules: "{count} règle(s)",
+			setpoint: "Consigne",
+			tank: "Ballon",
+			flow: "Départ",
+			return: "Retour",
+			forced_title: "Forçage manuel activé",
+			forced: "Forcé",
+			runtime_title: "Durée d'activité du circulateur aujourd'hui",
+			circulator: "Circulateur :",
+			circulator_on: "en marche",
+			circulator_off: "arrêté",
+			no_device_presets: "Aucun device preset. Clique sur « ＋ Device preset » pour fixer les réglages d'un modèle de vanne thermostatique.",
+			no_settings: "Aucun réglage",
+			not_found: "« {id} » introuvable.",
+			edit_system: "Modifier le système",
+			new_system: "Nouveau système de chauffage",
+			edit_zone: "Modifier la zone",
+			new_zone: "Nouvelle zone",
+			edit_device_preset: "Modifier le device preset",
+			new_device_preset: "Nouveau device preset",
+			edit_setpoint: "Modifier le setpoint",
+			new_setpoint: "Nouveau setpoint",
+			disable_title: "Désactiver : toutes les vannes passent sur off",
+			enable_title: "Activer : les presets sont ré-appliqués",
+			heating_enabled: "Chauffage activé",
+			heating_disabled: "Chauffage désactivé"
+		}
+	},
+	heatingSystemEditor: {
+		en: {
+			sensor_setpoint: "Setpoint temperature",
+			sensor_tank: "Tank temperature",
+			sensor_flow: "Flow temperature",
+			sensor_return: "Return temperature",
+			rule_setpoint_tank: "Setpoint / tank delta",
+			rule_flow_return: "Flow / return delta",
+			add_rule_setpoint_tank: "＋ Setpoint / tank delta rule",
+			add_rule_flow_return: "＋ Flow / return delta rule",
+			short_setpoint: "setpoint",
+			short_tank: "tank",
+			short_flow: "flow",
+			short_return: "return",
+			type_boiler: "Boiler",
+			type_buffer_tank: "Buffer Tank",
+			no_area: "No area",
+			rule_required: "Delta and tolerance required.",
+			rule_invalid: "Delta must be > tolerance ≥ 0.",
+			delete_confirm: "Delete the system “{name}”?",
+			dry_contact: "Dry contact",
+			dry_contact_hint: "The boiler's controlled switch: on as soon as its scope needs heating, off otherwise.",
+			choose_switch: "Choose a switch…",
+			driven_contact: "dry contact",
+			driven_circulator: "circulator",
+			scope: "Scope",
+			scope_hint: "The zones whose heating demand counts for this system.",
+			global_system: "Global system (all zones)",
+			zone: "Zone {name}",
+			aggressive_mode: "Aggressive mode",
+			aggressive_hint: "Aggressive mode: “aggressive” tolerance over the scope while the {driven} is on",
+			explain_setpoint_tank: "Circulates when tank ≤ setpoint − {delta} °C; stops when tank > setpoint − {tolerance} °C.",
+			explain_setpoint_tank_live: "Setpoint {setpoint}: circulates when tank ≤ {start}; stops when tank > {stop}.",
+			explain_flow_return: "Circulates when flow − return ≥ {delta} °C; stops when flow − return < {tolerance} °C.",
+			currently: " Currently {a} − {b} = {value}.",
+			rule_title: "Rule {n} · {label}",
+			delta: "Delta (°C)",
+			tolerance: "Tolerance (°C)",
+			delete_rule: "Delete the rule",
+			manual_override: "Manual override",
+			force_hint: "While on, the circulator runs regardless of the rules and of the radiators' demand (if heating is enabled globally).",
+			force_entity: "Entity:",
+			force_entity_suffix: "(applies immediately).",
+			force_unavailable: "Available once the system is saved.",
+			sensors: "Sensors",
+			required: "{label} (required)",
+			choose_sensor: "Choose a sensor…",
+			circulator: "Circulator",
+			controlled_switch: "Controlled switch",
+			min_runtime: "Minimum run time (min)",
+			rules: "Circulation rules",
+			rules_hint: "The circulator runs as long as at least one rule requests it and at least one radiator needs heat (heating enabled globally). Once started, it always runs at least the minimum run time, even if the temperature rises quickly or nothing requests heat any more.",
+			name: "Name",
+			name_placeholder: "Boiler",
+			id: "Id",
+			id_label: "Id: {id}",
+			type: "Type",
+			heat_pump_unavailable: "Heat pumps are no longer offered: choose Boiler or Buffer Tank."
+		},
+		fr: {
+			sensor_setpoint: "Température de consigne",
+			sensor_tank: "Température ballon",
+			sensor_flow: "Température départ",
+			sensor_return: "Température retour",
+			rule_setpoint_tank: "Delta consigne / ballon",
+			rule_flow_return: "Delta départ / retour",
+			add_rule_setpoint_tank: "＋ Règle delta consigne / ballon",
+			add_rule_flow_return: "＋ Règle delta départ / retour",
+			short_setpoint: "consigne",
+			short_tank: "ballon",
+			short_flow: "départ",
+			short_return: "retour",
+			type_boiler: "Chaudière",
+			type_buffer_tank: "Ballon tampon",
+			no_area: "Sans pièce",
+			rule_required: "Delta et tolérance requis.",
+			rule_invalid: "Il faut delta > tolérance ≥ 0.",
+			delete_confirm: "Supprimer le système « {name} » ?",
+			dry_contact: "Contact sec",
+			dry_contact_hint: "L'interrupteur commandé de la chaudière : activé dès que sa portée a besoin d'être chauffée, désactivé sinon.",
+			choose_switch: "Choisir un interrupteur…",
+			driven_contact: "contact sec",
+			driven_circulator: "circulateur",
+			scope: "Portée",
+			scope_hint: "Les zones dont la demande de chauffe compte pour ce système.",
+			global_system: "Système global (toutes les zones)",
+			zone: "Zone {name}",
+			aggressive_mode: "Mode agressif",
+			aggressive_hint: "Mode agressif : tolérance « agressive » sur la portée tant que le {driven} est actif",
+			explain_setpoint_tank: "Circule quand ballon ≤ consigne − {delta} °C ; s'arrête quand ballon > consigne − {tolerance} °C.",
+			explain_setpoint_tank_live: "Consigne {setpoint} : circule quand ballon ≤ {start} ; s'arrête quand ballon > {stop}.",
+			explain_flow_return: "Circule quand départ − retour ≥ {delta} °C ; s'arrête quand départ − retour < {tolerance} °C.",
+			currently: " Actuellement {a} − {b} = {value}.",
+			rule_title: "Règle {n} · {label}",
+			delta: "Delta (°C)",
+			tolerance: "Tolérance (°C)",
+			delete_rule: "Supprimer la règle",
+			manual_override: "Forçage manuel",
+			force_hint: "Tant qu'il est activé, le circulateur tourne quelles que soient les règles et la demande des radiateurs (si le chauffage est activé globalement).",
+			force_entity: "Entité :",
+			force_entity_suffix: "(s'applique immédiatement).",
+			force_unavailable: "Disponible une fois le système enregistré.",
+			sensors: "Capteurs",
+			required: "{label} (requis)",
+			choose_sensor: "Choisir un capteur…",
+			circulator: "Circulateur",
+			controlled_switch: "Interrupteur commandé",
+			min_runtime: "Temps d'exécution minimal (min)",
+			rules: "Règles de circulation",
+			rules_hint: "Le circulateur tourne tant qu'au moins une règle le demande et qu'au moins un radiateur a besoin de chauffer (chauffage activé globalement). Une fois lancé, il tourne toujours au moins le temps d'exécution minimal, même si la température remonte vite ou si plus rien ne demande de chauffe.",
+			name: "Nom",
+			name_placeholder: "Chaudière",
+			id: "Id",
+			id_label: "Id : {id}",
+			type: "Type",
+			heat_pump_unavailable: "Les pompes à chaleur ne sont plus proposées : choisis Chaudière ou Ballon tampon."
+		}
+	},
+	heatingSystemsCard: {
+		en: {
+			title: "Heating systems",
+			rule_setpoint_tank: "Setpoint − tank",
+			rule_flow_return: "Flow − return",
+			global: "Global",
+			runtime_days: "Run time · {days} days",
+			day_value: "{day}: {value}",
+			total: "Total {total} · avg. {avg}/day",
+			chart_label: "Daily run time of {name} over {days} days",
+			buffer_tank: "Buffer Tank",
+			boiler: "Boiler",
+			circulating: "Circulating",
+			stopped: "Stopped",
+			demand_title: "Heating demand of the scope",
+			demand: "Demand",
+			no_demand: "No demand",
+			forced: "Forced",
+			aggressive: "Aggressive",
+			setpoint: "Setpoint",
+			tank: "Tank",
+			flow: "Flow",
+			return: "Return",
+			tank_active_today: "Active today",
+			min_time_left: "Min. time left",
+			rule_status: "starts ≥ {delta} · stops < {tolerance} · {state}",
+			rule_on: "requests circulation",
+			rule_off: "inactive",
+			manual_override: "Manual override",
+			boiler_on: "Running",
+			boiler_off: "Stopped",
+			boiler_active_today: "Active today"
+		},
+		fr: {
+			title: "Systèmes de chauffage",
+			rule_setpoint_tank: "Consigne − ballon",
+			rule_flow_return: "Départ − retour",
+			global: "Global",
+			runtime_days: "Temps d'activité · {days} jours",
+			day_value: "{day} : {value}",
+			total: "Total {total} · moy. {avg}/j",
+			chart_label: "Temps d'activité quotidien de {name} sur {days} jours",
+			buffer_tank: "Ballon tampon",
+			boiler: "Chaudière",
+			circulating: "Circulation",
+			stopped: "Arrêté",
+			demand_title: "Demande de chauffe de la portée",
+			demand: "Demande",
+			no_demand: "Pas de demande",
+			forced: "Forcé",
+			aggressive: "Agressif",
+			setpoint: "Consigne",
+			tank: "Ballon",
+			flow: "Départ",
+			return: "Retour",
+			tank_active_today: "Actif aujourd'hui",
+			min_time_left: "Temps min. restant",
+			rule_status: "démarre ≥ {delta} · s'arrête < {tolerance} · {state}",
+			rule_on: "demande la circulation",
+			rule_off: "inactive",
+			manual_override: "Forçage manuel",
+			boiler_on: "En marche",
+			boiler_off: "Arrêtée",
+			boiler_active_today: "Active aujourd'hui"
+		}
+	},
+	heatingZoneEditor: {
+		en: {
+			delete_confirm: "Delete the zone “{name}”? Its rooms go back to the default zone.",
+			name: "Name",
+			name_placeholder: "Studio",
+			id: "Id",
+			id_label: "Id: {id}",
+			control_entity: "Control entity:",
+			rooms: "Rooms",
+			default_hint: "Contains every room that is in no other zone.",
+			rooms_hint: "A room belongs to one zone only: ticking it removes it from its current zone.",
+			triggers: "Triggers per mode",
+			triggers_hint: "Each trigger switches the zone to the matching mode. Switch buttons can also be set up in the Switch Manager (🔥 Climate module).",
+			trigger_count: "· {count} trigger(s)"
+		},
+		fr: {
+			delete_confirm: "Supprimer la zone « {name} » ? Ses pièces repassent dans la zone par défaut.",
+			name: "Nom",
+			name_placeholder: "Studio",
+			id: "Id",
+			id_label: "Id : {id}",
+			control_entity: "Entité de commande :",
+			rooms: "Pièces",
+			default_hint: "Contient toutes les pièces qui ne sont dans aucune autre zone.",
+			rooms_hint: "Une pièce n'appartient qu'à une zone : la cocher la retire de sa zone actuelle.",
+			triggers: "Déclencheurs par mode",
+			triggers_hint: "Chaque déclencheur passe la zone dans le mode correspondant. Les boutons d'interrupteurs se configurent aussi dans la Gestion des interrupteurs (module 🔥 Climat).",
+			trigger_count: "· {count} déclencheur(s)"
+		}
+	},
+	layoutEditor: {
+		en: {
+			name_id_required: "Layout name and id are required.",
+			confirm_delete: "Delete layout \"{name}\"?",
+			name: "Name",
+			name_placeholder: "Round 2 buttons",
+			main_shape: "Main shape",
+			shape_round: "● Round",
+			shape_square: "■ Square",
+			shape_vrect: "▮ Vertical rect.",
+			buttons: "Buttons",
+			columns: "Columns",
+			rows: "Rows",
+			center_shape: "⊕ Center the shape",
+			hint: "Magnetic 20×20 grid. A button takes up one zone (cell) delimited by the separators. Drag a number to assign it to a cell (it swaps with the occupant) or to the “Invisible” zone to remove it from the visual. The shape is recentered on save.",
+			invisible: "Invisible",
+			tray_empty: "Drag a button here to make it invisible",
+			create_layout: "Create layout"
+		},
+		fr: {
+			name_id_required: "Nom et id du layout requis.",
+			confirm_delete: "Supprimer le layout \"{name}\" ?",
+			name: "Nom",
+			name_placeholder: "Rond 2 boutons",
+			main_shape: "Forme principale",
+			shape_round: "● Rond",
+			shape_square: "■ Carré",
+			shape_vrect: "▮ Rect. vertical",
+			buttons: "Boutons",
+			columns: "Colonnes",
+			rows: "Lignes",
+			center_shape: "⊕ Centrer la forme",
+			hint: "Grille aimantée 20×20. Un bouton occupe une zone (cadran) délimitée par les séparateurs. Glisse un chiffre pour l'assigner à un cadran (il s'échange avec l'occupant) ou vers la zone « Invisible » pour le retirer du visuel. La forme est recentrée à la sauvegarde.",
+			invisible: "Invisible",
+			tray_empty: "Glisse un bouton ici pour le rendre invisible",
+			create_layout: "Créer le layout"
+		}
+	},
+	managedTriggers: {
+		en: { managed_by_switches: "Managed by the Switches module" },
+		fr: { managed_by_switches: "Géré par le module Interrupteurs" }
+	},
+	presetEditor: {
+		en: {
+			tap_single: "Single",
+			tap_double: "Double",
+			tap_long: "Long",
+			name_id_required: "Preset name and id are required.",
+			choose_device_model: "Choose a device (model).",
+			select_layout: "Select a layout.",
+			confirm_delete: "Delete preset \"{name}\"?",
+			no_actions: "No actions available for this device.",
+			actions_per_button: "Actions per button",
+			actions_hint: "For each tap mode, map each button to the model's standard actions.",
+			button: "Button {n}",
+			no_action: "No action",
+			name: "Preset name",
+			name_placeholder: "Model X",
+			id: "Id: {id}",
+			switch_model: "Switch model",
+			choose_model: "Choose a model…",
+			devices_count: "{count} device(s)",
+			no_switches: "No switch detected (device exposing actions).",
+			ref_device: "Reference device",
+			ref_device_hint: "Device of the model the actions are pulled from. The same model can expose different actions depending on the device.",
+			choose_device: "Choose a device…",
+			no_devices_for_model: "No device detected for this model.",
+			layout: "Layout",
+			choose_layout: "Choose a layout…",
+			buttons_count: "{count} button(s)",
+			no_layouts: "No layouts yet. Create one in “Switch Layouts”.",
+			tap_modes: "Tap modes per button",
+			tap_modes_hint: "Single enabled by default; add Double / Long as needed.",
+			create_preset: "Create preset"
+		},
+		fr: {
+			tap_single: "Simple",
+			tap_double: "Double",
+			tap_long: "Long",
+			name_id_required: "Nom et id du preset requis.",
+			choose_device_model: "Choisis un appareil (modèle).",
+			select_layout: "Sélectionne un layout.",
+			confirm_delete: "Supprimer le preset \"{name}\" ?",
+			no_actions: "Aucune action disponible pour cet appareil.",
+			actions_per_button: "Actions par bouton",
+			actions_hint: "Pour chaque tap mode, associe chaque bouton aux actions standard du modèle.",
+			button: "Bouton {n}",
+			no_action: "Aucune action",
+			name: "Nom du preset",
+			name_placeholder: "Modèle X",
+			id: "Id : {id}",
+			switch_model: "Modèle d'interrupteur",
+			choose_model: "Choisir un modèle…",
+			devices_count: "{count} appareil(s)",
+			no_switches: "Aucun interrupteur détecté (appareil exposant des actions).",
+			ref_device: "Appareil de référence",
+			ref_device_hint: "Appareil du modèle duquel les actions sont récupérées. Un même modèle peut exposer des actions différentes selon l'appareil.",
+			choose_device: "Choisir un appareil…",
+			no_devices_for_model: "Aucun appareil détecté pour ce modèle.",
+			layout: "Layout",
+			choose_layout: "Choisir un layout…",
+			buttons_count: "{count} bouton(s)",
+			no_layouts: "Aucun layout. Crée-en un dans « Switch Layouts ».",
+			tap_modes: "Tap modes par bouton",
+			tap_modes_hint: "Simple activé par défaut ; ajoute Double / Long au besoin.",
+			create_preset: "Créer le preset"
+		}
+	},
+	radiatorDialog: {
+		en: {
+			external_sensor: "External temperature sensor",
+			external_sensor_hint: "Its temperature is copied to the valve on every update.",
+			choose_sensor: "Choose a sensor…",
+			room_reference: "Room reference",
+			reference_temperature: "Reference temperature ({room})",
+			room_sensors: "Room sensors",
+			area: "Area: {area}",
+			others: "Others",
+			sensor_required: "This preset uses an external sensor: choose one.",
+			already_in_room: "already in the room",
+			edit_title: "Edit radiator",
+			add_title: "Add a radiator",
+			radiator: "Radiator",
+			choose_radiator: "Choose a radiator…",
+			already_in_other_room: "Already in the room “{room}”.",
+			device_preset: "Device preset",
+			no_preset: "No preset",
+			external_sensor_tag: "external sensor",
+			no_preset_for_model: "No device preset for this model (Climate Manager → Heating → Device Presets).",
+			preset_applied: "The preset is applied continuously (checked and re-applied every 10 minutes)."
+		},
+		fr: {
+			external_sensor: "Capteur de température externe",
+			external_sensor_hint: "Sa température est recopiée dans la vanne à chaque mise à jour.",
+			choose_sensor: "Choisir un capteur…",
+			room_reference: "Référence de la pièce",
+			reference_temperature: "Température de référence ({room})",
+			room_sensors: "Capteurs de la pièce",
+			area: "Pièce : {area}",
+			others: "Autres",
+			sensor_required: "Ce preset utilise un capteur externe : choisis-en un.",
+			already_in_room: "déjà dans la pièce",
+			edit_title: "Modifier le radiateur",
+			add_title: "Ajouter un radiateur",
+			radiator: "Radiateur",
+			choose_radiator: "Choisir un radiateur…",
+			already_in_other_room: "Déjà dans la pièce « {room} ».",
+			device_preset: "Device preset",
+			no_preset: "Aucun preset",
+			external_sensor_tag: "capteur externe",
+			no_preset_for_model: "Aucun device preset pour ce modèle (Gestion du climat → Chauffage → Device presets).",
+			preset_applied: "Le preset est appliqué en continu (vérifié et ré-appliqué toutes les 10 minutes)."
+		}
+	},
+	roomCard: {
+		en: {
+			synced: "Synced: {entities} entity(ies) (area + labels), {scenes} scene(s) renamed.",
+			confirm_delete_scene: "Delete the scene \"{name}\"?",
+			drag_reorder: "Drag to reorder",
+			always_last: "Always last",
+			active: "active",
+			open_in_ha: "View in Home Assistant",
+			default_scene: "Default scene",
+			collapse_expand: "Collapse / expand",
+			dim_down: "Lower brightness (−20)",
+			dim_up: "Raise brightness (+20)",
+			next_scene: "Next scene",
+			actions: "Actions",
+			edit_room: "Edit room",
+			triggers: "Triggers ({count})",
+			add_group: "Add a group",
+			syncing: "Syncing…",
+			sync_labels: "Sync labels",
+			delete_room: "Delete room",
+			heating_disabled_room: "Heating disabled in the room",
+			zone_mode: "{zone} zone mode",
+			heating: "Heating",
+			heating_hint: "At least one valve is heating",
+			idle: "Idle",
+			idle_hint: "No valve is heating",
+			valve_check: "Valve?",
+			module_lights: "Lights",
+			module_switches: "Switches",
+			module_shutters: "Shutters",
+			module_climate: "Climate",
+			lights_count: "{count} light(s)",
+			scenes_count: "{count} scene(s)",
+			groups_count: "{count} group(s)",
+			switches_count: "{count} switch(es)",
+			actions_count: "{count} action(s)",
+			shutters_count: "{count} shutter(s)",
+			metrics_count: "{count} metric(s)",
+			radiators_count: "{count} radiator(s)",
+			no_modules: "No module enabled on this room.",
+			scenes: "Scenes",
+			add_scene: "Scene",
+			groups: "Groups",
+			add_group_short: "Group",
+			no_groups: "No groups. A group controls part of the room's lights (e.g. a bedside lamp).",
+			switches: "Switches",
+			add_switch: "Switch",
+			no_preset: "no preset",
+			no_switches: "No associated switch. Click “＋ {button}” to create one (via the Switch Manager) and associate it with this room.",
+			shutter_groups: "Shutter groups",
+			configure_group: "Configure the group",
+			no_shutters_in_group: "No shutter in this group.",
+			shutters_title: "Shutters ({name}): {state}",
+			confirm_delete_room: "Delete the room “{name}”?",
+			delete_room_text: "The room's switch, light group and triggers will be deleted. This action cannot be undone.",
+			delete_scenes_too: "Also delete the {count} associated scene(s)",
+			deleting: "Deleting…"
+		},
+		fr: {
+			synced: "Synchronisé : {entities} entité(s) (area + labels), {scenes} scène(s) renommée(s).",
+			confirm_delete_scene: "Supprimer la scène \"{name}\" ?",
+			drag_reorder: "Glisser pour réordonner",
+			always_last: "Toujours en dernier",
+			active: "active",
+			open_in_ha: "Voir dans Home Assistant",
+			default_scene: "Scène par défaut",
+			collapse_expand: "Plier / déplier",
+			dim_down: "Baisser la luminosité (−20)",
+			dim_up: "Monter la luminosité (+20)",
+			next_scene: "Changer de scène",
+			actions: "Actions",
+			edit_room: "Modifier la pièce",
+			triggers: "Déclencheurs ({count})",
+			add_group: "Ajouter un groupe",
+			syncing: "Synchronisation…",
+			sync_labels: "Synchroniser les labels",
+			delete_room: "Supprimer la pièce",
+			heating_disabled_room: "Chauffage désactivé dans la pièce",
+			zone_mode: "Mode de la zone {zone}",
+			heating: "En chauffe",
+			heating_hint: "Au moins une vanne chauffe",
+			idle: "Au repos",
+			idle_hint: "Aucune vanne ne chauffe",
+			valve_check: "Vanne ?",
+			module_lights: "Lumières",
+			module_switches: "Interrupteurs",
+			module_shutters: "Volets",
+			module_climate: "Climat",
+			lights_count: "{count} lumière(s)",
+			scenes_count: "{count} scène(s)",
+			groups_count: "{count} groupe(s)",
+			switches_count: "{count} interrupteur(s)",
+			actions_count: "{count} action(s)",
+			shutters_count: "{count} volet(s)",
+			metrics_count: "{count} métrique(s)",
+			radiators_count: "{count} radiateur(s)",
+			no_modules: "Aucun module actif sur cette pièce.",
+			scenes: "Scènes",
+			add_scene: "Scène",
+			groups: "Groupes",
+			add_group_short: "Groupe",
+			no_groups: "Aucun groupe. Un groupe pilote une partie des lumières de la pièce (ex. une lampe de chevet).",
+			switches: "Interrupteurs",
+			add_switch: "Interrupteur",
+			no_preset: "aucun preset",
+			no_switches: "Aucun interrupteur associé. Clique sur « ＋ {button} » pour en créer un (via le Switch Manager) et l'associer à cette pièce.",
+			shutter_groups: "Groupes de volets",
+			configure_group: "Configurer le groupe",
+			no_shutters_in_group: "Aucun volet dans ce groupe.",
+			shutters_title: "Volets ({name}) : {state}",
+			confirm_delete_room: "Supprimer la pièce « {name} » ?",
+			delete_room_text: "Le switch, le groupe de lumières et les déclencheurs de cette pièce seront supprimés. Cette action est irréversible.",
+			delete_scenes_too: "Supprimer aussi les {count} scène(s) associée(s)",
+			deleting: "Suppression…"
+		}
+	},
+	roomClimate: {
+		en: {
+			metric_temperature: "Temperature",
+			metric_humidity: "Humidity",
+			metric_pm25: "PM2.5",
+			metric_pm10: "PM10",
+			metric_co2: "CO₂",
+			rule_mean: "weighted average",
+			rule_max: "max",
+			rule_min: "min",
+			action_heating: "🔥 Heating",
+			action_idle: "Idle",
+			action_off: "Off",
+			action_preheating: "Preheating",
+			action_heat: "Heat mode",
+			action_auto: "Auto mode",
+			metrics: "Metrics",
+			configure: "Configure",
+			sensor_count: "{count} sensor(s)",
+			no_sensors: "No sensors: “Configure” to add some.",
+			this_radiator: "this radiator",
+			confirm_remove: "Remove {name} from the room?",
+			preset: "Preset: {name}",
+			no_preset: "No preset",
+			sensor: "Sensor: {name}",
+			unavailable: "Unavailable",
+			valve_stuck: "Heating while the temperature is above the setpoint: valve stuck open or state not refreshed — check the radiator.",
+			target_temp: "Target temperature",
+			current_temp: "Current temperature",
+			remove: "Remove",
+			heating: "Heating",
+			disable_hint: "Disable: the room switches to Unheated, its valves off",
+			enable_hint: "Enable: the room goes back to its zone's mode",
+			heating_on: "Heating on",
+			heating_off: "Heating off",
+			add_radiator: "Radiator",
+			no_radiators: "No radiators."
+		},
+		fr: {
+			metric_temperature: "Température",
+			metric_humidity: "Humidité",
+			metric_pm25: "PM2.5",
+			metric_pm10: "PM10",
+			metric_co2: "CO₂",
+			rule_mean: "moyenne pondérée",
+			rule_max: "max",
+			rule_min: "min",
+			action_heating: "🔥 Chauffe",
+			action_idle: "En veille",
+			action_off: "Éteint",
+			action_preheating: "Préchauffe",
+			action_heat: "Mode chauffage",
+			action_auto: "Mode auto",
+			metrics: "Mesures",
+			configure: "Configurer",
+			sensor_count: "{count} capteur(s)",
+			no_sensors: "Aucun capteur : « Configurer » pour en ajouter.",
+			this_radiator: "ce radiateur",
+			confirm_remove: "Retirer {name} de la pièce ?",
+			preset: "Preset : {name}",
+			no_preset: "Aucun preset",
+			sensor: "Capteur : {name}",
+			unavailable: "Indisponible",
+			valve_stuck: "Chauffe alors que la température dépasse la consigne : vanne bloquée ouverte ou état non rafraîchi — vérifie le radiateur.",
+			target_temp: "Température de consigne",
+			current_temp: "Température actuelle",
+			remove: "Retirer",
+			heating: "Chauffage",
+			disable_hint: "Désactiver : la pièce passe en mode Non chauffé, ses vannes sur off",
+			enable_hint: "Activer : la pièce reprend le mode de sa zone",
+			heating_on: "Chauffage activé",
+			heating_off: "Chauffage désactivé",
+			add_radiator: "Radiateur",
+			no_radiators: "Aucun radiateur."
+		}
+	},
+	roomDialog: {
+		en: {
+			name_id_required: "Name and id are required.",
+			heading_edit: "Edit room",
+			heading_new: "New room",
+			name: "Name",
+			name_placeholder: "Bedroom",
+			id: "Id",
+			area: "Home Assistant area (optional)",
+			area_none: "None",
+			modules: "Modules",
+			module_lights: "Lights",
+			module_lights_hint: "The Lights module handles the room's lighting, scenes and groups.",
+			module_switches: "Switches",
+			module_switches_hint: "The Switches module handles the room's physical switches.",
+			module_shutters: "Shutters",
+			module_shutters_hint: "The Shutters module handles the room's roller shutters.",
+			module_climate: "Climate",
+			module_climate_hint: "The Climate module handles the room's sensors and radiators (Climate tab).",
+			lights_devices: "Room lights",
+			strategy: "Scene switching strategy",
+			strategy_first: "Start over",
+			strategy_first_hint: "First scene",
+			strategy_last: "Last used",
+			strategy_last_hint: "Resumes the last scene",
+			strategy_hint: "When a scene-switching trigger changes scene while the room was off: start again from the first scene, or resume the last one used.",
+			heating_zone: "Heating zone",
+			zone_default_hint: "All other rooms",
+			climate_hint: "Sensors and radiators are configured in the room's Climate tab.",
+			create: "Create room"
+		},
+		fr: {
+			name_id_required: "Nom et id requis.",
+			heading_edit: "Modifier la pièce",
+			heading_new: "Nouvelle pièce",
+			name: "Nom",
+			name_placeholder: "Chambre",
+			id: "Id",
+			area: "Pièce Home Assistant (optionnel)",
+			area_none: "Aucune",
+			modules: "Modules",
+			module_lights: "Lumières",
+			module_lights_hint: "Le module Lumières gère l'allumage, les scènes et les groupes de la pièce.",
+			module_switches: "Interrupteurs",
+			module_switches_hint: "Le module Interrupteurs gère les interrupteurs physiques de la pièce.",
+			module_shutters: "Volets",
+			module_shutters_hint: "Le module Volets gère les volets roulants de la pièce.",
+			module_climate: "Climat",
+			module_climate_hint: "Le module Climat gère les capteurs et les radiateurs de la pièce (onglet Climat).",
+			lights_devices: "Luminaires de la pièce",
+			strategy: "Stratégie de changement de scène",
+			strategy_first: "Repart de zéro",
+			strategy_first_hint: "Première scène",
+			strategy_last: "Dernière utilisée",
+			strategy_last_hint: "Reprend la dernière scène",
+			strategy_hint: "Quand un trigger scene-switching change de scène et que la pièce était éteinte : repartir de la première scène, ou reprendre la dernière utilisée.",
+			heating_zone: "Zone de chauffage",
+			zone_default_hint: "Toutes les autres pièces",
+			climate_hint: "Capteurs et radiateurs se configurent dans l'onglet Climat de la pièce.",
+			create: "Créer la pièce"
+		}
+	},
+	sceneDialog: {
+		en: {
+			pick_scene_required: "Pick an existing scene to attach.",
+			heading_rename: "Rename scene",
+			heading_new: "New scene",
+			name: "Scene name",
+			name_placeholder: "Night",
+			name_taken: "This scene name already exists.",
+			triggers: "Triggers (activate this scene)",
+			attach: "Attach",
+			create: "Create scene",
+			mode_new: "New",
+			mode_attach: "Attach an existing one",
+			new_hint: "The scene is created “all off”; edit it afterwards in Home Assistant.",
+			attach_hint: "Existing scene to adopt (it will be renamed, its content kept)",
+			pick_scene: "Pick a scene…"
+		},
+		fr: {
+			pick_scene_required: "Choisis une scène existante à rattacher.",
+			heading_rename: "Renommer la scène",
+			heading_new: "Nouvelle scène",
+			name: "Nom de la scène",
+			name_placeholder: "Nuit",
+			name_taken: "Ce nom de scène existe déjà.",
+			triggers: "Déclencheurs (activent cette scène)",
+			attach: "Rattacher",
+			create: "Créer la scène",
+			mode_new: "Nouvelle",
+			mode_attach: "Rattacher une existante",
+			new_hint: "La scène est créée « tout éteint » ; édite-la ensuite dans Home Assistant.",
+			attach_hint: "Scène existante à adopter (elle sera renommée, son contenu conservé)",
+			pick_scene: "Choisir une scène…"
+		}
+	},
+	select: {
+		en: { no_option: "No option" },
+		fr: { no_option: "Aucune option" }
+	},
+	shutterControlDialog: {
+		en: {
+			heading: "Shutters · {room}",
+			avg_position: "Average position: {position} %",
+			open: "Open",
+			stop: "Stop",
+			close: "Close",
+			done: "Done"
+		},
+		fr: {
+			heading: "Volets · {room}",
+			avg_position: "Position moyenne : {position} %",
+			open: "Ouvrir",
+			stop: "Stop",
+			close: "Fermer",
+			done: "Terminé"
+		}
+	},
+	shutterGroupDialog: {
+		en: {
+			name_required: "Group name is required.",
+			confirm_delete: "Delete shutter group \"{name}\"?",
+			edit_heading: "Edit shutter group",
+			new_heading: "New shutter group",
+			name: "Name",
+			name_placeholder: "Living room",
+			covers: "Shutters (cover entities)",
+			triggers: "Group triggers",
+			triggers_hint: "Each trigger drives the shutters of this group.",
+			toggle: "Toggle (open / close)",
+			open: "Open",
+			close: "Close",
+			stop: "Stop",
+			create_group: "Create group"
+		},
+		fr: {
+			name_required: "Nom du groupe requis.",
+			confirm_delete: "Supprimer le groupe de volets \"{name}\" ?",
+			edit_heading: "Modifier le groupe de volets",
+			new_heading: "Nouveau groupe de volets",
+			name: "Nom",
+			name_placeholder: "Salon",
+			covers: "Volets (entités cover)",
+			triggers: "Déclencheurs du groupe",
+			triggers_hint: "Chaque déclencheur pilote les volets de ce groupe.",
+			toggle: "Permuter (ouvrir / fermer)",
+			open: "Ouvrir",
+			close: "Fermer",
+			stop: "Stop",
+			create_group: "Créer le groupe"
+		}
+	},
+	shutterManager: {
+		en: {
+			presets: "Presets",
+			not_found: "“{id}” not found.",
+			edit_preset: "Edit preset",
+			new_preset: "New shutter device preset",
+			title: "Shutter Manager",
+			add_preset: "＋ Preset",
+			no_presets: "No shutter device presets yet. Click “＋ Preset” to define how a shutter model is driven.",
+			smart_toggle: " · smart toggle"
+		},
+		fr: {
+			presets: "Presets",
+			not_found: "« {id} » introuvable.",
+			edit_preset: "Modifier le preset",
+			new_preset: "Nouveau shutter device preset",
+			title: "Gestion des volets",
+			add_preset: "＋ Preset",
+			no_presets: "Aucun shutter device preset. Clique sur « ＋ Preset » pour définir le pilotage d'un modèle de volet.",
+			smart_toggle: " · permutation intelligente"
+		}
+	},
+	shutterPresetEditor: {
+		en: {
+			field_placeholder: "field, e.g. motor_run_status",
+			z2m_field: "Zigbee2MQTT field…",
+			sensor: "Sensor…",
+			source_ha: "HA sensor",
+			source_z2m: "Zigbee2MQTT state",
+			value: "value",
+			z2m_no_state: "No state received from Zigbee2MQTT for this device yet (it is published on every change: move the shutter, then reopen this preset to see the list of fields), or type the field name.",
+			name_id_required: "Preset name and id are required.",
+			choose_model_device: "Choose a model and a reference device.",
+			confirm_delete: "Delete preset \"{name}\"?",
+			name: "Preset name",
+			name_placeholder: "Living room shutter",
+			id: "Id: {id}",
+			shutter_model: "Shutter model",
+			choose_model: "Choose a model…",
+			devices_count: "{count} device(s)",
+			no_shutters: "No shutter (device with a cover entity) detected.",
+			ref_device: "Reference device",
+			ref_device_hint: "Sensors/actions are taken from this device.",
+			smart_toggle: "Enable smart toggle",
+			smart_toggle_hint: "When enabled, tell how to detect the shutter's state: a Home Assistant sensor, or a field of the device's Zigbee2MQTT state (e.g. motor_run_status), with a specific value. “Toggle” then stops a moving shutter, and restarts a stopped shutter in the opposite direction of its last movement.",
+			up_title: "Rising (shutter moving up)",
+			up_hint: "The shutter is rising when this sensor equals:",
+			down_title: "Lowering (shutter moving down)",
+			down_hint: "The shutter is lowering when this sensor equals:",
+			stopped_title: "Stopped (shutter not moving)",
+			stopped_hint: "The shutter is stopped when this sensor equals:",
+			create_preset: "Create preset"
+		},
+		fr: {
+			field_placeholder: "champ, ex. motor_run_status",
+			z2m_field: "Champ Zigbee2MQTT…",
+			sensor: "Capteur…",
+			source_ha: "Capteur HA",
+			source_z2m: "État Zigbee2MQTT",
+			value: "valeur",
+			z2m_no_state: "Aucun état reçu de Zigbee2MQTT pour cet appareil pour l'instant (il est publié à chaque changement : bouge le volet puis rouvre ce preset pour voir la liste des champs), ou saisis le nom du champ.",
+			name_id_required: "Nom et id du preset requis.",
+			choose_model_device: "Choisis un modèle et un device de référence.",
+			confirm_delete: "Supprimer le preset \"{name}\" ?",
+			name: "Nom du preset",
+			name_placeholder: "Volet salon",
+			id: "Id : {id}",
+			shutter_model: "Modèle de volet",
+			choose_model: "Choisir un modèle…",
+			devices_count: "{count} appareil(s)",
+			no_shutters: "Aucun volet (device avec entité cover) détecté.",
+			ref_device: "Device de référence",
+			ref_device_hint: "Les capteurs/actions sont tirés de ce device.",
+			smart_toggle: "Implémenter la permutation intelligente",
+			smart_toggle_hint: "Si activée, indique comment détecter l'état du volet : un capteur Home Assistant, ou un champ de l'état Zigbee2MQTT de l'appareil (ex. motor_run_status), avec une valeur précise. « Permuter » arrête alors un volet en mouvement, et relance un volet arrêté dans le sens inverse de son dernier mouvement.",
+			up_title: "Montée (volet en mouvement vers le haut)",
+			up_hint: "Le volet est en train de monter quand ce capteur vaut :",
+			down_title: "Descente (volet en mouvement vers le bas)",
+			down_hint: "Le volet est en train de descendre quand ce capteur vaut :",
+			stopped_title: "Arrêt (volet à l'arrêt)",
+			stopped_hint: "Le volet est à l'arrêt quand ce capteur vaut :",
+			create_preset: "Créer le preset"
+		}
+	},
+	switchManager: {
+		en: {
+			not_found: "“{id}” not found.",
+			layouts: "Layouts",
+			presets: "Presets",
+			switches: "Switches",
+			edit_layout: "Edit layout",
+			new_layout: "New layout",
+			edit_preset: "Edit preset",
+			new_preset: "New device preset",
+			edit_switch: "Edit switch",
+			new_switch: "New switch",
+			add_layout: "＋ Layout",
+			add_preset: "＋ Preset",
+			add_switch: "＋ Switch",
+			title: "Switch Manager",
+			no_layouts: "No layouts yet. Click “＋ Layout”.",
+			layout_meta: "{count} button(s) · {shape}",
+			shape_round: "round",
+			shape_square: "square",
+			shape_vrect: "vertical rect.",
+			no_presets: "No presets yet. Click “＋ Preset” to define the standard mapping of a device model.",
+			no_switches: "No switches yet. Click “＋ Switch”.",
+			no_preset: "no preset",
+			rooms_count: "{count} room(s)"
+		},
+		fr: {
+			not_found: "« {id} » introuvable.",
+			layouts: "Layouts",
+			presets: "Presets",
+			switches: "Interrupteurs",
+			edit_layout: "Modifier le layout",
+			new_layout: "Nouveau layout",
+			edit_preset: "Modifier le preset",
+			new_preset: "Nouveau device preset",
+			edit_switch: "Modifier le switch",
+			new_switch: "Nouveau switch",
+			add_layout: "＋ Layout",
+			add_preset: "＋ Preset",
+			add_switch: "＋ Switch",
+			title: "Gestion des interrupteurs",
+			no_layouts: "Aucun layout. Clique sur « ＋ Layout ».",
+			layout_meta: "{count} bouton(s) · {shape}",
+			shape_round: "rond",
+			shape_square: "carré",
+			shape_vrect: "rect. vertical",
+			no_presets: "Aucun preset. Clique sur « ＋ Preset » pour définir le mapping standard d'un modèle d'appareil.",
+			no_switches: "Aucun switch. Clique sur « ＋ Switch ».",
+			no_preset: "aucun preset",
+			rooms_count: "{count} pièce(s)"
+		}
+	},
+	switchMapping: {
+		en: {
+			module_lights: "💡 Lights",
+			module_shutters: "🪟 Shutters",
+			module_heating: "🔥 Climate",
+			tap_single: "Single",
+			tap_double: "Double",
+			tap_long: "Long",
+			toggle_room: "Toggle room (on / off)",
+			toggle_short: "Toggle",
+			scene_next: "Next scene",
+			scene_next_short: "Scene →",
+			dim_up: "Dimmer +",
+			dim_up_short: "Dim +",
+			dim_down: "Dimmer −",
+			dim_down_short: "Dim −",
+			group: "Group: {name}",
+			scene: "Scene: {name}",
+			shutter_toggle: "{name} — Toggle",
+			shutter_open: "{name} — Open",
+			shutter_close: "{name} — Close",
+			shutter_stop: "{name} — Stop",
+			heating_next: "Heating — next mode",
+			heating_next_short: "Mode →",
+			heating_mode: "Heating — {name}",
+			layout_not_found: "Layout not found for this model.",
+			invisible_buttons: "Invisible buttons",
+			heading: "Assignments — {name}",
+			homex_actions: "Homex actions",
+			no_rooms: "No room associated with this switch.",
+			no_actions: "No actions available: the associated rooms have no active module (e.g. Lights).",
+			hint: "Drag an action onto a button of the canvas (or tap an action, then a button). Tap an assigned button to clear it.",
+			no_tap_modes: "No tap mode configured on this preset."
+		},
+		fr: {
+			module_lights: "💡 Lumières",
+			module_shutters: "🪟 Volets",
+			module_heating: "🔥 Climat",
+			tap_single: "Simple",
+			tap_double: "Double",
+			tap_long: "Long",
+			toggle_room: "Toggle pièce (on / off)",
+			toggle_short: "Toggle",
+			scene_next: "Changement de scène",
+			scene_next_short: "Scène →",
+			dim_up: "Dimmer +",
+			dim_up_short: "Dim +",
+			dim_down: "Dimmer −",
+			dim_down_short: "Dim −",
+			group: "Groupe : {name}",
+			scene: "Scène : {name}",
+			shutter_toggle: "{name} — Permuter",
+			shutter_open: "{name} — Ouvrir",
+			shutter_close: "{name} — Fermer",
+			shutter_stop: "{name} — Stop",
+			heating_next: "Chauffage — mode suivant",
+			heating_next_short: "Mode →",
+			heating_mode: "Chauffage — {name}",
+			layout_not_found: "Layout introuvable pour ce modèle.",
+			invisible_buttons: "Boutons invisibles",
+			heading: "Assignations — {name}",
+			homex_actions: "Actions Homex",
+			no_rooms: "Aucune pièce associée à cet interrupteur.",
+			no_actions: "Aucune action disponible : les pièces associées n'ont aucun module actif (ex. Lumières).",
+			hint: "Glisse une action sur un bouton du canvas (ou touche une action puis un bouton). Touche un bouton assigné pour le vider.",
+			no_tap_modes: "Aucun tap mode configuré sur ce preset."
+		}
+	},
+	triggerSelector: {
+		en: {
+			select_entity: "Select an entity",
+			type: "Type",
+			type_state: "State",
+			type_numeric: "Numeric state",
+			attribute: "Attribute (optional)",
+			attribute_none: "(entity state)",
+			for: "For (optional)",
+			above: "Above (optional)",
+			below: "Below (optional)",
+			from: "From (optional)",
+			to: "To (optional)",
+			select_action: "Select an action",
+			device: "Device",
+			entity: "Entity",
+			action: "Action",
+			add_trigger: "Add trigger"
+		},
+		fr: {
+			select_entity: "Sélectionnez une entité",
+			type: "Type",
+			type_state: "État",
+			type_numeric: "État numérique",
+			attribute: "Attribut (facultatif)",
+			attribute_none: "(état de l'entité)",
+			for: "Pendant (facultatif)",
+			above: "Au-dessus de (facultatif)",
+			below: "En-dessous de (facultatif)",
+			from: "De (facultatif)",
+			to: "À (facultatif)",
+			select_action: "Sélectionnez une action",
+			device: "Appareil",
+			entity: "Entité",
+			action: "Action",
+			add_trigger: "Ajouter un déclencheur"
+		}
+	},
+	triggersDialog: {
+		en: {
+			heading: "Room triggers",
+			toggle_title: "Toggle triggers (turn on / off)",
+			toggle_hint: "Each trigger toggles the room on/off.",
+			scene_title: "Scene switching triggers",
+			scene_hint: "Each trigger moves to the next scene (cycle).",
+			scene_strategy_hint: "The strategy (start over / last used) is set in “Edit room”.",
+			dim_up_title: "Dimmer + (raise brightness)",
+			dim_up_hint: "Each trigger adds 20 to the brightness of the room's lights.",
+			dim_down_title: "Dimmer − (lower brightness)",
+			dim_down_hint: "Each trigger removes 20 from the brightness of the room's lights."
+		},
+		fr: {
+			heading: "Déclencheurs de la pièce",
+			toggle_title: "Déclencheurs allumer / éteindre",
+			toggle_hint: "Chaque déclenchement permute l'état on/off de la pièce.",
+			scene_title: "Déclencheurs de changement de scène",
+			scene_hint: "Chaque déclenchement passe à la scène suivante (cycle).",
+			scene_strategy_hint: "La stratégie (repart de zéro / dernière utilisée) se règle dans « Modifier la pièce ».",
+			dim_up_title: "Dimmer + (monter la luminosité)",
+			dim_up_hint: "Chaque déclenchement ajoute 20 à la luminosité des lumières de la pièce.",
+			dim_down_title: "Dimmer − (baisser la luminosité)",
+			dim_down_hint: "Chaque déclenchement retire 20 à la luminosité des lumières de la pièce."
+		}
+	},
+	unitControls: {
+		en: {
+			lit_scene_turn_off: "On · {scene} — turn off",
+			lit_turn_off: "On — turn off",
+			stray_turn_on: "Off, but at least one light is on — turn on",
+			turn_on: "Turn on"
+		},
+		fr: {
+			lit_scene_turn_off: "Allumée · {scene} — éteindre",
+			lit_turn_off: "Allumée — éteindre",
+			stray_turn_on: "Éteinte, mais au moins une lumière est allumée — allumer",
+			turn_on: "Allumer"
+		}
+	},
+	cardRoomTile: {
+		en: {
+			config_required: "homex-room-tile: configuration required",
+			room_unheated: "Room not heated",
+			room_heated: "Room heated",
+			heating: "Heating",
+			no_demand: "No heating demand",
+			shutters_closed: "Shutters closed",
+			shutters_open: "Shutters open",
+			shutters_partial: "Shutters {pos} % open",
+			choose_room: "Choose a Homex room",
+			not_found: "Not found",
+			unavailable: "Unavailable",
+			heated_toggle: "Room heated — stop heating",
+			unheated_toggle: "Room not heated — heat",
+			lit_toggle: "On — turn off",
+			stray_toggle: "Off, but at least one light is on — turn on",
+			off_toggle: "Off — turn on",
+			setpoint: "Setpoint {value} °C",
+			metric_title: "{label}: {value} {unit}",
+			room_status: "Room status",
+			scenes: "Scenes",
+			level_good: "Good",
+			level_fair: "Fair",
+			level_poor: "Poor",
+			card_name: "Homex – Room",
+			card_description: "The room's lights and scenes, climate, heating and Homex shutters (details on tapping the right part)."
+		},
+		fr: {
+			config_required: "homex-room-tile: configuration requise",
+			room_unheated: "Pièce non chauffée",
+			room_heated: "Pièce chauffée",
+			heating: "En chauffe",
+			no_demand: "Pas de demande de chauffe",
+			shutters_closed: "Volets fermés",
+			shutters_open: "Volets ouverts",
+			shutters_partial: "Volets ouverts à {pos} %",
+			choose_room: "Choisir une pièce Homex",
+			not_found: "Introuvable",
+			unavailable: "Indisponible",
+			heated_toggle: "Pièce chauffée — ne plus chauffer",
+			unheated_toggle: "Pièce non chauffée — chauffer",
+			lit_toggle: "Allumée — éteindre",
+			stray_toggle: "Éteinte, mais au moins une lumière est allumée — allumer",
+			off_toggle: "Éteinte — allumer",
+			setpoint: "Consigne {value} °C",
+			metric_title: "{label} : {value} {unit}",
+			room_status: "État de la pièce",
+			scenes: "Scènes",
+			level_good: "Bon",
+			level_fair: "Moyen",
+			level_poor: "Mauvais",
+			card_name: "Homex – Pièce",
+			card_description: "Lumières de la pièce et ses scènes, climat, chauffage et volets Homex (détail au clic sur la partie droite)."
+		}
+	},
+	cardRoomDetail: {
+		en: {
+			temperature: "Temperature",
+			humidity: "Humidity",
+			climate: "Climate",
+			off: "Off",
+			heating: "Heating",
+			idle: "Idle",
+			section_heating: "Heating",
+			stop_heating_room: "Stop heating the room",
+			heat_room: "Heat the room",
+			room_heated: "Room heated",
+			room_unheated: "Room not heated",
+			setpoint_kept: "Kept until the next mode change",
+			setpoint: "Setpoint",
+			raise: "Raise",
+			lower: "Lower",
+			mode: "{name} mode",
+			global_off: " · global heating off",
+			opening: "Opening",
+			closing: "Closing",
+			closed: "Closed",
+			open: "Open",
+			partial: "Partly open · {pos} %",
+			all: "All",
+			shutter_n: "Shutter {n}",
+			shutters: "Shutters",
+			open_action: "Open",
+			stop_action: "Stop",
+			close_action: "Close",
+			no_data: "No climate, heating or shutter data for this room."
+		},
+		fr: {
+			temperature: "Température",
+			humidity: "Humidité",
+			climate: "Climat",
+			off: "Éteint",
+			heating: "En chauffe",
+			idle: "Inactif",
+			section_heating: "Chauffage",
+			stop_heating_room: "Ne plus chauffer la pièce",
+			heat_room: "Chauffer la pièce",
+			room_heated: "Pièce chauffée",
+			room_unheated: "Pièce non chauffée",
+			setpoint_kept: "Gardée jusqu'au prochain changement de mode",
+			setpoint: "Consigne",
+			raise: "Monter",
+			lower: "Baisser",
+			mode: "Mode {name}",
+			global_off: " · chauffage global coupé",
+			opening: "Ouverture",
+			closing: "Fermeture",
+			closed: "Fermé",
+			open: "Ouvert",
+			partial: "Entrouvert · {pos} %",
+			all: "Tous",
+			shutter_n: "Volet {n}",
+			shutters: "Volets",
+			open_action: "Ouvrir",
+			stop_action: "Stop",
+			close_action: "Fermer",
+			no_data: "Aucune donnée de climat, de chauffage ni de volet pour cette pièce."
+		}
+	},
+	cardRoomTileEditor: {
+		en: {
+			color_red: "Red",
+			color_pink: "Pink",
+			color_purple: "Purple",
+			color_deep_purple: "Deep purple",
+			color_indigo: "Indigo",
+			color_blue: "Blue",
+			color_light_blue: "Light blue",
+			color_cyan: "Cyan",
+			color_teal: "Teal",
+			color_green: "Green",
+			color_light_green: "Light green",
+			color_lime: "Lime",
+			color_yellow: "Yellow",
+			color_amber: "Amber",
+			color_orange: "Orange",
+			color_deep_orange: "Deep orange",
+			color_brown: "Brown",
+			color_grey: "Grey",
+			color_blue_grey: "Blue grey",
+			lights: "Lights",
+			heating: "Heating",
+			room: "Homex room",
+			variant: "Variant",
+			variant_default: "Default — lights, air quality, shutters, scenes",
+			variant_climate: "Climate — heating and setpoint",
+			tile_switch: "Tile switch",
+			name: "Name (optional)",
+			active_color: "Active colour",
+			color_default: "Default ({color})",
+			color_default_heating: "heating orange",
+			color_default_lights: "lights amber",
+			color_custom: "Custom…",
+			toggle_heating: "Turn heating on / off on tap",
+			toggle_lights: "Turn on / off on tap",
+			show_scenes: "Show scenes",
+			scenes_hint: "Widget scenes — uncheck to hide, label optional",
+			remove_scene: "Remove from the widget",
+			add_scene: "Add to the widget"
+		},
+		fr: {
+			color_red: "Rouge",
+			color_pink: "Rose",
+			color_purple: "Violet",
+			color_deep_purple: "Violet foncé",
+			color_indigo: "Indigo",
+			color_blue: "Bleu",
+			color_light_blue: "Bleu clair",
+			color_cyan: "Cyan",
+			color_teal: "Sarcelle",
+			color_green: "Vert",
+			color_light_green: "Vert clair",
+			color_lime: "Citron vert",
+			color_yellow: "Jaune",
+			color_amber: "Ambre",
+			color_orange: "Orange",
+			color_deep_orange: "Orange foncé",
+			color_brown: "Marron",
+			color_grey: "Gris",
+			color_blue_grey: "Gris bleu",
+			lights: "Lumières",
+			heating: "Chauffage",
+			room: "Pièce Homex",
+			variant: "Variante",
+			variant_default: "Défaut — lumières, qualité de l'air, volets, scènes",
+			variant_climate: "Climat — chauffage et consigne",
+			tile_switch: "Interrupteur de la tuile",
+			name: "Nom (optionnel)",
+			active_color: "Couleur active",
+			color_default: "Défaut ({color})",
+			color_default_heating: "orange chauffage",
+			color_default_lights: "ambre lumières",
+			color_custom: "Personnalisée…",
+			toggle_heating: "Activer / désactiver le chauffage au clic",
+			toggle_lights: "Allumer / éteindre au clic",
+			show_scenes: "Afficher les scènes",
+			scenes_hint: "Scènes du widget — décocher pour masquer, libellé facultatif",
+			remove_scene: "Retirer du widget",
+			add_scene: "Ajouter au widget"
+		}
+	},
+	lib: {
+		en: {
+			unknown_model: "unknown model",
+			stuck_warning: "Heating while the temperature is above the setpoint: {names}. Valve stuck open or state not refreshed — check the radiator.",
+			unheated: "Unheated",
+			shutter_open: "Open",
+			shutter_closed: "Closed",
+			shutter_partial: "Partly open",
+			shutter_opening: "Opening…",
+			shutter_closing: "Closing…",
+			shutter_unavailable: "Unavailable"
+		},
+		fr: {
+			unknown_model: "modèle inconnu",
+			stuck_warning: "Chauffe alors que la température dépasse la consigne : {names}. Vanne bloquée ouverte ou état non rafraîchi — vérifie le radiateur.",
+			unheated: "Non chauffé",
+			shutter_open: "Ouvert",
+			shutter_closed: "Fermé",
+			shutter_partial: "Entrouvert",
+			shutter_opening: "Ouverture…",
+			shutter_closing: "Fermeture…",
+			shutter_unavailable: "Indisponible"
+		}
+	}
+}, Qt = ["en", "fr"], $t = {
+	en: {},
+	fr: {}
+};
+for (let [e, t] of Object.entries(Zt)) for (let n of Qt) for (let [r, i] of Object.entries(t[n] ?? {})) $t[n][`${e}.${r}`] = i;
+var en = "auto", tn, nn = "en", rn = /* @__PURE__ */ new Set();
+function an(e) {
+	return rn.add(e), () => rn.delete(e);
+}
+function on(e) {
+	let t = (e || "").toLowerCase().split(/[-_]/)[0];
+	return Qt.includes(t) ? t : void 0;
+}
+function sn() {
+	let e = (en === "auto" ? on(tn) : en) ?? "en";
+	e !== nn && (nn = e, document.documentElement.dispatchEvent(new CustomEvent("homex-language-changed")), rn.forEach((e) => e()));
+}
+function cn(e) {
+	let t = e?.locale?.language || e?.language;
+	t && t !== tn && (tn = t, sn());
+}
+function ln(e) {
+	en = e && (e === "auto" || on(e)) ? e : "auto", sn();
+}
+var un = () => en, dn = () => nn, fn;
+function pn(e) {
+	return cn(e), fn ??= e.connection.sendMessagePromise({ type: "homex/settings/get" }).then((e) => ln(e.language)).catch(() => {
+		fn = void 0;
+	}), fn;
+}
+function S(e, t) {
+	let n = $t[nn][e] ?? $t.en[e] ?? e;
+	return t && (n = n.replace(/\{(\w+)\}/g, (e, n) => n in t ? String(t[n]) : e)), n;
+}
+var mn = () => nn, hn = (e = 28) => g`<svg viewBox="0 0 32 32" width=${e} height=${e} aria-hidden="true" class="homex-logo">
+  <rect x="2" y="2" width="28" height="28" rx="8" fill="var(--homex-logo-plate, #fbfcfd)" stroke="var(--homex-logo-edge, #c9d1da)" stroke-width="1.5"></rect>
+  <rect x="7" y="7" width="8" height="18" rx="2.5" fill="#f2b233"></rect>
+  <rect x="17" y="7" width="8" height="18" rx="2.5" fill="none" stroke="var(--homex-logo-off, #556275)" stroke-width="1.5"></rect>
+</svg>`, gn = "M10 1H22A9 9 0 0 1 31 10V22A9 9 0 0 1 22 31H10A9 9 0 0 1 1 22V10A9 9 0 0 1 10 1ZM10 3.5A6.5 6.5 0 0 0 3.5 10V22A6.5 6.5 0 0 0 10 28.5H22A6.5 6.5 0 0 0 28.5 22V10A6.5 6.5 0 0 0 22 3.5ZM9.5 7H12.5A2.5 2.5 0 0 1 15 9.5V22.5A2.5 2.5 0 0 1 12.5 25H9.5A2.5 2.5 0 0 1 7 22.5V9.5A2.5 2.5 0 0 1 9.5 7ZM19.5 6.5H22.5A3 3 0 0 1 25.5 9.5V22.5A3 3 0 0 1 22.5 25.5H19.5A3 3 0 0 1 16.5 22.5V9.5A3 3 0 0 1 19.5 6.5ZM19.75 8.75A1 1 0 0 0 18.75 9.75V22.25A1 1 0 0 0 19.75 23.25H22.25A1 1 0 0 0 23.25 22.25V9.75A1 1 0 0 0 22.25 8.75Z";
+function _n() {
+	let e = window;
+	e.customIconsets = e.customIconsets || {}, e.customIconsets.homex ??= async () => ({
+		path: gn,
+		viewBox: "0 0 32 32"
+	});
+}
 // src/types.ts
-var Lt = "homex-changed", S = (e) => e.dispatchEvent(new CustomEvent(Lt, {
+var vn = "homex-changed", C = (e) => e.dispatchEvent(new CustomEvent(vn, {
 	bubbles: !0,
 	composed: !0
-})), Rt = async (e) => (await e.callWS({ type: "homex/layouts" })).layouts || [], zt = (e, t) => e.callWS({
+})), yn = async (e) => (await e.callWS({ type: "homex/layouts" })).layouts || [], bn = (e, t) => e.callWS({
 	type: "homex/layout/save",
 	layout: t
-}), Bt = (e, t) => e.callWS({
+}), xn = (e, t) => e.callWS({
 	type: "homex/layout/delete",
 	layout_id: t
-}), Vt = async (e) => (await e.callWS({ type: "homex/switches" })).switches || [], Ht = (e, t, n = !1) => e.callWS({
+}), Sn = async (e) => (await e.callWS({ type: "homex/switches" })).switches || [], Cn = (e, t, n = !1) => e.callWS({
 	type: "homex/switch/save",
 	switch: t,
 	create: n
-}), Ut = (e, t) => e.callWS({
+}), wn = (e, t) => e.callWS({
 	type: "homex/switch/remove",
 	switch_id: t
-}), Wt = async (e) => (await e.callWS({ type: "homex/presets" })).presets || [], Gt = (e, t) => e.callWS({
+}), Tn = async (e) => (await e.callWS({ type: "homex/presets" })).presets || [], En = (e, t) => e.callWS({
 	type: "homex/preset/save",
 	preset: t
-}), Kt = (e, t) => e.callWS({
+}), Dn = (e, t) => e.callWS({
 	type: "homex/preset/delete",
 	preset_id: t
-}), qt = async (e) => (await e.callWS({ type: "homex/switch_models" })).models || [], Jt = async (e) => (await e.callWS({ type: "homex/switch_devices" })).devices || [], Yt = async (e) => (await e.callWS({ type: "homex/shutter_models" })).models || [], Xt = (e, t) => e.callWS({
+}), On = async (e) => (await e.callWS({ type: "homex/switch_models" })).models || [], kn = async (e) => (await e.callWS({ type: "homex/switch_devices" })).devices || [], An = async (e) => (await e.callWS({ type: "homex/shutter_models" })).models || [], jn = (e, t) => e.callWS({
 	type: "homex/z2m/state",
 	device_id: t
-}), Zt = async (e) => (await e.callWS({ type: "homex/shutter_presets" })).presets || [], Qt = (e, t) => e.callWS({
+}), Mn = async (e) => (await e.callWS({ type: "homex/shutter_presets" })).presets || [], Nn = (e, t) => e.callWS({
 	type: "homex/shutter_preset/save",
 	preset: t
-}), $t = (e, t) => e.callWS({
+}), Pn = (e, t) => e.callWS({
 	type: "homex/shutter_preset/delete",
 	preset_id: t
-}), en = async (e) => (await e.callWS({ type: "homex/rooms" })).rooms || [], tn = (e, t) => e.callWS({
+}), Fn = async (e) => (await e.callWS({ type: "homex/rooms" })).rooms || [], In = (e, t) => e.callWS({
 	type: "homex/room/create",
 	...t
-}), nn = (e, t, n = !0) => e.callWS({
+}), Ln = (e, t, n = !0) => e.callWS({
 	type: "homex/room/delete",
 	entry_id: t,
 	delete_scenes: n
-}), rn = (e, t, n) => e.callWS({
+}), Rn = (e, t, n) => e.callWS({
 	type: "homex/shutter_group/add",
 	entry_id: t,
 	name: n
-}), an = (e, t) => e.callWS({
+}), zn = (e, t) => e.callWS({
 	type: "homex/shutter_group/update",
 	...t
-}), on = (e, t, n) => e.callWS({
+}), Bn = (e, t, n) => e.callWS({
 	type: "homex/shutter_group/delete",
 	entry_id: t,
 	group_id: n
-}), sn = async (e, t) => (await e.callWS({
+}), Vn = async (e, t) => (await e.callWS({
 	type: "homex/device_triggers",
 	device_id: t
-})).triggers || [], cn = (e, t) => e.callWS({
+})).triggers || [], Hn = (e, t) => e.callWS({
 	type: "homex/room/update",
 	...t
-}), ln = (e, t) => e.callWS({
+}), Un = (e, t) => e.callWS({
 	type: "homex/room/sync_labels",
 	entry_id: t
-}), un = (e, t, n) => e.callWS({
+}), Wn = (e, t, n) => e.callWS({
 	type: "homex/room/dim",
 	entry_id: t,
 	delta: n
-}), dn = (e, t, n, r) => e.callWS({
+}), Gn = (e, t, n, r) => e.callWS({
 	type: "homex/room/shutter",
 	entry_id: t,
 	group_id: n,
 	service: r
-}), fn = (e, t) => e.callWS({
+}), Kn = (e, t) => e.callWS({
 	type: "homex/group/add",
 	...t
-}), pn = (e, t) => e.callWS({
+}), qn = (e, t) => e.callWS({
 	type: "homex/group/update",
 	...t
-}), mn = (e, t, n) => e.callWS({
+}), Jn = (e, t, n) => e.callWS({
 	type: "homex/group/delete",
 	entry_id: t,
 	group_id: n
-}), hn = (e, t, n, r, i) => e.callWS({
+}), Yn = (e, t, n, r, i) => e.callWS({
 	type: "homex/scene/add",
 	entry_id: t,
 	name: n,
 	...r ? { attach: r } : {},
 	...i ? { triggers: i } : {}
-}), gn = (e, t, n) => e.callWS({
+}), Xn = (e, t, n) => e.callWS({
 	type: "homex/scene/delete",
 	entry_id: t,
 	key: n
-}), _n = (e, t, n) => e.callWS({
+}), Zn = (e, t, n) => e.callWS({
 	type: "homex/scene/reorder",
 	entry_id: t,
 	order: n
-}), vn = (e, t) => e.callWS({
+}), Qn = (e, t) => e.callWS({
 	type: "homex/scene/next",
 	entry_id: t
-}), yn = (e, t, n, r, i) => e.callWS({
+}), $n = (e, t, n, r, i) => e.callWS({
 	type: "homex/scene/rename",
 	entry_id: t,
 	key: n,
 	name: r,
 	...i ? { triggers: i } : {}
-}), C = (e) => e && (e.message || e.code) || String(e), bn = async (e) => e.callWS({ type: "homex/heating" }), xn = (e, t, n) => e.callWS({
+}), w = (e) => e && (e.message || e.code) || String(e), er = async (e) => e.callWS({ type: "homex/heating" }), tr = (e, t, n) => e.callWS({
 	type: "homex/heating/preset/save",
 	preset: t,
 	create: n
-}), Sn = (e, t) => e.callWS({
+}), nr = (e, t) => e.callWS({
 	type: "homex/heating/preset/delete",
 	preset_id: t
-}), Cn = (e, t, n) => e.callWS({
+}), rr = (e, t, n) => e.callWS({
 	type: "homex/heating/group/save",
 	group: t,
 	create: n
-}), wn = (e, t) => e.callWS({
+}), ir = (e, t) => e.callWS({
 	type: "homex/heating/group/delete",
 	group_id: t
-}), Tn = async (e) => (await e.callWS({ type: "homex/heating/models" })).models || [], En = async (e, t, n) => (await e.callWS({
+}), ar = async (e) => (await e.callWS({ type: "homex/heating/models" })).models || [], or = async (e, t, n) => (await e.callWS({
 	type: "homex/heating/device_preset/save",
 	preset: t,
 	create: n
-})).results || [], Dn = (e, t) => e.callWS({
+})).results || [], sr = (e, t) => e.callWS({
 	type: "homex/heating/device_preset/delete",
 	preset_id: t
-}), On = async (e, t) => (await e.callWS({
+}), cr = async (e, t) => (await e.callWS({
 	type: "homex/heating/device_preset/apply",
 	preset_id: t
-})).results || [], kn = (e, t, n) => e.callWS({
+})).results || [], lr = (e, t, n) => e.callWS({
 	type: "homex/heating/zone/save",
 	zone: t,
 	create: n
-}), An = (e, t) => e.callWS({
+}), ur = (e, t) => e.callWS({
 	type: "homex/heating/zone/delete",
 	zone_id: t
-}), jn = (e, t, n) => e.callWS({
+}), dr = (e, t, n) => e.callWS({
 	type: "homex/heating/zone/set_mode",
 	zone_id: t,
 	mode_id: n
-}), Mn = (e, t, n) => e.callWS({
+}), fr = (e, t, n) => e.callWS({
 	type: "homex/heating/room_zone",
 	room_id: t,
 	zone_id: n
-}), Nn = (e, t) => e.callWS({
+}), pr = (e, t) => e.callWS({
 	type: "homex/heating/enabled",
 	enabled: t
-}), Pn = (e, t, n) => e.callWS({
+}), mr = (e, t, n) => e.callWS({
 	type: "homex/heating/system/save",
 	system: t,
 	create: n
-}), Fn = (e, t) => e.callWS({
+}), hr = (e, t) => e.callWS({
 	type: "homex/heating/system/delete",
 	system_id: t
-}), In = null, Ln = () => !!customElements.get("ha-entities-picker");
-function Rn() {
-	return Ln() ? Promise.resolve(!0) : In || (In = (async () => {
+}), gr = null, _r = () => !!customElements.get("ha-entities-picker");
+function vr() {
+	return _r() ? Promise.resolve(!0) : gr || (gr = (async () => {
 		try {
 			let e = await window.loadCardHelpers?.();
 			if (e?.createCardElement) {
@@ -733,35 +2627,35 @@ function Rn() {
 				t?.getConfigElement && await t.getConfigElement();
 			}
 		} catch {}
-		return Ln();
-	})(), In);
+		return _r();
+	})(), gr);
 }
 // src/lib/router.ts
-var zn = (e = "") => e.split("/").filter(Boolean).map(decodeURIComponent), w = (e, ...t) => [e.replace(/\/+$/, ""), ...t.filter(Boolean).map(encodeURIComponent)].join("/");
-function T(e, t = !1) {
+var yr = (e = "") => e.split("/").filter(Boolean).map(decodeURIComponent), T = (e, ...t) => [e.replace(/\/+$/, ""), ...t.filter(Boolean).map(encodeURIComponent)].join("/");
+function E(e, t = !1) {
 	t ? history.replaceState(history.state, "", e) : history.pushState({ homexFrom: location.pathname }, "", e), window.dispatchEvent(new CustomEvent("location-changed", { detail: { replace: t } }));
 }
-function E(e) {
-	history.state?.homexFrom === e ? history.back() : T(e, !0);
+function D(e) {
+	history.state?.homexFrom === e ? history.back() : E(e, !0);
 }
-function Bn(e, t) {
-	t && (t.metaKey || t.ctrlKey || t.shiftKey || t.button === 1) ? window.open(e, "_blank", "noopener") : (t?.preventDefault(), T(e));
+function br(e, t) {
+	t && (t.metaKey || t.ctrlKey || t.shiftKey || t.button === 1) ? window.open(e, "_blank", "noopener") : (t?.preventDefault(), E(e));
 }
 // src/lib/device.ts
-function Vn(e, t) {
+function xr(e, t) {
 	let n = (e.devices || {})[t];
 	return n ? `${n.manufacturer || ""}|${n.model || n.model_id || ""}` : "";
 }
-function Hn(e, t) {
+function Sr(e, t) {
 	let n = (e.devices || {})[t];
-	return n ? [n.manufacturer, n.model || n.model_id].filter(Boolean).join(" ") || "modèle inconnu" : "";
+	return n ? [n.manufacturer, n.model || n.model_id].filter(Boolean).join(" ") || S("lib.unknown_model") : "";
 }
-function Un(e, t, n) {
-	let r = Vn(e, n);
+function Cr(e, t, n) {
+	let r = xr(e, n);
 	return r ? t.filter((e) => e.model === r) : [];
 }
-function Wn(e, t, n) {
-	let r = Un(e, t, n.device_id);
+function wr(e, t, n) {
+	let r = Cr(e, t, n.device_id);
 	if (n.preset_id) {
 		let e = r.find((e) => e.id === n.preset_id);
 		if (e) return e;
@@ -769,39 +2663,39 @@ function Wn(e, t, n) {
 	return r[0];
 }
 // src/lib/climate.ts
-function Gn(e, t) {
+function Tr(e, t) {
 	return Object.values(e.entities || {}).filter((e) => e.device_id === t && e.entity_id.startsWith("climate.")).map((e) => e.entity_id).sort((e, t) => e.length - t.length)[0];
 }
-var Kn = .5;
-function qn(e) {
+var Er = .5;
+function Dr(e) {
 	let t = e?.attributes ?? {}, n = Number(t.temperature), r = Number(t.current_temperature);
-	return t.hvac_action === "heating" && t.temperature != null && t.current_temperature != null && !Number.isNaN(n) && !Number.isNaN(r) && r >= n + Kn;
+	return t.hvac_action === "heating" && t.temperature != null && t.current_temperature != null && !Number.isNaN(n) && !Number.isNaN(r) && r >= n + Er;
 }
-function Jn(e, t) {
+function Or(e, t) {
 	return (t.heating?.radiators ?? []).flatMap((t) => {
-		let n = Gn(e, t.device_id), r = n ? e.states[n] : void 0;
-		if (!qn(r)) return [];
+		let n = Tr(e, t.device_id), r = n ? e.states[n] : void 0;
+		if (!Dr(r)) return [];
 		let i = e.devices?.[t.device_id];
 		return [i?.name_by_user || i?.name || r.attributes?.friendly_name || n];
 	});
 }
-function Yn(e, t) {
-	let n = Jn(e, t);
-	return n.length ? `Chauffe alors que la température dépasse la consigne : ${n.join(", ")}. Vanne bloquée ouverte ou état non rafraîchi — vérifie le radiateur.` : "";
+function kr(e, t) {
+	let n = Or(e, t);
+	return n.length ? S("lib.stuck_warning", { names: n.join(", ") }) : "";
 }
-function Xn(e, t) {
+function Ar(e, t) {
 	return (t.heating?.radiators ?? []).some((t) => {
-		let n = Gn(e, t.device_id);
+		let n = Tr(e, t.device_id);
 		return !!n && e.states[n]?.attributes?.hvac_action === "heating";
 	});
 }
-function Zn(e, t) {
+function jr(e, t) {
 	let n = Object.values(e.states || {}).filter((e) => e.entity_id.startsWith("select.homex_heating_")), r = n.find((e) => (e.attributes?.rooms ?? []).includes(t.room_id)) ?? n.find((e) => e.attributes?.zone_id === "default");
 	if (!r || r.state === "unavailable" || r.state === "unknown") return;
 	let i = String(r.attributes?.zone_name ?? r.attributes?.zone_id ?? "");
 	return t.heating?.enabled === !1 ? {
 		zone: i,
-		mode: r.attributes?.modes?.unheated ?? "Unheated",
+		mode: r.attributes?.modes?.unheated ?? S("lib.unheated"),
 		own: !0
 	} : {
 		zone: i,
@@ -810,42 +2704,35 @@ function Zn(e, t) {
 	};
 }
 // src/lib/shutter.ts
-var Qn = {
-	open: Pt,
-	closed: Mt,
+var Mr = {
+	open: Ft,
+	closed: Nt,
 	partial: Dt,
 	opening: et,
 	closing: Qe,
-	unavailable: Nt
-}, $n = {
-	open: "Ouvert",
-	closed: "Fermé",
-	partial: "Entrouvert",
-	opening: "Ouverture…",
-	closing: "Fermeture…",
-	unavailable: "Indisponible"
-};
-function er(e, t) {
+	unavailable: Pt
+}, Nr = (e) => S(`lib.shutter_${e}`);
+function Pr(e, t) {
 	let n = e.states[t];
 	if (!n) return null;
 	let r = n.attributes?.current_position;
 	return typeof r == "number" ? r : n.state === "open" ? 100 : n.state === "closed" ? 0 : null;
 }
-function tr(e, t) {
-	let n = t.map((t) => e.states[t]).filter((e) => e && e.state !== "unavailable" && e.state !== "unknown"), r = n.map((t) => er(e, t.entity_id)).filter((e) => e !== null), i = r.length ? Math.round(r.reduce((e, t) => e + t, 0) / r.length) : null, a = n.length ? n.some((e) => e.state === "opening") ? "opening" : n.some((e) => e.state === "closing") ? "closing" : r.every((e) => e === 0) ? "closed" : r.every((e) => e === 100) ? "open" : "partial" : "unavailable";
+function Fr(e, t) {
+	let n = t.map((t) => e.states[t]).filter((e) => e && e.state !== "unavailable" && e.state !== "unknown"), r = n.map((t) => Pr(e, t.entity_id)).filter((e) => e !== null), i = r.length ? Math.round(r.reduce((e, t) => e + t, 0) / r.length) : null, a = n.length ? n.some((e) => e.state === "opening") ? "opening" : n.some((e) => e.state === "closing") ? "closing" : r.every((e) => e === 0) ? "closed" : r.every((e) => e === 100) ? "open" : "partial" : "unavailable";
 	return {
 		state: a,
 		position: i,
-		icon: Qn[a],
-		label: $n[a]
+		icon: Mr[a],
+		label: Nr(a)
 	};
 }
-function nr(e) {
+function Ir(e) {
 	let t = (e.shutter_groups ?? []).filter((e) => e.devices?.length);
 	return t.find((e) => !e.removable) ?? t[0];
 }
 // src/lib/styles.ts
-var D = o`
+var O = o`
   /* On/off toggle switch (see toggleSwitch in lib/fields). */
   .toggle {
     position: relative;
@@ -979,14 +2866,14 @@ var D = o`
   }
 `;
 // \0@oxc-project+runtime@0.156.0/helpers/esm/decorate.js
-function O(e, t, n, r) {
+function k(e, t, n, r) {
 	var i = arguments.length, a = i < 3 ? t : r === null ? r = Object.getOwnPropertyDescriptor(t, n) : r, o;
 	if (typeof Reflect == "object" && typeof Reflect.decorate == "function") a = Reflect.decorate(e, t, n, r);
 	else for (var s = e.length - 1; s >= 0; s--) (o = e[s]) && (a = (i < 3 ? o(a) : i > 3 ? o(t, n, a) : o(t, n)) || a);
 	return i > 3 && a && Object.defineProperty(t, n, a), a;
 }
 // src/components/homex-unit-controls.ts
-var rr = class extends v {
+var Lr = class extends v {
 	constructor(...e) {
 		super(...e), this.hideToggle = !1, this.hideId = !1, this.info = [];
 	}
@@ -1008,7 +2895,7 @@ var rr = class extends v {
 		this.hass.callService("switch", n ? "turn_off" : "turn_on", { entity_id: t.switch });
 	}
 	render() {
-		let e = this.unit, t = this._isOn(e.switch), n = this._lightState(t), r = n === "lit" ? `Allumée${this.activeScene ? ` · ${this.activeScene}` : ""} — éteindre` : n === "stray" ? "Éteinte, mais au moins une lumière est allumée — allumer" : "Allumer";
+		let e = this.unit, t = this._isOn(e.switch), n = this._lightState(t), r = n === "lit" ? this.activeScene ? S("unitControls.lit_scene_turn_off", { scene: this.activeScene }) : S("unitControls.lit_turn_off") : S(n === "stray" ? "unitControls.stray_turn_on" : "unitControls.turn_on");
 		return h`
       <div class="controls">
         ${this.hideToggle ? "" : h`<button
@@ -1036,7 +2923,7 @@ var rr = class extends v {
       </div>
     `;
 	}
-}, k = (rr.styles = [D, o`
+}, A = (Lr.styles = [O, o`
       :host {
         display: block;
         min-width: 0;
@@ -1124,17 +3011,17 @@ var rr = class extends v {
         border-radius: 6px;
         padding: 1px 8px;
       }
-    `], rr);
-O([b({ attribute: !1 })], k.prototype, "hass", void 0), O([b({ attribute: !1 })], k.prototype, "unit", void 0), O([b({ attribute: !1 })], k.prototype, "areaIcon", void 0), O([b({ attribute: !1 })], k.prototype, "floorName", void 0), O([b({ attribute: !1 })], k.prototype, "activeScene", void 0), O([b({ type: Boolean })], k.prototype, "hideToggle", void 0), O([b({ type: Boolean })], k.prototype, "hideId", void 0), O([b({ attribute: !1 })], k.prototype, "info", void 0), k = O([y("homex-unit-controls")], k);
+    `], Lr);
+k([b({ attribute: !1 })], A.prototype, "hass", void 0), k([b({ attribute: !1 })], A.prototype, "unit", void 0), k([b({ attribute: !1 })], A.prototype, "areaIcon", void 0), k([b({ attribute: !1 })], A.prototype, "floorName", void 0), k([b({ attribute: !1 })], A.prototype, "activeScene", void 0), k([b({ type: Boolean })], A.prototype, "hideToggle", void 0), k([b({ type: Boolean })], A.prototype, "hideId", void 0), k([b({ attribute: !1 })], A.prototype, "info", void 0), A = k([y("homex-unit-controls")], A);
 // src/lib/fields.ts
-var A = (e, t, n, r = "") => h`<div class="field">
+var j = (e, t, n, r = "") => h`<div class="field">
   <span>${e}</span>
   <input
     .value=${t ?? ""}
     placeholder=${r}
     @input=${(e) => n(e.target.value)}
   />
-</div>`, j = (e, t, n = !1) => h`<span class="toggle ${e ? "on" : ""}">
+</div>`, M = (e, t, n = !1) => h`<span class="toggle ${e ? "on" : ""}">
   <input
     type="checkbox"
     .checked=${e}
@@ -1142,7 +3029,7 @@ var A = (e, t, n, r = "") => h`<div class="field">
     @change=${(e) => t(e.target.checked)}
   />
   <span class="knob"></span>
-</span>`, ir = /[̀-ͯ]/g, M = (e) => (e || "").normalize("NFD").replace(ir, "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, ""), ar = class extends v {
+</span>`, Rr = /[̀-ͯ]/g, N = (e) => (e || "").normalize("NFD").replace(Rr, "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, ""), zr = class extends v {
 	constructor(...e) {
 		super(...e), this.open = !1, this.heading = "", this.compact = !1;
 	}
@@ -1160,7 +3047,7 @@ var A = (e, t, n, r = "") => h`<div class="field">
         <div class="dialog" role="dialog" aria-modal="true">
           <header>
             <h2>${this.heading}</h2>
-            <button class="x" title="Fermer" @click=${this._close}>×</button>
+            <button class="x" title=${S("common.close")} @click=${this._close}>×</button>
           </header>
           <div class="content"><slot></slot></div>
           <div class="footer"><slot name="actions"></slot></div>
@@ -1168,7 +3055,7 @@ var A = (e, t, n, r = "") => h`<div class="field">
       </div>
     ` : h``;
 	}
-}, or = (ar.styles = o`
+}, Br = (zr.styles = o`
     .backdrop {
       position: fixed;
       inset: 0;
@@ -1238,63 +3125,19 @@ var A = (e, t, n, r = "") => h`<div class="field">
         padding-right: 14px;
       }
     }
-  `, ar);
-O([b({ type: Boolean })], or.prototype, "open", void 0), O([b()], or.prototype, "heading", void 0), O([b({
+  `, zr);
+k([b({ type: Boolean })], Br.prototype, "open", void 0), k([b()], Br.prototype, "heading", void 0), k([b({
 	type: Boolean,
 	reflect: !0
-})], or.prototype, "compact", void 0), or = O([y("homex-dialog")], or);
-// node_modules/lit-html/directive.js
-var sr = {
-	ATTRIBUTE: 1,
-	CHILD: 2,
-	PROPERTY: 3,
-	BOOLEAN_ATTRIBUTE: 4,
-	EVENT: 5,
-	ELEMENT: 6
-}, cr = (e) => (...t) => ({
-	_$litDirective$: e,
-	values: t
-}), lr = class {
-	constructor(e) {}
-	get _$AU() {
-		return this._$AM._$AU;
-	}
-	_$AT(e, t, n) {
-		this._$Ct = e, this._$AM = t, this._$Ci = n;
-	}
-	_$AS(e, t) {
-		return this.update(e, t);
-	}
-	update(e, t) {
-		return this.render(...t);
-	}
-}, { I: ur } = Ge, dr = (e) => e, fr = () => document.createComment(""), pr = (e, t, n) => {
-	let r = e._$AA.parentNode, i = t === void 0 ? e._$AB : t._$AA;
-	if (n === void 0) n = new ur(r.insertBefore(fr(), i), r.insertBefore(fr(), i), e, e.options);
-	else {
-		let t = n._$AB.nextSibling, a = n._$AM, o = a !== e;
-		if (o) {
-			let t;
-			n._$AQ?.(e), n._$AM = e, n._$AP !== void 0 && (t = e._$AU) !== a._$AU && n._$AP(t);
-		}
-		if (t !== i || o) {
-			let e = n._$AA;
-			for (; e !== t;) {
-				let t = dr(e).nextSibling;
-				dr(r).insertBefore(e, i), e = t;
-			}
-		}
-	}
-	return n;
-}, mr = (e, t, n = e) => (e._$AI(t, n), e), hr = {}, gr = (e, t = hr) => e._$AH = t, _r = (e) => e._$AH, vr = (e) => {
-	e._$AR(), e._$AA.remove();
-}, yr = (e, t, n) => {
+})], Br.prototype, "compact", void 0), Br = k([y("homex-dialog")], Br);
+// node_modules/lit-html/directives/repeat.js
+var Vr = (e, t, n) => {
 	let r = /* @__PURE__ */ new Map();
 	for (let i = t; i <= n; i++) r.set(e[i], i);
 	return r;
-}, br = cr(class extends lr {
+}, Hr = zt(class extends Bt {
 	constructor(e) {
-		if (super(e), e.type !== sr.CHILD) throw Error("repeat() can only be used in text expressions");
+		if (super(e), e.type !== Rt.CHILD) throw Error("repeat() can only be used in text expressions");
 	}
 	dt(e, t, n) {
 		let r;
@@ -1310,46 +3153,36 @@ var sr = {
 		return this.dt(e, t, n).values;
 	}
 	update(e, [t, n, r]) {
-		let i = _r(e), { values: a, keys: o } = this.dt(t, n, r);
+		let i = Jt(e), { values: a, keys: o } = this.dt(t, n, r);
 		if (!Array.isArray(i)) return this.ut = o, a;
 		let s = this.ut ??= [], c = [], l, u, d = 0, f = i.length - 1, p = 0, m = a.length - 1;
 		for (; d <= f && p <= m;) if (i[d] === null) d++;
 		else if (i[f] === null) f--;
-		else if (s[d] === o[p]) c[p] = mr(i[d], a[p]), d++, p++;
-		else if (s[f] === o[m]) c[m] = mr(i[f], a[m]), f--, m--;
-		else if (s[d] === o[m]) c[m] = mr(i[d], a[m]), pr(e, c[m + 1], i[d]), d++, m--;
-		else if (s[f] === o[p]) c[p] = mr(i[f], a[p]), pr(e, i[d], i[f]), f--, p++;
-		else if (l === void 0 && (l = yr(o, p, m), u = yr(s, d, f)), l.has(s[d])) {
+		else if (s[d] === o[p]) c[p] = Gt(i[d], a[p]), d++, p++;
+		else if (s[f] === o[m]) c[m] = Gt(i[f], a[m]), f--, m--;
+		else if (s[d] === o[m]) c[m] = Gt(i[d], a[m]), Wt(e, c[m + 1], i[d]), d++, m--;
+		else if (s[f] === o[p]) c[p] = Gt(i[f], a[p]), Wt(e, i[d], i[f]), f--, p++;
+		else if (l === void 0 && (l = Vr(o, p, m), u = Vr(s, d, f)), l.has(s[d])) {
 			if (l.has(s[f])) {
 				let t = u.get(o[p]), n = t === void 0 ? null : i[t];
 				if (n === null) {
-					let t = pr(e, i[d]);
-					mr(t, a[p]), c[p] = t;
-				} else c[p] = mr(n, a[p]), pr(e, i[d], n), i[t] = null;
+					let t = Wt(e, i[d]);
+					Gt(t, a[p]), c[p] = t;
+				} else c[p] = Gt(n, a[p]), Wt(e, i[d], n), i[t] = null;
 				p++;
-			} else vr(i[f]), f--;
-		} else vr(i[d]), d++;
+			} else Yt(i[f]), f--;
+		} else Yt(i[d]), d++;
 		for (; p <= m;) {
-			let t = pr(e, c[m + 1]);
-			mr(t, a[p]), c[p++] = t;
+			let t = Wt(e, c[m + 1]);
+			Gt(t, a[p]), c[p++] = t;
 		}
 		for (; d <= f;) {
 			let e = i[d++];
-			e !== null && vr(e);
+			e !== null && Yt(e);
 		}
-		return this.ut = o, gr(e, c), je;
+		return this.ut = o, qt(e, c), je;
 	}
-}), xr = cr(class extends lr {
-	constructor() {
-		super(...arguments), this.key = _;
-	}
-	render(e, t) {
-		return this.key = e, t;
-	}
-	update(e, [t, n]) {
-		return t !== this.key && (gr(e), this.key = t), n;
-	}
-}), Sr = class extends v {
+}), Ur = class extends v {
 	constructor(...e) {
 		super(...e), this.value = [], this._query = "", this._open = !1;
 	}
@@ -1380,8 +3213,8 @@ var sr = {
 	}
 	render() {
 		return customElements.get("ha-entity-picker") ? h`
-        ${br(this.value, (e) => e, (e, t) => this._nativePicker(e, this.value.filter((e, n) => n !== t), (e) => this._setAt(t, e)))}
-        ${xr(this.value.length, this._nativePicker("", this.value, (e) => this._addNew(e)))}
+        ${Hr(this.value, (e) => e, (e, t) => this._nativePicker(e, this.value.filter((e, n) => n !== t), (e) => this._setAt(t, e)))}
+        ${Xt(this.value.length, this._nativePicker("", this.value, (e) => this._addNew(e)))}
       ` : this._renderFallback();
 	}
 	get _candidates() {
@@ -1405,7 +3238,7 @@ var sr = {
         ${this.value.map((e) => h`<span class="chip"
               >${this._friendly(e)}<button
                 class="chipx"
-                title="Retirer"
+                title=${S("entityPicker.remove")}
                 @click=${() => this._remove(e)}
               >
                 ×</button
@@ -1414,7 +3247,7 @@ var sr = {
       </div>
       <input
         .value=${this._query}
-        placeholder="Rechercher une entité…"
+        placeholder=${S("entityPicker.search")}
         autocomplete="off"
         @focus=${() => this._open = !0}
         @input=${(e) => {
@@ -1425,11 +3258,11 @@ var sr = {
       ${this._open ? h`<div class="suggestions">
             ${this._filtered.length ? this._filtered.map((e) => h`<div class="sugg" @mousedown=${() => this._add(e)}>
                     <span>${this._friendly(e)}</span><span class="sid">${e}</span>
-                  </div>`) : h`<div class="sugg empty">Aucune entité</div>`}
+                  </div>`) : h`<div class="sugg empty">${S("entityPicker.no_entity")}</div>`}
           </div>` : ""}
     `;
 	}
-}, Cr = (Sr.styles = o`
+}, Wr = (Ur.styles = o`
     :host {
       display: block;
       width: 100%;
@@ -1513,20 +3346,20 @@ var sr = {
       width: 100%;
       margin-bottom: 8px;
     }
-  `, Sr);
-O([b({ attribute: !1 })], Cr.prototype, "hass", void 0), O([b({ type: Array })], Cr.prototype, "value", void 0), O([b({ attribute: !1 })], Cr.prototype, "includeDomains", void 0), O([b({ attribute: !1 })], Cr.prototype, "includeEntities", void 0), O([x()], Cr.prototype, "_query", void 0), O([x()], Cr.prototype, "_open", void 0), Cr = O([y("homex-entity-picker")], Cr);
+  `, Ur);
+k([b({ attribute: !1 })], Wr.prototype, "hass", void 0), k([b({ type: Array })], Wr.prototype, "value", void 0), k([b({ attribute: !1 })], Wr.prototype, "includeDomains", void 0), k([b({ attribute: !1 })], Wr.prototype, "includeEntities", void 0), k([x()], Wr.prototype, "_query", void 0), k([x()], Wr.prototype, "_open", void 0), Wr = k([y("homex-entity-picker")], Wr);
 // src/lib/domains.ts
-var wr = [
+var Gr = [
 	"light",
 	"switch",
 	"input_boolean"
-], Tr = [
+], Kr = [
 	"binary_sensor",
 	"switch",
 	"input_boolean",
 	"person",
 	"device_tracker"
-], Er = class extends v {
+], qr = class extends v {
 	constructor(...e) {
 		super(...e), this.value = "", this._query = "", this._open = !1;
 	}
@@ -1550,11 +3383,11 @@ var wr = [
 		}}
       ></ha-device-picker>` : this.value ? h`<div class="selected">
         <span class="name">${this._name(this.value)}</span>
-        <button class="clear" title="Effacer" @click=${() => this._emit("")}>×</button>
+        <button class="clear" title=${S("deviceField.clear")} @click=${() => this._emit("")}>×</button>
       </div>` : h`
       <input
         .value=${this._query}
-        placeholder="Rechercher un appareil…"
+        placeholder=${S("deviceField.search")}
         autocomplete="off"
         @focus=${() => this._open = !0}
         @input=${(e) => {
@@ -1570,11 +3403,11 @@ var wr = [
 		}}
                     >
                       ${this._name(e)}
-                    </div>`) : h`<div class="sugg">Aucun appareil</div>`}
+                    </div>`) : h`<div class="sugg">${S("deviceField.no_device")}</div>`}
           </div>` : ""}
     `;
 	}
-}, Dr = (Er.styles = o`
+}, Jr = (qr.styles = o`
     :host {
       display: block;
       width: 100%;
@@ -1638,10 +3471,10 @@ var wr = [
     .sugg:hover {
       background: var(--secondary-background-color, rgba(225, 225, 225, 0.08));
     }
-  `, Er);
-O([b({ attribute: !1 })], Dr.prototype, "hass", void 0), O([b()], Dr.prototype, "value", void 0), O([x()], Dr.prototype, "_query", void 0), O([x()], Dr.prototype, "_open", void 0), Dr = O([y("homex-device-field")], Dr);
+  `, qr);
+k([b({ attribute: !1 })], Jr.prototype, "hass", void 0), k([b()], Jr.prototype, "value", void 0), k([x()], Jr.prototype, "_query", void 0), k([x()], Jr.prototype, "_open", void 0), Jr = k([y("homex-device-field")], Jr);
 // src/components/homex-select.ts
-var Or, kr = 320, N = (Or = class extends v {
+var Yr, Xr = 320, P = (Yr = class extends v {
 	constructor(...e) {
 		super(...e), this.value = "", this.label = "", this.placeholder = "", this.options = [], this.groups = [], this.disabled = !1, this._open = !1, this._active = -1, this._pos = {}, this._none = {
 			value: "",
@@ -1670,16 +3503,16 @@ var Or, kr = 320, N = (Or = class extends v {
 	}
 	_openPanel() {
 		if (this.disabled || this._open) return;
-		let e = this.renderRoot.querySelector(".trigger").getBoundingClientRect(), t = window.innerHeight - e.bottom, n = t < Math.min(kr, 220) && e.top > t;
+		let e = this.renderRoot.querySelector(".trigger").getBoundingClientRect(), t = window.innerHeight - e.bottom, n = t < Math.min(Xr, 220) && e.top > t;
 		this._pos = {
 			left: `${e.left}px`,
 			width: `${e.width}px`,
 			...n ? {
 				bottom: `${window.innerHeight - e.top + 6}px`,
-				maxHeight: `${Math.min(kr, e.top - 12)}px`
+				maxHeight: `${Math.min(Xr, e.top - 12)}px`
 			} : {
 				top: `${e.bottom + 6}px`,
-				maxHeight: `${Math.min(kr, t - 12)}px`
+				maxHeight: `${Math.min(Xr, t - 12)}px`
 			}
 		}, this._active = Math.max(0, this._flat.findIndex((e) => e.value === this.value)), this._open = !0, document.addEventListener("pointerdown", this._onOutside, !0), window.addEventListener("scroll", this._onViewport, !0), window.addEventListener("resize", this._onViewport), this.updateComplete.then(() => this._scrollActive());
 	}
@@ -1758,11 +3591,11 @@ var Or, kr = 320, N = (Or = class extends v {
             ${this.options.map((e) => this._renderOption(e))}
             ${this.groups.map((e) => h`<div class="group">${e.label}</div>
                 ${e.options.map((e) => this._renderOption(e))}`)}
-            ${this._flat.length ? _ : h`<div class="empty">Aucune option</div>`}
+            ${this._flat.length ? _ : h`<div class="empty">${S("select.no_option")}</div>`}
           </div>` : _}
     `;
 	}
-}, Or.styles = o`
+}, Yr.styles = o`
     :host {
       display: block;
       min-width: 0;
@@ -1851,7 +3684,7 @@ var Or, kr = 320, N = (Or = class extends v {
       position: fixed;
       z-index: 2000;
       box-sizing: border-box;
-      max-height: ${kr}px;
+      max-height: ${Xr}px;
       overflow-y: auto;
       padding: 6px;
       background: var(--card-background-color, #1c1c1c);
@@ -1936,13 +3769,13 @@ var Or, kr = 320, N = (Or = class extends v {
       font-size: 14px;
       color: var(--secondary-text-color);
     }
-  `, Or);
-O([b()], N.prototype, "value", void 0), O([b()], N.prototype, "label", void 0), O([b()], N.prototype, "placeholder", void 0), O([b({ attribute: !1 })], N.prototype, "options", void 0), O([b({ attribute: !1 })], N.prototype, "groups", void 0), O([b({
+  `, Yr);
+k([b()], P.prototype, "value", void 0), k([b()], P.prototype, "label", void 0), k([b()], P.prototype, "placeholder", void 0), k([b({ attribute: !1 })], P.prototype, "options", void 0), k([b({ attribute: !1 })], P.prototype, "groups", void 0), k([b({
 	type: Boolean,
 	reflect: !0
-})], N.prototype, "disabled", void 0), O([x()], N.prototype, "_open", void 0), O([x()], N.prototype, "_active", void 0), O([x()], N.prototype, "_pos", void 0), N = O([y("homex-select")], N);
+})], P.prototype, "disabled", void 0), k([x()], P.prototype, "_open", void 0), k([x()], P.prototype, "_active", void 0), k([x()], P.prototype, "_pos", void 0), P = k([y("homex-select")], P);
 // src/components/homex-trigger-selector.ts
-var Ar = class extends v {
+var Zr = class extends v {
 	constructor(...e) {
 		super(...e), this.value = [], this._menuOpen = !1, this._devTriggers = {};
 	}
@@ -1956,7 +3789,7 @@ var Ar = class extends v {
 				[e]: []
 			};
 			try {
-				let t = await sn(this.hass, e);
+				let t = await Vn(this.hass, e);
 				this._devTriggers = {
 					...this._devTriggers,
 					[e]: t
@@ -2036,15 +3869,15 @@ var Ar = class extends v {
 		if (customElements.get("ha-entity-picker")) return h`<ha-entity-picker
         .hass=${this.hass}
         .value=${n}
-        .includeDomains=${Tr}
+        .includeDomains=${Kr}
         allow-custom-entity
         @value-changed=${(e) => {
 			e.stopPropagation(), r(e.detail.value || "");
 		}}
       ></ha-entity-picker>`;
-		let i = Object.keys(this.hass.states).filter((e) => Tr.includes(e.split(".")[0])).sort();
+		let i = Object.keys(this.hass.states).filter((e) => Kr.includes(e.split(".")[0])).sort();
 		return h`<homex-select
-      placeholder="Sélectionnez une entité"
+      placeholder=${S("triggerSelector.select_entity")}
       .value=${n ?? ""}
       .options=${i.map((e) => ({
 			value: e,
@@ -2055,26 +3888,27 @@ var Ar = class extends v {
     ></homex-select>`;
 	}
 	_entityTypeField(e, t) {
-		return h`<label class="field"><span>Type</span>
+		let n = this._entityType(e);
+		return h`<label class="field"><span>${S("triggerSelector.type")}</span>
       <homex-select
-        .value=${this._entityType(e)}
+        .value=${n}
         .options=${[{
 			value: "state",
-			label: "État"
+			label: S("triggerSelector.type_state")
 		}, {
 			value: "numeric",
-			label: "État numérique"
+			label: S("triggerSelector.type_numeric")
 		}]}
         @value-changed=${(n) => this._setEntityType(t, e, n.detail.value)}
       ></homex-select>
     </label>`;
 	}
 	_attrField(e, t) {
-		let n = this._entityOf(e), r = Object.keys(this.hass.states[n]?.attributes || {});
-		return h`<label class="field"><span>Attribut (facultatif)</span>
+		let n = this._entityOf(e), r = Object.keys(this.hass.states[n]?.attributes || {}), i = e.attribute || "";
+		return h`<label class="field"><span>${S("triggerSelector.attribute")}</span>
       <homex-select
-        placeholder="(état de l'entité)"
-        .value=${e.attribute || ""}
+        placeholder=${S("triggerSelector.attribute_none")}
+        .value=${i}
         .options=${r.map((e) => ({
 			value: e,
 			label: e
@@ -2153,7 +3987,7 @@ var Ar = class extends v {
       .value=${r ? String(r) : ""}
       @change=${(r) => this._setForPart(e, t, n, Number(r.target.value))}
     />`;
-		return h`<label class="field"><span>Pendant (facultatif)</span>
+		return h`<label class="field"><span>${S("triggerSelector.for")}</span>
       <div class="dur-row">
         ${r("h", n.h, "hh")}<span>:</span>${r("m", n.m, "mm")}<span>:</span>${r("s", n.s, "ss")}
       </div>
@@ -2165,9 +3999,9 @@ var Ar = class extends v {
 		return h`
       ${this._entityTypeField(e, t)}
       ${this._attrField(e, t)}
-      ${n ? h`${this._numField(e, t, "above", "Au-dessus de (facultatif)")}
-            ${this._numField(e, t, "below", "En-dessous de (facultatif)")}` : h`${this._stateValueField(e, t, "from", "De (facultatif)")}
-            ${this._stateValueField(e, t, "to", "À (facultatif)")}`}
+      ${n ? h`${this._numField(e, t, "above", S("triggerSelector.above"))}
+            ${this._numField(e, t, "below", S("triggerSelector.below"))}` : h`${this._stateValueField(e, t, "from", S("triggerSelector.from"))}
+            ${this._stateValueField(e, t, "to", S("triggerSelector.to"))}`}
       ${this._forField(e, t)}
     `;
 	}
@@ -2188,7 +4022,7 @@ var Ar = class extends v {
 	_actionField(e, t) {
 		let n = this._devTriggers[e.device_id] || [], r = this._deviceTriggerIndex(e);
 		return h`<homex-select
-      placeholder="Sélectionnez une action"
+      placeholder=${S("triggerSelector.select_action")}
       .value=${r >= 0 ? String(r) : ""}
       .options=${n.map((e, t) => ({
 			value: String(t),
@@ -2205,14 +4039,14 @@ var Ar = class extends v {
 		return h`<div class="card">
       <div class="head">
         <svg viewBox="0 0 24 24"><path d=${n ? ot : Ot}></path></svg>
-        <span class="title">${n ? "Appareil" : "Entité"}</span>
-        <button class="icon-btn" title="Supprimer" @click=${() => this._remove(t)}>
+        <span class="title">${S(n ? "triggerSelector.device" : "triggerSelector.entity")}</span>
+        <button class="icon-btn" title=${S("common.delete")} @click=${() => this._remove(t)}>
           <svg viewBox="0 0 24 24"><path d=${it}></path></svg>
         </button>
       </div>
       <div class="body">
-        ${n ? h`<label class="field"><span>Appareil</span>${this._deviceField(e, t)}</label>
-              ${e.device_id ? h`<label class="field"><span>Action</span>${this._actionField(e, t)}</label>` : ""}` : h`<label class="field"><span>Entité</span>${this._entityField(e, t)}</label>
+        ${n ? h`<label class="field"><span>${S("triggerSelector.device")}</span>${this._deviceField(e, t)}</label>
+              ${e.device_id ? h`<label class="field"><span>${S("triggerSelector.action")}</span>${this._actionField(e, t)}</label>` : ""}` : h`<label class="field"><span>${S("triggerSelector.entity")}</span>${this._entityField(e, t)}</label>
               ${this._entityBody(e, t)}`}
       </div>
     </div>`;
@@ -2223,23 +4057,23 @@ var Ar = class extends v {
       <div class="add-wrap">
         <button class="add-btn" @click=${() => this._menuOpen = !this._menuOpen}>
           <svg viewBox="0 0 24 24"><path d=${Ct}></path></svg>
-          Ajouter un déclencheur
+          ${S("triggerSelector.add_trigger")}
         </button>
         ${this._menuOpen ? h`
               <div class="backdrop" @click=${() => this._menuOpen = !1}></div>
               <div class="menu">
                 <button @click=${() => this._add("entity")}>
-                  <svg viewBox="0 0 24 24"><path d=${Ot}></path></svg> Entité
+                  <svg viewBox="0 0 24 24"><path d=${Ot}></path></svg> ${S("triggerSelector.entity")}
                 </button>
                 <button @click=${() => this._add("device")}>
-                  <svg viewBox="0 0 24 24"><path d=${ot}></path></svg> Appareil
+                  <svg viewBox="0 0 24 24"><path d=${ot}></path></svg> ${S("triggerSelector.device")}
                 </button>
               </div>
             ` : ""}
       </div>
     `;
 	}
-}, jr = (Ar.styles = o`
+}, Qr = (Zr.styles = o`
     :host {
       display: block;
       width: 100%;
@@ -2403,10 +4237,10 @@ var Ar = class extends v {
       inset: 0;
       z-index: 29;
     }
-  `, Ar);
-O([b({ attribute: !1 })], jr.prototype, "hass", void 0), O([b({ attribute: !1 })], jr.prototype, "value", void 0), O([x()], jr.prototype, "_menuOpen", void 0), O([x()], jr.prototype, "_devTriggers", void 0), jr = O([y("homex-trigger-selector")], jr);
+  `, Zr);
+k([b({ attribute: !1 })], Qr.prototype, "hass", void 0), k([b({ attribute: !1 })], Qr.prototype, "value", void 0), k([x()], Qr.prototype, "_menuOpen", void 0), k([x()], Qr.prototype, "_devTriggers", void 0), Qr = k([y("homex-trigger-selector")], Qr);
 // src/components/homex-managed-triggers.ts
-var Mr = class extends v {
+var $r = class extends v {
 	constructor(...e) {
 		super(...e), this.triggers = [];
 	}
@@ -2415,11 +4249,11 @@ var Mr = class extends v {
       ${this.triggers.map((e) => h`<div class="row">
           <span class="icon">🎛</span>
           <span class="lbl">${e}</span>
-          <span class="tag">Géré par le module Switches</span>
+          <span class="tag">${S("managedTriggers.managed_by_switches")}</span>
         </div>`)}
     </div>` : h``;
 	}
-}, Nr = (Mr.styles = o`
+}, ei = ($r.styles = o`
     .list {
       margin: 6px 0 4px;
     }
@@ -2451,10 +4285,10 @@ var Mr = class extends v {
       padding: 2px 8px;
       white-space: nowrap;
     }
-  `, Mr);
-O([b({ attribute: !1 })], Nr.prototype, "triggers", void 0), Nr = O([y("homex-managed-triggers")], Nr);
+  `, $r);
+k([b({ attribute: !1 })], ei.prototype, "triggers", void 0), ei = k([y("homex-managed-triggers")], ei);
 // src/components/homex-group-dialog.ts
-var Pr = class extends v {
+var ti = class extends v {
 	constructor(...e) {
 		super(...e), this.open = !1, this.group = null, this._name = "", this._id = "", this._devices = [], this._triggers = [], this._dim = !1, this._dimUp = [], this._dimDown = [], this._busy = !1, this._idEdited = !1;
 	}
@@ -2462,7 +4296,7 @@ var Pr = class extends v {
 		e.has("open") && this.open && (this._name = this.group?.name ?? "", this._id = this.group?.group_id ?? "", this._devices = this.group?.devices ?? [], this._triggers = (this.group?.triggers ?? []).map((e) => ({ ...e })), this._dim = this.group?.dim ?? !1, this._dimUp = (this.group?.dim_up_triggers ?? []).map((e) => ({ ...e })), this._dimDown = (this.group?.dim_down_triggers ?? []).map((e) => ({ ...e })), this._busy = !1, this._idEdited = !!this.group);
 	}
 	_onName(e) {
-		this._name = e, this._idEdited || (this._id = M(e));
+		this._name = e, this._idEdited || (this._id = N(e));
 	}
 	_onId(e) {
 		this._id = e, this._idEdited = !0;
@@ -2473,7 +4307,7 @@ var Pr = class extends v {
 	async _save() {
 		let e = this._name.trim(), t = this._id.trim();
 		if (!e || !t) {
-			alert("Nom et id du groupe requis.");
+			alert(S("groupDialog.name_id_required"));
 			return;
 		}
 		let n = this._triggers, r = {
@@ -2483,32 +4317,32 @@ var Pr = class extends v {
 		};
 		this._busy = !0;
 		try {
-			this.group ? await pn(this.hass, {
+			this.group ? await qn(this.hass, {
 				entry_id: this.room.entry_id,
 				group_id: this.group.group_id,
 				name: e,
 				devices: this._devices,
 				triggers: n,
 				...r
-			}) : await fn(this.hass, {
+			}) : await Kn(this.hass, {
 				entry_id: this.room.entry_id,
 				group_id: t,
 				name: e,
 				devices: this._devices,
 				triggers: n,
 				...r
-			}), S(this), this._close();
+			}), C(this), this._close();
 		} catch (e) {
-			this._busy = !1, alert("Erreur Homex : " + C(e));
+			this._busy = !1, alert(S("common.error", { message: w(e) }));
 		}
 	}
 	async _delete() {
-		if (this.group && confirm(`Supprimer le groupe "${this.group.name || this.group.group_id}" ?`)) {
+		if (this.group && confirm(S("groupDialog.confirm_delete", { name: this.group.name || this.group.group_id }))) {
 			this._busy = !0;
 			try {
-				await mn(this.hass, this.room.entry_id, this.group.group_id), S(this), this._close();
+				await Jn(this.hass, this.room.entry_id, this.group.group_id), C(this), this._close();
 			} catch (e) {
-				this._busy = !1, alert("Erreur Homex : " + C(e));
+				this._busy = !1, alert(S("common.error", { message: w(e) }));
 			}
 		}
 	}
@@ -2517,12 +4351,12 @@ var Pr = class extends v {
 		return h`
       <homex-dialog
         .open=${this.open}
-        heading=${e ? "Modifier le groupe" : "Nouveau groupe"}
+        heading=${S(e ? "groupDialog.heading_edit" : "groupDialog.heading_new")}
         @dialog-closed=${this._close}
       >
-        ${A("Nom", this._name, (e) => this._onName(e), "Table de chevet L")}
-        ${e ? h`<div class="section">Id : ${this.group.group_id}</div>` : A("Id", this._id, (e) => this._onId(e), "bedside_l")}
-        <div class="section">Appareils (parmi la pièce)</div>
+        ${j(S("groupDialog.name"), this._name, (e) => this._onName(e), S("groupDialog.name_placeholder"))}
+        ${e ? h`<div class="section">${S("groupDialog.id_label", { id: this.group.group_id })}</div>` : j(S("groupDialog.id"), this._id, (e) => this._onId(e), "bedside_l")}
+        <div class="section">${S("groupDialog.devices")}</div>
         <homex-entity-picker
           .hass=${this.hass}
           .includeEntities=${this.room.devices}
@@ -2530,7 +4364,7 @@ var Pr = class extends v {
           @value-changed=${(e) => this._devices = e.detail.value}
         ></homex-entity-picker>
         <label class="dim-toggle">
-          <span class="dim-name">Activer le dimming du groupe</span>
+          <span class="dim-name">${S("groupDialog.enable_dim")}</span>
           <span class="toggle ${this._dim ? "on" : ""}">
             <input
               type="checkbox"
@@ -2540,7 +4374,7 @@ var Pr = class extends v {
             <span class="knob"></span>
           </span>
         </label>
-        <div class="section">Déclencheurs</div>
+        <div class="section">${S("groupDialog.triggers")}</div>
         <homex-trigger-selector
           .hass=${this.hass}
           .value=${this._triggers}
@@ -2552,21 +4386,15 @@ var Pr = class extends v {
 
         
         ${this._dim ? h`
-              <div class="section">Dimmer + (monter la luminosité)</div>
-              <p class="hint">
-                Chaque déclenchement ajoute 20 à la luminosité des lumières du
-                groupe.
-              </p>
+              <div class="section">${S("groupDialog.dim_up_title")}</div>
+              <p class="hint">${S("groupDialog.dim_up_hint")}</p>
               <homex-trigger-selector
                 .hass=${this.hass}
                 .value=${this._dimUp}
                 @value-changed=${(e) => this._dimUp = e.detail.value}
               ></homex-trigger-selector>
-              <div class="section">Dimmer − (baisser la luminosité)</div>
-              <p class="hint">
-                Chaque déclenchement retire 20 à la luminosité des lumières du
-                groupe.
-              </p>
+              <div class="section">${S("groupDialog.dim_down_title")}</div>
+              <p class="hint">${S("groupDialog.dim_down_hint")}</p>
               <homex-trigger-selector
                 .hass=${this.hass}
                 .value=${this._dimDown}
@@ -2576,17 +4404,17 @@ var Pr = class extends v {
 
         <span slot="actions">
           ${e ? h`<button class="danger" ?disabled=${this._busy} @click=${this._delete}>
-                Supprimer
+                ${S("common.delete")}
               </button>` : ""}
-          <button @click=${this._close}>Annuler</button>
+          <button @click=${this._close}>${S("common.cancel")}</button>
           <button class="primary" ?disabled=${this._busy} @click=${this._save}>
-            ${e ? "Enregistrer" : "Créer le groupe"}
+            ${S(e ? "common.save" : "groupDialog.create")}
           </button>
         </span>
       </homex-dialog>
     `;
 	}
-}, P = (Pr.styles = [D, o`
+}, F = (ti.styles = [O, o`
       .dim-toggle {
         display: flex;
         align-items: center;
@@ -2640,12 +4468,12 @@ var Pr = class extends v {
         color: var(--secondary-text-color);
         margin: 0 0 8px;
       }
-    `], Pr);
-O([b({ attribute: !1 })], P.prototype, "hass", void 0), O([b({ type: Boolean })], P.prototype, "open", void 0), O([b({ attribute: !1 })], P.prototype, "room", void 0), O([b({ attribute: !1 })], P.prototype, "group", void 0), O([x()], P.prototype, "_name", void 0), O([x()], P.prototype, "_id", void 0), O([x()], P.prototype, "_devices", void 0), O([x()], P.prototype, "_triggers", void 0), O([x()], P.prototype, "_dim", void 0), O([x()], P.prototype, "_dimUp", void 0), O([x()], P.prototype, "_dimDown", void 0), O([x()], P.prototype, "_busy", void 0), P = O([y("homex-group-dialog")], P);
+    `], ti);
+k([b({ attribute: !1 })], F.prototype, "hass", void 0), k([b({ type: Boolean })], F.prototype, "open", void 0), k([b({ attribute: !1 })], F.prototype, "room", void 0), k([b({ attribute: !1 })], F.prototype, "group", void 0), k([x()], F.prototype, "_name", void 0), k([x()], F.prototype, "_id", void 0), k([x()], F.prototype, "_devices", void 0), k([x()], F.prototype, "_triggers", void 0), k([x()], F.prototype, "_dim", void 0), k([x()], F.prototype, "_dimUp", void 0), k([x()], F.prototype, "_dimDown", void 0), k([x()], F.prototype, "_busy", void 0), F = k([y("homex-group-dialog")], F);
 // src/components/homex-group-row.ts
-var Fr = class extends v {
+var ni = class extends v {
 	constructor(...e) {
-		super(...e), this._open = !1, this._openScene = (e) => Bn(e.currentTarget.getAttribute("href"), e);
+		super(...e), this._open = !1, this._openScene = (e) => br(e.currentTarget.getAttribute("href"), e);
 	}
 	get _slug() {
 		return `${this.room.room_id}_${this.group.group_id}`;
@@ -2659,7 +4487,7 @@ var Fr = class extends v {
           class="scene-link"
           href="/config/scene/edit/homex_${e}_turn_on"
           @click=${this._openScene}
-          title="Éditer la scène « allumé » du groupe"
+          title=${S("groupRow.edit_on_scene")}
         >
           <svg viewBox="0 0 24 24"><path d=${ht}></path></svg>
         </a>
@@ -2667,11 +4495,11 @@ var Fr = class extends v {
           class="scene-link"
           href="/config/scene/edit/homex_${e}_turn_off"
           @click=${this._openScene}
-          title="Éditer la scène « éteint » du groupe"
+          title=${S("groupRow.edit_off_scene")}
         >
           <svg viewBox="0 0 24 24"><path d=${mt}></path></svg>
         </a>
-        <button title="Configurer le groupe" @click=${() => this._open = !0}>
+        <button title=${S("groupRow.configure")} @click=${() => this._open = !0}>
           ⚙︎
         </button>
       </div>
@@ -2684,7 +4512,7 @@ var Fr = class extends v {
       ></homex-group-dialog>
     `;
 	}
-}, Ir = (Fr.styles = [D, o`
+}, ri = (ni.styles = [O, o`
       .row {
         display: flex;
         align-items: center;
@@ -2712,10 +4540,10 @@ var Fr = class extends v {
         height: 20px;
         fill: currentColor;
       }
-    `], Fr);
-O([b({ attribute: !1 })], Ir.prototype, "hass", void 0), O([b({ attribute: !1 })], Ir.prototype, "room", void 0), O([b({ attribute: !1 })], Ir.prototype, "group", void 0), O([x()], Ir.prototype, "_open", void 0), Ir = O([y("homex-group-row")], Ir);
+    `], ni);
+k([b({ attribute: !1 })], ri.prototype, "hass", void 0), k([b({ attribute: !1 })], ri.prototype, "room", void 0), k([b({ attribute: !1 })], ri.prototype, "group", void 0), k([x()], ri.prototype, "_open", void 0), ri = k([y("homex-group-row")], ri);
 // src/components/homex-room-dialog.ts
-var Lr = class extends v {
+var ii = class extends v {
 	constructor(...e) {
 		super(...e), this.open = !1, this.room = null, this._name = "", this._id = "", this._areaId = "", this._modules = ["lights"], this._devices = [], this._strategy = "recall_first", this._busy = !1, this._zones = [], this._zoneId = "default", this._initialZone = "default", this._idEdited = !1;
 	}
@@ -2724,7 +4552,7 @@ var Lr = class extends v {
 	}
 	async _loadZones() {
 		try {
-			this._zones = (await bn(this.hass)).zones ?? [];
+			this._zones = (await er(this.hass)).zones ?? [];
 		} catch {
 			this._zones = [];
 		}
@@ -2761,7 +4589,7 @@ var Lr = class extends v {
     `;
 	}
 	_onName(e) {
-		this._name = e, this._idEdited || (this._id = M(e));
+		this._name = e, this._idEdited || (this._id = N(e));
 	}
 	_onId(e) {
 		this._id = e, this._idEdited = !0;
@@ -2771,12 +4599,12 @@ var Lr = class extends v {
 	}
 	async _save() {
 		let e = this._name.trim(), t = this._id.trim();
-		if (!e || !t) alert("Nom et id requis.");
+		if (!e || !t) alert(S("roomDialog.name_id_required"));
 		else {
 			this._busy = !0;
 			try {
 				let n = this._areaId || null;
-				this.room ? await cn(this.hass, {
+				this.room ? await Hn(this.hass, {
 					entry_id: this.room.entry_id,
 					name: e,
 					room_id: t,
@@ -2784,16 +4612,16 @@ var Lr = class extends v {
 					modules: this._modules,
 					devices: this._devices,
 					scene_strategy: this._strategy
-				}) : await tn(this.hass, {
+				}) : await In(this.hass, {
 					name: e,
 					room_id: t,
 					area_id: n,
 					modules: this._modules,
 					devices: this._devices,
 					scene_strategy: this._strategy
-				}), this._hasModule("heating") && this._zoneId !== this._initialZone && await Mn(this.hass, t, this._zoneId), S(this), this._close();
+				}), this._hasModule("heating") && this._zoneId !== this._initialZone && await fr(this.hass, t, this._zoneId), C(this), this._close();
 			} catch (e) {
-				this._busy = !1, alert("Erreur Homex : " + C(e));
+				this._busy = !1, alert(S("common.error", { message: w(e) }));
 			}
 		}
 	}
@@ -2802,14 +4630,14 @@ var Lr = class extends v {
 		return h`
       <homex-dialog
         .open=${this.open}
-        heading=${e ? "Modifier la pièce" : "Nouvelle pièce"}
+        heading=${S(e ? "roomDialog.heading_edit" : "roomDialog.heading_new")}
         @dialog-closed=${this._close}
       >
-        ${A("Nom", this._name, (e) => this._onName(e), "Chambre")}
-        ${A("Id", this._id, (e) => this._onId(e), "bedroom")}
-        <div class="section">Pièce Home Assistant (optionnel)</div>
+        ${j(S("roomDialog.name"), this._name, (e) => this._onName(e), S("roomDialog.name_placeholder"))}
+        ${j(S("roomDialog.id"), this._id, (e) => this._onId(e), "bedroom")}
+        <div class="section">${S("roomDialog.area")}</div>
         <homex-select
-          placeholder="Aucune"
+          placeholder=${S("roomDialog.area_none")}
           .value=${this._areaId}
           .options=${this._areas.map((e) => ({
 			value: e.area_id,
@@ -2818,70 +4646,64 @@ var Lr = class extends v {
           @value-changed=${(e) => this._areaId = e.detail.value}
         ></homex-select>
 
-        <div class="section">Modules</div>
-        ${this._moduleRow("lights", "💡", "Lights", "Le module Lights gère l'allumage, les scènes et les groupes de la pièce.")}
-        ${this._moduleRow("switches", "🎛", "Switches", "Le module Switches gère les interrupteurs physiques de la pièce.")}
-        ${this._moduleRow("shutters", "🪟", "Shutters", "Le module Shutters gère les volets roulants de la pièce.")}
-        ${this._moduleRow("heating", "🔥", "Climate", "Le module Climate gère les capteurs et les radiateurs de la pièce (onglet Climate).")}
+        <div class="section">${S("roomDialog.modules")}</div>
+        ${this._moduleRow("lights", "💡", S("roomDialog.module_lights"), S("roomDialog.module_lights_hint"))}
+        ${this._moduleRow("switches", "🎛", S("roomDialog.module_switches"), S("roomDialog.module_switches_hint"))}
+        ${this._moduleRow("shutters", "🪟", S("roomDialog.module_shutters"), S("roomDialog.module_shutters_hint"))}
+        ${this._moduleRow("heating", "🔥", S("roomDialog.module_climate"), S("roomDialog.module_climate_hint"))}
 
         ${this._hasModule("lights") ? h`
-              <div class="tab">Lights</div>
-              <div class="section">Luminaires de la pièce</div>
+              <div class="tab">${S("roomDialog.module_lights")}</div>
+              <div class="section">${S("roomDialog.lights_devices")}</div>
               <homex-entity-picker
                 .hass=${this.hass}
-                .includeDomains=${wr}
+                .includeDomains=${Gr}
                 .value=${this._devices}
                 @value-changed=${(e) => this._devices = e.detail.value}
               ></homex-entity-picker>
 
-              <div class="section">Scene switching strategy</div>
+              <div class="section">${S("roomDialog.strategy")}</div>
               <homex-select
                 .value=${this._strategy}
                 .options=${[{
 			value: "recall_first",
-			label: "Repart de zéro",
-			secondary: "Première scène"
+			label: S("roomDialog.strategy_first"),
+			secondary: S("roomDialog.strategy_first_hint")
 		}, {
 			value: "recall_last",
-			label: "Dernière utilisée",
-			secondary: "Reprend la dernière scène"
+			label: S("roomDialog.strategy_last"),
+			secondary: S("roomDialog.strategy_last_hint")
 		}]}
                 @value-changed=${(e) => this._strategy = e.detail.value}
               ></homex-select>
-              <p class="hint">
-                Quand un trigger scene-switching change de scène et que la pièce
-                était éteinte : repartir de la première scène, ou reprendre la
-                dernière utilisée.
-              </p>
+              <p class="hint">${S("roomDialog.strategy_hint")}</p>
             ` : ""}
 
         ${this._hasModule("heating") ? h`
-              <div class="tab">Climate</div>
-              <div class="section">Zone de chauffage</div>
+              <div class="tab">${S("roomDialog.module_climate")}</div>
+              <div class="section">${S("roomDialog.heating_zone")}</div>
               <homex-select
                 .value=${this._zoneId}
                 .options=${this._zones.map((e) => ({
 			value: e.id,
 			label: e.name,
-			secondary: e.id === "default" ? "Toutes les autres pièces" : void 0
+			secondary: e.id === "default" ? S("roomDialog.zone_default_hint") : void 0
 		}))}
                 @value-changed=${(e) => this._zoneId = e.detail.value}
               ></homex-select>
-              <p class="hint">
-                Capteurs et radiateurs se configurent dans l'onglet Climate de la pièce.
-              </p>
+              <p class="hint">${S("roomDialog.climate_hint")}</p>
             ` : ""}
 
         <span slot="actions">
-          <button @click=${this._close}>Annuler</button>
+          <button @click=${this._close}>${S("common.cancel")}</button>
           <button class="primary" ?disabled=${this._busy} @click=${this._save}>
-            ${e ? "Enregistrer" : "Créer la pièce"}
+            ${S(e ? "common.save" : "roomDialog.create")}
           </button>
         </span>
       </homex-dialog>
     `;
 	}
-}, F = (Lr.styles = [D, o`
+}, I = (ii.styles = [O, o`
       .hint {
         font-size: 12px;
         color: var(--secondary-text-color);
@@ -2945,10 +4767,10 @@ var Lr = class extends v {
         font-size: 14px;
         font-weight: 600;
       }
-    `], Lr);
-O([b({ attribute: !1 })], F.prototype, "hass", void 0), O([b({ type: Boolean })], F.prototype, "open", void 0), O([b({ attribute: !1 })], F.prototype, "room", void 0), O([x()], F.prototype, "_name", void 0), O([x()], F.prototype, "_id", void 0), O([x()], F.prototype, "_areaId", void 0), O([x()], F.prototype, "_modules", void 0), O([x()], F.prototype, "_devices", void 0), O([x()], F.prototype, "_strategy", void 0), O([x()], F.prototype, "_busy", void 0), O([x()], F.prototype, "_zones", void 0), O([x()], F.prototype, "_zoneId", void 0), F = O([y("homex-room-dialog")], F);
+    `], ii);
+k([b({ attribute: !1 })], I.prototype, "hass", void 0), k([b({ type: Boolean })], I.prototype, "open", void 0), k([b({ attribute: !1 })], I.prototype, "room", void 0), k([x()], I.prototype, "_name", void 0), k([x()], I.prototype, "_id", void 0), k([x()], I.prototype, "_areaId", void 0), k([x()], I.prototype, "_modules", void 0), k([x()], I.prototype, "_devices", void 0), k([x()], I.prototype, "_strategy", void 0), k([x()], I.prototype, "_busy", void 0), k([x()], I.prototype, "_zones", void 0), k([x()], I.prototype, "_zoneId", void 0), I = k([y("homex-room-dialog")], I);
 // src/components/homex-triggers-dialog.ts
-var Rr = class extends v {
+var ai = class extends v {
 	constructor(...e) {
 		super(...e), this.open = !1, this._toggle = [], this._scene = [], this._dimUp = [], this._dimDown = [], this._busy = !1;
 	}
@@ -2964,30 +4786,28 @@ var Rr = class extends v {
 	async _save() {
 		this._busy = !0;
 		try {
-			await cn(this.hass, {
+			await Hn(this.hass, {
 				entry_id: this.room.entry_id,
 				triggers: this._toggle,
 				scene_triggers: this._scene,
 				dim_up_triggers: this._dimUp,
 				dim_down_triggers: this._dimDown
-			}), S(this), this._close();
+			}), C(this), this._close();
 		} catch (e) {
-			this._busy = !1, alert("Erreur Homex : " + C(e));
+			this._busy = !1, alert(S("common.error", { message: w(e) }));
 		}
 	}
 	render() {
 		return h`
       <homex-dialog
         .open=${this.open}
-        heading="Déclencheurs de la pièce"
+        heading=${S("triggersDialog.heading")}
         @dialog-closed=${this._close}
       >
         ${this._hasLights ? h`
               <div class="group">
-                <div class="section">Triggers toggle (allumer / éteindre)</div>
-                <p class="hint">
-                  Chaque déclenchement permute l'état on/off de la pièce.
-                </p>
+                <div class="section">${S("triggersDialog.toggle_title")}</div>
+                <p class="hint">${S("triggersDialog.toggle_hint")}</p>
                 <homex-trigger-selector
                   .hass=${this.hass}
                   .value=${this._toggle}
@@ -2999,8 +4819,8 @@ var Rr = class extends v {
               </div>
 
               <div class="group">
-                <div class="section">Triggers scene switching</div>
-                <p class="hint">Chaque déclenchement passe à la scène suivante (cycle).</p>
+                <div class="section">${S("triggersDialog.scene_title")}</div>
+                <p class="hint">${S("triggersDialog.scene_hint")}</p>
                 <homex-trigger-selector
                   .hass=${this.hass}
                   .value=${this._scene}
@@ -3009,17 +4829,12 @@ var Rr = class extends v {
                 <homex-managed-triggers
                   .triggers=${this.room?.switch_triggers?.scene_next ?? []}
                 ></homex-managed-triggers>
-                <p class="hint">
-                  La stratégie (repart de zéro / dernière utilisée) se règle dans
-                  « Modifier la pièce ».
-                </p>
+                <p class="hint">${S("triggersDialog.scene_strategy_hint")}</p>
               </div>
 
               <div class="group">
-                <div class="section">Dimmer + (monter la luminosité)</div>
-                <p class="hint">
-                  Chaque déclenchement ajoute 20 à la luminosité des lumières de la pièce.
-                </p>
+                <div class="section">${S("triggersDialog.dim_up_title")}</div>
+                <p class="hint">${S("triggersDialog.dim_up_hint")}</p>
                 <homex-trigger-selector
                   .hass=${this.hass}
                   .value=${this._dimUp}
@@ -3031,10 +4846,8 @@ var Rr = class extends v {
               </div>
 
               <div class="group">
-                <div class="section">Dimmer − (baisser la luminosité)</div>
-                <p class="hint">
-                  Chaque déclenchement retire 20 à la luminosité des lumières de la pièce.
-                </p>
+                <div class="section">${S("triggersDialog.dim_down_title")}</div>
+                <p class="hint">${S("triggersDialog.dim_down_hint")}</p>
                 <homex-trigger-selector
                   .hass=${this.hass}
                   .value=${this._dimDown}
@@ -3047,15 +4860,15 @@ var Rr = class extends v {
             ` : ""}
 
         <span slot="actions">
-          <button @click=${this._close}>Annuler</button>
+          <button @click=${this._close}>${S("common.cancel")}</button>
           <button class="primary" ?disabled=${this._busy} @click=${this._save}>
-            Enregistrer
+            ${S("common.save")}
           </button>
         </span>
       </homex-dialog>
     `;
 	}
-}, I = (Rr.styles = [D, o`
+}, oi = (ai.styles = [O, o`
       .hint {
         font-size: 12px;
         color: var(--secondary-text-color);
@@ -3067,10 +4880,10 @@ var Rr = class extends v {
         padding: 12px 14px;
         margin-bottom: 14px;
       }
-    `], Rr);
-O([b({ attribute: !1 })], I.prototype, "hass", void 0), O([b({ type: Boolean })], I.prototype, "open", void 0), O([b({ attribute: !1 })], I.prototype, "room", void 0), O([x()], I.prototype, "_toggle", void 0), O([x()], I.prototype, "_scene", void 0), O([x()], I.prototype, "_dimUp", void 0), O([x()], I.prototype, "_dimDown", void 0), O([x()], I.prototype, "_busy", void 0), I = O([y("homex-triggers-dialog")], I);
+    `], ai);
+k([b({ attribute: !1 })], oi.prototype, "hass", void 0), k([b({ type: Boolean })], oi.prototype, "open", void 0), k([b({ attribute: !1 })], oi.prototype, "room", void 0), k([x()], oi.prototype, "_toggle", void 0), k([x()], oi.prototype, "_scene", void 0), k([x()], oi.prototype, "_dimUp", void 0), k([x()], oi.prototype, "_dimDown", void 0), k([x()], oi.prototype, "_busy", void 0), oi = k([y("homex-triggers-dialog")], oi);
 // src/components/homex-scene-dialog.ts
-var zr = class extends v {
+var si = class extends v {
 	constructor(...e) {
 		super(...e), this.open = !1, this.scene = null, this._name = "", this._mode = "new", this._attachId = "", this._triggers = [], this._busy = !1;
 	}
@@ -3089,7 +4902,7 @@ var zr = class extends v {
 	get _nameTaken() {
 		let e = this._name.trim();
 		if (!e) return !1;
-		let t = M(e);
+		let t = N(e);
 		return this.room.scenes.some((n) => this.scene && n.key === this.scene.key ? !1 : n.name.toLowerCase() === e.toLowerCase() || n.key === t);
 	}
 	_close() {
@@ -3104,13 +4917,13 @@ var zr = class extends v {
 	async _save() {
 		let e = this._name.trim();
 		if (e && !this._nameTaken) {
-			if (!this.scene && this._mode === "attach" && !this._attachId) alert("Choisis une scène existante à rattacher.");
+			if (!this.scene && this._mode === "attach" && !this._attachId) alert(S("sceneDialog.pick_scene_required"));
 			else {
 				this._busy = !0;
 				try {
-					this.scene ? await yn(this.hass, this.room.entry_id, this.scene.key, e, this._triggers) : this._mode === "attach" ? await hn(this.hass, this.room.entry_id, e, this._attachId, this._triggers) : await hn(this.hass, this.room.entry_id, e, void 0, this._triggers), S(this), this._close();
+					this.scene ? await $n(this.hass, this.room.entry_id, this.scene.key, e, this._triggers) : this._mode === "attach" ? await Yn(this.hass, this.room.entry_id, e, this._attachId, this._triggers) : await Yn(this.hass, this.room.entry_id, e, void 0, this._triggers), C(this), this._close();
 				} catch (e) {
-					this._busy = !1, alert("Erreur Homex : " + C(e));
+					this._busy = !1, alert(S("common.error", { message: w(e) }));
 				}
 			}
 		}
@@ -3120,13 +4933,13 @@ var zr = class extends v {
 		return h`
       <homex-dialog
         .open=${this.open}
-        heading=${e ? "Renommer la scène" : "Nouvelle scène"}
+        heading=${S(e ? "sceneDialog.heading_rename" : "sceneDialog.heading_new")}
         @dialog-closed=${this._close}
       >
-        ${A("Nom de la scène", this._name, (e) => this._name = e, "Nuit")}
-        ${t ? h`<div class="err">Ce nom de scène existe déjà.</div>` : ""}
+        ${j(S("sceneDialog.name"), this._name, (e) => this._name = e, S("sceneDialog.name_placeholder"))}
+        ${t ? h`<div class="err">${S("sceneDialog.name_taken")}</div>` : ""}
         ${e ? "" : this._renderModePicker()}
-        <div class="section">Déclencheurs (activent cette scène)</div>
+        <div class="section">${S("sceneDialog.triggers")}</div>
         <homex-trigger-selector
           .hass=${this.hass}
           .value=${this._triggers}
@@ -3136,9 +4949,9 @@ var zr = class extends v {
               .triggers=${this.room?.switch_triggers?.scenes?.[this.scene.key] ?? []}
             ></homex-managed-triggers>` : ""}
         <span slot="actions">
-          <button @click=${this._close}>Annuler</button>
+          <button @click=${this._close}>${S("common.cancel")}</button>
           <button class="primary" ?disabled=${this._busy || !n} @click=${this._save}>
-            ${e ? "Renommer" : this._mode === "attach" ? "Rattacher" : "Créer la scène"}
+            ${e ? S("common.rename") : this._mode === "attach" ? S("sceneDialog.attach") : S("sceneDialog.create")}
           </button>
         </span>
       </homex-dialog>
@@ -3151,23 +4964,19 @@ var zr = class extends v {
           class=${this._mode === "new" ? "active" : ""}
           @click=${() => this._mode = "new"}
         >
-          Nouvelle
+          ${S("sceneDialog.mode_new")}
         </button>
         <button
           class=${this._mode === "attach" ? "active" : ""}
           @click=${() => this._mode = "attach"}
         >
-          Rattacher une existante
+          ${S("sceneDialog.mode_attach")}
         </button>
       </div>
-      ${this._mode === "new" ? h`<div class="section">
-            La scène est créée « tout éteint » ; édite-la ensuite dans Home Assistant.
-          </div>` : h`
-            <div class="section">
-              Scène existante à adopter (elle sera renommée, son contenu conservé)
-            </div>
+      ${this._mode === "new" ? h`<div class="section">${S("sceneDialog.new_hint")}</div>` : h`
+            <div class="section">${S("sceneDialog.attach_hint")}</div>
             <homex-select
-              placeholder="Choisir une scène…"
+              placeholder=${S("sceneDialog.pick_scene")}
               .value=${this._attachId}
               .options=${this._availableScenes.map((e) => ({
 			value: e.config_id,
@@ -3179,7 +4988,7 @@ var zr = class extends v {
           `}
     `;
 	}
-}, L = (zr.styles = [D, o`
+}, L = (si.styles = [O, o`
       .modes {
         display: flex;
         gap: 8px;
@@ -3197,10 +5006,10 @@ var zr = class extends v {
         font-size: 12px;
         margin: -4px 0 8px;
       }
-    `], zr);
-O([b({ attribute: !1 })], L.prototype, "hass", void 0), O([b({ type: Boolean })], L.prototype, "open", void 0), O([b({ attribute: !1 })], L.prototype, "room", void 0), O([b({ attribute: !1 })], L.prototype, "scene", void 0), O([x()], L.prototype, "_name", void 0), O([x()], L.prototype, "_mode", void 0), O([x()], L.prototype, "_attachId", void 0), O([x()], L.prototype, "_triggers", void 0), O([x()], L.prototype, "_busy", void 0), L = O([y("homex-scene-dialog")], L);
+    `], si);
+k([b({ attribute: !1 })], L.prototype, "hass", void 0), k([b({ type: Boolean })], L.prototype, "open", void 0), k([b({ attribute: !1 })], L.prototype, "room", void 0), k([b({ attribute: !1 })], L.prototype, "scene", void 0), k([x()], L.prototype, "_name", void 0), k([x()], L.prototype, "_mode", void 0), k([x()], L.prototype, "_attachId", void 0), k([x()], L.prototype, "_triggers", void 0), k([x()], L.prototype, "_busy", void 0), L = k([y("homex-scene-dialog")], L);
 // src/components/homex-shutter-group-dialog.ts
-var Br = class extends v {
+var ci = class extends v {
 	constructor(...e) {
 		super(...e), this.open = !1, this.group = null, this._name = "", this._devices = [], this._toggle = [], this._openT = [], this._close = [], this._stop = [], this._busy = !1;
 	}
@@ -3215,12 +5024,12 @@ var Br = class extends v {
 	}
 	async _save() {
 		let e = this._name.trim();
-		if (!e) alert("Nom du groupe requis.");
+		if (!e) alert(S("shutterGroupDialog.name_required"));
 		else {
 			this._busy = !0;
 			try {
 				let t = this.group?.id;
-				t ||= (await rn(this.hass, this.room.entry_id, e))?.group_id, await an(this.hass, {
+				t ||= (await Rn(this.hass, this.room.entry_id, e))?.group_id, await zn(this.hass, {
 					entry_id: this.room.entry_id,
 					group_id: t,
 					name: e,
@@ -3229,19 +5038,19 @@ var Br = class extends v {
 					open_triggers: this._openT,
 					close_triggers: this._close,
 					stop_triggers: this._stop
-				}), S(this), this._close_();
+				}), C(this), this._close_();
 			} catch (e) {
-				this._busy = !1, alert("Erreur Homex : " + C(e));
+				this._busy = !1, alert(S("common.error", { message: w(e) }));
 			}
 		}
 	}
 	async _delete() {
-		if (this.group && confirm(`Supprimer le groupe de volets "${this.group.name}" ?`)) {
+		if (this.group && confirm(S("shutterGroupDialog.confirm_delete", { name: this.group.name }))) {
 			this._busy = !0;
 			try {
-				await on(this.hass, this.room.entry_id, this.group.id), S(this), this._close_();
+				await Bn(this.hass, this.room.entry_id, this.group.id), C(this), this._close_();
 			} catch (e) {
-				this._busy = !1, alert("Erreur Homex : " + C(e));
+				this._busy = !1, alert(S("common.error", { message: w(e) }));
 			}
 		}
 	}
@@ -3260,11 +5069,11 @@ var Br = class extends v {
 		return h`
       <homex-dialog
         .open=${this.open}
-        heading=${e ? "Modifier le groupe de volets" : "Nouveau groupe de volets"}
+        heading=${S(e ? "shutterGroupDialog.edit_heading" : "shutterGroupDialog.new_heading")}
         @dialog-closed=${this._close_}
       >
-        ${A("Nom", this._name, (e) => this._name = e, "Salon")}
-        <div class="section">Volets (entités cover)</div>
+        ${j(S("shutterGroupDialog.name"), this._name, (e) => this._name = e, S("shutterGroupDialog.name_placeholder"))}
+        <div class="section">${S("shutterGroupDialog.covers")}</div>
         <homex-entity-picker
           .hass=${this.hass}
           .includeDomains=${["cover"]}
@@ -3272,28 +5081,26 @@ var Br = class extends v {
           @value-changed=${(e) => this._devices = e.detail.value}
         ></homex-entity-picker>
 
-        <div class="section">Déclencheurs du groupe</div>
-        <p class="hint">
-          Chaque déclencheur pilote les volets de ce groupe.
-        </p>
-        ${this._trigGroup("Permuter (ouvrir / fermer)", this._toggle, (e) => this._toggle = e)}
-        ${this._trigGroup("Ouvrir", this._openT, (e) => this._openT = e)}
-        ${this._trigGroup("Fermer", this._close, (e) => this._close = e)}
-        ${this._trigGroup("Stop", this._stop, (e) => this._stop = e)}
+        <div class="section">${S("shutterGroupDialog.triggers")}</div>
+        <p class="hint">${S("shutterGroupDialog.triggers_hint")}</p>
+        ${this._trigGroup(S("shutterGroupDialog.toggle"), this._toggle, (e) => this._toggle = e)}
+        ${this._trigGroup(S("shutterGroupDialog.open"), this._openT, (e) => this._openT = e)}
+        ${this._trigGroup(S("shutterGroupDialog.close"), this._close, (e) => this._close = e)}
+        ${this._trigGroup(S("shutterGroupDialog.stop"), this._stop, (e) => this._stop = e)}
 
         <span slot="actions">
           ${t ? h`<button class="danger" ?disabled=${this._busy} @click=${this._delete}>
-                Supprimer
+                ${S("common.delete")}
               </button>` : ""}
-          <button @click=${this._close_}>Annuler</button>
+          <button @click=${this._close_}>${S("common.cancel")}</button>
           <button class="primary" ?disabled=${this._busy} @click=${this._save}>
-            ${e ? "Enregistrer" : "Créer le groupe"}
+            ${S(e ? "common.save" : "shutterGroupDialog.create_group")}
           </button>
         </span>
       </homex-dialog>
     `;
 	}
-}, R = (Br.styles = [D, o`
+}, R = (ci.styles = [O, o`
       .hint {
         font-size: 12px;
         color: var(--secondary-text-color);
@@ -3305,15 +5112,15 @@ var Br = class extends v {
         padding: 12px 14px;
         margin-bottom: 12px;
       }
-    `], Br);
-O([b({ attribute: !1 })], R.prototype, "hass", void 0), O([b({ type: Boolean })], R.prototype, "open", void 0), O([b({ attribute: !1 })], R.prototype, "room", void 0), O([b({ attribute: !1 })], R.prototype, "group", void 0), O([x()], R.prototype, "_name", void 0), O([x()], R.prototype, "_devices", void 0), O([x()], R.prototype, "_toggle", void 0), O([x()], R.prototype, "_openT", void 0), O([x()], R.prototype, "_close", void 0), O([x()], R.prototype, "_stop", void 0), O([x()], R.prototype, "_busy", void 0), R = O([y("homex-shutter-group-dialog")], R);
+    `], ci);
+k([b({ attribute: !1 })], R.prototype, "hass", void 0), k([b({ type: Boolean })], R.prototype, "open", void 0), k([b({ attribute: !1 })], R.prototype, "room", void 0), k([b({ attribute: !1 })], R.prototype, "group", void 0), k([x()], R.prototype, "_name", void 0), k([x()], R.prototype, "_devices", void 0), k([x()], R.prototype, "_toggle", void 0), k([x()], R.prototype, "_openT", void 0), k([x()], R.prototype, "_close", void 0), k([x()], R.prototype, "_stop", void 0), k([x()], R.prototype, "_busy", void 0), R = k([y("homex-shutter-group-dialog")], R);
 // src/components/homex-shutter-control-dialog.ts
-var Vr = class extends v {
+var li = class extends v {
 	constructor(...e) {
 		super(...e), this.open = !1, this._groupId = "", this._busy = !1;
 	}
 	willUpdate(e) {
-		e.has("open") && this.open && (this._groupId = nr(this.room)?.id ?? "");
+		e.has("open") && this.open && (this._groupId = Ir(this.room)?.id ?? "");
 	}
 	get _groups() {
 		return (this.room.shutter_groups ?? []).filter((e) => e.devices?.length);
@@ -3321,9 +5128,9 @@ var Vr = class extends v {
 	async _run(e) {
 		this._busy = !0;
 		try {
-			await dn(this.hass, this.room.entry_id, this._groupId, e);
+			await Gn(this.hass, this.room.entry_id, this._groupId, e);
 		} catch (e) {
-			alert("Erreur Homex : " + C(e));
+			alert(S("common.error", { message: w(e) }));
 		} finally {
 			this._busy = !1;
 		}
@@ -3333,12 +5140,12 @@ var Vr = class extends v {
 	}
 	render() {
 		if (!this.open) return h``;
-		let e = this._groups, t = e.find((e) => e.id === this._groupId) ?? e[0], n = t?.devices ?? [], r = tr(this.hass, n);
+		let e = this._groups, t = e.find((e) => e.id === this._groupId) ?? e[0], n = t?.devices ?? [], r = Fr(this.hass, n);
 		return h`
       <homex-dialog
         compact
         .open=${this.open}
-        .heading=${`Volets · ${this.room.name}`}
+        .heading=${S("shutterControlDialog.heading", { room: this.room.name })}
         @dialog-closed=${this._close}
       >
         ${e.length > 1 ? h`<div class="groups">
@@ -3354,23 +5161,23 @@ var Vr = class extends v {
           <div>
             <div class="state">${r.label}</div>
             <div class="pos">
-              ${r.position === null ? "" : `Position moyenne : ${r.position} %`}
+              ${r.position === null ? "" : S("shutterControlDialog.avg_position", { position: r.position })}
             </div>
           </div>
         </div>
         <div class="controls">
           <button ?disabled=${this._busy || !t} @click=${() => this._run("open_cover")}>
-            <svg viewBox="0 0 24 24"><path d=${$e}></path></svg>Ouvrir
+            <svg viewBox="0 0 24 24"><path d=${$e}></path></svg>${S("shutterControlDialog.open")}
           </button>
           <button ?disabled=${this._busy || !t} @click=${() => this._run("stop_cover")}>
-            <svg viewBox="0 0 24 24"><path d=${At}></path></svg>Stop
+            <svg viewBox="0 0 24 24"><path d=${At}></path></svg>${S("shutterControlDialog.stop")}
           </button>
           <button ?disabled=${this._busy || !t} @click=${() => this._run("close_cover")}>
-            <svg viewBox="0 0 24 24"><path d=${Ze}></path></svg>Fermer
+            <svg viewBox="0 0 24 24"><path d=${Ze}></path></svg>${S("shutterControlDialog.close")}
           </button>
         </div>
         ${n.map((e) => {
-			let t = tr(this.hass, [e]), n = er(this.hass, e);
+			let t = Fr(this.hass, [e]), n = Pr(this.hass, e);
 			return h`<div class="cover">
             <svg viewBox="0 0 24 24"><path d=${t.icon}></path></svg>
             <span class="name">
@@ -3379,11 +5186,11 @@ var Vr = class extends v {
             <span class="val">${t.label}${n === null ? "" : ` · ${n} %`}</span>
           </div>`;
 		})}
-        <button slot="actions" @click=${this._close}>Terminé</button>
+        <button slot="actions" @click=${this._close}>${S("shutterControlDialog.done")}</button>
       </homex-dialog>
     `;
 	}
-}, Hr = (Vr.styles = [D, o`
+}, ui = (li.styles = [O, o`
       .groups {
         display: flex;
         flex-wrap: wrap;
@@ -3460,28 +5267,28 @@ var Vr = class extends v {
         color: var(--secondary-text-color);
         white-space: nowrap;
       }
-    `], Vr);
-O([b({ attribute: !1 })], Hr.prototype, "hass", void 0), O([b({ type: Boolean })], Hr.prototype, "open", void 0), O([b({ attribute: !1 })], Hr.prototype, "room", void 0), O([x()], Hr.prototype, "_groupId", void 0), O([x()], Hr.prototype, "_busy", void 0), Hr = O([y("homex-shutter-control-dialog")], Hr);
+    `], li);
+k([b({ attribute: !1 })], ui.prototype, "hass", void 0), k([b({ type: Boolean })], ui.prototype, "open", void 0), k([b({ attribute: !1 })], ui.prototype, "room", void 0), k([x()], ui.prototype, "_groupId", void 0), k([x()], ui.prototype, "_busy", void 0), ui = k([y("homex-shutter-control-dialog")], ui);
 // src/lib/area.ts
-function Ur(e, t) {
+function di(e, t) {
 	let n = e.entities?.[t];
 	return n?.area_id || n?.device_id && e.devices?.[n.device_id]?.area_id || void 0;
 }
-function Wr(e, t) {
+function fi(e, t) {
 	return e.devices?.[t]?.area_id || void 0;
 }
-function Gr(e, t, n) {
+function pi(e, t, n) {
 	let r = new Set(n.filter(Boolean)), i = r.size ? e.filter((e) => r.has(t(e) ?? "")) : [];
 	return {
 		inArea: i,
 		others: e.filter((e) => !i.includes(e))
 	};
 }
-function Kr(e, t) {
+function mi(e, t) {
 	return [...new Set(t.filter(Boolean))].map((t) => e.areas?.[t]?.name ?? t).join(", ");
 }
 // src/components/homex-radiator-dialog.ts
-var qr = class extends v {
+var hi = class extends v {
 	constructor(...e) {
 		super(...e), this.open = !1, this.index = -1, this._rad = {
 			device_id: "",
@@ -3505,9 +5312,9 @@ var qr = class extends v {
 	async _load() {
 		try {
 			let [e, t, n] = await Promise.all([
-				bn(this.hass),
-				Tn(this.hass),
-				en(this.hass)
+				er(this.hass),
+				ar(this.hass),
+				Fn(this.hass)
 			]);
 			this._presets = e.device_presets ?? [], this._models = t, this._otherRooms = n.filter((e) => e.room_id !== this.room.room_id);
 		} catch {
@@ -3546,48 +5353,48 @@ var qr = class extends v {
 		};
 		this.index >= 0 ? e[this.index] = t : e.push(t), this._busy = !0;
 		try {
-			await cn(this.hass, {
+			await Hn(this.hass, {
 				entry_id: this.room.entry_id,
 				heating: {
 					...this.room.heating,
 					radiators: e
 				}
-			}), S(this), this._close();
+			}), C(this), this._close();
 		} catch (e) {
-			alert("Erreur Homex : " + C(e)), this._busy = !1;
+			alert(S("common.error", { message: w(e) })), this._busy = !1;
 		}
 	}
 	_renderExternalSensor() {
 		let e = (e) => this.hass.states[e]?.attributes?.friendly_name || e, t = (e) => {
 			let t = this.hass.states[e], n = t?.attributes?.unit_of_measurement ?? "";
 			return t && !["unknown", "unavailable"].includes(t.state) ? `${t.state} ${n}` : "—";
-		}, n = `sensor.homex_${this.room.room_id}_temperature`, r = !!this.room.metrics?.temperature?.sensors?.length, i = (this.room.metrics?.temperature?.sensors ?? []).map((e) => e.entity_id), { inArea: a, others: o } = Gr(Object.keys(this.hass.states).filter((e) => e.startsWith("sensor.") && e !== n && !i.includes(e) && this.hass.states[e]?.attributes?.device_class === "temperature").sort((t, n) => e(t).localeCompare(e(n))), (e) => Ur(this.hass, e), [this.room.area_id]), s = this._rad.external_sensor ?? "", c = (n, r = e(n)) => ({
+		}, n = `sensor.homex_${this.room.room_id}_temperature`, r = !!this.room.metrics?.temperature?.sensors?.length, i = (this.room.metrics?.temperature?.sensors ?? []).map((e) => e.entity_id), { inArea: a, others: o } = pi(Object.keys(this.hass.states).filter((e) => e.startsWith("sensor.") && e !== n && !i.includes(e) && this.hass.states[e]?.attributes?.device_class === "temperature").sort((t, n) => e(t).localeCompare(e(n))), (e) => di(this.hass, e), [this.room.area_id]), s = this._rad.external_sensor ?? "", c = (n, r = e(n)) => ({
 			value: n,
 			label: r,
 			secondary: n,
 			tertiary: t(n)
 		});
 		return h`
-      <div class="section">Capteur de température externe</div>
-      <p class="hint">Sa température est recopiée dans la vanne à chaque mise à jour.</p>
+      <div class="section">${S("radiatorDialog.external_sensor")}</div>
+      <p class="hint">${S("radiatorDialog.external_sensor_hint")}</p>
       <homex-select
-        placeholder="Choisir un capteur…"
+        placeholder=${S("radiatorDialog.choose_sensor")}
         .value=${s}
         .groups=${[
 			...r ? [{
-				label: "Référence de la pièce",
-				options: [c(n, `Température de référence (${this.room.name})`)]
+				label: S("radiatorDialog.room_reference"),
+				options: [c(n, S("radiatorDialog.reference_temperature", { room: this.room.name }))]
 			}] : [],
 			...i.length ? [{
-				label: "Capteurs de la pièce",
+				label: S("radiatorDialog.room_sensors"),
 				options: i.map((e) => c(e))
 			}] : [],
 			...a.length ? [{
-				label: `Pièce : ${Kr(this.hass, [this.room.area_id])}`,
+				label: S("radiatorDialog.area", { area: mi(this.hass, [this.room.area_id]) }),
 				options: a.map((e) => c(e))
 			}] : [],
 			{
-				label: "Autres",
+				label: S("radiatorDialog.others"),
 				options: o.map((e) => c(e))
 			}
 		]}
@@ -3596,51 +5403,51 @@ var qr = class extends v {
 			external_sensor: e.detail.value
 		}}
       ></homex-select>
-      ${s ? "" : h`<p class="hint warn">Ce preset utilise un capteur externe : choisis-en un.</p>`}
+      ${s ? "" : h`<p class="hint warn">${S("radiatorDialog.sensor_required")}</p>`}
     `;
 	}
 	render() {
 		if (!this.open) return h``;
-		let e = this.index >= 0, t = new Set((this.room.heating?.radiators ?? []).filter((e, t) => t !== this.index).map((e) => e.device_id)), n = this._otherRooms.find((e) => (e.heating?.radiators ?? []).some((e) => e.device_id === this._rad.device_id)), r = this._modelPresets, i = this.room.area_id || "", a = i ? this.hass.areas?.[i]?.name : void 0, { inArea: o, others: s } = Gr(this._thermostats, (e) => Wr(this.hass, e.device_id), [i]), c = (e) => ({
+		let e = this.index >= 0, t = new Set((this.room.heating?.radiators ?? []).filter((e, t) => t !== this.index).map((e) => e.device_id)), n = this._otherRooms.find((e) => (e.heating?.radiators ?? []).some((e) => e.device_id === this._rad.device_id)), r = this._modelPresets, i = this.room.area_id || "", a = i ? this.hass.areas?.[i]?.name : void 0, { inArea: o, others: s } = pi(this._thermostats, (e) => fi(this.hass, e.device_id), [i]), c = (e) => ({
 			value: e.device_id,
 			label: e.name,
 			secondary: e.label,
-			tertiary: t.has(e.device_id) ? "déjà dans la pièce" : void 0,
+			tertiary: t.has(e.device_id) ? S("radiatorDialog.already_in_room") : void 0,
 			disabled: t.has(e.device_id)
 		});
 		return h`
       <homex-dialog
         compact
         .open=${this.open}
-        .heading=${e ? "Modifier le radiateur" : "Ajouter un radiateur"}
+        .heading=${S(e ? "radiatorDialog.edit_title" : "radiatorDialog.add_title")}
         @dialog-closed=${this._close}
       >
-        <div class="section">Radiateur</div>
+        <div class="section">${S("radiatorDialog.radiator")}</div>
         <homex-select
-          placeholder="Choisir un radiateur…"
+          placeholder=${S("radiatorDialog.choose_radiator")}
           .value=${this._rad.device_id}
           ?disabled=${e}
           .options=${i ? [] : this._thermostats.map(c)}
           .groups=${i ? [...o.length ? [{
-			label: `Pièce : ${a ?? i}`,
+			label: S("radiatorDialog.area", { area: a ?? i }),
 			options: o.map(c)
 		}] : [], {
-			label: "Autres",
+			label: S("radiatorDialog.others"),
 			options: s.map(c)
 		}] : []}
           @value-changed=${(e) => this._onDevice(e.detail.value)}
         ></homex-select>
-        ${n ? h`<p class="hint warn">Déjà dans la pièce « ${n.name} ».</p>` : ""}
+        ${n ? h`<p class="hint warn">${S("radiatorDialog.already_in_other_room", { room: n.name })}</p>` : ""}
 
-        <div class="section">Device preset</div>
+        <div class="section">${S("radiatorDialog.device_preset")}</div>
         <homex-select
-          placeholder="Aucun preset"
+          placeholder=${S("radiatorDialog.no_preset")}
           .value=${this._rad.preset_id}
           ?disabled=${!this._rad.device_id}
           .options=${r.map((e) => ({
 			value: e.id,
 			label: e.name,
-			tertiary: e.external_input ? "capteur externe" : void 0
+			tertiary: e.external_input ? S("radiatorDialog.external_sensor_tag") : void 0
 		}))}
           @value-changed=${(e) => this._rad = {
 			...this._rad,
@@ -3648,25 +5455,25 @@ var qr = class extends v {
 		}}
         ></homex-select>
         <p class="hint">
-          ${this._rad.device_id && !r.length ? "Aucun device preset pour ce modèle (Climate Manager → Heating → Device Presets)." : "Le preset est appliqué en continu (vérifié et ré-appliqué toutes les 10 minutes)."}
+          ${this._rad.device_id && !r.length ? S("radiatorDialog.no_preset_for_model") : S("radiatorDialog.preset_applied")}
         </p>
 
         ${this._preset?.external_input ? this._renderExternalSensor() : ""}
 
         <span slot="actions">
-          <button @click=${this._close}>Annuler</button>
+          <button @click=${this._close}>${S("common.cancel")}</button>
           <button
             class="primary"
             ?disabled=${this._busy || !this._rad.device_id}
             @click=${this._save}
           >
-            ${e ? "Enregistrer" : "Ajouter"}
+            ${S(e ? "common.save" : "common.add")}
           </button>
         </span>
       </homex-dialog>
     `;
 	}
-}, z = (qr.styles = [D, o`
+}, z = (hi.styles = [O, o`
       .hint {
         font-size: 13px;
         color: var(--secondary-text-color);
@@ -3675,47 +5482,42 @@ var qr = class extends v {
       .warn {
         color: var(--warning-color, #ff9800);
       }
-    `], qr);
-O([b({ attribute: !1 })], z.prototype, "hass", void 0), O([b({ type: Boolean })], z.prototype, "open", void 0), O([b({ attribute: !1 })], z.prototype, "room", void 0), O([b({ type: Number })], z.prototype, "index", void 0), O([x()], z.prototype, "_rad", void 0), O([x()], z.prototype, "_models", void 0), O([x()], z.prototype, "_presets", void 0), O([x()], z.prototype, "_otherRooms", void 0), O([x()], z.prototype, "_busy", void 0), z = O([y("homex-radiator-dialog")], z);
+    `], hi);
+k([b({ attribute: !1 })], z.prototype, "hass", void 0), k([b({ type: Boolean })], z.prototype, "open", void 0), k([b({ attribute: !1 })], z.prototype, "room", void 0), k([b({ type: Number })], z.prototype, "index", void 0), k([x()], z.prototype, "_rad", void 0), k([x()], z.prototype, "_models", void 0), k([x()], z.prototype, "_presets", void 0), k([x()], z.prototype, "_otherRooms", void 0), k([x()], z.prototype, "_busy", void 0), z = k([y("homex-radiator-dialog")], z);
 // src/components/homex-room-climate.ts
-var Jr, Yr = [
+var gi, _i = [
 	{
 		key: "temperature",
-		icon: "🌡",
-		label: "Température"
+		icon: "🌡"
 	},
 	{
 		key: "humidity",
-		icon: "💧",
-		label: "Humidité"
+		icon: "💧"
 	},
 	{
 		key: "pm25",
-		icon: "🌫",
-		label: "PM2.5"
+		icon: "🌫"
 	},
 	{
 		key: "pm10",
-		icon: "🌫",
-		label: "PM10"
+		icon: "🌫"
 	},
 	{
 		key: "co2",
-		icon: "🫧",
-		label: "CO₂"
+		icon: "🫧"
 	}
-], Xr = {
-	mean: "moyenne pondérée",
-	max: "max",
-	min: "min"
-}, Zr = {
-	heating: "🔥 Chauffe",
-	idle: "En veille",
-	off: "Éteint",
-	preheating: "Préchauffe",
-	heat: "Mode chauffage",
-	auto: "Mode auto"
-}, Qr = (Jr = class extends v {
+], vi = [
+	"mean",
+	"max",
+	"min"
+], yi = (e) => vi.includes(e) ? S(`roomClimate.rule_${e}`) : e, bi = [
+	"heating",
+	"idle",
+	"off",
+	"preheating",
+	"heat",
+	"auto"
+], xi = (e) => bi.includes(e) ? S(`roomClimate.action_${e}`) : e, Si = (gi = class extends v {
 	constructor(...e) {
 		super(...e), this._devicePresets = [], this._dialogIndex = null, this._switching = !1;
 	}
@@ -3724,7 +5526,7 @@ var Jr, Yr = [
 	}
 	async _load() {
 		try {
-			this._devicePresets = (await bn(this.hass)).device_presets ?? [];
+			this._devicePresets = (await er(this.hass)).device_presets ?? [];
 		} catch {
 			this._devicePresets = [];
 		}
@@ -3736,26 +5538,26 @@ var Jr, Yr = [
 		return n ? `${t.state} ${n}` : t.state;
 	}
 	_renderMetrics() {
-		let e = this.room, t = Yr.filter((t) => e.metrics?.[t.key]?.sensors?.length);
+		let e = this.room, t = _i.filter((t) => e.metrics?.[t.key]?.sensors?.length);
 		return h`
       <div class="section-row">
-        <span class="section">Metrics</span>
-        <button @click=${() => T(`/homex/climate/metrics/${e.room_id}`)}>
-          Configurer
+        <span class="section">${S("roomClimate.metrics")}</span>
+        <button @click=${() => E(`/homex/climate/metrics/${e.room_id}`)}>
+          ${S("roomClimate.configure")}
         </button>
       </div>
       ${t.length ? h`<div class="metrics">
             ${t.map((t) => {
 			let n = e.metrics[t.key];
 			return h`<div class="metric">
-                <div class="muted">${t.icon} ${t.label}</div>
+                <div class="muted">${t.icon} ${S(`roomClimate.metric_${t.key}`)}</div>
                 <div class="v">${this._state(`sensor.homex_${e.room_id}_${t.key}`)}</div>
                 <div class="muted">
-                  ${n.sensors.length} capteur(s) · ${Xr[n.rule] ?? n.rule}
+                  ${S("roomClimate.sensor_count", { count: n.sensors.length })} · ${yi(n.rule)}
                 </div>
               </div>`;
 		})}
-          </div>` : h`<div class="empty">Aucun capteur : « Configurer » pour en ajouter.</div>`}
+          </div>` : h`<div class="empty">${S("roomClimate.no_sensors")}</div>`}
     `;
 	}
 	get _roomOn() {
@@ -3764,72 +5566,72 @@ var Jr, Yr = [
 	async _setRoomHeating(e) {
 		this._switching = !0;
 		try {
-			await cn(this.hass, {
+			await Hn(this.hass, {
 				entry_id: this.room.entry_id,
 				heating: {
 					radiators: this.room.heating?.radiators ?? [],
 					enabled: e
 				}
-			}), S(this);
+			}), C(this);
 		} catch (e) {
-			alert("Erreur Homex : " + C(e));
+			alert(S("common.error", { message: w(e) }));
 		} finally {
 			this._switching = !1;
 		}
 	}
 	async _remove(e) {
-		let t = [...this.room.heating?.radiators ?? []], n = this.hass.devices?.[t[e]?.device_id]?.name ?? "ce radiateur";
-		if (confirm(`Retirer ${n} de la pièce ?`)) {
+		let t = [...this.room.heating?.radiators ?? []], n = this.hass.devices?.[t[e]?.device_id]?.name ?? S("roomClimate.this_radiator");
+		if (confirm(S("roomClimate.confirm_remove", { name: n }))) {
 			t.splice(e, 1);
 			try {
-				await cn(this.hass, {
+				await Hn(this.hass, {
 					entry_id: this.room.entry_id,
 					heating: {
 						...this.room.heating,
 						radiators: t
 					}
-				}), S(this);
+				}), C(this);
 			} catch (e) {
-				alert("Erreur Homex : " + C(e));
+				alert(S("common.error", { message: w(e) }));
 			}
 		}
 	}
 	_renderRadiator(e) {
-		let t = this.room.heating.radiators[e], n = this.hass.devices?.[t.device_id], r = Gn(this.hass, t.device_id), i = r ? this.hass.states[r] : void 0, a = i?.attributes ?? {}, o = a.hvac_action ?? i?.state, s = this.hass.config?.unit_system?.temperature ?? "°C", c = (e) => e == null ? "—" : `${e} ${s}`, l = this._devicePresets.find((e) => e.id === t.preset_id), u = t.external_sensor ? this.hass.states[t.external_sensor]?.attributes?.friendly_name || t.external_sensor : "";
+		let t = this.room.heating.radiators[e], n = this.hass.devices?.[t.device_id], r = Tr(this.hass, t.device_id), i = r ? this.hass.states[r] : void 0, a = i?.attributes ?? {}, o = a.hvac_action ?? i?.state, s = this.hass.config?.unit_system?.temperature ?? "°C", c = (e) => e == null ? "—" : `${e} ${s}`, l = this._devicePresets.find((e) => e.id === t.preset_id), u = t.external_sensor ? this.hass.states[t.external_sensor]?.attributes?.friendly_name || t.external_sensor : "";
 		return h`<div class="row">
       <div class="info">
         <div class="name">${n?.name_by_user || n?.name || t.device_id}</div>
         <div class="muted">
-          ${l ? `Preset : ${l.name}` : "Aucun preset"}
-          ${u ? h` · Capteur : ${u}` : ""}
+          ${l ? S("roomClimate.preset", { name: l.name }) : S("roomClimate.no_preset")}
+          ${u ? h` · ${S("roomClimate.sensor", { name: u })}` : ""}
         </div>
       </div>
       <span class=${o === "heating" ? "heating" : "muted"}>
-        ${!i || i.state === "unavailable" ? "Indisponible" : Zr[o] ?? o}
-        ${qn(i) ? h`<span
+        ${!i || i.state === "unavailable" ? S("roomClimate.unavailable") : xi(o)}
+        ${Dr(i) ? h`<span
               class="warning"
-              title="Chauffe alors que la température dépasse la consigne : vanne bloquée ouverte ou état non rafraîchi — vérifie le radiateur."
+              title=${S("roomClimate.valve_stuck")}
               >⚠</span
             >` : ""}
       </span>
       <div class="temps">
-        <span title="Température de consigne">🎯 ${c(a.temperature)}</span>
-        <span title="Température actuelle">🌡 ${c(a.current_temperature)}</span>
+        <span title=${S("roomClimate.target_temp")}>🎯 ${c(a.temperature)}</span>
+        <span title=${S("roomClimate.current_temp")}>🌡 ${c(a.current_temperature)}</span>
       </div>
-      <button title="Modifier" @click=${() => this._dialogIndex = e}>✏️</button>
-      <button title="Retirer" @click=${() => this._remove(e)}>✕</button>
+      <button title=${S("common.edit")} @click=${() => this._dialogIndex = e}>✏️</button>
+      <button title=${S("roomClimate.remove")} @click=${() => this._remove(e)}>✕</button>
     </div>`;
 	}
 	_renderHeating() {
 		let e = this.room.heating?.radiators ?? [];
 		return h`
       <div class="section-row">
-        <span class="section">Heating</span>
+        <span class="section">${S("roomClimate.heating")}</span>
         ${e.length ? h`<label
               class="room-switch ${this._roomOn ? "on" : ""}"
-              title=${this._roomOn ? "Désactiver : la pièce passe en Unheated, ses vannes sur off" : "Activer : la pièce reprend le mode de sa zone"}
+              title=${this._roomOn ? S("roomClimate.disable_hint") : S("roomClimate.enable_hint")}
             >
-              ${this._roomOn ? "Chauffage activé" : "Chauffage désactivé"}
+              ${this._roomOn ? S("roomClimate.heating_on") : S("roomClimate.heating_off")}
               <span class="toggle ${this._roomOn ? "on" : ""}">
                 <input
                   type="checkbox"
@@ -3840,9 +5642,9 @@ var Jr, Yr = [
                 <span class="knob"></span>
               </span>
             </label>` : ""}
-        <button @click=${() => this._dialogIndex = -1}>＋ Radiateur</button>
+        <button @click=${() => this._dialogIndex = -1}>＋ ${S("roomClimate.add_radiator")}</button>
       </div>
-      ${e.length ? e.map((e, t) => this._renderRadiator(t)) : h`<div class="empty">Aucun radiateur.</div>`}
+      ${e.length ? e.map((e, t) => this._renderRadiator(t)) : h`<div class="empty">${S("roomClimate.no_radiators")}</div>`}
     `;
 	}
 	render() {
@@ -3857,7 +5659,7 @@ var Jr, Yr = [
       ></homex-radiator-dialog>
     `;
 	}
-}, Jr.styles = [D, o`
+}, gi.styles = [O, o`
       .section-row {
         display: flex;
         align-items: center;
@@ -3983,22 +5785,18 @@ var Jr, Yr = [
           margin-left: auto;
         }
       }
-    `], Jr);
-O([b({ attribute: !1 })], Qr.prototype, "hass", void 0), O([b({ attribute: !1 })], Qr.prototype, "room", void 0), O([x()], Qr.prototype, "_devicePresets", void 0), O([x()], Qr.prototype, "_dialogIndex", void 0), O([x()], Qr.prototype, "_switching", void 0), Qr = O([y("homex-room-climate")], Qr);
+    `], gi);
+k([b({ attribute: !1 })], Si.prototype, "hass", void 0), k([b({ attribute: !1 })], Si.prototype, "room", void 0), k([x()], Si.prototype, "_devicePresets", void 0), k([x()], Si.prototype, "_dialogIndex", void 0), k([x()], Si.prototype, "_switching", void 0), Si = k([y("homex-room-climate")], Si);
 // src/components/homex-switch-mapping.ts
-var $r, ei = {
-	lights: "💡 Lights",
-	shutters: "🪟 Shutters",
-	heating: "🔥 Climate"
-}, ti = {
-	single: "Simple",
-	double: "Double",
-	long: "Long"
-};
-function ni(e) {
+var Ci, wi = [
+	"lights",
+	"shutters",
+	"heating"
+], Ti = (e) => wi.includes(e) ? S(`switchMapping.module_${e}`) : e, Ei = (e) => S(`switchMapping.tap_${e}`);
+function Di(e) {
 	return e.kind === "group" ? `group:${e.group_id}` : e.kind === "scene" ? `scene:${e.scene_key}` : e.kind.startsWith("shutter_") ? `${e.kind}:${e.group_id}` : e.kind === "heating_mode" ? `heating_mode:${e.mode_id}` : e.kind;
 }
-var B = ($r = class extends v {
+var B = (Ci = class extends v {
 	constructor(...e) {
 		super(...e), this.open = !1, this.layout = null, this.taps = {}, this._rooms = [], this._heatingModes = [], this._mappings = {}, this._tapTab = "single", this._dragId = "", this._picked = "", this._dropBtn = null, this._busy = !1;
 	}
@@ -4007,13 +5805,13 @@ var B = ($r = class extends v {
 	}
 	async _loadRooms() {
 		try {
-			let e = await en(this.hass), t = new Set(this.sw?.rooms ?? []);
+			let e = await Fn(this.hass), t = new Set(this.sw?.rooms ?? []);
 			this._rooms = e.filter((e) => t.has(e.room_id));
 		} catch {
 			this._rooms = [];
 		}
 		try {
-			this._heatingModes = (await bn(this.hass)).presets;
+			this._heatingModes = (await er(this.hass)).presets;
 		} catch {
 			this._heatingModes = [];
 		}
@@ -4023,7 +5821,7 @@ var B = ($r = class extends v {
 	}
 	_actionsForRoom(e) {
 		let t = (t, n, r, i, a) => ({
-			id: `${e.room_id}::${ni(a)}`,
+			id: `${e.room_id}::${Di(a)}`,
 			room_id: e.room_id,
 			room_name: e.name,
 			module: t,
@@ -4033,32 +5831,32 @@ var B = ($r = class extends v {
 			action: a
 		}), n = [];
 		if ((e.modules ?? []).includes("lights")) {
-			n.push(t("lights", "Toggle pièce (on / off)", "Toggle", "⏻", { kind: "toggle" }), t("lights", "Changement de scène", "Scène →", "🎬", { kind: "scene_next" }), t("lights", "Dimmer +", "Dim +", "🔆", { kind: "dim_up" }), t("lights", "Dimmer −", "Dim −", "🔅", { kind: "dim_down" }));
-			for (let r of e.groups ?? []) n.push(t("lights", `Groupe : ${r.name}`, r.name, "◧", {
+			n.push(t("lights", S("switchMapping.toggle_room"), S("switchMapping.toggle_short"), "⏻", { kind: "toggle" }), t("lights", S("switchMapping.scene_next"), S("switchMapping.scene_next_short"), "🎬", { kind: "scene_next" }), t("lights", S("switchMapping.dim_up"), S("switchMapping.dim_up_short"), "🔆", { kind: "dim_up" }), t("lights", S("switchMapping.dim_down"), S("switchMapping.dim_down_short"), "🔅", { kind: "dim_down" }));
+			for (let r of e.groups ?? []) n.push(t("lights", S("switchMapping.group", { name: r.name }), r.name, "◧", {
 				kind: "group",
 				group_id: r.group_id
 			}));
-			for (let r of e.scenes ?? []) n.push(t("lights", `Scène : ${r.name}`, r.name, "★", {
+			for (let r of e.scenes ?? []) n.push(t("lights", S("switchMapping.scene", { name: r.name }), r.name, "★", {
 				kind: "scene",
 				scene_key: r.key
 			}));
 		}
-		if ((e.modules ?? []).includes("shutters")) for (let r of e.shutter_groups ?? []) n.push(t("shutters", `${r.name} — Permuter`, `${r.name} ⇅`, "⇅", {
+		if ((e.modules ?? []).includes("shutters")) for (let r of e.shutter_groups ?? []) n.push(t("shutters", S("switchMapping.shutter_toggle", { name: r.name }), `${r.name} ⇅`, "⇅", {
 			kind: "shutter_toggle",
 			group_id: r.id
-		}), t("shutters", `${r.name} — Ouvrir`, `${r.name} ⬆`, "⬆", {
+		}), t("shutters", S("switchMapping.shutter_open", { name: r.name }), `${r.name} ⬆`, "⬆", {
 			kind: "shutter_open",
 			group_id: r.id
-		}), t("shutters", `${r.name} — Fermer`, `${r.name} ⬇`, "⬇", {
+		}), t("shutters", S("switchMapping.shutter_close", { name: r.name }), `${r.name} ⬇`, "⬇", {
 			kind: "shutter_close",
 			group_id: r.id
-		}), t("shutters", `${r.name} — Stop`, `${r.name} ⏹`, "⏹", {
+		}), t("shutters", S("switchMapping.shutter_stop", { name: r.name }), `${r.name} ⏹`, "⏹", {
 			kind: "shutter_stop",
 			group_id: r.id
 		}));
 		if (this._heatingModes.length) {
-			n.push(t("heating", "Chauffage — mode suivant", "Mode →", "🔥", { kind: "heating_mode_next" }));
-			for (let e of this._heatingModes) n.push(t("heating", `Chauffage — ${e.name}`, e.name, "🌡", {
+			n.push(t("heating", S("switchMapping.heating_next"), S("switchMapping.heating_next_short"), "🔥", { kind: "heating_mode_next" }));
+			for (let e of this._heatingModes) n.push(t("heating", S("switchMapping.heating_mode", { name: e.name }), e.name, "🌡", {
 				kind: "heating_mode",
 				mode_id: e.id
 			}));
@@ -4080,11 +5878,11 @@ var B = ($r = class extends v {
 		return this._allActions().find((t) => t.id === e);
 	}
 	_itemForValue(e) {
-		return this._itemById(`${e.room}::${ni(e.action)}`);
+		return this._itemById(`${e.room}::${Di(e.action)}`);
 	}
 	_usedIds() {
 		let e = /* @__PURE__ */ new Set();
-		for (let t of Object.values(this._mappings)) for (let n of Object.values(t)) e.add(`${n.room}::${ni(n.action)}`);
+		for (let t of Object.values(this._mappings)) for (let n of Object.values(t)) e.add(`${n.room}::${Di(n.action)}`);
 		return e;
 	}
 	_enabledModes() {
@@ -4131,12 +5929,12 @@ var B = ($r = class extends v {
 	async _save() {
 		this._busy = !0;
 		try {
-			await Ht(this.hass, {
+			await Cn(this.hass, {
 				...this.sw,
 				mappings: this._mappings
-			}), S(this), this._close();
+			}), C(this), this._close();
 		} catch (e) {
-			this._busy = !1, alert("Erreur Homex : " + C(e));
+			this._busy = !1, alert(S("common.error", { message: w(e) }));
 		}
 	}
 	_trunc(e, t) {
@@ -4160,7 +5958,7 @@ var B = ($r = class extends v {
 	}
 	_canvas(e) {
 		let t = this.layout;
-		if (!t) return h`<p class="hint">Layout introuvable pour ce modèle.</p>`;
+		if (!t) return h`<p class="hint">${S("switchMapping.layout_not_found")}</p>`;
 		let n = t.bounds, r = t.shape === "round", i = `mapclip-${t.id}`, a = r ? g`<ellipse cx=${n.x + n.w / 2} cy=${n.y + n.h / 2} rx=${n.w / 2} ry=${n.h / 2}></ellipse>` : g`<rect x=${n.x} y=${n.y} width=${n.w} height=${n.h} rx="0.4"></rect>`, o = r ? g`<ellipse class="sh" cx=${n.x + n.w / 2} cy=${n.y + n.h / 2} rx=${n.w / 2} ry=${n.h / 2}></ellipse>` : g`<rect class="sh" x=${n.x} y=${n.y} width=${n.w} height=${n.h} rx="0.4"></rect>`, s = new Set(this._buttonsFor(e)), c = (e) => (t.positions || []).find((t) => t.n === e), l = n.x + n.w / 2, u = n.y + n.h / 2, d = (e, t) => r ? [l + (e - l) * .82, u + (t - u) * .82] : [e, t];
 		return h`<svg class="canvas" viewBox="-10 -10 20 20">
       <defs><clipPath id=${i}>${a}</clipPath></defs>
@@ -4190,7 +5988,7 @@ var B = ($r = class extends v {
 	_invisibleTray(e) {
 		let t = this._invisibleButtons(e);
 		return t.length ? h`<div class="tray">
-      <span class="tray-label">Boutons invisibles</span>
+      <span class="tray-label">${S("switchMapping.invisible_buttons")}</span>
       ${t.map((t) => {
 			let n = this._mappings[e]?.[t], r = n ? this._itemForValue(n) : void 0;
 			return h`<div
@@ -4219,48 +6017,42 @@ var B = ($r = class extends v {
 		return h`
       <homex-dialog
         .open=${this.open}
-        heading=${`Assignations — ${this.sw?.name ?? ""}`}
+        heading=${S("switchMapping.heading", { name: this.sw?.name ?? "" })}
         @dialog-closed=${this._close}
       >
         <div class="cols">
           <div class="left">
-            <p class="section">Actions Homex</p>
-            ${this._rooms.length === 0 ? h`<p class="hint">Aucune pièce associée à cet interrupteur.</p>` : this._rooms.every((e) => !this._actionsByModule(e).length) ? h`<p class="hint">
-                    Aucune action disponible : les pièces associées n'ont aucun
-                    module actif (ex. Lights).
-                  </p>` : this._rooms.map((e) => [e, this._actionsByModule(e)]).filter(([, e]) => e.length > 0).map(([e, t]) => h`
+            <p class="section">${S("switchMapping.homex_actions")}</p>
+            ${this._rooms.length === 0 ? h`<p class="hint">${S("switchMapping.no_rooms")}</p>` : this._rooms.every((e) => !this._actionsByModule(e).length) ? h`<p class="hint">${S("switchMapping.no_actions")}</p>` : this._rooms.map((e) => [e, this._actionsByModule(e)]).filter(([, e]) => e.length > 0).map(([e, t]) => h`
                         ${this._multi ? h`<p class="room-head">🏠 ${e.name}</p>` : ""}
                         ${t.map(([e, t]) => h`
-                            <p class="mod-head">${ei[e] ?? e}</p>
+                            <p class="mod-head">${Ti(e)}</p>
                             ${t.map((e) => this._actionRow(e, n))}
                           `)}
                       `)}
-            <p class="hint">
-              Glisse une action sur un bouton du canvas (ou touche une action
-              puis un bouton). Touche un bouton assigné pour le vider.
-            </p>
+            <p class="hint">${S("switchMapping.hint")}</p>
           </div>
           <div class="right">
             ${e.length ? h`<div class="tabs">
                     ${e.map((e) => h`<span
                         class="tab ${e === t ? "active" : ""}"
                         @click=${() => this._tapTab = e}
-                        >${ti[e]}</span
+                        >${Ei(e)}</span
                       >`)}
                   </div>
-                  ${this._canvas(t)} ${this._invisibleTray(t)}` : h`<p class="hint">Aucun tap mode configuré sur ce preset.</p>`}
+                  ${this._canvas(t)} ${this._invisibleTray(t)}` : h`<p class="hint">${S("switchMapping.no_tap_modes")}</p>`}
           </div>
         </div>
         <div slot="actions">
-          <button @click=${this._close}>Annuler</button>
+          <button @click=${this._close}>${S("common.cancel")}</button>
           <button class="primary" ?disabled=${this._busy} @click=${this._save}>
-            Enregistrer
+            ${S("common.save")}
           </button>
         </div>
       </homex-dialog>
     `;
 	}
-}, $r.styles = [D, o`
+}, Ci.styles = [O, o`
       .cols {
         display: flex;
         gap: 20px;
@@ -4499,45 +6291,48 @@ var B = ($r = class extends v {
         background: var(--primary-color);
         color: var(--text-primary-color, #fff);
       }
-    `], $r);
-O([b({ attribute: !1 })], B.prototype, "hass", void 0), O([b({ type: Boolean })], B.prototype, "open", void 0), O([b({ attribute: !1 })], B.prototype, "sw", void 0), O([b({ attribute: !1 })], B.prototype, "layout", void 0), O([b({ attribute: !1 })], B.prototype, "taps", void 0), O([x()], B.prototype, "_rooms", void 0), O([x()], B.prototype, "_heatingModes", void 0), O([x()], B.prototype, "_mappings", void 0), O([x()], B.prototype, "_tapTab", void 0), O([x()], B.prototype, "_dragId", void 0), O([x()], B.prototype, "_picked", void 0), O([x()], B.prototype, "_dropBtn", void 0), O([x()], B.prototype, "_busy", void 0), B = O([y("homex-switch-mapping")], B);
+    `], Ci);
+k([b({ attribute: !1 })], B.prototype, "hass", void 0), k([b({ type: Boolean })], B.prototype, "open", void 0), k([b({ attribute: !1 })], B.prototype, "sw", void 0), k([b({ attribute: !1 })], B.prototype, "layout", void 0), k([b({ attribute: !1 })], B.prototype, "taps", void 0), k([x()], B.prototype, "_rooms", void 0), k([x()], B.prototype, "_heatingModes", void 0), k([x()], B.prototype, "_mappings", void 0), k([x()], B.prototype, "_tapTab", void 0), k([x()], B.prototype, "_dragId", void 0), k([x()], B.prototype, "_picked", void 0), k([x()], B.prototype, "_dropBtn", void 0), k([x()], B.prototype, "_busy", void 0), B = k([y("homex-switch-mapping")], B);
 // src/components/homex-room-card.ts
-var ri = class extends v {
+var Oi = class extends v {
 	constructor(...e) {
 		super(...e), this.expanded = !1, this._dialog = "", this._menuOpen = !1, this._shutterCtlOpen = !1, this._renameScene = null, this._deleteScenes = !0, this._deleting = !1, this._syncing = !1, this._activeTab = "", this._gswitches = [], this._presets = [], this._layouts = [], this._mappingSwitch = null, this._shutterGroupOpen = !1, this._shutterGroupEdit = null, this._close = () => this._dialog = "", this._delete = () => {
 			this._menuOpen = !1, this._deleteScenes = !0, this._dialog = "delete";
 		}, this._confirmDelete = async () => {
 			this._deleting = !0;
 			try {
-				await nn(this.hass, this.room.entry_id, this._deleteScenes), this._dialog = "", S(this);
+				await Ln(this.hass, this.room.entry_id, this._deleteScenes), this._dialog = "", C(this);
 			} catch (e) {
-				alert("Erreur Homex : " + C(e));
+				alert(S("common.error", { message: w(e) }));
 			} finally {
 				this._deleting = !1;
 			}
 		}, this._syncLabels = async () => {
 			this._menuOpen = !1, this._syncing = !0;
 			try {
-				let e = await ln(this.hass, this.room.entry_id);
-				alert(`Synchronisé : ${e.updated} entité(s) (area + labels), ${e.scenes_renamed} scène(s) renommée(s).`);
+				let e = await Un(this.hass, this.room.entry_id);
+				alert(S("roomCard.synced", {
+					entities: e.updated,
+					scenes: e.scenes_renamed
+				}));
 			} catch (e) {
-				alert("Erreur Homex : " + C(e));
+				alert(S("common.error", { message: w(e) }));
 			} finally {
 				this._syncing = !1;
 			}
 		}, this._sceneNext = async (e) => {
 			e?.stopPropagation();
 			try {
-				await vn(this.hass, this.room.entry_id);
+				await Qn(this.hass, this.room.entry_id);
 			} catch (e) {
-				alert("Erreur Homex : " + C(e));
+				alert(S("common.error", { message: w(e) }));
 			}
 		}, this._dim = async (e, t) => {
 			t?.stopPropagation();
 			try {
-				await un(this.hass, this.room.entry_id, e);
+				await Wn(this.hass, this.room.entry_id, e);
 			} catch (e) {
-				alert("Erreur Homex : " + C(e));
+				alert(S("common.error", { message: w(e) }));
 			}
 		}, this._toggleExpand = () => {
 			this.dispatchEvent(new CustomEvent("homex-toggle-expand", {
@@ -4554,22 +6349,22 @@ var ri = class extends v {
 		return this.hass.states[this.room.switch]?.state === "on";
 	}
 	_openHa(e, t) {
-		Bn(`/config/scene/edit/${e.config_id}`, t);
+		br(`/config/scene/edit/${e.config_id}`, t);
 	}
 	async _deleteScene(e) {
-		if (confirm(`Supprimer la scène "${e.name}" ?`)) try {
-			await gn(this.hass, this.room.entry_id, e.key), S(this);
+		if (confirm(S("roomCard.confirm_delete_scene", { name: e.name }))) try {
+			await Xn(this.hass, this.room.entry_id, e.key), C(this);
 		} catch (e) {
-			alert("Erreur Homex : " + C(e));
+			alert(S("common.error", { message: w(e) }));
 		}
 	}
 	async _sceneMoved(e) {
 		let { oldIndex: t, newIndex: n } = e.detail, r = this.room.scenes.filter((e) => e.orderable).map((e) => e.key), [i] = r.splice(t, 1);
 		r.splice(n, 0, i);
 		try {
-			await _n(this.hass, this.room.entry_id, r), S(this);
+			await Zn(this.hass, this.room.entry_id, r), C(this);
 		} catch (e) {
-			alert("Erreur Homex : " + C(e));
+			alert(S("common.error", { message: w(e) }));
 		}
 	}
 	_iconBtn(e, t, n, r = !1) {
@@ -4586,17 +6381,17 @@ var ri = class extends v {
 	_sceneRow(e, t) {
 		return h`
       <div class="scene-row">
-        ${e.orderable ? h`<span class="handle" title="Glisser pour réordonner">
+        ${e.orderable ? h`<span class="handle" title=${S("roomCard.drag_reorder")}>
               <svg viewBox="0 0 24 24"><path d=${ct}></path></svg>
-            </span>` : h`<span class="pin" title="Toujours en dernier">
+            </span>` : h`<span class="pin" title=${S("roomCard.always_last")}>
               <svg viewBox="0 0 24 24"><path d=${St}></path></svg>
             </span>`}
         <span class="scene-name">${e.name}</span>
-        ${e.key === t ? h`<span class="active-tag">active</span>` : ""}
+        ${e.key === t ? h`<span class="active-tag">${S("roomCard.active")}</span>` : ""}
         <span class="btn-group">
-          ${this._iconBtn(bt, "Voir dans Home Assistant", (t) => this._openHa(e, t))}
-          ${this._iconBtn(xt, "Renommer", () => this._renameScene = e)}
-          ${this._iconBtn(at, e.removable ? "Supprimer" : "Scène par défaut", () => this._deleteScene(e), !e.removable)}
+          ${this._iconBtn(bt, S("roomCard.open_in_ha"), (t) => this._openHa(e, t))}
+          ${this._iconBtn(xt, S("common.rename"), () => this._renameScene = e)}
+          ${this._iconBtn(at, e.removable ? S("common.delete") : S("roomCard.default_scene"), () => this._deleteScene(e), !e.removable)}
         </span>
       </div>
     `;
@@ -4605,7 +6400,7 @@ var ri = class extends v {
 		let e = this.room, t = this._isOn() ? this.hass.states[e.switch]?.attributes?.active_scene ?? null : null, n = t ? e.scenes.find((e) => e.key === t)?.name : void 0, r = (e.area_id ? this.hass.areas?.[e.area_id] : null)?.icon || void 0, i = e.scenes.filter((e) => e.orderable), a = e.scenes.filter((e) => !e.orderable), o = e.scenes.some((e) => e.removable), s = e.modules?.includes("lights") ?? !0, c = e.modules?.includes("switches") ?? !1, l = e.modules?.includes("shutters") ?? !1, u = e.modules?.includes("heating") ?? !1, d = !!(e.dim_up_triggers?.length || e.dim_down_triggers?.length);
 		return h`
       <ha-card class=${this.expanded ? "selected" : ""}>
-        <div class="head" @click=${this._toggleExpand} title="Plier / déplier">
+        <div class="head" @click=${this._toggleExpand} title=${S("roomCard.collapse_expand")}>
           <svg class="chevron" viewBox="0 0 24 24">
             <path d=${this.expanded ? rt : nt}></path>
           </svg>
@@ -4622,14 +6417,14 @@ var ri = class extends v {
             ${s && d ? h`
                   <button
                     class="round"
-                    title="Baisser la luminosité (−20)"
+                    title=${S("roomCard.dim_down")}
                     @click=${(e) => this._dim(-20, e)}
                   >
                     <svg viewBox="0 0 24 24"><path d=${yt}></path></svg>
                   </button>
                   <button
                     class="round"
-                    title="Monter la luminosité (+20)"
+                    title=${S("roomCard.dim_up")}
                     @click=${(e) => this._dim(20, e)}
                   >
                     <svg viewBox="0 0 24 24"><path d=${Ct}></path></svg>
@@ -4637,7 +6432,7 @@ var ri = class extends v {
                 ` : ""}
             ${s && o ? h`<button
                   class="round"
-                  title="Changer de scène"
+                  title=${S("roomCard.next_scene")}
                   @click=${(e) => this._sceneNext(e)}
                 >
                   <svg viewBox="0 0 24 24"><path d=${jt}></path></svg>
@@ -4645,7 +6440,7 @@ var ri = class extends v {
             ${l ? this._renderShutterButton(e) : ""}
             <button
               class="kebab"
-              title="Actions"
+              title=${S("roomCard.actions")}
               @click=${(e) => {
 			e.stopPropagation(), this._menuOpen = !0;
 		}}
@@ -4658,23 +6453,23 @@ var ri = class extends v {
         ${this._menuOpen ? h`
               <div class="menu-backdrop" @click=${() => this._menuOpen = !1}></div>
               <div class="menu">
-                <button @click=${() => this._pick("room")}>✏️ Modifier la pièce</button>
+                <button @click=${() => this._pick("room")}>✏️ ${S("roomCard.edit_room")}</button>
                 ${s ? h`
-                      <div class="menu-section">Lights</div>
+                      <div class="menu-section">${S("roomCard.module_lights")}</div>
                       <button @click=${() => this._pick("triggers")}>
-                        ⚡ Déclencheurs (${e.triggers.length + e.scene_triggers.length})
+                        ⚡ ${S("roomCard.triggers", { count: e.triggers.length + e.scene_triggers.length })}
                       </button>
                       <button @click=${() => this._pick("addgroup")}>
-                        ＋ Ajouter un groupe
+                        ＋ ${S("roomCard.add_group")}
                       </button>
                       <div class="sep"></div>
                     ` : ""}
                 <button ?disabled=${this._syncing} @click=${this._syncLabels}>
-                  🏷 ${this._syncing ? "Synchronisation…" : "Synchroniser les labels"}
+                  🏷 ${this._syncing ? S("roomCard.syncing") : S("roomCard.sync_labels")}
                 </button>
                 <div class="sep"></div>
                 <button class="danger-item" @click=${this._delete}>
-                  🗑 Supprimer la pièce
+                  🗑 ${S("roomCard.delete_room")}
                 </button>
               </div>
             ` : ""}
@@ -4695,45 +6490,45 @@ var ri = class extends v {
 		});
 	}
 	_climatePills(e) {
-		let t = Zn(this.hass, e), n = Yn(this.hass, e), r = (e, t, n, r = "") => h`<span class="stat icon-stat ${r}" title=${n}>
+		let t = jr(this.hass, e), n = kr(this.hass, e), r = (e, t, n, r = "") => h`<span class="stat icon-stat ${r}" title=${n}>
         <svg viewBox="0 0 24 24"><path d=${e}></path></svg>${t}
       </span>`;
 		return h`
-      ${t ? r(ft, t.mode, t.own ? "Chauffage désactivé dans la pièce" : `Mode de la zone ${t.zone}`) : ""}
-      ${e.heating?.radiators?.length ? Xn(this.hass, e) ? r(lt, "Heating", "Au moins une vanne chauffe", "heating") : r(ut, "Idle", "Aucune vanne ne chauffe") : ""}
-      ${n ? r(Xe, "Vanne ?", n, "warning") : ""}
+      ${t ? r(ft, t.mode, t.own ? S("roomCard.heating_disabled_room") : S("roomCard.zone_mode", { zone: t.zone })) : ""}
+      ${e.heating?.radiators?.length ? Ar(this.hass, e) ? r(lt, S("roomCard.heating"), S("roomCard.heating_hint"), "heating") : r(ut, S("roomCard.idle"), S("roomCard.idle_hint")) : ""}
+      ${n ? r(Xe, S("roomCard.valve_check"), n, "warning") : ""}
     `;
 	}
 	_renderStats(e, t, n, r, i) {
 		let a = Object.values(e.metrics ?? {}).filter((e) => e?.sensors?.length).length;
 		return h`
       ${t ? h`
-            <div class="module-title">Lights</div>
+            <div class="module-title">${S("roomCard.module_lights")}</div>
             <div class="stats">
-              <span class="stat">🔌 ${e.devices.length} lumière(s)</span>
-              <span class="stat">🎬 ${e.scenes.length} scène(s)</span>
-              ${e.groups.length ? h`<span class="stat">📦 ${e.groups.length} groupe(s)</span>` : ""}
+              <span class="stat">🔌 ${S("roomCard.lights_count", { count: e.devices.length })}</span>
+              <span class="stat">🎬 ${S("roomCard.scenes_count", { count: e.scenes.length })}</span>
+              ${e.groups.length ? h`<span class="stat">📦 ${S("roomCard.groups_count", { count: e.groups.length })}</span>` : ""}
             </div>
           ` : ""}
       ${n ? h`
-            <div class="module-title">Switches</div>
+            <div class="module-title">${S("roomCard.module_switches")}</div>
             <div class="stats">
-              <span class="stat">🎛 ${this._roomSwitches().length} interrupteur(s)</span>
-              <span class="stat">⚡ ${this._switchActionCount(e)} action(s)</span>
+              <span class="stat">🎛 ${S("roomCard.switches_count", { count: this._roomSwitches().length })}</span>
+              <span class="stat">⚡ ${S("roomCard.actions_count", { count: this._switchActionCount(e) })}</span>
             </div>
           ` : ""}
       ${r ? h`
-            <div class="module-title">Shutters</div>
+            <div class="module-title">${S("roomCard.module_shutters")}</div>
             <div class="stats">
-              <span class="stat">📦 ${(e.shutter_groups ?? []).length} groupe(s)</span>
-              <span class="stat">🪟 ${this._shutterCount(e)} volet(s)</span>
+              <span class="stat">📦 ${S("roomCard.groups_count", { count: (e.shutter_groups ?? []).length })}</span>
+              <span class="stat">🪟 ${S("roomCard.shutters_count", { count: this._shutterCount(e) })}</span>
             </div>
           ` : ""}
       ${i ? h`
-            <div class="module-title">Climate</div>
+            <div class="module-title">${S("roomCard.module_climate")}</div>
             <div class="stats">
-              <span class="stat">📈 ${a} métrique(s)</span>
-              <span class="stat">🔥 ${e.heating?.radiators?.length ?? 0} radiateur(s)</span>
+              <span class="stat">📈 ${S("roomCard.metrics_count", { count: a })}</span>
+              <span class="stat">🔥 ${S("roomCard.radiators_count", { count: e.heating?.radiators?.length ?? 0 })}</span>
               ${this._climatePills(e)}
             </div>
           ` : ""}
@@ -4743,17 +6538,17 @@ var ri = class extends v {
 		let c = [];
 		if (i && c.push({
 			key: "lights",
-			label: "Lights"
+			label: S("roomCard.module_lights")
 		}), a && c.push({
 			key: "switches",
-			label: "Switches"
+			label: S("roomCard.module_switches")
 		}), o && c.push({
 			key: "shutters",
-			label: "Shutters"
+			label: S("roomCard.module_shutters")
 		}), s && c.push({
 			key: "climate",
-			label: "Climate"
-		}), !c.length) return h`<div class="empty-body">Aucun module actif sur cette pièce.</div>`;
+			label: S("roomCard.module_climate")
+		}), !c.length) return h`<div class="empty-body">${S("roomCard.no_modules")}</div>`;
 		let l = c.some((e) => e.key === this._activeTab) ? this._activeTab : c[0].key;
 		return h`
       <div class="tabs">
@@ -4771,8 +6566,8 @@ var ri = class extends v {
 	_renderLightsTab(e, t, n, r) {
 		return h`
       <div class="section-row">
-        <span class="section">Scènes</span>
-        <button @click=${() => this._pick("addscene")}>＋ Scène</button>
+        <span class="section">${S("roomCard.scenes")}</span>
+        <button @click=${() => this._pick("addscene")}>＋ ${S("roomCard.add_scene")}</button>
       </div>
       <ha-sortable handle-selector=".handle" @item-moved=${this._sceneMoved}>
         <div>${n.map((e) => this._sceneRow(e, t))}</div>
@@ -4780,8 +6575,8 @@ var ri = class extends v {
       ${r.map((e) => this._sceneRow(e, t))}
 
       <div class="section-row">
-        <span class="section">Groupes</span>
-        <button @click=${() => this._pick("addgroup")}>＋ Groupe</button>
+        <span class="section">${S("roomCard.groups")}</span>
+        <button @click=${() => this._pick("addgroup")}>＋ ${S("roomCard.add_group_short")}</button>
       </div>
       ${e.groups.length ? h`<div class="groups">
             ${e.groups.map((t) => h`<homex-group-row
@@ -4789,10 +6584,7 @@ var ri = class extends v {
                 .room=${e}
                 .group=${t}
               ></homex-group-row>`)}
-          </div>` : h`<div class="empty-body">
-            Aucun groupe. Un groupe pilote une partie des lumières de la pièce
-            (ex. une lampe de chevet).
-          </div>`}
+          </div>` : h`<div class="empty-body">${S("roomCard.no_groups")}</div>`}
     `;
 	}
 	connectedCallback() {
@@ -4801,9 +6593,9 @@ var ri = class extends v {
 	async _loadSwitchData() {
 		try {
 			[this._gswitches, this._presets, this._layouts] = await Promise.all([
-				Vt(this.hass),
-				Wt(this.hass),
-				Rt(this.hass)
+				Sn(this.hass),
+				Tn(this.hass),
+				yn(this.hass)
 			]);
 		} catch {}
 	}
@@ -4820,7 +6612,7 @@ var ri = class extends v {
 		return n;
 	}
 	_presetFor(e) {
-		return Wn(this.hass, this._presets, e);
+		return wr(this.hass, this._presets, e);
 	}
 	_layoutFor(e) {
 		return e ? this._layouts.find((t) => t.id === e.layout_id) : void 0;
@@ -4836,8 +6628,8 @@ var ri = class extends v {
 		let t = this._roomSwitches();
 		return h`
       <div class="section-row">
-        <span class="section">Interrupteurs</span>
-        <button @click=${() => this._openSwitchManagerAdd()}>＋ Interrupteur</button>
+        <span class="section">${S("roomCard.switches")}</span>
+        <button @click=${() => this._openSwitchManagerAdd()}>＋ ${S("roomCard.add_switch")}</button>
       </div>
       ${t.length ? t.map((e) => {
 			let t = this._presetFor(e);
@@ -4847,30 +6639,28 @@ var ri = class extends v {
             >
               <span class="switch-name">🎛 ${e.name}</span>
               <span class="switch-meta">
-                ${t ? t.name : "aucun preset"}
+                ${t ? t.name : S("roomCard.no_preset")}
               </span>
             </div>`;
-		}) : h`<div class="empty-body">
-            Aucun interrupteur associé. Clique sur « ＋ Interrupteur » pour en
-            créer un (via le Switch Manager) et l'associer à cette pièce.
-          </div>`}
+		}) : h`<div class="empty-body">${S("roomCard.no_switches", { button: S("roomCard.add_switch") })}</div>`}
     `;
 	}
 	_openShutterGroup(e) {
 		this._shutterGroupEdit = e, this._shutterGroupOpen = !0;
 	}
 	_renderShuttersTab(e) {
+		let t = e.shutter_groups ?? [];
 		return h`
       <div class="section-row">
-        <span class="section">Groupes de volets</span>
-        <button @click=${() => this._openShutterGroup(null)}>＋ Groupe</button>
+        <span class="section">${S("roomCard.shutter_groups")}</span>
+        <button @click=${() => this._openShutterGroup(null)}>＋ ${S("roomCard.add_group_short")}</button>
       </div>
-      ${(e.shutter_groups ?? []).map((e) => h`<div class="shutter-group">
+      ${t.map((e) => h`<div class="shutter-group">
           <div class="shutter-group-head">
             <span class="switch-name">📦 ${e.name}</span>
             <button
               class="cfg-btn"
-              title="Configurer le groupe"
+              title=${S("roomCard.configure_group")}
               @click=${() => this._openShutterGroup(e)}
             >
               ⚙
@@ -4878,7 +6668,7 @@ var ri = class extends v {
           </div>
           ${e.devices.length ? e.devices.map((e) => h`<div class="shutter-cover">
                   🪟 ${this._entityName(e)}
-                </div>`) : h`<div class="shutter-cover empty">Aucun volet dans ce groupe.</div>`}
+                </div>`) : h`<div class="shutter-cover empty">${S("roomCard.no_shutters_in_group")}</div>`}
         </div>`)}
     `;
 	}
@@ -4889,12 +6679,15 @@ var ri = class extends v {
 		return (e.shutter_groups ?? []).reduce((e, t) => e + (t.devices?.length ?? 0), 0);
 	}
 	_renderShutterButton(e) {
-		let t = nr(e);
+		let t = Ir(e);
 		if (!t) return "";
-		let n = tr(this.hass, t.devices);
+		let n = Fr(this.hass, t.devices);
 		return h`<button
       class="round shutter-btn ${n.state}"
-      title=${`Volets (${t.name}) : ${n.label}${n.position === null ? "" : ` · ${n.position} %`}`}
+      title=${`${S("roomCard.shutters_title", {
+			name: t.name,
+			state: n.label
+		})}${n.position === null ? "" : ` · ${n.position} %`}`}
       @click=${(e) => {
 			e.stopPropagation(), this._shutterCtlOpen = !0;
 		}}
@@ -4972,11 +6765,8 @@ var ri = class extends v {
 		}}
       >
         <div class="confirm-card" role="dialog" aria-modal="true">
-          <h3>Supprimer la pièce « ${e.name} » ?</h3>
-          <p class="confirm-text">
-            Le switch, le groupe de lumières et les déclencheurs de cette pièce
-            seront supprimés. Cette action est irréversible.
-          </p>
+          <h3>${S("roomCard.confirm_delete_room", { name: e.name })}</h3>
+          <p class="confirm-text">${S("roomCard.delete_room_text")}</p>
           <label class="toggle-row">
             <span class="toggle ${this._deleteScenes ? "on" : ""}">
               <input
@@ -4987,26 +6777,26 @@ var ri = class extends v {
               <span class="knob"></span>
             </span>
             <span class="toggle-label">
-              Supprimer aussi les ${e.scenes.length} scène(s) associée(s)
+              ${S("roomCard.delete_scenes_too", { count: e.scenes.length })}
             </span>
           </label>
           <div class="confirm-actions">
             <button @click=${this._close} ?disabled=${this._deleting}>
-              Annuler
+              ${S("common.cancel")}
             </button>
             <button
               class="danger"
               @click=${this._confirmDelete}
               ?disabled=${this._deleting}
             >
-              ${this._deleting ? "Suppression…" : "Supprimer"}
+              ${this._deleting ? S("roomCard.deleting") : S("common.delete")}
             </button>
           </div>
         </div>
       </div>
     `;
 	}
-}, V = (ri.styles = [D, o`
+}, V = (Oi.styles = [O, o`
       ha-card {
         position: relative;
         padding: 16px;
@@ -5426,22 +7216,22 @@ var ri = class extends v {
         opacity: 0.6;
         cursor: default;
       }
-    `], ri);
-O([b({ attribute: !1 })], V.prototype, "hass", void 0), O([b({ attribute: !1 })], V.prototype, "room", void 0), O([b({ type: Boolean })], V.prototype, "expanded", void 0), O([x()], V.prototype, "_dialog", void 0), O([x()], V.prototype, "_menuOpen", void 0), O([x()], V.prototype, "_shutterCtlOpen", void 0), O([x()], V.prototype, "_renameScene", void 0), O([x()], V.prototype, "_deleteScenes", void 0), O([x()], V.prototype, "_deleting", void 0), O([x()], V.prototype, "_syncing", void 0), O([x()], V.prototype, "_activeTab", void 0), O([x()], V.prototype, "_gswitches", void 0), O([x()], V.prototype, "_presets", void 0), O([x()], V.prototype, "_layouts", void 0), O([x()], V.prototype, "_mappingSwitch", void 0), O([x()], V.prototype, "_shutterGroupOpen", void 0), O([x()], V.prototype, "_shutterGroupEdit", void 0), V = O([y("homex-room-card")], V);
+    `], Oi);
+k([b({ attribute: !1 })], V.prototype, "hass", void 0), k([b({ attribute: !1 })], V.prototype, "room", void 0), k([b({ type: Boolean })], V.prototype, "expanded", void 0), k([x()], V.prototype, "_dialog", void 0), k([x()], V.prototype, "_menuOpen", void 0), k([x()], V.prototype, "_shutterCtlOpen", void 0), k([x()], V.prototype, "_renameScene", void 0), k([x()], V.prototype, "_deleteScenes", void 0), k([x()], V.prototype, "_deleting", void 0), k([x()], V.prototype, "_syncing", void 0), k([x()], V.prototype, "_activeTab", void 0), k([x()], V.prototype, "_gswitches", void 0), k([x()], V.prototype, "_presets", void 0), k([x()], V.prototype, "_layouts", void 0), k([x()], V.prototype, "_mappingSwitch", void 0), k([x()], V.prototype, "_shutterGroupOpen", void 0), k([x()], V.prototype, "_shutterGroupEdit", void 0), V = k([y("homex-room-card")], V);
 // src/components/homex-export-dialog.ts
-var ii, ai = (e) => "\"" + String(e).replace(/\\/g, "\\\\").replace(/"/g, "\\\"") + "\"";
-function oi(e) {
+var ki, Ai = (e) => "\"" + String(e).replace(/\\/g, "\\\\").replace(/"/g, "\\\"") + "\"";
+function ji(e) {
 	let t = ["google_assistant:", "  entity_config:"];
 	e.length || (t[1] = "  entity_config: {}");
-	for (let n of e) t.push(`    ${n.switch}:`), t.push(`      name: ${ai(n.name)}`), t.push("      expose: true"), t.push(`      room: ${ai(n.name)}`);
+	for (let n of e) t.push(`    ${n.switch}:`), t.push(`      name: ${Ai(n.name)}`), t.push("      expose: true"), t.push(`      room: ${Ai(n.name)}`);
 	return t.join("\n") + "\n";
 }
-var si = (ii = class extends v {
+var Mi = (ki = class extends v {
 	constructor(...e) {
 		super(...e), this.open = !1, this.rooms = [], this._copied = !1;
 	}
 	get _yaml() {
-		return oi(this.rooms);
+		return ji(this.rooms);
 	}
 	_close() {
 		this.dispatchEvent(new CustomEvent("dialog-closed"));
@@ -5464,12 +7254,12 @@ var si = (ii = class extends v {
 		return h`
       <homex-dialog
         .open=${this.open}
-        heading="Exposer les pièces (Google Assistant)"
+        heading=${S("exportDialog.heading")}
         @dialog-closed=${this._close}
       >
         <p class="hint">
-          Colle cet extrait dans <code>configuration.yaml</code> pour exposer le
-          toggle on/off de chaque pièce à Google Assistant.
+          ${S("exportDialog.hint_before")} <code>configuration.yaml</code>
+          ${S("exportDialog.hint_after")}
         </p>
         <textarea
           readonly
@@ -5477,16 +7267,16 @@ var si = (ii = class extends v {
           @click=${(e) => e.target.select()}
         ></textarea>
         <span slot="actions">
-          <button @click=${this._download}>Télécharger .yaml</button>
-          <button @click=${this._close}>Fermer</button>
+          <button @click=${this._download}>${S("exportDialog.download")}</button>
+          <button @click=${this._close}>${S("common.close")}</button>
           <button class="primary" @click=${this._copy}>
-            ${this._copied ? "Copié ✓" : "Copier"}
+            ${this._copied ? S("exportDialog.copied") : S("exportDialog.copy")}
           </button>
         </span>
       </homex-dialog>
     `;
 	}
-}, ii.styles = [D, o`
+}, ki.styles = [O, o`
       .hint {
         font-size: 13px;
         color: var(--secondary-text-color);
@@ -5510,10 +7300,10 @@ var si = (ii = class extends v {
         white-space: pre;
         resize: vertical;
       }
-    `], ii);
-O([b({ type: Boolean })], si.prototype, "open", void 0), O([b({ attribute: !1 })], si.prototype, "rooms", void 0), O([x()], si.prototype, "_copied", void 0), si = O([y("homex-export-dialog")], si);
+    `], ki);
+k([b({ type: Boolean })], Mi.prototype, "open", void 0), k([b({ attribute: !1 })], Mi.prototype, "rooms", void 0), k([x()], Mi.prototype, "_copied", void 0), Mi = k([y("homex-export-dialog")], Mi);
 // src/components/homex-layout-editor.ts
-var ci, li = 20, ui = .5, H = (ci = class extends v {
+var Ni, Pi = 20, Fi = .5, H = (Ni = class extends v {
 	constructor(...e) {
 		super(...e), this.layout = null, this._name = "", this._id = "", this._buttons = 2, this._shape = "round", this._bounds = {
 			x: 5,
@@ -5591,7 +7381,7 @@ var ci, li = 20, ui = .5, H = (ci = class extends v {
 		};
 	}
 	_snap(e) {
-		return Math.min(li, Math.max(0, Math.round(e / ui) * ui));
+		return Math.min(Pi, Math.max(0, Math.round(e / Fi) * Fi));
 	}
 	_resetDividers() {
 		let e = this._bounds, t = Math.max(1, this._columns), n = Math.max(1, this._rows);
@@ -5660,10 +7450,10 @@ var ci, li = 20, ui = .5, H = (ci = class extends v {
 		this._rows = isNaN(e) || e < 1 ? 1 : Math.floor(e), this._resetDividers(), this._reconcile();
 	}
 	_onName(e) {
-		this._name = e, this._idEdited || (this._id = M(e));
+		this._name = e, this._idEdited || (this._id = N(e));
 	}
 	_svgPoint(e, t = !0) {
-		let n = this.renderRoot.querySelector("svg").getBoundingClientRect(), r = (e.clientX - n.left) / n.width * li, i = (e.clientY - n.top) / n.height * li;
+		let n = this.renderRoot.querySelector("svg").getBoundingClientRect(), r = (e.clientX - n.left) / n.width * Pi, i = (e.clientY - n.top) / n.height * Pi;
 		return t ? {
 			x: this._snap(r),
 			y: this._snap(i)
@@ -5681,7 +7471,7 @@ var ci, li = 20, ui = .5, H = (ci = class extends v {
 	_hitTest(e, t) {
 		let n = this.renderRoot.querySelector("svg").getBoundingClientRect();
 		if (e >= n.left && e <= n.right && t >= n.top && t <= n.bottom) {
-			let r = (e - n.left) / n.width * li, i = (t - n.top) / n.height * li;
+			let r = (e - n.left) / n.width * Pi, i = (t - n.top) / n.height * Pi;
 			this._hoverCell = this._cellAt(r, i), this._overTray = !1;
 			return;
 		}
@@ -5703,7 +7493,7 @@ var ci, li = 20, ui = .5, H = (ci = class extends v {
 	async _save() {
 		let e = this._name.trim(), t = this._id.trim();
 		if (!e || !t) {
-			alert("Nom et id du layout requis.");
+			alert(S("layoutEditor.name_id_required"));
 			return;
 		}
 		this._recenterShape();
@@ -5738,18 +7528,18 @@ var ci, li = 20, ui = .5, H = (ci = class extends v {
 		};
 		this._busy = !0;
 		try {
-			await zt(this.hass, o), this._close();
+			await bn(this.hass, o), this._close();
 		} catch (e) {
-			this._busy = !1, alert("Erreur Homex : " + C(e));
+			this._busy = !1, alert(S("common.error", { message: w(e) }));
 		}
 	}
 	async _delete() {
-		if (this.layout && confirm(`Supprimer le layout "${this.layout.name}" ?`)) {
+		if (this.layout && confirm(S("layoutEditor.confirm_delete", { name: this.layout.name }))) {
 			this._busy = !0;
 			try {
-				await Bt(this.hass, this.layout.id), this._close();
+				await xn(this.hass, this.layout.id), this._close();
 			} catch (e) {
-				this._busy = !1, alert("Erreur Homex : " + C(e));
+				this._busy = !1, alert(S("common.error", { message: w(e) }));
 			}
 		}
 	}
@@ -5769,42 +7559,37 @@ var ci, li = 20, ui = .5, H = (ci = class extends v {
 		return h`
       <div class="cols">
         <div class="form">
-          ${A("Nom", this._name, (e) => this._onName(e), "Rond 2 boutons")}
-          <div class="section">Forme principale</div>
+          ${j(S("layoutEditor.name"), this._name, (e) => this._onName(e), S("layoutEditor.name_placeholder"))}
+          <div class="section">${S("layoutEditor.main_shape")}</div>
           <div class="shapes">
             <button class="shape-btn ${this._shape === "round" ? "on" : ""}"
-              @click=${() => this._setShape("round")}>● Rond</button>
+              @click=${() => this._setShape("round")}>${S("layoutEditor.shape_round")}</button>
             <button class="shape-btn ${this._shape === "square" ? "on" : ""}"
-              @click=${() => this._setShape("square")}>■ Carré</button>
+              @click=${() => this._setShape("square")}>${S("layoutEditor.shape_square")}</button>
             <button class="shape-btn ${this._shape === "vrect" ? "on" : ""}"
-              @click=${() => this._setShape("vrect")}>▮ Rect. vertical</button>
+              @click=${() => this._setShape("vrect")}>${S("layoutEditor.shape_vrect")}</button>
           </div>
           <div class="fields">
             <div class="field">
-              <label>Boutons</label>
+              <label>${S("layoutEditor.buttons")}</label>
               <input class="num" type="number" min="1" .value=${String(this._buttons)}
                 @change=${(e) => this._setButtons(Number(e.target.value))} />
             </div>
             <div class="field">
-              <label>Colonnes</label>
+              <label>${S("layoutEditor.columns")}</label>
               <input class="num" type="number" min="1" .value=${String(this._columns)}
                 @change=${(e) => this._setColumns(Number(e.target.value))} />
             </div>
             <div class="field">
-              <label>Lignes</label>
+              <label>${S("layoutEditor.rows")}</label>
               <input class="num" type="number" min="1" .value=${String(this._rows)}
                 @change=${(e) => this._setRows(Number(e.target.value))} />
             </div>
           </div>
           <button class="center-btn" @click=${() => this._recenterShape()}>
-            ⊕ Centrer la forme
+            ${S("layoutEditor.center_shape")}
           </button>
-          <p class="hint">
-            Grille aimantée 20×20. Un bouton occupe une zone (cadran) délimitée par
-            les séparateurs. Glisse un chiffre pour l'assigner à un cadran (il
-            s'échange avec l'occupant) ou vers la zone « Invisible » pour le
-            retirer du visuel. La forme est recentrée à la sauvegarde.
-          </p>
+          <p class="hint">${S("layoutEditor.hint")}</p>
         </div>
 
         <div class="stage">
@@ -5857,7 +7642,7 @@ var ci, li = 20, ui = .5, H = (ci = class extends v {
           </svg>
 
           <div class="tray ${i && this._overTray ? "over" : ""}">
-            <span class="tray-label">Invisible</span>
+            <span class="tray-label">${S("layoutEditor.invisible")}</span>
             ${r.length ? r.map((e) => h`<span
                     class="tray-badge"
                     @pointerdown=${(t) => this._start({
@@ -5867,7 +7652,7 @@ var ci, li = 20, ui = .5, H = (ci = class extends v {
 		}, t)}
                     >${e}</span
                   >`) : h`<span class="tray-empty">
-                  Glisse un bouton ici pour le rendre invisible
+                  ${S("layoutEditor.tray_empty")}
                 </span>`}
           </div>
         </div>
@@ -5882,16 +7667,16 @@ var ci, li = 20, ui = .5, H = (ci = class extends v {
 
       <div class="actions">
         ${this.layout ? h`<button class="danger" ?disabled=${this._busy} @click=${this._delete}>
-              Supprimer
+              ${S("common.delete")}
             </button>` : ""}
-        <button @click=${this._close}>Annuler</button>
+        <button @click=${this._close}>${S("common.cancel")}</button>
         <button class="primary" ?disabled=${this._busy} @click=${this._save}>
-          ${this.layout ? "Enregistrer" : "Créer le layout"}
+          ${this.layout ? S("common.save") : S("layoutEditor.create_layout")}
         </button>
       </div>
     `;
 	}
-}, ci.styles = [D, o`
+}, Ni.styles = [O, o`
       .cols {
         display: flex;
         gap: 20px;
@@ -6099,26 +7884,29 @@ var ci, li = 20, ui = .5, H = (ci = class extends v {
         opacity: 0.5;
         cursor: default;
       }
-    `], ci);
-O([b({ attribute: !1 })], H.prototype, "hass", void 0), O([b({ attribute: !1 })], H.prototype, "layout", void 0), O([x()], H.prototype, "_name", void 0), O([x()], H.prototype, "_id", void 0), O([x()], H.prototype, "_buttons", void 0), O([x()], H.prototype, "_shape", void 0), O([x()], H.prototype, "_bounds", void 0), O([x()], H.prototype, "_columns", void 0), O([x()], H.prototype, "_rows", void 0), O([x()], H.prototype, "_colLines", void 0), O([x()], H.prototype, "_rowLines", void 0), O([x()], H.prototype, "_assignments", void 0), O([x()], H.prototype, "_busy", void 0), O([x()], H.prototype, "_dragClient", void 0), O([x()], H.prototype, "_hoverCell", void 0), O([x()], H.prototype, "_overTray", void 0), H = O([y("homex-layout-editor")], H);
+    `], Ni);
+k([b({ attribute: !1 })], H.prototype, "hass", void 0), k([b({ attribute: !1 })], H.prototype, "layout", void 0), k([x()], H.prototype, "_name", void 0), k([x()], H.prototype, "_id", void 0), k([x()], H.prototype, "_buttons", void 0), k([x()], H.prototype, "_shape", void 0), k([x()], H.prototype, "_bounds", void 0), k([x()], H.prototype, "_columns", void 0), k([x()], H.prototype, "_rows", void 0), k([x()], H.prototype, "_colLines", void 0), k([x()], H.prototype, "_rowLines", void 0), k([x()], H.prototype, "_assignments", void 0), k([x()], H.prototype, "_busy", void 0), k([x()], H.prototype, "_dragClient", void 0), k([x()], H.prototype, "_hoverCell", void 0), k([x()], H.prototype, "_overTray", void 0), H = k([y("homex-layout-editor")], H);
 // src/components/homex-preset-editor.ts
-var di = class extends v {
+var Ii = class extends v {
 	constructor(...e) {
 		super(...e), this.preset = null, this.layouts = [], this.prefillDevice = "", this._name = "", this._nameTyped = !1, this._id = "", this._deviceId = "", this._modelKey = "", this._models = [], this._devices = [], this._layoutId = "", this._taps = {}, this._bindings = {}, this._actions = [], this._actionTab = "single", this._busy = !1, this._idEdited = !1;
+	}
+	static _tapLabel(e) {
+		return S(`presetEditor.tap_${e}`);
 	}
 	connectedCallback() {
 		super.connectedCallback(), this._loadModels(), this._loadDevices();
 	}
 	async _loadModels() {
 		try {
-			this._models = await qt(this.hass);
+			this._models = await On(this.hass);
 		} catch {
 			this._models = [];
 		}
 	}
 	async _loadDevices() {
 		try {
-			this._devices = await Jt(this.hass);
+			this._devices = await kn(this.hass);
 		} catch {
 			this._devices = [];
 		}
@@ -6129,7 +7917,7 @@ var di = class extends v {
 	willUpdate(e) {
 		if (e.has("preset")) {
 			let e = this.preset;
-			this._name = e?.name ?? "", this._nameTyped = !!e, this._id = e?.id ?? "", this._deviceId = e?.device_id ?? this.prefillDevice ?? "", this._modelKey = e?.model ?? (this._deviceId ? Vn(this.hass, this._deviceId) : ""), this._layoutId = e?.layout_id ?? "", this._taps = JSON.parse(JSON.stringify(e?.taps ?? {})), this._bindings = JSON.parse(JSON.stringify(e?.bindings ?? {})), this._actions = [], this._idEdited = !!e, this._busy = !1, !e && this._deviceId && !this._name && (this._name = Hn(this.hass, this._deviceId), this._id = M(this._name)), this._ensureTaps(), this._deviceId && this._loadActions();
+			this._name = e?.name ?? "", this._nameTyped = !!e, this._id = e?.id ?? "", this._deviceId = e?.device_id ?? this.prefillDevice ?? "", this._modelKey = e?.model ?? (this._deviceId ? xr(this.hass, this._deviceId) : ""), this._layoutId = e?.layout_id ?? "", this._taps = JSON.parse(JSON.stringify(e?.taps ?? {})), this._bindings = JSON.parse(JSON.stringify(e?.bindings ?? {})), this._actions = [], this._idEdited = !!e, this._busy = !1, !e && this._deviceId && !this._name && (this._name = Sr(this.hass, this._deviceId), this._id = N(this._name)), this._ensureTaps(), this._deviceId && this._loadActions();
 		}
 	}
 	_selectedLayout() {
@@ -6152,7 +7940,7 @@ var di = class extends v {
 	}
 	async _loadActions() {
 		try {
-			this._actions = await sn(this.hass, this._deviceId);
+			this._actions = await Vn(this.hass, this._deviceId);
 		} catch {
 			this._actions = [];
 		}
@@ -6160,14 +7948,14 @@ var di = class extends v {
 	_onModel(e) {
 		this._modelKey = e;
 		let t = this._models.find((t) => t.model === e);
-		this._deviceId = t?.device_id ?? "", this._actions = [], this._bindings = {}, t && (this._name.trim() && this._nameTyped || (this._name = t.label, this._idEdited || (this._id = M(t.label))), this._loadActions());
+		this._deviceId = t?.device_id ?? "", this._actions = [], this._bindings = {}, t && (this._name.trim() && this._nameTyped || (this._name = t.label, this._idEdited || (this._id = N(t.label))), this._loadActions());
 	}
 	_onRefDevice(e) {
 		this._deviceId = e, this._actions = [], this._bindings = {}, e && this._loadActions();
 	}
 	_enabledModes() {
 		let e = /* @__PURE__ */ new Set();
-		return Object.values(this._taps).forEach((t) => t.forEach((t) => e.add(t))), fi.TAP_MODES.map((e) => e.mode).filter((t) => e.has(t));
+		return Object.values(this._taps).forEach((t) => t.forEach((t) => e.add(t))), Li.TAP_MODES.map((e) => e.mode).filter((t) => e.has(t));
 	}
 	_buttonsFor(e) {
 		return Object.entries(this._taps).filter(([, t]) => t.includes(e)).map(([e]) => Number(e)).sort((e, t) => e - t);
@@ -6187,7 +7975,7 @@ var di = class extends v {
 		return n;
 	}
 	_onName(e) {
-		this._name = e, this._nameTyped = !0, this._idEdited || (this._id = M(e));
+		this._name = e, this._nameTyped = !0, this._idEdited || (this._id = N(e));
 	}
 	_onId(e) {
 		this._id = e, this._idEdited = !0;
@@ -6197,48 +7985,46 @@ var di = class extends v {
 	}
 	async _save() {
 		let e = this._name.trim(), t = this._id.trim();
-		if (!e || !t) alert("Nom et id du preset requis.");
-		else if (!this._deviceId) alert("Choisis un appareil (modèle).");
-		else if (!this._layoutId) alert("Sélectionne un layout.");
+		if (!e || !t) alert(S("presetEditor.name_id_required"));
+		else if (!this._deviceId) alert(S("presetEditor.choose_device_model"));
+		else if (!this._layoutId) alert(S("presetEditor.select_layout"));
 		else {
 			this._busy = !0;
 			try {
-				await Gt(this.hass, {
+				await En(this.hass, {
 					id: t,
 					name: e,
-					model: Vn(this.hass, this._deviceId),
-					model_label: Hn(this.hass, this._deviceId),
+					model: xr(this.hass, this._deviceId),
+					model_label: Sr(this.hass, this._deviceId),
 					device_id: this._deviceId,
 					layout_id: this._layoutId,
 					taps: this._taps,
 					bindings: this._bindings
 				}), this._close(t);
 			} catch (e) {
-				this._busy = !1, alert("Erreur Homex : " + C(e));
+				this._busy = !1, alert(S("common.error", { message: w(e) }));
 			}
 		}
 	}
 	async _delete() {
-		if (this.preset && confirm(`Supprimer le preset "${this.preset.name}" ?`)) {
+		if (this.preset && confirm(S("presetEditor.confirm_delete", { name: this.preset.name }))) {
 			this._busy = !0;
 			try {
-				await Kt(this.hass, this.preset.id), this._close();
+				await Dn(this.hass, this.preset.id), this._close();
 			} catch (e) {
-				this._busy = !1, alert("Erreur Homex : " + C(e));
+				this._busy = !1, alert(S("common.error", { message: w(e) }));
 			}
 		}
 	}
 	_renderActions() {
 		if (!this._deviceId) return "";
-		if (!this._actions.length) return h`<p class="hint">Aucune action disponible pour cet appareil.</p>`;
+		if (!this._actions.length) return h`<p class="hint">${S("presetEditor.no_actions")}</p>`;
 		let e = this._enabledModes();
 		if (!e.length) return "";
-		let t = e.includes(this._actionTab) ? this._actionTab : e[0], n = (e) => fi.TAP_MODES.find((t) => t.mode === e)?.label ?? e;
+		let t = e.includes(this._actionTab) ? this._actionTab : e[0], n = (e) => Li._tapLabel(e);
 		return h`
-      <div class="section">Actions par bouton</div>
-      <p class="hint">
-        Pour chaque tap mode, associe chaque bouton aux actions standard du modèle.
-      </p>
+      <div class="section">${S("presetEditor.actions_per_button")}</div>
+      <p class="hint">${S("presetEditor.actions_hint")}</p>
       <div class="tabs">
         ${e.map((e) => h`<span
             class="atab ${e === t ? "active" : ""}"
@@ -6249,10 +8035,10 @@ var di = class extends v {
       ${this._buttonsFor(t).map((e) => {
 			let n = this._bindings[t]?.[e]?.[0] ?? "", r = this._usedActions(t, e);
 			return h`<div class="bind-row">
-          <div class="btn-lbl">Bouton ${e}</div>
+          <div class="btn-lbl">${S("presetEditor.button", { n: e })}</div>
           <homex-select
             class="bind-select"
-            placeholder="Aucune action"
+            placeholder=${S("presetEditor.no_action")}
             .value=${n}
             .options=${this._actions.filter((e) => !r.has(e.label) || e.label === n).map((e) => ({
 				value: e.label,
@@ -6267,62 +8053,55 @@ var di = class extends v {
 	render() {
 		let e = !!this.preset;
 		return h`
-      ${A("Nom du preset", this._name, (e) => this._onName(e), "Modèle X")}
-      ${e ? h`<div class="section">Id : ${this.preset.id}</div>` : ""}
+      ${j(S("presetEditor.name"), this._name, (e) => this._onName(e), S("presetEditor.name_placeholder"))}
+      ${e ? h`<div class="section">${S("presetEditor.id", { id: this.preset.id })}</div>` : ""}
 
-      <div class="section">Modèle d'interrupteur</div>
+      <div class="section">${S("presetEditor.switch_model")}</div>
       ${this._models.length ? h`<homex-select
-            placeholder="Choisir un modèle…"
+            placeholder=${S("presetEditor.choose_model")}
             .value=${this._modelKey}
             .options=${this._models.map((e) => ({
 			value: e.model,
 			label: e.label,
-			tertiary: `${e.count} appareil(s)`
+			tertiary: S("presetEditor.devices_count", { count: e.count })
 		}))}
             @value-changed=${(e) => this._onModel(e.detail.value)}
-          ></homex-select>` : h`<p class="hint">
-            Aucun interrupteur détecté (appareil exposant des actions).
-          </p>`}
+          ></homex-select>` : h`<p class="hint">${S("presetEditor.no_switches")}</p>`}
 
-      ${this._modelKey ? h`<div class="section">Appareil de référence</div>
-            <p class="hint">
-              Appareil du modèle duquel les actions sont récupérées. Un même
-              modèle peut exposer des actions différentes selon l'appareil.
-            </p>
+      ${this._modelKey ? h`<div class="section">${S("presetEditor.ref_device")}</div>
+            <p class="hint">${S("presetEditor.ref_device_hint")}</p>
             ${this._devicesForModel().length ? h`<homex-select
-                  placeholder="Choisir un appareil…"
+                  placeholder=${S("presetEditor.choose_device")}
                   .value=${this._deviceId}
                   .options=${this._devicesForModel().map((e) => ({
 			value: e.device_id,
 			label: e.name
 		}))}
                   @value-changed=${(e) => this._onRefDevice(e.detail.value)}
-                ></homex-select>` : h`<p class="hint">
-                  Aucun appareil détecté pour ce modèle.
-                </p>`}` : ""}
+                ></homex-select>` : h`<p class="hint">${S("presetEditor.no_devices_for_model")}</p>`}` : ""}
 
-      <div class="section">Layout</div>
+      <div class="section">${S("presetEditor.layout")}</div>
       ${this.layouts.length ? h`<homex-select
-            placeholder="Choisir un layout…"
+            placeholder=${S("presetEditor.choose_layout")}
             .value=${this._layoutId}
             .options=${this.layouts.map((e) => ({
 			value: e.id,
 			label: e.name,
-			tertiary: `${e.buttons} bouton(s)`
+			tertiary: S("presetEditor.buttons_count", { count: e.buttons })
 		}))}
             @value-changed=${(e) => this._onLayout(e.detail.value)}
-          ></homex-select>` : h`<p class="hint">Aucun layout. Crée-en un dans « Switch Layouts ».</p>`}
+          ></homex-select>` : h`<p class="hint">${S("presetEditor.no_layouts")}</p>`}
 
       ${this._selectedLayout() ? h`
-            <div class="section">Tap modes par bouton</div>
-            <p class="hint">Simple activé par défaut ; ajoute Double / Long au besoin.</p>
+            <div class="section">${S("presetEditor.tap_modes")}</div>
+            <p class="hint">${S("presetEditor.tap_modes_hint")}</p>
             ${Array.from({ length: this._selectedLayout().buttons }, (e, t) => t + 1).map((e) => h`<div class="btn-row">
-                <span class="btn-lbl">Bouton ${e}</span>
+                <span class="btn-lbl">${S("presetEditor.button", { n: e })}</span>
                 <div class="chips">
-                  ${fi.TAP_MODES.map((t) => h`<span
+                  ${Li.TAP_MODES.map((t) => h`<span
                       class="tap ${(this._taps[e] ?? []).includes(t.mode) ? "on" : ""}"
                       @click=${() => this._toggleTap(e, t.mode)}
-                      >${t.label}</span
+                      >${Li._tapLabel(t.mode)}</span
                     >`)}
                 </div>
               </div>`)}
@@ -6331,29 +8110,20 @@ var di = class extends v {
 
       <div class="actions">
         ${e ? h`<button class="danger" ?disabled=${this._busy} @click=${this._delete}>
-              Supprimer
+              ${S("common.delete")}
             </button>` : ""}
-        <button @click=${this._close}>Annuler</button>
+        <button @click=${this._close}>${S("common.cancel")}</button>
         <button class="primary" ?disabled=${this._busy} @click=${this._save}>
-          ${e ? "Enregistrer" : "Créer le preset"}
+          ${S(e ? "common.save" : "presetEditor.create_preset")}
         </button>
       </div>
     `;
 	}
-}, fi = di, U = (di.TAP_MODES = [
-	{
-		mode: "single",
-		label: "Simple"
-	},
-	{
-		mode: "double",
-		label: "Double"
-	},
-	{
-		mode: "long",
-		label: "Long"
-	}
-], di.styles = [D, o`
+}, Li = Ii, U = (Ii.TAP_MODES = [
+	{ mode: "single" },
+	{ mode: "double" },
+	{ mode: "long" }
+], Ii.styles = [O, o`
       .hint {
         font-size: 12px;
         color: var(--secondary-text-color);
@@ -6425,10 +8195,10 @@ var di = class extends v {
         gap: 8px;
         margin-top: 16px;
       }
-    `], di);
-O([b({ attribute: !1 })], U.prototype, "hass", void 0), O([b({ attribute: !1 })], U.prototype, "preset", void 0), O([b({ attribute: !1 })], U.prototype, "layouts", void 0), O([b({ attribute: !1 })], U.prototype, "prefillDevice", void 0), O([x()], U.prototype, "_name", void 0), O([x()], U.prototype, "_id", void 0), O([x()], U.prototype, "_deviceId", void 0), O([x()], U.prototype, "_modelKey", void 0), O([x()], U.prototype, "_models", void 0), O([x()], U.prototype, "_devices", void 0), O([x()], U.prototype, "_layoutId", void 0), O([x()], U.prototype, "_taps", void 0), O([x()], U.prototype, "_bindings", void 0), O([x()], U.prototype, "_actions", void 0), O([x()], U.prototype, "_actionTab", void 0), O([x()], U.prototype, "_busy", void 0), U = fi = O([y("homex-preset-editor")], U);
+    `], Ii);
+k([b({ attribute: !1 })], U.prototype, "hass", void 0), k([b({ attribute: !1 })], U.prototype, "preset", void 0), k([b({ attribute: !1 })], U.prototype, "layouts", void 0), k([b({ attribute: !1 })], U.prototype, "prefillDevice", void 0), k([x()], U.prototype, "_name", void 0), k([x()], U.prototype, "_id", void 0), k([x()], U.prototype, "_deviceId", void 0), k([x()], U.prototype, "_modelKey", void 0), k([x()], U.prototype, "_models", void 0), k([x()], U.prototype, "_devices", void 0), k([x()], U.prototype, "_layoutId", void 0), k([x()], U.prototype, "_taps", void 0), k([x()], U.prototype, "_bindings", void 0), k([x()], U.prototype, "_actions", void 0), k([x()], U.prototype, "_actionTab", void 0), k([x()], U.prototype, "_busy", void 0), U = Li = k([y("homex-preset-editor")], U);
 // src/components/homex-gswitch-editor.ts
-var pi = class extends v {
+var Ri = class extends v {
 	constructor(...e) {
 		super(...e), this.sw = null, this.presets = [], this.initialRooms = [], this.draft = null, this._name = "", this._id = "", this._deviceId = "", this._presetId = "", this._devices = [], this._rooms = [], this._allRooms = [], this._busy = !1, this._idEdited = !1, this._closeRoomsOutside = (e) => {
 			let t = this._roomsDropdown();
@@ -6449,7 +8219,7 @@ var pi = class extends v {
 	}
 	async _loadRooms() {
 		try {
-			let e = await en(this.hass);
+			let e = await Fn(this.hass);
 			this._allRooms = e.filter((e) => (e.modules ?? []).includes("switches")).map((e) => ({
 				room_id: e.room_id,
 				name: e.name,
@@ -6470,16 +8240,16 @@ var pi = class extends v {
 	}
 	async _loadDevices() {
 		try {
-			this._devices = await Jt(this.hass);
+			this._devices = await kn(this.hass);
 		} catch {
 			this._devices = [];
 		}
 	}
 	_modelPresets() {
-		return this._deviceId ? Un(this.hass, this.presets, this._deviceId) : [];
+		return this._deviceId ? Cr(this.hass, this.presets, this._deviceId) : [];
 	}
 	_preset() {
-		if (this._deviceId) return Wn(this.hass, this.presets, {
+		if (this._deviceId) return wr(this.hass, this.presets, {
 			device_id: this._deviceId,
 			preset_id: this._presetId
 		});
@@ -6490,7 +8260,7 @@ var pi = class extends v {
 		t.some((e) => e.id === this._presetId) || (this._presetId = t.length === 1 ? t[0].id : "");
 	}
 	_onName(e) {
-		this._name = e, this._idEdited || (this._id = M(e));
+		this._name = e, this._idEdited || (this._id = N(e));
 	}
 	_toggleRoom(e) {
 		this._rooms = this._rooms.includes(e) ? this._rooms.filter((t) => t !== e) : [...this._rooms, e];
@@ -6512,12 +8282,12 @@ var pi = class extends v {
 	}
 	async _save() {
 		let e = this._name.trim(), t = this._id.trim();
-		if (!e || !t) alert("Nom et id du switch requis.");
-		else if (!this._deviceId) alert("Choisis un appareil.");
+		if (!e || !t) alert(S("gswitchEditor.name_id_required"));
+		else if (!this._deviceId) alert(S("gswitchEditor.choose_device"));
 		else {
 			this._busy = !0;
 			try {
-				await Ht(this.hass, {
+				await Cn(this.hass, {
 					...this.sw ?? {},
 					id: t,
 					name: e,
@@ -6526,24 +8296,35 @@ var pi = class extends v {
 					rooms: this._rooms
 				}, !this.sw), this._close();
 			} catch (e) {
-				this._busy = !1, alert("Erreur Homex : " + C(e));
+				this._busy = !1, alert(S("common.error", { message: w(e) }));
 			}
 		}
 	}
 	async _delete() {
-		if (this.sw && confirm(`Supprimer le switch "${this.sw.name}" ?`)) {
+		if (this.sw && confirm(S("gswitchEditor.confirm_delete", { name: this.sw.name }))) {
 			this._busy = !0;
 			try {
-				await Ut(this.hass, this.sw.id), this._close();
+				await wn(this.hass, this.sw.id), this._close();
 			} catch (e) {
-				this._busy = !1, alert("Erreur Homex : " + C(e));
+				this._busy = !1, alert(S("common.error", { message: w(e) }));
 			}
 		}
 	}
 	_renderPreset(e) {
-		let t = this._modelPresets(), n = Hn(this.hass, this._deviceId);
-		return t.length ? h`<div class="preset-box ${e ? "ok" : ""}">
-      <div class="section">Preset</div>
+		let t = this._modelPresets(), n = Sr(this.hass, this._deviceId);
+		if (!t.length) {
+			let [e, t] = S("gswitchEditor.no_preset_for_model").split("{model}");
+			return h`<div class="preset-box">
+        <div class="row">
+          <span>${e}<b>${n}</b>${t}</span>
+          <button class="primary" @click=${this._createPreset}>
+            ${S("gswitchEditor.create_preset")}
+          </button>
+        </div>
+      </div>`;
+		}
+		return h`<div class="preset-box ${e ? "ok" : ""}">
+      <div class="section">${S("gswitchEditor.preset")}</div>
       <homex-select
         .value=${e?.id ?? ""}
         .options=${t.map((e) => ({
@@ -6553,80 +8334,71 @@ var pi = class extends v {
         @value-changed=${(e) => this._presetId = e.detail.value}
       ></homex-select>
       <div class="row">
-        <span class="hint">Modèle : ${n}</span>
-        <button @click=${this._createPreset}>＋ Nouveau preset</button>
+        <span class="hint">${S("gswitchEditor.model", { model: n })}</span>
+        <button @click=${this._createPreset}>${S("gswitchEditor.new_preset")}</button>
       </div>
-    </div>` : h`<div class="preset-box">
-        <div class="row">
-          <span>Aucun preset pour le modèle <b>${n}</b>.</span>
-          <button class="primary" @click=${this._createPreset}>
-            ＋ Créer un preset
-          </button>
-        </div>
-      </div>`;
+    </div>`;
 	}
 	_renderRooms() {
-		if (!this._allRooms.length) return h`<p class="hint">Aucune pièce avec le module Switches.</p>`;
+		if (!this._allRooms.length) return h`<p class="hint">${S("gswitchEditor.no_rooms_with_module")}</p>`;
 		let e = this._allRooms.filter((e) => this._rooms.includes(e.room_id)).map((e) => e.name);
 		return h`<details class="multi">
       <summary>
         <span class=${e.length ? "" : "placeholder"}>
-          ${e.length ? e.join(", ") : "— Aucune pièce —"}
+          ${e.length ? e.join(", ") : S("gswitchEditor.no_room")}
         </span>
         ▾
       </summary>
       <div class="options">
         ${this._allRooms.map((e) => h`<label>
-            ${j(this._rooms.includes(e.room_id), () => this._toggleRoom(e.room_id))}
+            ${M(this._rooms.includes(e.room_id), () => this._toggleRoom(e.room_id))}
             ${e.name}
           </label>`)}
       </div>
     </details>`;
 	}
 	render() {
-		let e = !!this.sw, t = this._preset(), n = this._allRooms.filter((e) => this._rooms.includes(e.room_id) && e.area_id).map((e) => e.area_id), { inArea: r, others: i } = Gr(this._devices, (e) => Wr(this.hass, e.device_id), n), a = (e) => ({
+		let e = !!this.sw, t = this._preset(), n = this._allRooms.filter((e) => this._rooms.includes(e.room_id) && e.area_id).map((e) => e.area_id), { inArea: r, others: i } = pi(this._devices, (e) => fi(this.hass, e.device_id), n), a = (e) => ({
 			value: e.device_id,
 			label: e.name,
 			secondary: e.model_label
 		});
 		return h`
-      ${A("Nom", this._name, (e) => this._onName(e), "Interrupteur chevet")}
-      ${e ? h`<div class="section">Id : ${this.sw.id}</div>` : ""}
+      ${j(S("gswitchEditor.name"), this._name, (e) => this._onName(e), S("gswitchEditor.name_placeholder"))}
+      ${e ? h`<div class="section">${S("gswitchEditor.id", { id: this.sw.id })}</div>` : ""}
 
-      <div class="section">Interrupteur (appareil)</div>
+      <div class="section">${S("gswitchEditor.device")}</div>
       ${this._devices.length ? h`<homex-select
-            placeholder="Choisir un interrupteur…"
+            placeholder=${S("gswitchEditor.choose_switch")}
             .value=${this._deviceId}
             .options=${n.length ? [] : this._devices.map(a)}
             .groups=${n.length ? [...r.length ? [{
-			label: `Pièce : ${Kr(this.hass, n)}`,
+			label: S("gswitchEditor.area", { names: mi(this.hass, n) }),
 			options: r.map(a)
 		}] : [], {
-			label: "Autres",
+			label: S("gswitchEditor.others"),
 			options: i.map(a)
 		}] : []}
             @value-changed=${(e) => this._onDevice(e.detail.value)}
-          ></homex-select>` : h`<p class="hint">
-            Aucun interrupteur détecté (appareil exposant des actions).
-          </p>`}
+          ></homex-select>` : h`<p class="hint">${S("gswitchEditor.no_devices")}</p>`}
 
       ${this._deviceId ? this._renderPreset(t) : ""}
 
-      <div class="section">Pièces Homex assignées (0..n)</div>
+      <div class="section">${S("gswitchEditor.rooms")}</div>
       ${this._renderRooms()}
 
       <div class="actions">
         ${e ? h`<button class="danger" ?disabled=${this._busy} @click=${this._delete}>
-              Supprimer
+              ${S("common.delete")}
             </button>` : ""}
-        <button @click=${this._close}>Annuler</button>
+        <button @click=${this._close}>${S("common.cancel")}</button>
         <button class="primary" ?disabled=${this._busy} @click=${this._save}>
-          ${e ? "Enregistrer" : "Créer le switch"}
+          ${S(e ? "common.save" : "gswitchEditor.create_switch")}
         </button>
       </div>
     `;
 	}
-}, W = (pi.styles = [D, o`
+}, W = (Ri.styles = [O, o`
       details.multi {
         position: relative;
         margin: 6px 0;
@@ -6714,14 +8486,14 @@ var pi = class extends v {
         gap: 8px;
         margin-top: 16px;
       }
-    `], pi);
-O([b({ attribute: !1 })], W.prototype, "hass", void 0), O([b({ attribute: !1 })], W.prototype, "sw", void 0), O([b({ attribute: !1 })], W.prototype, "presets", void 0), O([b({ attribute: !1 })], W.prototype, "initialRooms", void 0), O([b({ attribute: !1 })], W.prototype, "draft", void 0), O([x()], W.prototype, "_name", void 0), O([x()], W.prototype, "_id", void 0), O([x()], W.prototype, "_deviceId", void 0), O([x()], W.prototype, "_presetId", void 0), O([x()], W.prototype, "_devices", void 0), O([x()], W.prototype, "_rooms", void 0), O([x()], W.prototype, "_allRooms", void 0), O([x()], W.prototype, "_busy", void 0), W = O([y("homex-gswitch-editor")], W);
+    `], Ri);
+k([b({ attribute: !1 })], W.prototype, "hass", void 0), k([b({ attribute: !1 })], W.prototype, "sw", void 0), k([b({ attribute: !1 })], W.prototype, "presets", void 0), k([b({ attribute: !1 })], W.prototype, "initialRooms", void 0), k([b({ attribute: !1 })], W.prototype, "draft", void 0), k([x()], W.prototype, "_name", void 0), k([x()], W.prototype, "_id", void 0), k([x()], W.prototype, "_deviceId", void 0), k([x()], W.prototype, "_presetId", void 0), k([x()], W.prototype, "_devices", void 0), k([x()], W.prototype, "_rooms", void 0), k([x()], W.prototype, "_allRooms", void 0), k([x()], W.prototype, "_busy", void 0), W = k([y("homex-gswitch-editor")], W);
 // src/components/homex-switch-manager.ts
-var mi, hi = [
+var zi, Bi = [
 	"switches",
 	"presets",
 	"layouts"
-], G = (mi = class extends v {
+], G = (zi = class extends v {
 	constructor(...e) {
 		super(...e), this.base = "", this.subpath = "", this._addRooms = [], this._layouts = [], this._presets = [], this._gswitches = [], this._loaded = !1, this._prefillDevice = "", this._switchFlowFrom = null, this._switchDraft = null;
 	}
@@ -6729,9 +8501,9 @@ var mi, hi = [
 		super.connectedCallback(), this._load();
 	}
 	get _route() {
-		let [e, t, n] = zn(this.subpath);
+		let [e, t, n] = yr(this.subpath);
 		return {
-			section: hi.includes(e) ? e : "switches",
+			section: Bi.includes(e) ? e : "switches",
 			editing: t === "new" || t === "edit" && !!n,
 			id: t === "edit" ? n : void 0
 		};
@@ -6740,10 +8512,10 @@ var mi, hi = [
 		return this._route.section;
 	}
 	_url(e, ...t) {
-		return e === "switches" && !t.length ? this.base : w(this.base, e, ...t);
+		return e === "switches" && !t.length ? this.base : T(this.base, e, ...t);
 	}
 	_openEditor(e, t) {
-		T(this._url(e, ...t ? ["edit", t] : ["new"]));
+		E(this._url(e, ...t ? ["edit", t] : ["new"]));
 	}
 	willUpdate(e) {
 		if (!e.has("subpath")) return;
@@ -6757,9 +8529,9 @@ var mi, hi = [
 	async _load() {
 		try {
 			[this._layouts, this._presets, this._gswitches] = await Promise.all([
-				Rt(this.hass),
-				Wt(this.hass),
-				Vt(this.hass)
+				yn(this.hass),
+				Tn(this.hass),
+				Sn(this.hass)
 			]);
 		} catch {
 			this._layouts = [], this._presets = [], this._gswitches = [];
@@ -6770,7 +8542,7 @@ var mi, hi = [
 		this.dispatchEvent(new CustomEvent("close"));
 	}
 	_onLayoutClosed() {
-		this._load(), E(this._url("layouts"));
+		this._load(), D(this._url("layouts"));
 	}
 	_onPresetClosed(e) {
 		this._prefillDevice = "", this._load();
@@ -6780,11 +8552,11 @@ var mi, hi = [
 			n && this._switchDraft && (this._switchDraft = {
 				...this._switchDraft,
 				preset_id: n
-			}), this._switchFlowFrom = null, E(t);
-		} else E(this._url("presets"));
+			}), this._switchFlowFrom = null, D(t);
+		} else D(this._url("presets"));
 	}
 	_onSwitchClosed() {
-		this._switchDraft = null, this._load(), E(this._url("switches"));
+		this._switchDraft = null, this._load(), D(this._url("switches"));
 	}
 	_onCreatePreset(e) {
 		this._switchDraft = e.detail.draft ?? null, this._prefillDevice = e.detail.device_id || "", this._switchFlowFrom = location.pathname, this._openEditor("presets");
@@ -6813,18 +8585,18 @@ var mi, hi = [
           <h2></h2>
         </div>
         <div class="msg">
-          ${this._loaded ? `« ${r} » introuvable.` : "Chargement…"}
+          ${this._loaded ? S("switchManager.not_found", { id: r }) : S("common.loading")}
         </div>
       ` };
 	}
 	render() {
 		let { section: e, editing: t } = this._route;
 		if (t && e === "layouts") {
-			let e = () => this._onLayoutClosed(), t = this._editTarget(this._layouts, e, "Layouts");
+			let e = () => this._onLayoutClosed(), t = this._editTarget(this._layouts, e, S("switchManager.layouts"));
 			return "page" in t ? t.page : h`
         <div class="head">
-          <button @click=${e}>← Layouts</button>
-          <h2>${t.item ? "Modifier le layout" : "Nouveau layout"}</h2>
+          <button @click=${e}>← ${S("switchManager.layouts")}</button>
+          <h2>${t.item ? S("switchManager.edit_layout") : S("switchManager.new_layout")}</h2>
         </div>
         <homex-layout-editor
           .hass=${this.hass}
@@ -6834,11 +8606,11 @@ var mi, hi = [
       `;
 		}
 		if (t && e === "presets") {
-			let e = () => this._onPresetClosed(), t = this._editTarget(this._presets, e, "Presets");
+			let e = () => this._onPresetClosed(), t = this._editTarget(this._presets, e, S("switchManager.presets"));
 			return "page" in t ? t.page : h`
         <div class="head">
-          <button @click=${e}>← Presets</button>
-          <h2>${t.item ? "Modifier le preset" : "Nouveau device preset"}</h2>
+          <button @click=${e}>← ${S("switchManager.presets")}</button>
+          <h2>${t.item ? S("switchManager.edit_preset") : S("switchManager.new_preset")}</h2>
         </div>
         <div class="editor">
           <homex-preset-editor
@@ -6852,11 +8624,11 @@ var mi, hi = [
       `;
 		}
 		if (t) {
-			let e = () => this._onSwitchClosed(), t = this._editTarget(this._gswitches, e, "Switches");
+			let e = () => this._onSwitchClosed(), t = this._editTarget(this._gswitches, e, S("switchManager.switches"));
 			return "page" in t ? t.page : h`
         <div class="head">
-          <button @click=${e}>← Switches</button>
-          <h2>${t.item ? "Modifier le switch" : "Nouveau switch"}</h2>
+          <button @click=${e}>← ${S("switchManager.switches")}</button>
+          <h2>${t.item ? S("switchManager.edit_switch") : S("switchManager.new_switch")}</h2>
         </div>
         <div class="editor">
           <homex-gswitch-editor
@@ -6871,27 +8643,27 @@ var mi, hi = [
         </div>
       `;
 		}
-		let n = this._section === "layouts" ? "＋ Layout" : this._section === "presets" ? "＋ Preset" : "＋ Switch";
+		let n = this._section === "layouts" ? S("switchManager.add_layout") : this._section === "presets" ? S("switchManager.add_preset") : S("switchManager.add_switch");
 		return h`
       <div class="head">
         <button @click=${this._back}>← Homex</button>
-        <h2>Switch Manager</h2>
+        <h2>${S("switchManager.title")}</h2>
         <button class="primary" @click=${this._add}>${n}</button>
       </div>
       <div class="tabs">
         ${[
-			["switches", "Switches"],
-			["presets", "Presets"],
-			["layouts", "Layouts"]
+			["switches", S("switchManager.switches")],
+			["presets", S("switchManager.presets")],
+			["layouts", S("switchManager.layouts")]
 		].map(([e, t]) => h`<span
             class="tab ${this._section === e ? "active" : ""}"
             @click=${() => {
-			e !== this._section && T(this._url(e), !0);
+			e !== this._section && E(this._url(e), !0);
 		}}
             >${t}</span
           >`)}
       </div>
-      ${this._loaded ? this._section === "layouts" ? this._renderLayouts() : this._section === "presets" ? this._renderPresets() : this._renderSwitches() : h`<div class="msg">Chargement…</div>`}
+      ${this._loaded ? this._section === "layouts" ? this._renderLayouts() : this._section === "presets" ? this._renderPresets() : this._renderSwitches() : h`<div class="msg">${S("common.loading")}</div>`}
     `;
 	}
 	_renderLayouts() {
@@ -6903,10 +8675,13 @@ var mi, hi = [
           ${this._preview(e)}
           <div class="info">
             <div class="name">${e.name}</div>
-            <div class="meta">${e.buttons} bouton(s) · ${e.shape}</div>
+            <div class="meta">${S("switchManager.layout_meta", {
+			count: e.buttons,
+			shape: S(`switchManager.shape_${e.shape}`)
+		})}</div>
           </div>
         </div>`)}
-    </div>` : h`<div class="msg">Aucun layout. Clique sur « ＋ Layout ».</div>`;
+    </div>` : h`<div class="msg">${S("switchManager.no_layouts")}</div>`;
 	}
 	_renderPresets() {
 		return this._presets.length ? h`<div class="grid">
@@ -6925,15 +8700,12 @@ var mi, hi = [
           </div>
         </div>`;
 		})}
-    </div>` : h`<div class="msg">
-        Aucun preset. Clique sur « ＋ Preset » pour définir le mapping standard
-        d'un modèle d'appareil.
-      </div>`;
+    </div>` : h`<div class="msg">${S("switchManager.no_presets")}</div>`;
 	}
 	_renderSwitches() {
 		return this._gswitches.length ? h`<div class="grid">
       ${this._gswitches.map((e) => {
-			let t = Wn(this.hass, this._presets, e), n = t ? this._layouts.find((e) => e.id === t.layout_id) : void 0;
+			let t = wr(this.hass, this._presets, e), n = t ? this._layouts.find((e) => e.id === t.layout_id) : void 0;
 			return h`<div
           class="card"
           @click=${() => this._openEditor("switches", e.id)}
@@ -6942,15 +8714,15 @@ var mi, hi = [
           <div class="info">
             <div class="name">${e.name}</div>
             <div class="meta">
-              ${t ? t.name : "aucun preset"} ·
-              ${(e.rooms || []).length} pièce(s)
+              ${t ? t.name : S("switchManager.no_preset")} ·
+              ${S("switchManager.rooms_count", { count: (e.rooms || []).length })}
             </div>
           </div>
         </div>`;
 		})}
-    </div>` : h`<div class="msg">Aucun switch. Clique sur « ＋ Switch ».</div>`;
+    </div>` : h`<div class="msg">${S("switchManager.no_switches")}</div>`;
 	}
-}, mi.styles = [D, o`
+}, zi.styles = [O, o`
       .head {
         display: flex;
         align-items: center;
@@ -7066,10 +8838,10 @@ var mi, hi = [
         border-radius: 12px;
         padding: 16px;
       }
-    `], mi);
-O([b({ attribute: !1 })], G.prototype, "hass", void 0), O([b({ attribute: !1 })], G.prototype, "base", void 0), O([b({ attribute: !1 })], G.prototype, "subpath", void 0), O([x()], G.prototype, "_addRooms", void 0), O([x()], G.prototype, "_layouts", void 0), O([x()], G.prototype, "_presets", void 0), O([x()], G.prototype, "_gswitches", void 0), O([x()], G.prototype, "_loaded", void 0), O([x()], G.prototype, "_prefillDevice", void 0), O([x()], G.prototype, "_switchDraft", void 0), G = O([y("homex-switch-manager")], G);
+    `], zi);
+k([b({ attribute: !1 })], G.prototype, "hass", void 0), k([b({ attribute: !1 })], G.prototype, "base", void 0), k([b({ attribute: !1 })], G.prototype, "subpath", void 0), k([x()], G.prototype, "_addRooms", void 0), k([x()], G.prototype, "_layouts", void 0), k([x()], G.prototype, "_presets", void 0), k([x()], G.prototype, "_gswitches", void 0), k([x()], G.prototype, "_loaded", void 0), k([x()], G.prototype, "_prefillDevice", void 0), k([x()], G.prototype, "_switchDraft", void 0), G = k([y("homex-switch-manager")], G);
 // src/components/homex-shutter-preset-editor.ts
-var gi = class extends v {
+var Vi = class extends v {
 	constructor(...e) {
 		super(...e), this.preset = null, this._name = "", this._nameTyped = !1, this._id = "", this._models = [], this._modelKey = "", this._deviceId = "", this._smart = !1, this._up = { ...K.EMPTY }, this._down = { ...K.EMPTY }, this._stopped = { ...K.EMPTY }, this._z2m = null, this._busy = !1, this._idEdited = !1;
 	}
@@ -7098,7 +8870,7 @@ var gi = class extends v {
 	}
 	_deviceSlug() {
 		let e = this.hass.devices?.[this._deviceId];
-		return M(e?.name_by_user || e?.name || "");
+		return N(e?.name_by_user || e?.name || "");
 	}
 	connectedCallback() {
 		super.connectedCallback(), this._loadModels();
@@ -7109,7 +8881,7 @@ var gi = class extends v {
 	async _loadZ2M() {
 		let e = this._deviceId;
 		if (this._z2m = null, e) try {
-			let t = await Xt(this.hass, e);
+			let t = await jn(this.hass, e);
 			e === this._deviceId && (this._z2m = t);
 		} catch {
 			e === this._deviceId && (this._z2m = {
@@ -7121,7 +8893,7 @@ var gi = class extends v {
 	}
 	async _loadModels() {
 		try {
-			this._models = await Yt(this.hass);
+			this._models = await An(this.hass);
 		} catch {
 			this._models = [];
 		}
@@ -7138,10 +8910,10 @@ var gi = class extends v {
 	_onModel(e) {
 		this._modelKey = e;
 		let t = this._model();
-		this._deviceId = t?.devices[0]?.device_id ?? "", this._up = { ...K.EMPTY }, this._down = { ...K.EMPTY }, this._stopped = { ...K.EMPTY }, !t || this._name.trim() && this._nameTyped || (this._name = t.label, this._idEdited || (this._id = M(t.label)));
+		this._deviceId = t?.devices[0]?.device_id ?? "", this._up = { ...K.EMPTY }, this._down = { ...K.EMPTY }, this._stopped = { ...K.EMPTY }, !t || this._name.trim() && this._nameTyped || (this._name = t.label, this._idEdited || (this._id = N(t.label)));
 	}
 	_onName(e) {
-		this._name = e, this._nameTyped = !0, this._idEdited || (this._id = M(e));
+		this._name = e, this._nameTyped = !0, this._idEdited || (this._id = N(e));
 	}
 	_refSensors() {
 		let e = this.hass.entities || {}, t = /* @__PURE__ */ new Set(["sensor", "binary_sensor"]), n = this._deviceSlug();
@@ -7175,7 +8947,7 @@ var gi = class extends v {
 		if (o) {
 			let e = this._z2m?.fields ?? [], t = e.some((e) => e.field === r.field);
 			c = e.length ? h`<homex-select
-        placeholder="Champ Zigbee2MQTT…"
+        placeholder=${S("shutterPresetEditor.z2m_field")}
         .value=${r.field ?? ""}
         .options=${[...r.field && !t ? [{
 				value: r.field,
@@ -7191,7 +8963,7 @@ var gi = class extends v {
 			})}
       ></homex-select>` : h`<input
             class="field-name"
-            placeholder="champ, ex. motor_run_status"
+            placeholder=${S("shutterPresetEditor.field_placeholder")}
             .value=${r.field ?? ""}
             @change=${(e) => i({
 				...r,
@@ -7200,23 +8972,26 @@ var gi = class extends v {
           />`;
 			let n = r.field ? this._z2mValue(r.field) : "";
 			l = n ? [n] : [];
-		} else c = h`<homex-select
-        placeholder="Capteur…"
-        .value=${r.domain && r.suffix ? `${r.domain}|${r.suffix}` : ""}
+		} else {
+			let e = r.domain && r.suffix ? `${r.domain}|${r.suffix}` : "";
+			c = h`<homex-select
+        placeholder=${S("shutterPresetEditor.sensor")}
+        .value=${e}
         .options=${this._refSensors().map((e) => ({
-			value: e.key,
-			label: e.suffix,
-			secondary: e.entity_id
-		}))}
+				value: e.key,
+				label: e.suffix,
+				secondary: e.entity_id
+			}))}
         @value-changed=${(e) => {
-			let [t = "", n = ""] = String(e.detail.value).split("|");
-			i({
-				...r,
-				domain: t,
-				suffix: n
-			});
-		}}
+				let [t = "", n = ""] = String(e.detail.value).split("|");
+				i({
+					...r,
+					domain: t,
+					suffix: n
+				});
+			}}
       ></homex-select>`, l = this._sensorValues(this._condEntityId(r));
+		}
 		return h`<div class="cond">
       <div class="section">${t}</div>
       <p class="hint">${n}</p>
@@ -7228,7 +9003,7 @@ var gi = class extends v {
 			state: r.state
 		})}
             >
-              Capteur HA
+              ${S("shutterPresetEditor.source_ha")}
             </button>
             <button
               class="src ${o ? "on" : ""}"
@@ -7239,13 +9014,13 @@ var gi = class extends v {
 			state: r.state
 		})}
             >
-              État Zigbee2MQTT
+              ${S("shutterPresetEditor.source_z2m")}
             </button>
           </div>` : ""}
       <div class="cond-row">
         ${c}
         <input
-          placeholder="valeur"
+          placeholder=${S("shutterPresetEditor.value")}
           list=${a}
           .value=${r.state}
           @change=${(e) => i({
@@ -7257,11 +9032,7 @@ var gi = class extends v {
           ${l.map((e) => h`<option value=${e}></option>`)}
         </datalist>
       </div>
-      ${o && this._z2m?.available && !this._z2m.fields.length ? h`<p class="hint">
-            Aucun état reçu de Zigbee2MQTT pour cet appareil pour l'instant
-            (il est publié à chaque changement : bouge le volet puis rouvre ce
-            preset pour voir la liste des champs), ou saisis le nom du champ.
-          </p>` : ""}
+      ${o && this._z2m?.available && !this._z2m.fields.length ? h`<p class="hint">${S("shutterPresetEditor.z2m_no_state")}</p>` : ""}
     </div>`;
 	}
 	_close() {
@@ -7270,11 +9041,11 @@ var gi = class extends v {
 	async _save() {
 		let e = this._name.trim(), t = this._id.trim();
 		if (!e || !t) {
-			alert("Nom et id du preset requis.");
+			alert(S("shutterPresetEditor.name_id_required"));
 			return;
 		}
 		if (!this._modelKey || !this._deviceId) {
-			alert("Choisis un modèle et un device de référence.");
+			alert(S("shutterPresetEditor.choose_model_device"));
 			return;
 		}
 		let n = (e) => this._smart ? {
@@ -7283,7 +9054,7 @@ var gi = class extends v {
 		} : { ...K.EMPTY };
 		this._busy = !0;
 		try {
-			await Qt(this.hass, {
+			await Nn(this.hass, {
 				id: t,
 				name: e,
 				model: this._modelKey,
@@ -7295,40 +9066,40 @@ var gi = class extends v {
 				stopped: n(this._stopped)
 			}), this._close();
 		} catch (e) {
-			this._busy = !1, alert("Erreur Homex : " + C(e));
+			this._busy = !1, alert(S("common.error", { message: w(e) }));
 		}
 	}
 	async _delete() {
-		if (this.preset && confirm(`Supprimer le preset "${this.preset.name}" ?`)) {
+		if (this.preset && confirm(S("shutterPresetEditor.confirm_delete", { name: this.preset.name }))) {
 			this._busy = !0;
 			try {
-				await $t(this.hass, this.preset.id), this._close();
+				await Pn(this.hass, this.preset.id), this._close();
 			} catch (e) {
-				this._busy = !1, alert("Erreur Homex : " + C(e));
+				this._busy = !1, alert(S("common.error", { message: w(e) }));
 			}
 		}
 	}
 	render() {
 		let e = !!this.preset, t = this._model();
 		return h`
-      ${A("Nom du preset", this._name, (e) => this._onName(e), "Volet salon")}
-      ${e ? h`<div class="section">Id : ${this.preset.id}</div>` : ""}
+      ${j(S("shutterPresetEditor.name"), this._name, (e) => this._onName(e), S("shutterPresetEditor.name_placeholder"))}
+      ${e ? h`<div class="section">${S("shutterPresetEditor.id", { id: this.preset.id })}</div>` : ""}
 
-      <div class="section">Modèle de volet</div>
+      <div class="section">${S("shutterPresetEditor.shutter_model")}</div>
       ${this._models.length ? h`<homex-select
-            placeholder="Choisir un modèle…"
+            placeholder=${S("shutterPresetEditor.choose_model")}
             .value=${this._modelKey}
             .options=${this._models.map((e) => ({
 			value: e.model,
 			label: e.label,
-			tertiary: `${e.count} appareil(s)`
+			tertiary: S("shutterPresetEditor.devices_count", { count: e.count })
 		}))}
             @value-changed=${(e) => this._onModel(e.detail.value)}
-          ></homex-select>` : h`<p class="hint">Aucun volet (device avec entité cover) détecté.</p>`}
+          ></homex-select>` : h`<p class="hint">${S("shutterPresetEditor.no_shutters")}</p>`}
 
       ${t ? h`
-            <div class="section">Device de référence</div>
-            <p class="hint">Les capteurs/actions sont tirés de ce device.</p>
+            <div class="section">${S("shutterPresetEditor.ref_device")}</div>
+            <p class="hint">${S("shutterPresetEditor.ref_device_hint")}</p>
             <homex-select
               .value=${this._deviceId}
               .options=${t.devices.map((e) => ({
@@ -7341,7 +9112,7 @@ var gi = class extends v {
             ></homex-select>
 
             <label class="toggle-row">
-              <span>Implémenter la permutation intelligente</span>
+              <span>${S("shutterPresetEditor.smart_toggle")}</span>
               <span class="toggle ${this._smart ? "on" : ""}">
                 <input
                   type="checkbox"
@@ -7351,38 +9122,32 @@ var gi = class extends v {
                 <span class="knob"></span>
               </span>
             </label>
-            <p class="hint">
-              Si activée, indique comment détecter l'état du volet : un capteur
-              Home Assistant, ou un champ de l'état Zigbee2MQTT de l'appareil
-              (ex. motor_run_status), avec une valeur précise. « Permuter »
-              arrête alors un volet en mouvement, et relance un volet arrêté
-              dans le sens inverse de son dernier mouvement.
-            </p>
+            <p class="hint">${S("shutterPresetEditor.smart_toggle_hint")}</p>
             ${this._smart ? h`
-                  ${this._condEditor("up", "Montée (volet en mouvement vers le haut)", "Le volet est en train de monter quand ce capteur vaut :", this._up, (e) => this._up = e)}
-                  ${this._condEditor("down", "Descente (volet en mouvement vers le bas)", "Le volet est en train de descendre quand ce capteur vaut :", this._down, (e) => this._down = e)}
-                  ${this._condEditor("stopped", "Arrêt (volet à l'arrêt)", "Le volet est à l'arrêt quand ce capteur vaut :", this._stopped, (e) => this._stopped = e)}
+                  ${this._condEditor("up", S("shutterPresetEditor.up_title"), S("shutterPresetEditor.up_hint"), this._up, (e) => this._up = e)}
+                  ${this._condEditor("down", S("shutterPresetEditor.down_title"), S("shutterPresetEditor.down_hint"), this._down, (e) => this._down = e)}
+                  ${this._condEditor("stopped", S("shutterPresetEditor.stopped_title"), S("shutterPresetEditor.stopped_hint"), this._stopped, (e) => this._stopped = e)}
                 ` : ""}
           ` : ""}
 
       <div class="actions">
         ${e ? h`<button class="danger" ?disabled=${this._busy} @click=${this._delete}>
-              Supprimer
+              ${S("common.delete")}
             </button>` : ""}
-        <button @click=${this._close}>Annuler</button>
+        <button @click=${this._close}>${S("common.cancel")}</button>
         <button class="primary" ?disabled=${this._busy} @click=${this._save}>
-          ${e ? "Enregistrer" : "Créer le preset"}
+          ${S(e ? "common.save" : "shutterPresetEditor.create_preset")}
         </button>
       </div>
     `;
 	}
-}, K = gi, q = (gi.EMPTY = {
+}, K = Vi, q = (Vi.EMPTY = {
 	source: "entity",
 	domain: "",
 	suffix: "",
 	field: "",
 	state: ""
-}, gi.styles = [D, o`
+}, Vi.styles = [O, o`
       .hint {
         font-size: 12px;
         color: var(--secondary-text-color);
@@ -7497,10 +9262,10 @@ var gi = class extends v {
         gap: 8px;
         margin-top: 16px;
       }
-    `], gi);
-O([b({ attribute: !1 })], q.prototype, "hass", void 0), O([b({ attribute: !1 })], q.prototype, "preset", void 0), O([x()], q.prototype, "_name", void 0), O([x()], q.prototype, "_id", void 0), O([x()], q.prototype, "_models", void 0), O([x()], q.prototype, "_modelKey", void 0), O([x()], q.prototype, "_deviceId", void 0), O([x()], q.prototype, "_smart", void 0), O([x()], q.prototype, "_up", void 0), O([x()], q.prototype, "_down", void 0), O([x()], q.prototype, "_stopped", void 0), O([x()], q.prototype, "_z2m", void 0), O([x()], q.prototype, "_busy", void 0), q = K = O([y("homex-shutter-preset-editor")], q);
+    `], Vi);
+k([b({ attribute: !1 })], q.prototype, "hass", void 0), k([b({ attribute: !1 })], q.prototype, "preset", void 0), k([x()], q.prototype, "_name", void 0), k([x()], q.prototype, "_id", void 0), k([x()], q.prototype, "_models", void 0), k([x()], q.prototype, "_modelKey", void 0), k([x()], q.prototype, "_deviceId", void 0), k([x()], q.prototype, "_smart", void 0), k([x()], q.prototype, "_up", void 0), k([x()], q.prototype, "_down", void 0), k([x()], q.prototype, "_stopped", void 0), k([x()], q.prototype, "_z2m", void 0), k([x()], q.prototype, "_busy", void 0), q = K = k([y("homex-shutter-preset-editor")], q);
 // src/components/homex-shutter-manager.ts
-var _i = class extends v {
+var Hi = class extends v {
 	constructor(...e) {
 		super(...e), this._presets = [], this._loaded = !1, this.base = "", this.subpath = "";
 	}
@@ -7509,7 +9274,7 @@ var _i = class extends v {
 	}
 	async _load() {
 		try {
-			this._presets = await Zt(this.hass);
+			this._presets = await Mn(this.hass);
 		} catch {
 			this._presets = [];
 		}
@@ -7519,27 +9284,27 @@ var _i = class extends v {
 		this.dispatchEvent(new CustomEvent("close"));
 	}
 	_onClosed() {
-		this._load(), E(this.base);
+		this._load(), D(this.base);
 	}
 	_openEditor(e) {
-		T(w(this.base, ...e ? ["edit", e] : ["new"]));
+		E(T(this.base, ...e ? ["edit", e] : ["new"]));
 	}
 	render() {
-		let [e, t] = zn(this.subpath);
+		let [e, t] = yr(this.subpath);
 		if (e === "new" || e === "edit" && t) {
 			let e = t ? this._presets.find((e) => e.id === t) : null;
 			return t && !e ? h`
           <div class="head">
-            <button @click=${this._onClosed}>← Presets</button>
+            <button @click=${this._onClosed}>← ${S("shutterManager.presets")}</button>
             <h2></h2>
           </div>
           <div class="msg">
-            ${this._loaded ? `« ${t} » introuvable.` : "Chargement…"}
+            ${this._loaded ? S("shutterManager.not_found", { id: t }) : S("common.loading")}
           </div>
         ` : h`
         <div class="head">
-          <button @click=${this._onClosed}>← Presets</button>
-          <h2>${e ? "Modifier le preset" : "Nouveau shutter device preset"}</h2>
+          <button @click=${this._onClosed}>← ${S("shutterManager.presets")}</button>
+          <h2>${S(e ? "shutterManager.edit_preset" : "shutterManager.new_preset")}</h2>
         </div>
         <div class="editor">
           <homex-shutter-preset-editor
@@ -7553,12 +9318,12 @@ var _i = class extends v {
 		return h`
       <div class="head">
         <button @click=${this._back}>← Homex</button>
-        <h2>Shutter Manager</h2>
+        <h2>${S("shutterManager.title")}</h2>
         <button
           class="primary"
           @click=${() => this._openEditor()}
         >
-          ＋ Preset
+          ${S("shutterManager.add_preset")}
         </button>
       </div>
       ${this._loaded ? this._presets.length ? h`<div class="grid">
@@ -7570,17 +9335,14 @@ var _i = class extends v {
                   <div class="info">
                     <div class="name">${e.name}</div>
                     <div class="meta">
-                      ${e.model_label}${e.smart_toggle ? " · permutation intelligente" : ""}
+                      ${e.model_label}${e.smart_toggle ? S("shutterManager.smart_toggle") : ""}
                     </div>
                   </div>
                 </div>`)}
-            </div>` : h`<div class="msg">
-              Aucun shutter device preset. Clique sur « ＋ Preset » pour définir
-              le pilotage d'un modèle de volet.
-            </div>` : h`<div class="msg">Chargement…</div>`}
+            </div>` : h`<div class="msg">${S("shutterManager.no_presets")}</div>` : h`<div class="msg">${S("common.loading")}</div>`}
     `;
 	}
-}, vi = (_i.styles = [D, o`
+}, Ui = (Hi.styles = [O, o`
       .head {
         display: flex;
         align-items: center;
@@ -7651,10 +9413,10 @@ var _i = class extends v {
         border-radius: 12px;
         padding: 16px;
       }
-    `], _i);
-O([b({ attribute: !1 })], vi.prototype, "hass", void 0), O([x()], vi.prototype, "_presets", void 0), O([x()], vi.prototype, "_loaded", void 0), O([b({ attribute: !1 })], vi.prototype, "base", void 0), O([b({ attribute: !1 })], vi.prototype, "subpath", void 0), vi = O([y("homex-shutter-manager")], vi);
+    `], Hi);
+k([b({ attribute: !1 })], Ui.prototype, "hass", void 0), k([x()], Ui.prototype, "_presets", void 0), k([x()], Ui.prototype, "_loaded", void 0), k([b({ attribute: !1 })], Ui.prototype, "base", void 0), k([b({ attribute: !1 })], Ui.prototype, "subpath", void 0), Ui = k([y("homex-shutter-manager")], Ui);
 // src/components/homex-heating-group-editor.ts
-var yi, bi = "default", xi = 5, Si = 30, Ci = .5, wi = 12, Ti = (e) => Math.min(Si, Math.max(xi, Math.round(e / Ci) * Ci)), J = (yi = class extends v {
+var Wi, Gi = "default", Ki = 5, qi = 30, Ji = .5, Yi = 12, Xi = (e) => Math.min(qi, Math.max(Ki, Math.round(e / Ji) * Ji)), J = (Wi = class extends v {
 	constructor(...e) {
 		super(...e), this.group = null, this.groups = [], this.presets = [], this.rooms = [], this._name = "", this._id = "", this._rooms = [], this._setpoints = {}, this._busy = !1, this._idEdited = !1;
 	}
@@ -7666,15 +9428,15 @@ var yi, bi = "default", xi = 5, Si = 30, Ci = .5, wi = 12, Ti = (e) => Math.min(
 		}
 	}
 	get _isDefault() {
-		return this.group?.id === bi;
+		return this.group?.id === Gi;
 	}
 	_onName(e) {
-		this._name = e, this._idEdited || (this._id = M(e));
+		this._name = e, this._idEdited || (this._id = N(e));
 	}
 	_setTemp(e, t) {
 		Number.isNaN(t) || (this._setpoints = {
 			...this._setpoints,
-			[e]: Ti(t)
+			[e]: Xi(t)
 		});
 	}
 	_toggleRoom(e) {
@@ -7686,24 +9448,24 @@ var yi, bi = "default", xi = 5, Si = 30, Ci = .5, wi = 12, Ti = (e) => Math.min(
 	_stepper(e, t) {
 		return h`<div class="stepper">
       <button
-        title="−0,5 °C"
-        @click=${() => this._setTemp(e, (t ?? 20) - Ci)}
+        title=${S("heatingGroupEditor.minus")}
+        @click=${() => this._setTemp(e, (t ?? 20) - Ji)}
       >
         <svg viewBox="0 0 24 24"><path d=${yt}></path></svg>
       </button>
       <input
         type="number"
         inputmode="decimal"
-        min=${xi}
-        max=${Si}
-        step=${Ci}
+        min=${Ki}
+        max=${qi}
+        step=${Ji}
         .value=${t == null ? "" : String(t)}
         placeholder="—"
         @change=${(t) => this._setTemp(e, parseFloat(t.target.value))}
       />
       <button
-        title="+0,5 °C"
-        @click=${() => this._setTemp(e, (t ?? 20) + Ci)}
+        title=${S("heatingGroupEditor.plus")}
+        @click=${() => this._setTemp(e, (t ?? 20) + Ji)}
       >
         <svg viewBox="0 0 24 24"><path d=${Ct}></path></svg>
       </button>
@@ -7714,7 +9476,7 @@ var yi, bi = "default", xi = 5, Si = 30, Ci = .5, wi = 12, Ti = (e) => Math.min(
 		let { [e]: n, ...r } = this._setpoints;
 		this._setpoints = t ? r : {
 			...r,
-			[e]: wi
+			[e]: Yi
 		};
 	}
 	_close() {
@@ -7723,35 +9485,35 @@ var yi, bi = "default", xi = 5, Si = 30, Ci = .5, wi = 12, Ti = (e) => Math.min(
 	async _save() {
 		this._busy = !0;
 		try {
-			await Cn(this.hass, {
+			await rr(this.hass, {
 				id: this._id,
 				name: this._name.trim(),
 				rooms: this._isDefault ? [] : this._rooms,
 				setpoints: this._setpoints
 			}, !this.group), this._close();
 		} catch (e) {
-			alert("Erreur Homex : " + C(e)), this._busy = !1;
+			alert(S("common.error", { message: w(e) })), this._busy = !1;
 		}
 	}
 	async _delete() {
-		if (this.group && confirm(`Supprimer le setpoint « ${this.group.name} » ? Ses pièces repassent dans le setpoint par défaut.`)) {
+		if (this.group && confirm(S("heatingGroupEditor.delete_confirm", { name: this.group.name }))) {
 			this._busy = !0;
 			try {
-				await wn(this.hass, this.group.id), this._close();
+				await ir(this.hass, this.group.id), this._close();
 			} catch (e) {
-				alert("Erreur Homex : " + C(e)), this._busy = !1;
+				alert(S("common.error", { message: w(e) })), this._busy = !1;
 			}
 		}
 	}
 	render() {
 		let e = !!this.group;
 		return h`
-      ${A("Nom", this._name, (e) => this._onName(e), "Chambres")}
-      ${e ? h`<div class="section">Id : ${this.group.id}</div>` : A("Id", this._id, (e) => {
-			this._idEdited = !0, this._id = M(e);
+      ${j(S("heatingGroupEditor.name"), this._name, (e) => this._onName(e), S("heatingGroupEditor.name_placeholder"))}
+      ${e ? h`<div class="section">${S("heatingGroupEditor.id_label", { id: this.group.id })}</div>` : j(S("heatingGroupEditor.id"), this._id, (e) => {
+			this._idEdited = !0, this._id = N(e);
 		})}
 
-      <div class="section">Consignes de température</div>
+      <div class="section">${S("heatingGroupEditor.setpoints")}</div>
       ${this.presets.map((e) => {
 			let t = this._setpoints[e.id];
 			if (e.unheated) {
@@ -7759,8 +9521,8 @@ var yi, bi = "default", xi = 5, Si = 30, Ci = .5, wi = 12, Ti = (e) => Math.min(
 				return h`<div class="setpoint">
             <span class="label">${e.name}</span>
             <label class="cut">
-              ${j(n, (t) => this._setUnheatedCut(e.id, t))}
-              Chauffage coupé
+              ${M(n, (t) => this._setUnheatedCut(e.id, t))}
+              ${S("heatingGroupEditor.heating_off")}
             </label>
             ${n ? "" : this._stepper(e.id, t)}
           </div>`;
@@ -7771,18 +9533,13 @@ var yi, bi = "default", xi = 5, Si = 30, Ci = .5, wi = 12, Ti = (e) => Math.min(
         </div>`;
 		})}
 
-      <div class="section">Pièces</div>
-      ${this._isDefault ? h`<p class="hint">
-            S'applique à toutes les pièces qui ne sont dans aucun autre setpoint.
-          </p>` : h`<p class="hint">
-              Une pièce n'appartient qu'à un setpoint : la cocher la retire de son
-              setpoint actuel.
-            </p>
+      <div class="section">${S("heatingGroupEditor.rooms")}</div>
+      ${this._isDefault ? h`<p class="hint">${S("heatingGroupEditor.default_hint")}</p>` : h`<p class="hint">${S("heatingGroupEditor.rooms_hint")}</p>
             <div class="rooms">
               ${this.rooms.map((e) => {
 			let t = this._otherGroup(e.room_id);
 			return h`<label>
-                  ${j(this._rooms.includes(e.room_id), () => this._toggleRoom(e.room_id))}
+                  ${M(this._rooms.includes(e.room_id), () => this._toggleRoom(e.room_id))}
                   <span>
                     ${e.name}
                     ${t && !this._rooms.includes(e.room_id) ? h`<span class="other">· ${t.name}</span>` : ""}
@@ -7797,16 +9554,16 @@ var yi, bi = "default", xi = 5, Si = 30, Ci = .5, wi = 12, Ti = (e) => Math.min(
           ?disabled=${this._busy || !this._name.trim() || !this._id}
           @click=${this._save}
         >
-          Enregistrer
+          ${S("common.save")}
         </button>
-        <button ?disabled=${this._busy} @click=${this._close}>Annuler</button>
+        <button ?disabled=${this._busy} @click=${this._close}>${S("common.cancel")}</button>
         ${e && !this.group.builtin ? h`<button class="danger" ?disabled=${this._busy} @click=${this._delete}>
-              Supprimer
+              ${S("common.delete")}
             </button>` : ""}
       </div>
     `;
 	}
-}, yi.styles = [D, o`
+}, Wi.styles = [O, o`
       .hint {
         font-size: 13px;
         color: var(--secondary-text-color);
@@ -7883,35 +9640,35 @@ var yi, bi = "default", xi = 5, Si = 30, Ci = .5, wi = 12, Ti = (e) => Math.min(
         font-size: 12px;
         color: var(--secondary-text-color);
       }
-    `], yi);
-O([b({ attribute: !1 })], J.prototype, "hass", void 0), O([b({ attribute: !1 })], J.prototype, "group", void 0), O([b({ attribute: !1 })], J.prototype, "groups", void 0), O([b({ attribute: !1 })], J.prototype, "presets", void 0), O([b({ attribute: !1 })], J.prototype, "rooms", void 0), O([x()], J.prototype, "_name", void 0), O([x()], J.prototype, "_id", void 0), O([x()], J.prototype, "_rooms", void 0), O([x()], J.prototype, "_setpoints", void 0), O([x()], J.prototype, "_busy", void 0), J = O([y("homex-heating-group-editor")], J);
+    `], Wi);
+k([b({ attribute: !1 })], J.prototype, "hass", void 0), k([b({ attribute: !1 })], J.prototype, "group", void 0), k([b({ attribute: !1 })], J.prototype, "groups", void 0), k([b({ attribute: !1 })], J.prototype, "presets", void 0), k([b({ attribute: !1 })], J.prototype, "rooms", void 0), k([x()], J.prototype, "_name", void 0), k([x()], J.prototype, "_id", void 0), k([x()], J.prototype, "_rooms", void 0), k([x()], J.prototype, "_setpoints", void 0), k([x()], J.prototype, "_busy", void 0), J = k([y("homex-heating-group-editor")], J);
 // src/components/homex-heating-device-preset-editor.ts
-var Ei, Di = [
+var Zi, Qi = [
 	{
 		key: "tolerance",
-		label: "Tolérance / précision",
+		label: () => S("heatingDevicePresetEditor.param_tolerance"),
 		domains: ["number"],
 		guess: /accuracy|precision|hysteresis|tolerance/
 	},
 	{
 		key: "mode",
-		label: "Mode",
+		label: () => S("heatingDevicePresetEditor.param_mode"),
 		domains: ["climate", "select"],
 		guess: /.*/
 	},
 	{
 		key: "lock",
-		label: "Verrouillage",
+		label: () => S("heatingDevicePresetEditor.param_lock"),
 		domains: ["switch", "lock"],
 		guess: /child_lock|securite_enfants|verrou|lock/
 	},
 	{
 		key: "sensor",
-		label: "Capteur (interne / externe)",
+		label: () => S("heatingDevicePresetEditor.param_sensor"),
 		domains: ["select", "switch"],
 		guess: /sensor_select|temperature_sensor|capteur_de_temperature_externe|external.*sensor/
 	}
-], Oi = [["on", "Activé"], ["off", "Désactivé"]], ki = [["locked", "Verrouillé"], ["unlocked", "Déverrouillé"]], Ai = Object.fromEntries(Di.map((e) => [e.key, e.label])), Y = (Ei = class extends v {
+], $i = () => [["on", S("heatingDevicePresetEditor.switch_on")], ["off", S("heatingDevicePresetEditor.switch_off")]], ea = () => [["locked", S("heatingDevicePresetEditor.locked")], ["unlocked", S("heatingDevicePresetEditor.unlocked")]], ta = (e) => Qi.find((t) => t.key === e)?.label() ?? e, Y = (Zi = class extends v {
 	constructor(...e) {
 		super(...e), this.preset = null, this._models = [], this._name = "", this._id = "", this._modelKey = "", this._deviceId = "", this._params = this._emptyParams(), this._busy = !1, this._results = null, this._idEdited = !1, this._nameTyped = !1, this._extInput = "", this._created = !1;
 	}
@@ -7920,13 +9677,13 @@ var Ei, Di = [
 	}
 	async _loadModels() {
 		try {
-			this._models = await Tn(this.hass);
+			this._models = await ar(this.hass);
 		} catch {
 			this._models = [];
 		}
 	}
 	_emptyParams() {
-		return Object.fromEntries(Di.map((e) => [e.key, {
+		return Object.fromEntries(Qi.map((e) => [e.key, {
 			enabled: !1,
 			entity: "",
 			value: ""
@@ -7937,7 +9694,7 @@ var Ei, Di = [
 			let e = this.preset;
 			this._name = e?.name ?? "", this._nameTyped = !!e, this._id = e?.id ?? "", this._idEdited = !!e, this._modelKey = e?.model ?? "", this._deviceId = e?.device_id ?? "";
 			let t = this._emptyParams();
-			for (let n of Di) {
+			for (let n of Qi) {
 				let r = e?.params?.[n.key];
 				r && (t[n.key] = {
 					enabled: !0,
@@ -7954,7 +9711,7 @@ var Ei, Di = [
 	}
 	_deviceSlug() {
 		let e = this.hass.devices?.[this._deviceId];
-		return M(e?.name_by_user || e?.name || "");
+		return N(e?.name_by_user || e?.name || "");
 	}
 	_refEntities(e) {
 		let t = this._deviceSlug();
@@ -7979,8 +9736,8 @@ var Ei, Di = [
 			case "number": return null;
 			case "select": return (t.options ?? []).map((e) => [e, e]);
 			case "climate": return (t.hvac_modes ?? []).map((e) => [e, e]);
-			case "switch": return Oi;
-			case "lock": return ki;
+			case "switch": return $i();
+			case "lock": return ea();
 			default: return [];
 		}
 	}
@@ -7991,14 +9748,14 @@ var Ei, Di = [
 	_onModel(e) {
 		this._modelKey = e;
 		let t = this._model();
-		this._deviceId = t?.devices[0]?.device_id ?? "", !t || this._name.trim() && this._nameTyped || (this._name = t.label, this._idEdited || (this._id = M(t.label))), this._suggestParams();
+		this._deviceId = t?.devices[0]?.device_id ?? "", !t || this._name.trim() && this._nameTyped || (this._name = t.label, this._idEdited || (this._id = N(t.label))), this._suggestParams();
 	}
 	_onDevice(e) {
 		this._deviceId = e, this._suggestParams();
 	}
 	_suggestParams() {
 		let e = this._emptyParams();
-		for (let t of Di) {
+		for (let t of Qi) {
 			let n = this._refEntities(t.domains).find((e) => t.guess.test(e.suffix));
 			n && (e[t.key] = {
 				enabled: !1,
@@ -8029,7 +9786,7 @@ var Ei, Di = [
 	}
 	_buildPreset() {
 		let e = {};
-		for (let t of Di) {
+		for (let t of Qi) {
 			let n = this._params[t.key];
 			if (!n.enabled || !n.entity || n.value === "") continue;
 			let [r, i] = n.entity.split("|");
@@ -8057,9 +9814,9 @@ var Ei, Di = [
 	async _save() {
 		this._busy = !0;
 		try {
-			this._results = await En(this.hass, this._buildPreset(), !this.preset && !this._created), this._created = !0;
+			this._results = await or(this.hass, this._buildPreset(), !this.preset && !this._created), this._created = !0;
 		} catch (e) {
-			alert("Erreur Homex : " + C(e));
+			alert(S("common.error", { message: w(e) }));
 		} finally {
 			this._busy = !1;
 		}
@@ -8068,21 +9825,21 @@ var Ei, Di = [
 		if (this.preset) {
 			this._busy = !0;
 			try {
-				this._results = await On(this.hass, this.preset.id);
+				this._results = await cr(this.hass, this.preset.id);
 			} catch (e) {
-				alert("Erreur Homex : " + C(e));
+				alert(S("common.error", { message: w(e) }));
 			} finally {
 				this._busy = !1;
 			}
 		}
 	}
 	async _delete() {
-		if (this.preset && confirm(`Supprimer le device preset « ${this.preset.name} » ?`)) {
+		if (this.preset && confirm(S("heatingDevicePresetEditor.delete_confirm", { name: this.preset.name }))) {
 			this._busy = !0;
 			try {
-				await Dn(this.hass, this.preset.id), this._close();
+				await sr(this.hass, this.preset.id), this._close();
 			} catch (e) {
-				alert("Erreur Homex : " + C(e)), this._busy = !1;
+				alert(S("common.error", { message: w(e) })), this._busy = !1;
 			}
 		}
 	}
@@ -8102,7 +9859,7 @@ var Ei, Di = [
       /></span>`;
 		}
 		return h`<homex-select
-      placeholder="Choisir…"
+      placeholder=${S("heatingDevicePresetEditor.choose")}
       .value=${t.value}
       .options=${r.map(([e, t]) => ({
 			value: e,
@@ -8115,18 +9872,18 @@ var Ei, Di = [
 		let t = this._params[e.key], n = this._refEntities(e.domains), r = this._entityOf(t.entity), i = this._currentValue(r);
 		return h`<div class="param">
       <label class="param-head">
-        ${j(t.enabled, (t) => this._setParam(e.key, { enabled: t }))}
-        ${e.label}
+        ${M(t.enabled, (t) => this._setParam(e.key, { enabled: t }))}
+        ${e.label()}
       </label>
       ${t.enabled ? h`<div class="param-body">
             <label>
-              Entité (${e.domains.join(" / ")})
+              ${S("heatingDevicePresetEditor.entity", { domains: e.domains.join(" / ") })}
               <homex-select
-                placeholder="Choisir…"
+                placeholder=${S("heatingDevicePresetEditor.choose")}
                 .value=${t.entity}
                 .options=${n.map((e) => ({
 			value: e.key,
-			label: e.suffix || "(entité principale)",
+			label: e.suffix || S("heatingDevicePresetEditor.main_entity"),
 			secondary: e.entity_id,
 			tertiary: e.domain
 		}))}
@@ -8134,9 +9891,9 @@ var Ei, Di = [
               ></homex-select>
             </label>
             ${e.key === "tolerance" ? this._renderToleranceValues(t, r, i) : h`<label>
-                  Valeur à fixer
+                  ${S("heatingDevicePresetEditor.value")}
                   ${this._renderValue(e.key, t)}
-                  ${r ? h`<span class="current">Actuel : ${i || "—"}</span>` : ""}
+                  ${r ? h`<span class="current">${S("heatingDevicePresetEditor.current", { value: i || "—" })}</span>` : ""}
                 </label>`}
             ${e.key === "sensor" ? this._renderExtInput() : ""}
           </div>` : ""}
@@ -8155,15 +9912,15 @@ var Ei, Di = [
     /></span>`;
 		return h`<div class="tolerances">
       <label>
-        Mode normal
+        ${S("heatingDevicePresetEditor.mode_normal")}
         ${i(e.value, (e) => this._setParam("tolerance", { value: e }))}
       </label>
       <label>
-        Mode agressive
+        ${S("heatingDevicePresetEditor.mode_aggressive")}
         ${i(e.valueAgressive ?? "", (e) => this._setParam("tolerance", { valueAgressive: e }))}
       </label>
       ${t ? h`<span class="current">
-            Actuel : ${n || "—"} · appliqué selon select.homex_climate_tolerance_mode
+            ${S("heatingDevicePresetEditor.current_tolerance", { value: n || "—" })}
           </span>` : ""}
     </div>`;
 	}
@@ -8171,8 +9928,8 @@ var Ei, Di = [
 		let e = this._refEntities(["number"]);
 		return h`<label class="wide">
       <span>
-        ${j(!!this._extInput, (t) => this._extInput = t && (this._guessExtInput() || e[0]?.key) || "")}
-        Capteur externe : la valeur choisie fait lire à la vanne une température externe
+        ${M(!!this._extInput, (t) => this._extInput = t && (this._guessExtInput() || e[0]?.key) || "")}
+        ${S("heatingDevicePresetEditor.external_sensor")}
       </span>
       ${this._extInput ? h`<homex-select
               .value=${this._extInput}
@@ -8183,55 +9940,52 @@ var Ei, Di = [
 		}))}
               @value-changed=${(e) => this._extInput = e.detail.value}
             ></homex-select>
-            <span class="current">
-              Entrée de température externe : le capteur choisi pour chaque radiateur
-              (dans la pièce) y est recopié à chaque mise à jour.
-            </span>` : ""}
+            <span class="current">${S("heatingDevicePresetEditor.external_input_hint")}</span>` : ""}
     </label>`;
 	}
 	_renderResults() {
 		let e = this._results;
 		return e.length ? h`<div class="results">
-      <strong>Appliqué sur ${e.length} appareil(s)</strong>
+      <strong>${S("heatingDevicePresetEditor.applied_on", { count: e.length })}</strong>
       ${e.map((e) => h`<div class="dev">
           ${e.failed.length ? h`<span class="ko">✗</span>` : h`<span class="ok">✓</span>`}
           ${e.name}
-          ${e.applied.length ? h` · ${e.applied.map((e) => Ai[e]).join(", ")}` : ""}
-          ${e.failed.map((e) => h`<div class="ko">${Ai[e.param]} : ${e.error}</div>`)}
+          ${e.applied.length ? h` · ${e.applied.map((e) => ta(e)).join(", ")}` : ""}
+          ${e.failed.map((e) => h`<div class="ko">${S("heatingDevicePresetEditor.failed", {
+			param: ta(e.param),
+			error: e.error
+		})}</div>`)}
         </div>`)}
-    </div>` : h`<div class="results">Aucun appareil de ce modèle trouvé.</div>`;
+    </div>` : h`<div class="results">${S("heatingDevicePresetEditor.no_device")}</div>`;
 	}
 	render() {
-		let e = !!this.preset, t = this._model(), n = Di.some((e) => {
+		let e = !!this.preset, t = this._model(), n = Qi.some((e) => {
 			let t = this._params[e.key];
 			return t.enabled && t.entity && t.value !== "";
 		});
 		return h`
-      ${A("Nom", this._name, (e) => {
-			this._name = e, this._nameTyped = !0, this._idEdited || (this._id = M(e));
-		}, "Vanne thermostatique")}
-      ${e || this._created ? h`<div class="section">Id : ${this._id}</div>` : A("Id", this._id, (e) => {
-			this._idEdited = !0, this._id = M(e);
+      ${j(S("heatingDevicePresetEditor.name"), this._name, (e) => {
+			this._name = e, this._nameTyped = !0, this._idEdited || (this._id = N(e));
+		}, S("heatingDevicePresetEditor.name_placeholder"))}
+      ${e || this._created ? h`<div class="section">${S("heatingDevicePresetEditor.id_label", { id: this._id })}</div>` : j(S("heatingDevicePresetEditor.id"), this._id, (e) => {
+			this._idEdited = !0, this._id = N(e);
 		})}
 
-      <div class="section">Modèle de thermostat</div>
+      <div class="section">${S("heatingDevicePresetEditor.model")}</div>
       <homex-select
-        placeholder="Choisir un modèle…"
+        placeholder=${S("heatingDevicePresetEditor.choose_model")}
         .value=${this._modelKey}
         .options=${this._models.map((e) => ({
 			value: e.model,
 			label: e.label,
-			tertiary: `${e.count} appareil(s)`
+			tertiary: S("heatingDevicePresetEditor.device_count", { count: e.count })
 		}))}
         @value-changed=${(e) => this._onModel(e.detail.value)}
       ></homex-select>
 
       ${t ? h`
-            <div class="section">Appareil de référence</div>
-            <p class="hint">
-              Ses entités servent à choisir les réglages ; ils s'appliquent ensuite
-              aux ${t.count} appareil(s) du modèle.
-            </p>
+            <div class="section">${S("heatingDevicePresetEditor.reference_device")}</div>
+            <p class="hint">${S("heatingDevicePresetEditor.reference_hint", { count: t.count })}</p>
             <homex-select
               .value=${this._deviceId}
               .options=${t.devices.map((e) => ({
@@ -8241,9 +9995,9 @@ var Ei, Di = [
               @value-changed=${(e) => this._onDevice(e.detail.value)}
             ></homex-select>
 
-            <div class="section">Réglages à fixer</div>
-            ${Di.map((e) => this._renderParam(e))}
-          ` : this._modelKey ? h`<p class="hint">Modèle introuvable (plus aucun appareil ?).</p>` : ""}
+            <div class="section">${S("heatingDevicePresetEditor.settings")}</div>
+            ${Qi.map((e) => this._renderParam(e))}
+          ` : this._modelKey ? h`<p class="hint">${S("heatingDevicePresetEditor.model_not_found")}</p>` : ""}
 
       ${this._results ? this._renderResults() : ""}
 
@@ -8253,21 +10007,21 @@ var Ei, Di = [
           ?disabled=${this._busy || !this._name.trim() || !this._id || !t || !n}
           @click=${this._save}
         >
-          ${this._busy ? "Application…" : "Enregistrer et appliquer"}
+          ${this._busy ? S("heatingDevicePresetEditor.applying") : S("heatingDevicePresetEditor.save_apply")}
         </button>
         ${e ? h`<button ?disabled=${this._busy} @click=${this._apply}>
-              Appliquer maintenant
+              ${S("heatingDevicePresetEditor.apply_now")}
             </button>` : ""}
         <button ?disabled=${this._busy} @click=${this._close}>
-          ${this._results ? "Terminé" : "Annuler"}
+          ${this._results ? S("heatingDevicePresetEditor.done") : S("common.cancel")}
         </button>
         ${e ? h`<button class="danger" ?disabled=${this._busy} @click=${this._delete}>
-              Supprimer
+              ${S("common.delete")}
             </button>` : ""}
       </div>
     `;
 	}
-}, Ei.styles = [D, o`
+}, Zi.styles = [O, o`
       .value input {
         width: 100%;
         box-sizing: border-box;
@@ -8364,10 +10118,10 @@ var Ei, Di = [
       .ko {
         color: var(--error-color, #db4437);
       }
-    `], Ei);
-O([b({ attribute: !1 })], Y.prototype, "hass", void 0), O([b({ attribute: !1 })], Y.prototype, "preset", void 0), O([x()], Y.prototype, "_models", void 0), O([x()], Y.prototype, "_name", void 0), O([x()], Y.prototype, "_id", void 0), O([x()], Y.prototype, "_modelKey", void 0), O([x()], Y.prototype, "_deviceId", void 0), O([x()], Y.prototype, "_params", void 0), O([x()], Y.prototype, "_busy", void 0), O([x()], Y.prototype, "_results", void 0), O([x()], Y.prototype, "_extInput", void 0), Y = O([y("homex-heating-device-preset-editor")], Y);
+    `], Zi);
+k([b({ attribute: !1 })], Y.prototype, "hass", void 0), k([b({ attribute: !1 })], Y.prototype, "preset", void 0), k([x()], Y.prototype, "_models", void 0), k([x()], Y.prototype, "_name", void 0), k([x()], Y.prototype, "_id", void 0), k([x()], Y.prototype, "_modelKey", void 0), k([x()], Y.prototype, "_deviceId", void 0), k([x()], Y.prototype, "_params", void 0), k([x()], Y.prototype, "_busy", void 0), k([x()], Y.prototype, "_results", void 0), k([x()], Y.prototype, "_extInput", void 0), Y = k([y("homex-heating-device-preset-editor")], Y);
 // src/components/homex-heating-zone-editor.ts
-var ji, Mi = "default", X = (ji = class extends v {
+var na, ra = "default", X = (na = class extends v {
 	constructor(...e) {
 		super(...e), this.zone = null, this.zones = [], this.modes = [], this.rooms = [], this._name = "", this._id = "", this._rooms = [], this._triggers = {}, this._busy = !1, this._idEdited = !1;
 	}
@@ -8378,7 +10132,7 @@ var ji, Mi = "default", X = (ji = class extends v {
 		}
 	}
 	get _isDefault() {
-		return this.zone?.id === Mi;
+		return this.zone?.id === ra;
 	}
 	_toggleRoom(e) {
 		this._rooms = this._rooms.includes(e) ? this._rooms.filter((t) => t !== e) : [...this._rooms, e];
@@ -8392,51 +10146,46 @@ var ji, Mi = "default", X = (ji = class extends v {
 	async _save() {
 		this._busy = !0;
 		try {
-			await kn(this.hass, {
+			await lr(this.hass, {
 				id: this._id,
 				name: this._name.trim(),
 				rooms: this._isDefault ? [] : this._rooms,
 				triggers: this._triggers
 			}, !this.zone), this._close();
 		} catch (e) {
-			alert("Erreur Homex : " + C(e)), this._busy = !1;
+			alert(S("common.error", { message: w(e) })), this._busy = !1;
 		}
 	}
 	async _delete() {
-		if (this.zone && confirm(`Supprimer la zone « ${this.zone.name} » ? Ses pièces repassent dans la zone par défaut.`)) {
+		if (this.zone && confirm(S("heatingZoneEditor.delete_confirm", { name: this.zone.name }))) {
 			this._busy = !0;
 			try {
-				await An(this.hass, this.zone.id), this._close();
+				await ur(this.hass, this.zone.id), this._close();
 			} catch (e) {
-				alert("Erreur Homex : " + C(e)), this._busy = !1;
+				alert(S("common.error", { message: w(e) })), this._busy = !1;
 			}
 		}
 	}
 	render() {
 		let e = !!this.zone;
 		return h`
-      ${A("Nom", this._name, (e) => {
-			this._name = e, this._idEdited || (this._id = M(e));
-		}, "Studio")}
-      ${e ? h`<div class="section">Id : ${this.zone.id}</div>` : A("Id", this._id, (e) => {
-			this._idEdited = !0, this._id = M(e);
+      ${j(S("heatingZoneEditor.name"), this._name, (e) => {
+			this._name = e, this._idEdited || (this._id = N(e));
+		}, S("heatingZoneEditor.name_placeholder"))}
+      ${e ? h`<div class="section">${S("heatingZoneEditor.id_label", { id: this.zone.id })}</div>` : j(S("heatingZoneEditor.id"), this._id, (e) => {
+			this._idEdited = !0, this._id = N(e);
 		})}
       ${this._id ? h`<p class="hint">
-            Entité de commande : <code>select.homex_heating_${this._id}</code>
+            ${S("heatingZoneEditor.control_entity")} <code>select.homex_heating_${this._id}</code>
           </p>` : ""}
 
-      <div class="section">Pièces</div>
-      ${this._isDefault ? h`<p class="hint">
-            Contient toutes les pièces qui ne sont dans aucune autre zone.
-          </p>` : h`<p class="hint">
-              Une pièce n'appartient qu'à une zone : la cocher la retire de sa zone
-              actuelle.
-            </p>
+      <div class="section">${S("heatingZoneEditor.rooms")}</div>
+      ${this._isDefault ? h`<p class="hint">${S("heatingZoneEditor.default_hint")}</p>` : h`<p class="hint">${S("heatingZoneEditor.rooms_hint")}</p>
             <div class="rooms">
               ${this.rooms.map((e) => {
 			let t = this._otherZone(e.room_id);
 			return h`<label>
-                  ${j(this._rooms.includes(e.room_id), () => this._toggleRoom(e.room_id))}
+                  ${M(this._rooms.includes(e.room_id), () => this._toggleRoom(e.room_id))}
                   <span>
                     ${e.name}
                     ${t && !this._rooms.includes(e.room_id) ? h`<span class="other">· ${t.name}</span>` : ""}
@@ -8445,17 +10194,14 @@ var ji, Mi = "default", X = (ji = class extends v {
 		})}
             </div>`}
 
-      <div class="section">Déclencheurs par mode</div>
-      <p class="hint">
-        Chaque déclencheur passe la zone dans le mode correspondant. Les boutons
-        d'interrupteurs se configurent aussi dans le Switch Manager (module 🔥 Climate).
-      </p>
+      <div class="section">${S("heatingZoneEditor.triggers")}</div>
+      <p class="hint">${S("heatingZoneEditor.triggers_hint")}</p>
       ${this.modes.map((e) => {
 			let t = this._triggers[e.id] ?? [];
 			return h`<details class="mode" ?open=${t.length > 0}>
           <summary>
             ${e.name}
-            <span class="count">· ${t.length} déclencheur(s)</span>
+            <span class="count">${S("heatingZoneEditor.trigger_count", { count: t.length })}</span>
           </summary>
           <homex-trigger-selector
             .hass=${this.hass}
@@ -8474,16 +10220,16 @@ var ji, Mi = "default", X = (ji = class extends v {
           ?disabled=${this._busy || !this._name.trim() || !this._id}
           @click=${this._save}
         >
-          Enregistrer
+          ${S("common.save")}
         </button>
-        <button ?disabled=${this._busy} @click=${this._close}>Annuler</button>
+        <button ?disabled=${this._busy} @click=${this._close}>${S("common.cancel")}</button>
         ${e && !this.zone.builtin ? h`<button class="danger" ?disabled=${this._busy} @click=${this._delete}>
-              Supprimer
+              ${S("common.delete")}
             </button>` : ""}
       </div>
     `;
 	}
-}, ji.styles = [D, o`
+}, na.styles = [O, o`
       .hint {
         font-size: 13px;
         color: var(--secondary-text-color);
@@ -8522,32 +10268,34 @@ var ji, Mi = "default", X = (ji = class extends v {
         font-size: 12px;
         color: var(--secondary-text-color);
       }
-    `], ji);
-O([b({ attribute: !1 })], X.prototype, "hass", void 0), O([b({ attribute: !1 })], X.prototype, "zone", void 0), O([b({ attribute: !1 })], X.prototype, "zones", void 0), O([b({ attribute: !1 })], X.prototype, "modes", void 0), O([b({ attribute: !1 })], X.prototype, "rooms", void 0), O([x()], X.prototype, "_name", void 0), O([x()], X.prototype, "_id", void 0), O([x()], X.prototype, "_rooms", void 0), O([x()], X.prototype, "_triggers", void 0), O([x()], X.prototype, "_busy", void 0), X = O([y("homex-heating-zone-editor")], X);
+    `], na);
+k([b({ attribute: !1 })], X.prototype, "hass", void 0), k([b({ attribute: !1 })], X.prototype, "zone", void 0), k([b({ attribute: !1 })], X.prototype, "zones", void 0), k([b({ attribute: !1 })], X.prototype, "modes", void 0), k([b({ attribute: !1 })], X.prototype, "rooms", void 0), k([x()], X.prototype, "_name", void 0), k([x()], X.prototype, "_id", void 0), k([x()], X.prototype, "_rooms", void 0), k([x()], X.prototype, "_triggers", void 0), k([x()], X.prototype, "_busy", void 0), X = k([y("homex-heating-zone-editor")], X);
 // src/components/homex-heating-system-editor.ts
-var Ni, Pi = "global", Fi = ["switch", "input_boolean"], Ii = ["input_number", "number"], Li = [
-	["setpoint_sensor", "Température de consigne"],
-	["tank_sensor", "Température ballon"],
-	["flow_sensor", "Température départ"],
-	["return_sensor", "Température retour"]
-], Ri = {
+var ia, aa = "global", oa = ["switch", "input_boolean"], sa = ["input_number", "number"], ca = [
+	["setpoint_sensor", () => S("heatingSystemEditor.sensor_setpoint")],
+	["tank_sensor", () => S("heatingSystemEditor.sensor_tank")],
+	["flow_sensor", () => S("heatingSystemEditor.sensor_flow")],
+	["return_sensor", () => S("heatingSystemEditor.sensor_return")]
+], la = {
 	setpoint_tank: {
-		label: "Delta consigne / ballon",
+		label: () => S("heatingSystemEditor.rule_setpoint_tank"),
+		add: () => S("heatingSystemEditor.add_rule_setpoint_tank"),
 		gap: ["setpoint_sensor", "tank_sensor"],
-		a: "consigne",
-		b: "ballon",
+		a: () => S("heatingSystemEditor.short_setpoint"),
+		b: () => S("heatingSystemEditor.short_tank"),
 		init: ["6", "3"]
 	},
 	flow_return: {
-		label: "Delta départ / retour",
+		label: () => S("heatingSystemEditor.rule_flow_return"),
+		add: () => S("heatingSystemEditor.add_rule_flow_return"),
 		gap: ["flow_sensor", "return_sensor"],
-		a: "départ",
-		b: "retour",
+		a: () => S("heatingSystemEditor.short_flow"),
+		b: () => S("heatingSystemEditor.short_return"),
 		init: ["10", "5"]
 	}
-}, zi = { delta: "setpoint_tank" }, Bi = [["boiler", "Boiler"], ["buffer_tank", "Buffer Tank"]], Z = (Ni = class extends v {
+}, ua = { delta: "setpoint_tank" }, da = [["boiler", () => S("heatingSystemEditor.type_boiler")], ["buffer_tank", () => S("heatingSystemEditor.type_buffer_tank")]], Z = (ia = class extends v {
 	constructor(...e) {
-		super(...e), this.system = null, this.zones = [], this._sysName = "", this._id = "", this._type = "boiler", this._contact = "", this._zones = [Pi], this._aggressive = !1, this._tank = {
+		super(...e), this.system = null, this.zones = [], this._sysName = "", this._id = "", this._type = "boiler", this._contact = "", this._zones = [aa], this._aggressive = !1, this._tank = {
 			setpoint_sensor: "",
 			tank_sensor: "",
 			flow_sensor: "",
@@ -8557,13 +10305,13 @@ var Ni, Pi = "global", Fi = ["switch", "input_boolean"], Ii = ["input_number", "
 	willUpdate(e) {
 		if (e.has("system")) {
 			let e = this.system;
-			this._sysName = e?.name ?? "", this._id = e?.id ?? "", this._type = e?.type ?? "boiler", this._contact = e?.contact ?? "", this._zones = [...e?.zones?.length ? e.zones : [Pi]], this._aggressive = e?.aggressive ?? !1, this._tank = {
+			this._sysName = e?.name ?? "", this._id = e?.id ?? "", this._type = e?.type ?? "boiler", this._contact = e?.contact ?? "", this._zones = [...e?.zones?.length ? e.zones : [aa]], this._aggressive = e?.aggressive ?? !1, this._tank = {
 				setpoint_sensor: e?.setpoint_sensor ?? "",
 				tank_sensor: e?.tank_sensor ?? "",
 				flow_sensor: e?.flow_sensor ?? "",
 				return_sensor: e?.return_sensor ?? ""
 			}, this._circulator = e?.circulator ?? "", this._minRuntime = String(e?.min_runtime ?? 5), this._rules = (e?.rules ?? []).map((e) => ({
-				type: zi[e.type] ?? e.type,
+				type: ua[e.type] ?? e.type,
 				delta: String(e.delta),
 				tolerance: String(e.tolerance)
 			})), this._idEdited = !!e, this._busy = !1;
@@ -8571,7 +10319,7 @@ var Ni, Pi = "global", Fi = ["switch", "input_boolean"], Ii = ["input_number", "
 	}
 	get _contacts() {
 		let e = (e) => this.hass.states[e]?.attributes?.friendly_name || e;
-		return Object.keys(this.hass.states).filter((e) => Fi.includes(e.split(".")[0])).sort((t, n) => e(t).localeCompare(e(n)));
+		return Object.keys(this.hass.states).filter((e) => oa.includes(e.split(".")[0])).sort((t, n) => e(t).localeCompare(e(n)));
 	}
 	_name(e) {
 		return this.hass.states[e]?.attributes?.friendly_name || e;
@@ -8582,7 +10330,7 @@ var Ni, Pi = "global", Fi = ["switch", "input_boolean"], Ii = ["input_number", "
 			let e = this.hass.entities?.[n], r = e?.area_id || e?.device_id && this.hass.devices?.[e.device_id]?.area_id || "";
 			t.set(r, [...t.get(r) ?? [], n]);
 		}
-		let n = (e) => e ? this.hass.areas?.[e]?.name ?? e : "Sans pièce";
+		let n = (e) => e ? this.hass.areas?.[e]?.name ?? e : S("heatingSystemEditor.no_area");
 		return [...t.entries()].sort(([e], [t]) => e ? t ? n(e).localeCompare(n(t)) : -1 : 1).map(([e, t]) => ({
 			label: n(e),
 			options: t.sort((e, t) => this._name(e).localeCompare(this._name(t))).map((e) => {
@@ -8599,7 +10347,7 @@ var Ni, Pi = "global", Fi = ["switch", "input_boolean"], Ii = ["input_number", "
 	_tempSensors(e) {
 		return Object.keys(this.hass.states).filter((t) => {
 			let n = t.split(".")[0], r = this.hass.states[t].attributes ?? {};
-			return e && Ii.includes(n) ? !0 : n === "sensor" && (r.device_class === "temperature" || ["°C", "°F"].includes(r.unit_of_measurement));
+			return e && sa.includes(n) ? !0 : n === "sensor" && (r.device_class === "temperature" || ["°C", "°F"].includes(r.unit_of_measurement));
 		});
 	}
 	_value(e) {
@@ -8608,17 +10356,17 @@ var Ni, Pi = "global", Fi = ["switch", "input_boolean"], Ii = ["input_number", "
 	}
 	_ruleError(e) {
 		let t = parseFloat(e.delta), n = parseFloat(e.tolerance);
-		return Number.isNaN(t) || Number.isNaN(n) ? "Delta et tolérance requis." : t <= 0 || n < 0 || n >= t ? "Il faut delta > tolérance ≥ 0." : "";
+		return Number.isNaN(t) || Number.isNaN(n) ? S("heatingSystemEditor.rule_required") : t <= 0 || n < 0 || n >= t ? S("heatingSystemEditor.rule_invalid") : "";
 	}
 	get _required() {
-		return new Set(this._rules.flatMap((e) => Ri[e.type].gap));
+		return new Set(this._rules.flatMap((e) => la[e.type].gap));
 	}
 	get _tankValid() {
 		return [...this._required].every((e) => !!this._tank[e]) && !!this._circulator && !Number.isNaN(parseFloat(this._minRuntime)) && this._rules.every((e) => !this._ruleError(e));
 	}
 	_toggleZone(e) {
-		let t = this._zones.filter((e) => e !== Pi), n = t.includes(e) ? t.filter((t) => t !== e) : [...t, e];
-		this._zones = n.length ? n : [Pi];
+		let t = this._zones.filter((e) => e !== aa), n = t.includes(e) ? t.filter((t) => t !== e) : [...t, e];
+		this._zones = n.length ? n : [aa];
 	}
 	_close() {
 		this.dispatchEvent(new CustomEvent("heating-system-closed"));
@@ -8648,31 +10396,28 @@ var Ni, Pi = "global", Fi = ["switch", "input_boolean"], Ii = ["input_number", "
 			aggressive: this._type === "boiler" && this._aggressive
 		};
 		try {
-			await Pn(this.hass, t, !this.system), this._close();
+			await mr(this.hass, t, !this.system), this._close();
 		} catch (e) {
-			alert("Erreur Homex : " + C(e)), this._busy = !1;
+			alert(S("common.error", { message: w(e) })), this._busy = !1;
 		}
 	}
 	async _delete() {
-		if (this.system && confirm(`Supprimer le système « ${this.system.name} » ?`)) {
+		if (this.system && confirm(S("heatingSystemEditor.delete_confirm", { name: this.system.name }))) {
 			this._busy = !0;
 			try {
-				await Fn(this.hass, this.system.id), this._close();
+				await hr(this.hass, this.system.id), this._close();
 			} catch (e) {
-				alert("Erreur Homex : " + C(e)), this._busy = !1;
+				alert(S("common.error", { message: w(e) })), this._busy = !1;
 			}
 		}
 	}
 	_renderBoiler() {
 		let e = (e) => this._name(e);
 		return h`
-      <div class="section">Contact sec</div>
-      <p class="hint">
-        L'interrupteur commandé de la chaudière : activé dès que sa portée a besoin
-        d'être chauffée, désactivé sinon.
-      </p>
+      <div class="section">${S("heatingSystemEditor.dry_contact")}</div>
+      <p class="hint">${S("heatingSystemEditor.dry_contact_hint")}</p>
       <homex-select
-        placeholder="Choisir un interrupteur…"
+        placeholder=${S("heatingSystemEditor.choose_switch")}
         .value=${this._contact}
         .options=${this._contacts.map((t) => ({
 			value: t,
@@ -8682,31 +10427,30 @@ var Ni, Pi = "global", Fi = ["switch", "input_boolean"], Ii = ["input_number", "
         @value-changed=${(e) => this._contact = e.detail.value}
       ></homex-select>
 
-      ${this._renderScope("contact sec")}
+      ${this._renderScope(S("heatingSystemEditor.driven_contact"))}
     `;
 	}
 	_renderScope(e) {
-		let t = this._zones.includes(Pi);
+		let t = this._zones.includes(aa);
 		return h`
-      <div class="section">Portée</div>
-      <p class="hint">Les zones dont la demande de chauffe compte pour ce système.</p>
+      <div class="section">${S("heatingSystemEditor.scope")}</div>
+      <p class="hint">${S("heatingSystemEditor.scope_hint")}</p>
       <div class="checks">
         <label>
-          ${j(t, () => this._zones = [Pi])}
-          Système global (toutes les zones)
+          ${M(t, () => this._zones = [aa])}
+          ${S("heatingSystemEditor.global_system")}
         </label>
         ${this.zones.map((e) => h`<label>
-            ${j(!t && this._zones.includes(e.id), () => this._toggleZone(e.id))}
-            Zone ${e.name}
+            ${M(!t && this._zones.includes(e.id), () => this._toggleZone(e.id))}
+            ${S("heatingSystemEditor.zone", { name: e.name })}
           </label>`)}
       </div>
 
-      <div class="section">Mode agressif</div>
+      <div class="section">${S("heatingSystemEditor.aggressive_mode")}</div>
       <div class="checks">
         <label>
-          ${j(this._aggressive, (e) => this._aggressive = e)}
-          Mode agressif : tolérance « agressive » sur la portée tant que le ${e} est
-          actif
+          ${M(this._aggressive, (e) => this._aggressive = e)}
+          ${S("heatingSystemEditor.aggressive_hint", { driven: e })}
         </label>
       </div>
     `;
@@ -8732,7 +10476,7 @@ var Ni, Pi = "global", Fi = ["switch", "input_boolean"], Ii = ["input_number", "
 	}
 	_addRule(e) {
 		if (this._rules.some((t) => t.type === e)) return;
-		let [t, n] = Ri[e].init;
+		let [t, n] = la[e].init;
 		this._rules = [...this._rules, {
 			type: e,
 			delta: t,
@@ -8740,18 +10484,35 @@ var Ni, Pi = "global", Fi = ["switch", "input_boolean"], Ii = ["input_number", "
 		}];
 	}
 	_renderRule(e, t) {
-		let n = Ri[e.type], r = this._ruleError(e), i = (e) => `${Math.round(e * 10) / 10} °C`, [a, o] = n.gap, s = this._value(this._tank[a]), c = this._value(this._tank[o]), l = r;
+		let n = la[e.type], r = this._ruleError(e), i = (e) => `${Math.round(e * 10) / 10} °C`, [a, o] = n.gap, s = this._value(this._tank[a]), c = this._value(this._tank[o]), l = r;
 		if (!r && e.type === "setpoint_tank") {
 			let t = parseFloat(e.delta), n = parseFloat(e.tolerance);
-			l = s == null ? `Circule quand ballon ≤ consigne − ${e.delta} °C ; s'arrête quand ballon > consigne − ${e.tolerance} °C.` : `Consigne ${i(s)} : circule quand ballon ≤ ${i(s - t)} ; s'arrête quand ballon > ${i(s - n)}.`;
-		} else r || (l = `Circule quand départ − retour ≥ ${e.delta} °C ; s'arrête quand départ − retour < ${e.tolerance} °C.`);
-		let u = !r && s != null && c != null ? ` Actuellement ${n.a} − ${n.b} = ${i(Math.max(0, s - c))}.` : "";
+			l = s == null ? S("heatingSystemEditor.explain_setpoint_tank", {
+				delta: e.delta,
+				tolerance: e.tolerance
+			}) : S("heatingSystemEditor.explain_setpoint_tank_live", {
+				setpoint: i(s),
+				start: i(s - t),
+				stop: i(s - n)
+			});
+		} else r || (l = S("heatingSystemEditor.explain_flow_return", {
+			delta: e.delta,
+			tolerance: e.tolerance
+		}));
+		let u = !r && s != null && c != null ? S("heatingSystemEditor.currently", {
+			a: n.a(),
+			b: n.b(),
+			value: i(Math.max(0, s - c))
+		}) : "";
 		return h`<div class="rule">
-      <div class="title">Règle ${t + 1} · ${n.label}</div>
-      ${this._num("Delta (°C)", e.delta, (e) => this._setRule(t, { delta: e }))}
-      ${this._num("Tolérance (°C)", e.tolerance, (e) => this._setRule(t, { tolerance: e }))}
+      <div class="title">${S("heatingSystemEditor.rule_title", {
+			n: t + 1,
+			label: n.label()
+		})}</div>
+      ${this._num(S("heatingSystemEditor.delta"), e.delta, (e) => this._setRule(t, { delta: e }))}
+      ${this._num(S("heatingSystemEditor.tolerance"), e.tolerance, (e) => this._setRule(t, { tolerance: e }))}
       <button
-        title="Supprimer la règle"
+        title=${S("heatingSystemEditor.delete_rule")}
         @click=${() => this._rules = this._rules.filter((e, n) => n !== t)}
       >
         ✕
@@ -8763,24 +10524,23 @@ var Ni, Pi = "global", Fi = ["switch", "input_boolean"], Ii = ["input_number", "
 		let e = this.system ? `switch.homex_system_${this.system.id}_force` : "", t = e ? this.hass.states[e] : void 0;
 		return h`<div class="checks">
         <label>
-          ${j(t?.state === "on", (t) => this.hass.callService("switch", t ? "turn_on" : "turn_off", { entity_id: e }), !t)}
-          Forçage manuel
+          ${M(t?.state === "on", (t) => this.hass.callService("switch", t ? "turn_on" : "turn_off", { entity_id: e }), !t)}
+          ${S("heatingSystemEditor.manual_override")}
         </label>
       </div>
       <p class="hint">
-        Tant qu'il est activé, le circulateur tourne quelles que soient les règles et la
-        demande des radiateurs (si le chauffage est activé globalement).
-        ${t ? h`Entité : <code>${e}</code> (s'applique immédiatement).` : "Disponible une fois le système enregistré."}
+        ${S("heatingSystemEditor.force_hint")}
+        ${t ? h`${S("heatingSystemEditor.force_entity")} <code>${e}</code> ${S("heatingSystemEditor.force_entity_suffix")}` : S("heatingSystemEditor.force_unavailable")}
       </p>`;
 	}
 	_renderTank() {
 		let e = this._grouped(this._tempSensors(!1)), t = this._grouped(this._tempSensors(!0)), n = this._grouped(this._contacts);
 		return h`
-      <div class="section">Capteurs</div>
+      <div class="section">${S("heatingSystemEditor.sensors")}</div>
       <div class="tank-grid">
-        ${Li.map(([n, r]) => h`<homex-select
-            label=${this._required.has(n) ? `${r} (requis)` : r}
-            placeholder="Choisir un capteur…"
+        ${ca.map(([n, r]) => h`<homex-select
+            label=${this._required.has(n) ? S("heatingSystemEditor.required", { label: r() }) : r()}
+            placeholder=${S("heatingSystemEditor.choose_sensor")}
             .value=${this._tank[n]}
             .groups=${n === "setpoint_sensor" ? t : e}
             @value-changed=${(e) => this._tank = {
@@ -8790,55 +10550,48 @@ var Ni, Pi = "global", Fi = ["switch", "input_boolean"], Ii = ["input_number", "
           ></homex-select>`)}
       </div>
 
-      <div class="section">Circulateur</div>
+      <div class="section">${S("heatingSystemEditor.circulator")}</div>
       <div class="tank-grid">
         <homex-select
-          label="Interrupteur commandé"
-          placeholder="Choisir un interrupteur…"
+          label=${S("heatingSystemEditor.controlled_switch")}
+          placeholder=${S("heatingSystemEditor.choose_switch")}
           .value=${this._circulator}
           .groups=${n}
           @value-changed=${(e) => this._circulator = e.detail.value}
         ></homex-select>
-        ${this._num("Temps d'exécution minimal (min)", this._minRuntime, (e) => this._minRuntime = e, "1")}
+        ${this._num(S("heatingSystemEditor.min_runtime"), this._minRuntime, (e) => this._minRuntime = e, "1")}
       </div>
       ${this._renderForce()}
 
-      <div class="section">Règles de circulation</div>
-      <p class="hint">
-        Le circulateur tourne tant qu'au moins une règle le demande et qu'au moins un
-        radiateur a besoin de chauffer (chauffage activé globalement). Une fois lancé,
-        il tourne toujours au moins le temps d'exécution minimal, même si la
-        température remonte vite ou si plus rien ne demande de chauffe.
-      </p>
+      <div class="section">${S("heatingSystemEditor.rules")}</div>
+      <p class="hint">${S("heatingSystemEditor.rules_hint")}</p>
       ${this._rules.map((e, t) => this._renderRule(e, t))}
       <div class="rule-add">
-        ${Object.keys(Ri).filter((e) => !this._rules.some((t) => t.type === e)).map((e) => h`<button @click=${() => this._addRule(e)}>＋ Règle ${Ri[e].label.toLowerCase()}</button>`)}
+        ${Object.keys(la).filter((e) => !this._rules.some((t) => t.type === e)).map((e) => h`<button @click=${() => this._addRule(e)}>${la[e].add()}</button>`)}
       </div>
     `;
 	}
 	render() {
 		let e = !!this.system;
 		return h`
-      ${A("Nom", this._sysName, (e) => {
-			this._sysName = e, this._idEdited || (this._id = M(e));
-		}, "Chaudière")}
-      ${e ? h`<div class="section">Id : ${this.system.id}</div>` : A("Id", this._id, (e) => {
-			this._idEdited = !0, this._id = M(e);
+      ${j(S("heatingSystemEditor.name"), this._sysName, (e) => {
+			this._sysName = e, this._idEdited || (this._id = N(e));
+		}, S("heatingSystemEditor.name_placeholder"))}
+      ${e ? h`<div class="section">${S("heatingSystemEditor.id_label", { id: this.system.id })}</div>` : j(S("heatingSystemEditor.id"), this._id, (e) => {
+			this._idEdited = !0, this._id = N(e);
 		})}
 
-      <div class="section">Type</div>
+      <div class="section">${S("heatingSystemEditor.type")}</div>
       <div class="btn-group">
-        ${Bi.map(([e, t]) => h`<button
+        ${da.map(([e, t]) => h`<button
             class=${this._type === e ? "active" : ""}
             @click=${() => this._type = e}
           >
-            ${t}
+            ${t()}
           </button>`)}
       </div>
 
-      ${this._type === "boiler" ? this._renderBoiler() : this._type === "buffer_tank" ? h`${this._renderTank()}${this._renderScope("circulateur")}` : h`<p class="hint">
-              Les pompes à chaleur ne sont plus proposées : choisis Boiler ou Buffer Tank.
-            </p>`}
+      ${this._type === "boiler" ? this._renderBoiler() : this._type === "buffer_tank" ? h`${this._renderTank()}${this._renderScope(S("heatingSystemEditor.driven_circulator"))}` : h`<p class="hint">${S("heatingSystemEditor.heat_pump_unavailable")}</p>`}
 
       <div class="actions">
         <button
@@ -8846,16 +10599,16 @@ var Ni, Pi = "global", Fi = ["switch", "input_boolean"], Ii = ["input_number", "
           ?disabled=${this._busy || !this._sysName.trim() || !this._id || this._type === "buffer_tank" && !this._tankValid}
           @click=${this._save}
         >
-          Enregistrer
+          ${S("common.save")}
         </button>
-        <button ?disabled=${this._busy} @click=${this._close}>Annuler</button>
+        <button ?disabled=${this._busy} @click=${this._close}>${S("common.cancel")}</button>
         ${e ? h`<button class="danger" ?disabled=${this._busy} @click=${this._delete}>
-              Supprimer
+              ${S("common.delete")}
             </button>` : ""}
       </div>
     `;
 	}
-}, Ni.styles = [D, o`
+}, ia.styles = [O, o`
       .hint {
         font-size: 13px;
         color: var(--secondary-text-color);
@@ -8948,33 +10701,21 @@ var Ni, Pi = "global", Fi = ["switch", "input_boolean"], Ii = ["input_number", "
         font-size: 14px;
         cursor: pointer;
       }
-    `], Ni);
-O([b({ attribute: !1 })], Z.prototype, "hass", void 0), O([b({ attribute: !1 })], Z.prototype, "system", void 0), O([b({ attribute: !1 })], Z.prototype, "zones", void 0), O([x()], Z.prototype, "_sysName", void 0), O([x()], Z.prototype, "_id", void 0), O([x()], Z.prototype, "_type", void 0), O([x()], Z.prototype, "_contact", void 0), O([x()], Z.prototype, "_zones", void 0), O([x()], Z.prototype, "_aggressive", void 0), O([x()], Z.prototype, "_tank", void 0), O([x()], Z.prototype, "_circulator", void 0), O([x()], Z.prototype, "_minRuntime", void 0), O([x()], Z.prototype, "_rules", void 0), O([x()], Z.prototype, "_busy", void 0), Z = O([y("homex-heating-system-editor")], Z);
+    `], ia);
+k([b({ attribute: !1 })], Z.prototype, "hass", void 0), k([b({ attribute: !1 })], Z.prototype, "system", void 0), k([b({ attribute: !1 })], Z.prototype, "zones", void 0), k([x()], Z.prototype, "_sysName", void 0), k([x()], Z.prototype, "_id", void 0), k([x()], Z.prototype, "_type", void 0), k([x()], Z.prototype, "_contact", void 0), k([x()], Z.prototype, "_zones", void 0), k([x()], Z.prototype, "_aggressive", void 0), k([x()], Z.prototype, "_tank", void 0), k([x()], Z.prototype, "_circulator", void 0), k([x()], Z.prototype, "_minRuntime", void 0), k([x()], Z.prototype, "_rules", void 0), k([x()], Z.prototype, "_busy", void 0), Z = k([y("homex-heating-system-editor")], Z);
 // src/components/homex-heating-manager.ts
-var Vi, Hi = [
+var fa, pa = [
 	"modes",
 	"setpoints",
 	"zones",
 	"devices",
 	"systems"
-], Ui = {
-	modes: "Heating Modes",
-	setpoints: "Setpoints",
-	zones: "Zones",
-	devices: "Device Presets",
-	systems: "Heating System"
-}, Wi = {
-	modes: "＋ Mode",
-	setpoints: "＋ Setpoint",
-	zones: "＋ Zone",
-	devices: "＋ Device preset",
-	systems: "＋ Système"
-}, Gi = {
-	tolerance: "Tolérance",
-	mode: "Mode",
-	lock: "Verrouillage",
-	sensor: "Capteur"
-}, Ki = (e) => e == null ? "—" : `${e.toLocaleString("fr-FR")} °C`, Q = (Vi = class extends v {
+], ma = (e) => S(`heatingManager.section_${e}`), ha = (e) => S(`heatingManager.add_${e}`), ga = [
+	"tolerance",
+	"mode",
+	"lock",
+	"sensor"
+], _a = (e) => ga.includes(e) ? S(`heatingManager.param_${e}`) : e, va = (e) => e == null ? "—" : `${e.toLocaleString(mn())} °C`, Q = (fa = class extends v {
 	constructor(...e) {
 		super(...e), this.base = "", this.subpath = "", this._presets = [], this._groups = [], this._devicePresets = [], this._zones = [], this._systems = [], this._enabledLocal = !0, this._switching = !1, this._rooms = [], this._loaded = !1, this._presetName = "", this._presetId = "", this._busy = !1, this._presetIdEdited = !1, this._formFor = null;
 	}
@@ -8987,7 +10728,7 @@ var Vi, Hi = [
 	}
 	async _load() {
 		try {
-			let [e, t] = await Promise.all([bn(this.hass), en(this.hass)]);
+			let [e, t] = await Promise.all([er(this.hass), Fn(this.hass)]);
 			this._presets = e.presets, this._groups = e.groups, this._devicePresets = e.device_presets ?? [], this._zones = e.zones ?? [], this._systems = e.systems ?? [], this._enabledLocal = e.enabled ?? !0, this._rooms = t;
 		} catch {
 			this._presets = [], this._groups = [], this._devicePresets = [], this._zones = [];
@@ -9002,28 +10743,28 @@ var Vi, Hi = [
 		} else this._formFor = null;
 	}
 	get _route() {
-		let [e, t, n] = zn(this.subpath);
+		let [e, t, n] = yr(this.subpath);
 		return {
-			section: Hi.includes(e) ? e : "modes",
+			section: pa.includes(e) ? e : "modes",
 			editing: t === "new" || t === "edit" && !!n,
 			id: t === "edit" ? n : void 0
 		};
 	}
 	_url(e, ...t) {
-		return e === "modes" && !t.length ? this.base : w(this.base, e, ...t);
+		return e === "modes" && !t.length ? this.base : T(this.base, e, ...t);
 	}
 	_openEditor(e, t) {
-		T(this._url(e, ...t ? ["edit", t] : ["new"]));
+		E(this._url(e, ...t ? ["edit", t] : ["new"]));
 	}
 	_closeEditor(e) {
-		this._load(), E(this._url(e));
+		this._load(), D(this._url(e));
 	}
 	async _setEnabled(e) {
 		this._switching = !0;
 		try {
-			await Nn(this.hass, e), this._enabledLocal = e;
+			await pr(this.hass, e), this._enabledLocal = e;
 		} catch (e) {
-			alert("Erreur Homex : " + C(e));
+			alert(S("common.error", { message: w(e) }));
 		} finally {
 			this._switching = !1;
 		}
@@ -9038,21 +10779,21 @@ var Vi, Hi = [
 	async _savePreset(e) {
 		this._busy = !0;
 		try {
-			await xn(this.hass, {
+			await tr(this.hass, {
 				id: this._presetId,
 				name: this._presetName.trim()
 			}, !e), this._closeEditor("modes");
 		} catch (e) {
-			alert("Erreur Homex : " + C(e)), this._busy = !1;
+			alert(S("common.error", { message: w(e) })), this._busy = !1;
 		}
 	}
 	async _deletePreset(e) {
-		if (confirm(`Supprimer le mode « ${e.name} » et ses consignes ?`)) {
+		if (confirm(S("heatingManager.delete_mode_confirm", { name: e.name }))) {
 			this._busy = !0;
 			try {
-				await Sn(this.hass, e.id), this._closeEditor("modes");
+				await nr(this.hass, e.id), this._closeEditor("modes");
 			} catch (e) {
-				alert("Erreur Homex : " + C(e)), this._busy = !1;
+				alert(S("common.error", { message: w(e) })), this._busy = !1;
 			}
 		}
 	}
@@ -9060,32 +10801,32 @@ var Vi, Hi = [
 		let t = () => this._closeEditor("modes");
 		return h`
       <div class="head">
-        <button @click=${t}>← Heating Modes</button>
-        <h2>${e ? "Modifier le mode" : "Nouveau mode de chauffage"}</h2>
+        <button @click=${t}>← ${ma("modes")}</button>
+        <h2>${S(e ? "heatingManager.edit_mode" : "heatingManager.new_mode")}</h2>
       </div>
       <div class="editor">
-        ${A("Nom", this._presetName, (e) => {
-			this._presetName = e, this._presetIdEdited || (this._presetId = M(e));
-		}, "Vacances")}
-        ${e ? h`<div class="section">Id : ${e.id}</div>` : A("Id", this._presetId, (e) => {
-			this._presetIdEdited = !0, this._presetId = M(e);
+        ${j(S("heatingManager.name"), this._presetName, (e) => {
+			this._presetName = e, this._presetIdEdited || (this._presetId = N(e));
+		}, S("heatingManager.name_placeholder"))}
+        ${e ? h`<div class="section">${S("heatingManager.id_label", { id: e.id })}</div>` : j(S("heatingManager.id"), this._presetId, (e) => {
+			this._presetIdEdited = !0, this._presetId = N(e);
 		})}
-        ${e?.builtin ? h`<p class="hint">Mode par défaut : il peut être renommé, pas supprimé.</p>` : ""}
+        ${e?.builtin ? h`<p class="hint">${S("heatingManager.builtin_hint")}</p>` : ""}
         <div class="actions">
           <button
             class="primary"
             ?disabled=${this._busy || !this._presetName.trim() || !this._presetId}
             @click=${() => this._savePreset(e)}
           >
-            Enregistrer
+            ${S("common.save")}
           </button>
-          <button ?disabled=${this._busy} @click=${t}>Annuler</button>
+          <button ?disabled=${this._busy} @click=${t}>${S("common.cancel")}</button>
           ${e && !e.builtin ? h`<button
                 class="danger"
                 ?disabled=${this._busy}
                 @click=${() => this._deletePreset(e)}
               >
-                Supprimer
+                ${S("common.delete")}
               </button>` : ""}
         </div>
       </div>
@@ -9099,19 +10840,19 @@ var Vi, Hi = [
             <div>
               <div class="name">${e.name}</div>
               <div class="meta">
-                ${e.id}${e.builtin ? " · par défaut" : ""}${e.unheated ? " · coupé ou consigne" : ""}
+                ${e.id}${e.builtin ? S("heatingManager.builtin_tag") : ""}${e.unheated ? S("heatingManager.unheated_tag") : ""}
               </div>
             </div>
           </div>
         </div>`)}
     </div>`;
 	}
-	_roomNames(e, t = this._groups, n = bi) {
+	_roomNames(e, t = this._groups, n = Gi) {
 		if (e.id === n) {
 			let e = new Set(t.flatMap((e) => e.rooms)), n = this._rooms.filter((t) => !e.has(t.room_id));
-			return n.length ? `Autres pièces : ${n.map((e) => e.name).join(", ")}` : "Toutes les autres pièces (aucune pour l'instant)";
+			return n.length ? S("heatingManager.other_rooms", { rooms: n.map((e) => e.name).join(", ") }) : S("heatingManager.all_other_rooms");
 		}
-		return e.rooms.length ? e.rooms.map((e) => this._rooms.find((t) => t.room_id === e)?.name ?? e).join(", ") : "Aucune pièce";
+		return e.rooms.length ? e.rooms.map((e) => this._rooms.find((t) => t.room_id === e)?.name ?? e).join(", ") : S("heatingManager.no_rooms");
 	}
 	_renderGroups() {
 		return h`<div class="grid">
@@ -9126,7 +10867,7 @@ var Vi, Hi = [
           <div class="temps">
             ${this._presets.map((t) => h`<span class="temp"
                 >${t.name} ·
-                ${t.unheated && e.setpoints[t.id] == null ? "coupé" : Ki(e.setpoints[t.id])}</span
+                ${t.unheated && e.setpoints[t.id] == null ? S("heatingManager.off") : va(e.setpoints[t.id])}</span
               >`)}
           </div>
         </div>`)}
@@ -9134,12 +10875,12 @@ var Vi, Hi = [
 	}
 	async _setZoneMode(e, t) {
 		try {
-			await jn(this.hass, e.id, t), this._zones = this._zones.map((n) => n.id === e.id ? {
+			await dr(this.hass, e.id, t), this._zones = this._zones.map((n) => n.id === e.id ? {
 				...n,
 				mode: t
 			} : n);
 		} catch (e) {
-			alert("Erreur Homex : " + C(e));
+			alert(S("common.error", { message: w(e) }));
 		}
 	}
 	_renderZones() {
@@ -9152,12 +10893,12 @@ var Vi, Hi = [
             <div>
               <div class="name">${e.name}</div>
               <div class="meta">
-                ${this._roomNames(e, this._zones, Mi)}
+                ${this._roomNames(e, this._zones, ra)}
               </div>
             </div>
           </div>
           <label class="zone-mode" @click=${(e) => e.stopPropagation()}>
-            Mode actif
+            ${S("heatingManager.active_mode")}
             <homex-select
               .value=${e.mode}
               .options=${this._presets.map((e) => ({
@@ -9168,18 +10909,15 @@ var Vi, Hi = [
             ></homex-select>
           </label>
           <div class="meta">
-            select.homex_heating_${e.id} · ${t} déclencheur(s)
+            select.homex_heating_${e.id} · ${S("heatingManager.triggers", { count: t })}
           </div>
         </div>`;
 		})}
     </div>`;
 	}
 	_renderSystems() {
-		if (!this._systems.length) return h`<div class="msg">
-        Aucun système. Clique sur « ＋ Système » pour déclarer une chaudière (Boiler)
-        ou un ballon tampon (Buffer Tank).
-      </div>`;
-		let e = (e) => e === "global" ? "Global" : this._zones.find((t) => t.id === e)?.name ?? e;
+		if (!this._systems.length) return h`<div class="msg">${S("heatingManager.no_systems")}</div>`;
+		let e = (e) => e === "global" ? S("heatingManager.global") : this._zones.find((t) => t.id === e)?.name ?? e;
 		return h`<div class="grid">
       ${this._systems.map((t) => {
 			if (t.type === "buffer_tank") return this._renderTankCard(t);
@@ -9190,25 +10928,25 @@ var Vi, Hi = [
             <div>
               <div class="name">${t.name}</div>
               <div class="meta">
-                ${t.type === "boiler" ? "Boiler" : "Heat Pump"} ·
+                ${t.type === "boiler" ? S("heatingManager.boiler") : S("heatingManager.heat_pump")} ·
                 ${(t.zones ?? ["global"]).map(e).join(", ")}
               </div>
             </div>
           </div>
           ${t.type === "boiler" ? h`<div class="temps">
                 <span class="temp">
-                  Contact :
+                  ${S("heatingManager.contact")}
                   ${n?.attributes?.friendly_name ?? (t.contact || "—")}
                   ${n ? `(${n.state})` : ""}
                 </span>
-                ${t.aggressive ? h`<span class="temp">Agressif</span>` : ""}
+                ${t.aggressive ? h`<span class="temp">${S("heatingManager.aggressive")}</span>` : ""}
               </div>` : ""}
         </div>`;
 		})}
     </div>`;
 	}
 	_renderTankCard(e) {
-		let t = (e) => e === "global" ? "Global" : this._zones.find((t) => t.id === e)?.name ?? e, n = (e) => {
+		let t = (e) => e === "global" ? S("heatingManager.global") : this._zones.find((t) => t.id === e)?.name ?? e, n = (e) => {
 			let t = e ? this.hass.states[e] : void 0, n = parseFloat(t?.state ?? "");
 			return Number.isNaN(n) ? "—" : `${n} °C`;
 		}, r = e.circulator ? this.hass.states[e.circulator] : void 0, i = e.rules ?? [];
@@ -9218,26 +10956,26 @@ var Vi, Hi = [
         <div>
           <div class="name">${e.name}</div>
           <div class="meta">
-            Buffer Tank · ${(e.zones ?? ["global"]).map(t).join(", ")} ·
-            ${i.length} règle(s) · min ${e.min_runtime ?? 0} min
+            ${S("heatingManager.buffer_tank")} · ${(e.zones ?? ["global"]).map(t).join(", ")} ·
+            ${S("heatingManager.rules", { count: i.length })} · min ${e.min_runtime ?? 0} min
           </div>
         </div>
       </div>
       <div class="temps">
-        <span class="temp" title="Consigne">🎯 ${n(e.setpoint_sensor)}</span>
-        ${e.tank_sensor ? h`<span class="temp" title="Ballon">🛢 ${n(e.tank_sensor)}</span>` : ""}
-        ${e.flow_sensor ? h`<span class="temp" title="Départ">↗ ${n(e.flow_sensor)}</span>` : ""}
-        <span class="temp" title="Retour">↘ ${n(e.return_sensor)}</span>
-        ${e.aggressive ? h`<span class="temp">Agressif</span>` : ""}
-        ${this.hass.states[`switch.homex_system_${e.id}_force`]?.state === "on" ? h`<span class="temp" title="Forçage manuel activé">Forcé</span>` : ""}
+        <span class="temp" title=${S("heatingManager.setpoint")}>🎯 ${n(e.setpoint_sensor)}</span>
+        ${e.tank_sensor ? h`<span class="temp" title=${S("heatingManager.tank")}>🛢 ${n(e.tank_sensor)}</span>` : ""}
+        ${e.flow_sensor ? h`<span class="temp" title=${S("heatingManager.flow")}>↗ ${n(e.flow_sensor)}</span>` : ""}
+        <span class="temp" title=${S("heatingManager.return")}>↘ ${n(e.return_sensor)}</span>
+        ${e.aggressive ? h`<span class="temp">${S("heatingManager.aggressive")}</span>` : ""}
+        ${this.hass.states[`switch.homex_system_${e.id}_force`]?.state === "on" ? h`<span class="temp" title=${S("heatingManager.forced_title")}>${S("heatingManager.forced")}</span>` : ""}
         ${(() => {
 			let t = parseFloat(this.hass.states[`sensor.homex_system_${e.id}_runtime_today`]?.state ?? "");
 			if (Number.isNaN(t)) return "";
-			let n = Math.round(t);
-			return h`<span class="temp" title="Durée d'activité du circulateur aujourd'hui">⏱ ${n >= 60 ? `${Math.floor(n / 60)} h ${String(n % 60).padStart(2, "0")}` : `${n} min`}</span>`;
+			let n = Math.round(t), r = n >= 60 ? `${Math.floor(n / 60)} h ${String(n % 60).padStart(2, "0")}` : `${n} min`;
+			return h`<span class="temp" title=${S("heatingManager.runtime_title")}>⏱ ${r}</span>`;
 		})()}
         <span class="temp" title=${r?.attributes?.friendly_name ?? e.circulator ?? ""}>
-          Circulateur : ${r ? r.state === "on" ? "en marche" : r.state === "off" ? "arrêté" : r.state : "—"}
+          ${S("heatingManager.circulator")} ${r ? r.state === "on" ? S("heatingManager.circulator_on") : r.state === "off" ? S("heatingManager.circulator_off") : r.state : "—"}
         </span>
       </div>
     </div>`;
@@ -9256,26 +10994,23 @@ var Vi, Hi = [
           </div>
           <div class="temps">
             ${t.length ? t.map(([e, t]) => h`<span class="temp"
-                      >${Gi[e] ?? e} ·
+                      >${_a(e)} ·
                       ${String(t.value)}${t.value_agressive == null ? "" : ` / ${t.value_agressive}`}</span
-                    >`) : h`<span class="meta">Aucun réglage</span>`}
+                    >`) : h`<span class="meta">${S("heatingManager.no_settings")}</span>`}
           </div>
         </div>`;
 		})}
-    </div>` : h`<div class="msg">
-        Aucun device preset. Clique sur « ＋ Device preset » pour fixer les réglages
-        d'un modèle de vanne thermostatique.
-      </div>`;
+    </div>` : h`<div class="msg">${S("heatingManager.no_device_presets")}</div>`;
 	}
 	_notFound(e, t) {
 		return h`
       <div class="head">
         <button @click=${() => this._closeEditor(e)}>
-          ← ${Ui[e]}
+          ← ${ma(e)}
         </button>
         <h2></h2>
       </div>
-      <div class="msg">${this._loaded ? `« ${t} » introuvable.` : "Chargement…"}</div>
+      <div class="msg">${this._loaded ? S("heatingManager.not_found", { id: t }) : S("common.loading")}</div>
     `;
 	}
 	render() {
@@ -9288,8 +11023,8 @@ var Vi, Hi = [
 			let t = n ? this._systems.find((e) => e.id === n) : null;
 			return n && !t ? this._notFound(e, n) : h`
         <div class="head">
-          <button @click=${() => this._closeEditor("systems")}>← Heating System</button>
-          <h2>${t ? "Modifier le système" : "Nouveau système de chauffage"}</h2>
+          <button @click=${() => this._closeEditor("systems")}>← ${ma("systems")}</button>
+          <h2>${S(t ? "heatingManager.edit_system" : "heatingManager.new_system")}</h2>
         </div>
         <div class="editor">
           <homex-heating-system-editor
@@ -9305,8 +11040,8 @@ var Vi, Hi = [
 			let t = n ? this._zones.find((e) => e.id === n) : null;
 			return n && !t ? this._notFound(e, n) : h`
         <div class="head">
-          <button @click=${() => this._closeEditor("zones")}>← Zones</button>
-          <h2>${t ? "Modifier la zone" : "Nouvelle zone"}</h2>
+          <button @click=${() => this._closeEditor("zones")}>← ${ma("zones")}</button>
+          <h2>${S(t ? "heatingManager.edit_zone" : "heatingManager.new_zone")}</h2>
         </div>
         <div class="editor">
           <homex-heating-zone-editor
@@ -9324,8 +11059,8 @@ var Vi, Hi = [
 			let t = n ? this._devicePresets.find((e) => e.id === n) : null;
 			return n && !t ? this._notFound(e, n) : h`
         <div class="head">
-          <button @click=${() => this._closeEditor("devices")}>← Device Presets</button>
-          <h2>${t ? "Modifier le device preset" : "Nouveau device preset"}</h2>
+          <button @click=${() => this._closeEditor("devices")}>← ${ma("devices")}</button>
+          <h2>${S(t ? "heatingManager.edit_device_preset" : "heatingManager.new_device_preset")}</h2>
         </div>
         <div class="editor">
           <homex-heating-device-preset-editor
@@ -9340,8 +11075,8 @@ var Vi, Hi = [
 			let t = n ? this._groups.find((e) => e.id === n) : null;
 			return n && !t ? this._notFound(e, n) : h`
         <div class="head">
-          <button @click=${() => this._closeEditor("setpoints")}>← Setpoints</button>
-          <h2>${t ? "Modifier le setpoint" : "Nouveau setpoint"}</h2>
+          <button @click=${() => this._closeEditor("setpoints")}>← ${ma("setpoints")}</button>
+          <h2>${S(t ? "heatingManager.edit_setpoint" : "heatingManager.new_setpoint")}</h2>
         </div>
         <div class="editor">
           <homex-heating-group-editor
@@ -9357,13 +11092,13 @@ var Vi, Hi = [
 		}
 		return h`
       <div class="head">
-        <button @click=${this._back}>← Climate</button>
-        <h2>Heating</h2>
+        <button @click=${this._back}>${S("heatingManager.back_climate")}</button>
+        <h2>${S("heatingManager.title")}</h2>
         <label
           class="master ${this._enabled ? "on" : ""}"
-          title=${this._enabled ? "Désactiver : toutes les vannes passent sur off" : "Activer : les presets sont ré-appliqués"}
+          title=${this._enabled ? S("heatingManager.disable_title") : S("heatingManager.enable_title")}
         >
-          ${this._enabled ? "Chauffage activé" : "Chauffage désactivé"}
+          ${this._enabled ? S("heatingManager.heating_enabled") : S("heatingManager.heating_disabled")}
           <span class="toggle ${this._enabled ? "on" : ""}">
             <input
               type="checkbox"
@@ -9376,10 +11111,10 @@ var Vi, Hi = [
         </label>
       </div>
       <div class="tabs">
-        ${Hi.map((e) => [e, Ui[e]]).map(([t, n]) => h`<span
+        ${pa.map((e) => [e, ma(e)]).map(([t, n]) => h`<span
             class="tab ${e === t ? "active" : ""}"
             @click=${() => {
-			t !== e && T(this._url(t), !0);
+			t !== e && E(this._url(t), !0);
 		}}
             >${n}</span
           >`)}
@@ -9388,23 +11123,23 @@ var Vi, Hi = [
       <homex-select
         class="tab-picker"
         .value=${e}
-        .options=${Hi.map((e) => ({
+        .options=${pa.map((e) => ({
 			value: e,
-			label: Ui[e]
+			label: ma(e)
 		}))}
         @value-changed=${(t) => {
-			t.detail.value !== e && T(this._url(t.detail.value), !0);
+			t.detail.value !== e && E(this._url(t.detail.value), !0);
 		}}
       ></homex-select>
       <div class="tab-actions">
         <button class="primary" @click=${() => this._openEditor(e)}>
-          ${Wi[e]}
+          ${ha(e)}
         </button>
       </div>
-      ${this._loaded ? e === "modes" ? this._renderPresets() : e === "setpoints" ? this._renderGroups() : e === "zones" ? this._renderZones() : e === "systems" ? this._renderSystems() : this._renderDevicePresets() : h`<div class="msg">Chargement…</div>`}
+      ${this._loaded ? e === "modes" ? this._renderPresets() : e === "setpoints" ? this._renderGroups() : e === "zones" ? this._renderZones() : e === "systems" ? this._renderSystems() : this._renderDevicePresets() : h`<div class="msg">${S("common.loading")}</div>`}
     `;
 	}
-}, Vi.styles = [D, o`
+}, fa.styles = [O, o`
       .head {
         display: flex;
         align-items: center;
@@ -9582,58 +11317,58 @@ var Vi, Hi = [
           display: block;
         }
       }
-    `], Vi);
-O([b({ attribute: !1 })], Q.prototype, "hass", void 0), O([b({ attribute: !1 })], Q.prototype, "base", void 0), O([b({ attribute: !1 })], Q.prototype, "subpath", void 0), O([x()], Q.prototype, "_presets", void 0), O([x()], Q.prototype, "_groups", void 0), O([x()], Q.prototype, "_devicePresets", void 0), O([x()], Q.prototype, "_zones", void 0), O([x()], Q.prototype, "_systems", void 0), O([x()], Q.prototype, "_enabledLocal", void 0), O([x()], Q.prototype, "_switching", void 0), O([x()], Q.prototype, "_rooms", void 0), O([x()], Q.prototype, "_loaded", void 0), O([x()], Q.prototype, "_presetName", void 0), O([x()], Q.prototype, "_presetId", void 0), O([x()], Q.prototype, "_busy", void 0), Q = O([y("homex-heating-manager")], Q);
+    `], fa);
+k([b({ attribute: !1 })], Q.prototype, "hass", void 0), k([b({ attribute: !1 })], Q.prototype, "base", void 0), k([b({ attribute: !1 })], Q.prototype, "subpath", void 0), k([x()], Q.prototype, "_presets", void 0), k([x()], Q.prototype, "_groups", void 0), k([x()], Q.prototype, "_devicePresets", void 0), k([x()], Q.prototype, "_zones", void 0), k([x()], Q.prototype, "_systems", void 0), k([x()], Q.prototype, "_enabledLocal", void 0), k([x()], Q.prototype, "_switching", void 0), k([x()], Q.prototype, "_rooms", void 0), k([x()], Q.prototype, "_loaded", void 0), k([x()], Q.prototype, "_presetName", void 0), k([x()], Q.prototype, "_presetId", void 0), k([x()], Q.prototype, "_busy", void 0), Q = k([y("homex-heating-manager")], Q);
 // src/components/homex-climate-metrics.ts
-var qi, Ji = "heating", Yi = [
+var ya, ba = "heating", xa = [
 	{
 		key: "temperature",
-		label: "Température",
+		label: () => S("climateMetrics.temperature"),
 		icon: "🌡",
 		deviceClass: "temperature",
-		section: "Température"
+		section: () => S("climateMetrics.temperature")
 	},
 	{
 		key: "humidity",
-		label: "Humidité",
+		label: () => S("climateMetrics.humidity"),
 		icon: "💧",
 		deviceClass: "humidity",
-		section: "Humidité"
+		section: () => S("climateMetrics.humidity")
 	},
 	{
 		key: "pm25",
-		label: "PM2.5",
+		label: () => "PM2.5",
 		icon: "🌫",
 		deviceClass: "pm25",
-		section: "Qualité de l'air"
+		section: () => S("climateMetrics.air_quality")
 	},
 	{
 		key: "pm10",
-		label: "PM10",
+		label: () => "PM10",
 		icon: "🌫",
 		deviceClass: "pm10",
-		section: "Qualité de l'air"
+		section: () => S("climateMetrics.air_quality")
 	},
 	{
 		key: "co2",
-		label: "CO₂",
+		label: () => "CO₂",
 		icon: "🫧",
 		deviceClass: "carbon_dioxide",
-		section: "CO₂"
+		section: () => "CO₂"
 	}
-], Xi = [
-	["mean", "Moyenne pondérée"],
-	["max", "Maximum"],
-	["min", "Minimum"]
+], Sa = [
+	["mean", () => S("climateMetrics.rule_mean")],
+	["max", () => S("climateMetrics.rule_max")],
+	["min", () => S("climateMetrics.rule_min")]
 ];
-function Zi(e, t) {
+function Ca(e, t) {
 	if (!e.length) return null;
 	if (t === "max") return Math.max(...e.map(([e]) => e));
 	if (t === "min") return Math.min(...e.map(([e]) => e));
 	let n = e.reduce((e, [, t]) => e + t, 0);
 	return n <= 0 ? e.reduce((e, [t]) => e + t, 0) / e.length : e.reduce((e, [t, n]) => e + t * n, 0) / n;
 }
-var Qi = (qi = class extends v {
+var wa = (ya = class extends v {
 	constructor(...e) {
 		super(...e), this.base = "", this.subpath = "", this._rooms = [], this._loaded = !1, this._draft = {}, this._busy = !1, this._draftFor = null;
 	}
@@ -9642,36 +11377,36 @@ var Qi = (qi = class extends v {
 	}
 	async _load() {
 		try {
-			this._rooms = await en(this.hass);
+			this._rooms = await Fn(this.hass);
 		} catch {
 			this._rooms = [];
 		}
 		this._loaded = !0;
 	}
 	get _roomId() {
-		return zn(this.subpath)[0] ?? null;
+		return yr(this.subpath)[0] ?? null;
 	}
 	willUpdate() {
 		let e = this._roomId ? this._rooms.find((e) => e.room_id === this._roomId) : null;
 		e ? this._draftFor !== e.room_id && (this._draftFor = e.room_id, this._draft = JSON.parse(JSON.stringify(e.metrics ?? {})), this._busy = !1) : this._draftFor = null;
 	}
 	_hasClimate(e) {
-		return (e.modules ?? []).includes(Ji);
+		return (e.modules ?? []).includes(ba);
 	}
 	async _openRoom(e) {
 		if (!this._hasClimate(e)) {
-			if (!confirm(`Activer le module Climate sur la pièce « ${e.name} » ?`)) return;
+			if (!confirm(S("climateMetrics.enable_module", { room: e.name }))) return;
 			try {
-				await cn(this.hass, {
+				await Hn(this.hass, {
 					entry_id: e.entry_id,
-					modules: [...e.modules ?? [], Ji]
+					modules: [...e.modules ?? [], ba]
 				}), await this._load();
 			} catch (e) {
-				alert("Erreur Homex : " + C(e));
+				alert(S("common.error", { message: w(e) }));
 				return;
 			}
 		}
-		T(w(this.base, e.room_id));
+		E(T(this.base, e.room_id));
 	}
 	_friendly(e) {
 		return this.hass.states[e]?.attributes?.friendly_name || e;
@@ -9683,7 +11418,7 @@ var Qi = (qi = class extends v {
 		return n ? `${t.state} ${n}` : t.state;
 	}
 	_candidates(e, t) {
-		let n = (e, t) => this._friendly(e).localeCompare(this._friendly(t)), r = Object.keys(this.hass.states).filter((t) => t.startsWith("sensor.") && !t.startsWith("sensor.homex_") && this.hass.states[t]?.attributes?.device_class === e.deviceClass), i = t.area_id ? r.filter((e) => Ur(this.hass, e) === t.area_id).sort(n) : [];
+		let n = (e, t) => this._friendly(e).localeCompare(this._friendly(t)), r = Object.keys(this.hass.states).filter((t) => t.startsWith("sensor.") && !t.startsWith("sensor.homex_") && this.hass.states[t]?.attributes?.device_class === e.deviceClass), i = t.area_id ? r.filter((e) => di(this.hass, e) === t.area_id).sort(n) : [];
 		return {
 			area: i,
 			others: r.filter((e) => !i.includes(e)).sort(n)
@@ -9718,18 +11453,18 @@ var Qi = (qi = class extends v {
 			let t = this.hass.states[e.entity_id], i = parseFloat(t?.state);
 			Number.isNaN(i) || (n.push([i, e.weight]), r = r || t.attributes?.unit_of_measurement || "");
 		}
-		let i = Zi(n, t.rule);
+		let i = Ca(n, t.rule);
 		return i == null ? "—" : `${Math.round(i * 10) / 10}${r ? " " + r : ""}`;
 	}
 	async _save(e) {
 		this._busy = !0;
 		try {
-			await cn(this.hass, {
+			await Hn(this.hass, {
 				entry_id: e.entry_id,
 				metrics: this._draft
-			}), this._draftFor = null, await this._load(), E(this.base);
+			}), this._draftFor = null, await this._load(), D(this.base);
 		} catch (e) {
-			alert("Erreur Homex : " + C(e)), this._busy = !1;
+			alert(S("common.error", { message: w(e) })), this._busy = !1;
 		}
 	}
 	_renderMetric(e, t) {
@@ -9742,16 +11477,16 @@ var Qi = (qi = class extends v {
 		});
 		return h`<div class="metric">
       <div class="metric-head">
-        <span class="title">${e.icon} ${e.label}</span>
+        <span class="title">${e.icon} ${e.label()}</span>
         ${n.sensors.length ? h`<span class="ref">${this._reference(e.key)}</span>` : ""}
       </div>
       ${n.sensors.length > 1 ? h`<homex-select
             class="rule"
-            label="Calcul de la valeur de référence"
+            label=${S("climateMetrics.rule_label")}
             .value=${n.rule}
-            .options=${Xi.map(([e, t]) => ({
+            .options=${Sa.map(([e, t]) => ({
 			value: e,
-			label: t
+			label: t()
 		}))}
             @value-changed=${(t) => this._setCfg(e.key, {
 			...n,
@@ -9765,7 +11500,7 @@ var Qi = (qi = class extends v {
                 type="number"
                 min="0"
                 step="0.1"
-                title="Poids"
+                title=${S("climateMetrics.weight")}
                 .value=${String(t.weight)}
                 @change=${(t) => {
 			let i = Math.max(0, parseFloat(t.target.value) || 0);
@@ -9779,7 +11514,7 @@ var Qi = (qi = class extends v {
 		}}
               />` : h`<span></span>`}
           <button
-            title="Retirer"
+            title=${S("climateMetrics.remove")}
             @click=${() => this._setCfg(e.key, {
 			...n,
 			sensors: n.sensors.filter((e, t) => t !== r)
@@ -9790,13 +11525,13 @@ var Qi = (qi = class extends v {
         </div>`)}
       <homex-select
         class="add"
-        placeholder="＋ Ajouter un capteur…"
+        placeholder=${S("climateMetrics.add_sensor")}
         value=""
         .groups=${[...r.length ? [{
-			label: `Pièce : ${o ?? t.area_id}`,
+			label: S("climateMetrics.area", { area: o ?? t.area_id ?? "" }),
 			options: r.map((e) => s(e))
 		}] : [], {
-			label: "Autres",
+			label: S("climateMetrics.others"),
 			options: i.map((e) => s(e))
 		}]}
         @value-changed=${(t) => {
@@ -9809,44 +11544,44 @@ var Qi = (qi = class extends v {
 		let t = "";
 		return h`
       <div class="head">
-        <button @click=${() => E(this.base)}>← Metrics</button>
+        <button @click=${() => D(this.base)}>${S("climateMetrics.back_metrics")}</button>
         <h2>${e.name}</h2>
         <button class="primary" ?disabled=${this._busy} @click=${() => this._save(e)}>
-          Enregistrer
+          ${S("common.save")}
         </button>
       </div>
-      ${Yi.map((n) => {
-			let r = n.section === t ? "" : n.section;
-			return t = n.section, h`${r ? h`<div class="section-title">${r}</div>` : ""}
+      ${xa.map((n) => {
+			let r = n.section(), i = r === t ? "" : r;
+			return t = r, h`${i ? h`<div class="section-title">${i}</div>` : ""}
           ${this._renderMetric(n, e)}`;
 		})}
     `;
 	}
 	_roomValues(e) {
-		let t = Yi.filter((t) => e.metrics?.[t.key]?.sensors?.length);
+		let t = xa.filter((t) => e.metrics?.[t.key]?.sensors?.length);
 		return t.length ? h`<div class="values">
       ${t.map((t) => h`<span class="value">
           ${t.icon} ${this._current(`sensor.homex_${e.room_id}_${t.key}`)}
         </span>`)}
-    </div>` : h`<span class="meta">Aucun capteur</span>`;
+    </div>` : h`<span class="meta">${S("climateMetrics.no_sensor")}</span>`;
 	}
 	render() {
-		if (!this._loaded) return h`<div class="msg">Chargement…</div>`;
+		if (!this._loaded) return h`<div class="msg">${S("common.loading")}</div>`;
 		let e = this._roomId;
 		if (e) {
 			let t = this._rooms.find((t) => t.room_id === e);
 			return !t || !this._hasClimate(t) ? h`<div class="head">
-            <button @click=${() => E(this.base)}>← Metrics</button>
+            <button @click=${() => D(this.base)}>${S("climateMetrics.back_metrics")}</button>
             <h2></h2>
           </div>
           <div class="msg">
-            ${t ? "Le module Climate n'est pas activé sur cette pièce." : `« ${e} » introuvable.`}
+            ${t ? S("climateMetrics.module_not_enabled") : S("climateMetrics.room_not_found", { room: e })}
           </div>` : this._renderRoom(t);
 		}
 		return h`
       <div class="head">
-        <button @click=${() => this.dispatchEvent(new CustomEvent("close"))}>← Climate</button>
-        <h2>Metrics</h2>
+        <button @click=${() => this.dispatchEvent(new CustomEvent("close"))}>${S("climateMetrics.back_climate")}</button>
+        <h2>${S("climateMetrics.title")}</h2>
       </div>
       <div class="list">
         ${this._rooms.map((e) => {
@@ -9854,16 +11589,16 @@ var Qi = (qi = class extends v {
 			return h`<div class="row ${t ? "" : "off"}" @click=${() => this._openRoom(e)}>
             <div class="info">
               <div class="name">${e.name}</div>
-              <div class="meta">${n ?? "Aucune pièce HA associée"}</div>
+              <div class="meta">${n ?? S("climateMetrics.no_ha_area")}</div>
             </div>
-            ${t ? this._roomValues(e) : h`<span class="meta">Module Climate désactivé</span>`}
+            ${t ? this._roomValues(e) : h`<span class="meta">${S("climateMetrics.module_disabled")}</span>`}
             <span class="chevron">›</span>
           </div>`;
 		})}
       </div>
     `;
 	}
-}, qi.styles = [D, o`
+}, ya.styles = [O, o`
       .head {
         display: flex;
         align-items: center;
@@ -10013,40 +11748,40 @@ var Qi = (qi = class extends v {
         color: var(--secondary-text-color);
         margin: 18px 0 8px;
       }
-    `], qi);
-O([b({ attribute: !1 })], Qi.prototype, "hass", void 0), O([b({ attribute: !1 })], Qi.prototype, "base", void 0), O([b({ attribute: !1 })], Qi.prototype, "subpath", void 0), O([x()], Qi.prototype, "_rooms", void 0), O([x()], Qi.prototype, "_loaded", void 0), O([x()], Qi.prototype, "_draft", void 0), O([x()], Qi.prototype, "_busy", void 0), Qi = O([y("homex-climate-metrics")], Qi);
+    `], ya);
+k([b({ attribute: !1 })], wa.prototype, "hass", void 0), k([b({ attribute: !1 })], wa.prototype, "base", void 0), k([b({ attribute: !1 })], wa.prototype, "subpath", void 0), k([x()], wa.prototype, "_rooms", void 0), k([x()], wa.prototype, "_loaded", void 0), k([x()], wa.prototype, "_draft", void 0), k([x()], wa.prototype, "_busy", void 0), wa = k([y("homex-climate-metrics")], wa);
 // src/components/homex-climate-manager.ts
-var $i, ea = [
+var Ta, Ea = [
 	{
 		key: "metrics",
 		icon: "📈",
-		label: "Metrics",
-		desc: "Capteurs de température, d'humidité et de qualité de l'air."
+		label: () => S("climateManager.metrics"),
+		desc: () => S("climateManager.metrics_desc")
 	},
 	{
 		key: "heating",
 		icon: "🔥",
-		label: "Heating",
-		desc: "Modes de chauffage, consignes, zones et presets des radiateurs."
+		label: () => S("climateManager.heating"),
+		desc: () => S("climateManager.heating_desc")
 	},
 	{
 		key: "ac",
 		icon: "❄️",
-		label: "Air Conditioning",
-		desc: "Climatisation — pas encore disponible."
+		label: () => S("climateManager.ac"),
+		desc: () => S("climateManager.ac_desc")
 	}
-], ta = ($i = class extends v {
+], Da = (Ta = class extends v {
 	constructor(...e) {
-		super(...e), this.base = "", this.subpath = "", this._toLanding = () => E(this.base);
+		super(...e), this.base = "", this.subpath = "", this._toLanding = () => D(this.base);
 	}
 	get _page() {
-		let e = zn(this.subpath)[0];
-		return ea.some((t) => t.key === e) ? e : null;
+		let e = yr(this.subpath)[0];
+		return Ea.some((t) => t.key === e) ? e : null;
 	}
 	_placeholder(e, t) {
 		return h`
       <div class="head">
-        <button @click=${this._toLanding}>← Climate</button>
+        <button @click=${this._toLanding}>${S("climateManager.back_climate")}</button>
         <h2>${e}</h2>
       </div>
       <div class="msg">${t}</div>
@@ -10056,34 +11791,34 @@ var $i, ea = [
 		let e = this._page;
 		return e === "heating" ? h`<homex-heating-manager
         .hass=${this.hass}
-        .base=${w(this.base, "heating")}
-        .subpath=${zn(this.subpath).slice(1).join("/")}
+        .base=${T(this.base, "heating")}
+        .subpath=${yr(this.subpath).slice(1).join("/")}
         @close=${this._toLanding}
       ></homex-heating-manager>` : e === "metrics" ? h`<homex-climate-metrics
         .hass=${this.hass}
-        .base=${w(this.base, "metrics")}
-        .subpath=${zn(this.subpath).slice(1).join("/")}
+        .base=${T(this.base, "metrics")}
+        .subpath=${yr(this.subpath).slice(1).join("/")}
         @close=${this._toLanding}
-      ></homex-climate-metrics>` : e === "ac" ? this._placeholder("Air Conditioning", "La climatisation n'est pas encore disponible.") : h`
+      ></homex-climate-metrics>` : e === "ac" ? this._placeholder(S("climateManager.ac"), S("climateManager.ac_unavailable")) : h`
       <div class="head">
         <button @click=${() => this.dispatchEvent(new CustomEvent("close"))}>← Homex</button>
-        <h2>Climate Manager</h2>
+        <h2>${S("climateManager.title")}</h2>
       </div>
       <div class="pages">
-        ${ea.map((e) => h`<div
+        ${Ea.map((e) => h`<div
             class="page ${e.key === "ac" ? "soon" : ""}"
-            @click=${() => T(w(this.base, e.key))}
+            @click=${() => E(T(this.base, e.key))}
           >
             <div class="icon">${e.icon}</div>
             <div>
-              <div class="name">${e.label}</div>
-              <div class="desc">${e.desc}</div>
+              <div class="name">${e.label()}</div>
+              <div class="desc">${e.desc()}</div>
             </div>
           </div>`)}
       </div>
     `;
 	}
-}, $i.styles = [D, o`
+}, Ta.styles = [O, o`
       .head {
         display: flex;
         align-items: center;
@@ -10145,19 +11880,19 @@ var $i, ea = [
         padding: 24px 4px;
         color: var(--secondary-text-color);
       }
-    `], $i);
-O([b({ attribute: !1 })], ta.prototype, "hass", void 0), O([b({ attribute: !1 })], ta.prototype, "base", void 0), O([b({ attribute: !1 })], ta.prototype, "subpath", void 0), ta = O([y("homex-climate-manager")], ta);
+    `], Ta);
+k([b({ attribute: !1 })], Da.prototype, "hass", void 0), k([b({ attribute: !1 })], Da.prototype, "base", void 0), k([b({ attribute: !1 })], Da.prototype, "subpath", void 0), Da = k([y("homex-climate-manager")], Da);
 // src/components/homex-heating-systems-card.ts
-var na, ra = 7, ia = 3e5, aa = {
-	setpoint_tank: ["Consigne − ballon", "setpoint_tank"],
-	flow_return: ["Départ − retour", "flow_return"],
-	delta: ["Consigne − ballon", "setpoint_tank"]
-}, oa = (na = class extends v {
+var Oa, ka = 7, Aa = 3e5, ja = {
+	setpoint_tank: [() => S("heatingSystemsCard.rule_setpoint_tank"), "setpoint_tank"],
+	flow_return: [() => S("heatingSystemsCard.rule_flow_return"), "flow_return"],
+	delta: [() => S("heatingSystemsCard.rule_setpoint_tank"), "setpoint_tank"]
+}, Ma = (Oa = class extends v {
 	constructor(...e) {
 		super(...e), this.systems = [], this.zones = [], this._days = {}, this._hover = null;
 	}
 	connectedCallback() {
-		super.connectedCallback(), this._timer = window.setInterval(() => this._loadHistory(), ia);
+		super.connectedCallback(), this._timer = window.setInterval(() => this._loadHistory(), Aa);
 	}
 	disconnectedCallback() {
 		window.clearInterval(this._timer), super.disconnectedCallback();
@@ -10189,7 +11924,7 @@ var na, ra = 7, ia = 3e5, aa = {
 		}
 		let r = Date.now(), i = {};
 		for (let t of this.systems) {
-			let a = this._driven(t), o = Array.from({ length: ra }, (t, n) => {
+			let a = this._driven(t), o = Array.from({ length: ka }, (t, n) => {
 				let r = new Date(e);
 				return r.setDate(e.getDate() + n), {
 					date: r,
@@ -10216,7 +11951,7 @@ var na, ra = 7, ia = 3e5, aa = {
 		return t < 60 ? `${t} min` : `${Math.floor(t / 60)} h ${String(t % 60).padStart(2, "0")}`;
 	}
 	_scope(e) {
-		return (e.zones?.length ? e.zones : ["global"]).map((e) => e === "global" ? "Global" : this.zones.find((t) => t.id === e)?.name ?? e).join(", ");
+		return (e.zones?.length ? e.zones : ["global"]).map((e) => e === "global" ? S("heatingSystemsCard.global") : this.zones.find((t) => t.id === e)?.name ?? e).join(", ");
 	}
 	_ent(e, t, n) {
 		return this.hass.states[`${t}.homex_system_${e.id}_${n}`];
@@ -10224,14 +11959,14 @@ var na, ra = 7, ia = 3e5, aa = {
 	_toggle(e, t, n) {
 		let r = this._ent(e, "switch", t);
 		return r ? h`<label title=${r.entity_id}>
-      ${j(r.state === "on", (e) => this.hass.callService("switch", e ? "turn_on" : "turn_off", { entity_id: r.entity_id }))}
+      ${M(r.state === "on", (e) => this.hass.callService("switch", e ? "turn_on" : "turn_off", { entity_id: r.entity_id }))}
       ${n}
     </label>` : _;
 	}
 	_renderChart(e) {
 		let t = this._days[e.id];
 		if (!t) return _;
-		let n = 284 / ra, r = Math.max(60, ...t.map((e) => e.minutes)), i = t.reduce((e, t) => e + t.minutes, 0), a = this._hover?.sid === e.id ? t[this._hover.i] : void 0, o = (e) => e.toLocaleDateString(void 0, {
+		let n = 284 / ka, r = Math.max(60, ...t.map((e) => e.minutes)), i = t.reduce((e, t) => e + t.minutes, 0), a = this._hover?.sid === e.id ? t[this._hover.i] : void 0, o = (e) => e.toLocaleDateString(mn(), {
 			weekday: "short",
 			day: "numeric"
 		}), s = (e, t) => {
@@ -10241,9 +11976,15 @@ var na, ra = 7, ia = 3e5, aa = {
 		};
 		return h`<div class="chart">
       <div class="chart-head">
-        <span>Temps d'activité · ${ra} jours</span>
+        <span>${S("heatingSystemsCard.runtime_days", { days: ka })}</span>
         <span class="readout">
-          ${a ? `${o(a.date)} : ${this._dur(a.minutes)}` : `Total ${this._dur(i)} · moy. ${this._dur(i / ra)}/j`}
+          ${a ? S("heatingSystemsCard.day_value", {
+			day: o(a.date),
+			value: this._dur(a.minutes)
+		}) : S("heatingSystemsCard.total", {
+			total: this._dur(i),
+			avg: this._dur(i / ka)
+		})}
         </span>
       </div>
       <svg
@@ -10251,7 +11992,10 @@ var na, ra = 7, ia = 3e5, aa = {
         viewBox="0 0 ${320} ${70}"
         preserveAspectRatio="none"
         role="img"
-        aria-label=${`Temps d'activité quotidien de ${e.name} sur ${ra} jours`}
+        aria-label=${S("heatingSystemsCard.chart_label", {
+			name: e.name,
+			days: ka
+		})}
         @pointerleave=${() => this._hover = null}
       >
         ${t.map((t, n) => {
@@ -10268,7 +12012,10 @@ var na, ra = 7, ia = 3e5, aa = {
 				i: n
 			}}
             >
-              <title>${o(t.date)} : ${this._dur(t.minutes)}</title>
+              <title>${S("heatingSystemsCard.day_value", {
+				day: o(t.date),
+				value: this._dur(t.minutes)
+			})}</title>
             </rect>`;
 		})}
         ${g`<line class="base" x1="0" x2=${320} y1=${70} y2=${70}></line>`}
@@ -10280,7 +12027,7 @@ var na, ra = 7, ia = 3e5, aa = {
 			i: n
 		}}
             @pointerleave=${() => this._hover = null}
-            >${t.date.toLocaleDateString(void 0, { weekday: "short" })}</span
+            >${t.date.toLocaleDateString(mn(), { weekday: "short" })}</span
           >`)}
       </div>
     </div>`;
@@ -10291,47 +12038,51 @@ var na, ra = 7, ia = 3e5, aa = {
       <div class="head">
         <div class="info">
           <div class="name">🛢️ ${e.name}</div>
-          <div class="muted">Buffer Tank · ${this._scope(e)} · min ${e.min_runtime ?? 0} min</div>
+          <div class="muted">${S("heatingSystemsCard.buffer_tank")} · ${this._scope(e)} · min ${e.min_runtime ?? 0} min</div>
         </div>
         <div class="pills">
           <span class="pill ${t ? "on" : ""}" title=${e.circulator ?? ""}>
             <svg viewBox="0 0 24 24"><path d=${t ? wt : Tt}></path></svg>
-            ${t ? "Circulation" : "Arrêté"}
+            ${S(t ? "heatingSystemsCard.circulating" : "heatingSystemsCard.stopped")}
           </span>
-          <span class="pill ${r ? "on" : ""}" title="Demande de chauffe de la portée">
+          <span class="pill ${r ? "on" : ""}" title=${S("heatingSystemsCard.demand_title")}>
             <svg viewBox="0 0 24 24"><path d=${r ? lt : ut}></path></svg>
-            ${r ? "Demande" : "Pas de demande"}
+            ${S(r ? "heatingSystemsCard.demand" : "heatingSystemsCard.no_demand")}
           </span>
-          ${n ? h`<span class="pill on"><svg viewBox="0 0 24 24"><path d=${dt}></path></svg>Forcé</span>` : _}
-          ${e.aggressive ? h`<span class="pill"><svg viewBox="0 0 24 24"><path d=${kt}></path></svg>Agressif</span>` : _}
+          ${n ? h`<span class="pill on"><svg viewBox="0 0 24 24"><path d=${dt}></path></svg>${S("heatingSystemsCard.forced")}</span>` : _}
+          ${e.aggressive ? h`<span class="pill"><svg viewBox="0 0 24 24"><path d=${kt}></path></svg>${S("heatingSystemsCard.aggressive")}</span>` : _}
         </div>
       </div>
       <div class="tiles">
-        <div class="tile"><div class="label">Consigne</div><div class="value">${this._temp(e.setpoint_sensor)}</div></div>
-        ${e.tank_sensor ? h`<div class="tile"><div class="label">Ballon</div><div class="value">${this._temp(e.tank_sensor)}</div></div>` : _}
-        ${e.flow_sensor ? h`<div class="tile"><div class="label">Départ</div><div class="value">${this._temp(e.flow_sensor)}</div></div>` : _}
-        ${e.return_sensor ? h`<div class="tile"><div class="label">Retour</div><div class="value">${this._temp(e.return_sensor)}</div></div>` : _}
+        <div class="tile"><div class="label">${S("heatingSystemsCard.setpoint")}</div><div class="value">${this._temp(e.setpoint_sensor)}</div></div>
+        ${e.tank_sensor ? h`<div class="tile"><div class="label">${S("heatingSystemsCard.tank")}</div><div class="value">${this._temp(e.tank_sensor)}</div></div>` : _}
+        ${e.flow_sensor ? h`<div class="tile"><div class="label">${S("heatingSystemsCard.flow")}</div><div class="value">${this._temp(e.flow_sensor)}</div></div>` : _}
+        ${e.return_sensor ? h`<div class="tile"><div class="label">${S("heatingSystemsCard.return")}</div><div class="value">${this._temp(e.return_sensor)}</div></div>` : _}
         <div class="tile">
-          <div class="label">Actif aujourd'hui</div>
+          <div class="label">${S("heatingSystemsCard.tank_active_today")}</div>
           <div class="value">${Number.isNaN(a) ? "—" : this._dur(a)}</div>
         </div>
         ${o > 0 ? h`<div class="tile">
-              <div class="label">Temps min. restant</div>
+              <div class="label">${S("heatingSystemsCard.min_time_left")}</div>
               <div class="value">${this._dur(o / 60)}</div>
             </div>` : _}
       </div>
       ${(e.rules ?? []).length ? h`<div class="rules">
             ${(e.rules ?? []).map((t) => {
-			let [n, r] = aa[t.type] ?? [t.type, t.type], i = parseFloat(this._ent(e, "sensor", `gap_${r}`)?.state ?? ""), a = this._ent(e, "binary_sensor", `rule_${r}`)?.state === "on";
+			let [n, r] = ja[t.type] ?? [() => t.type, t.type], i = parseFloat(this._ent(e, "sensor", `gap_${r}`)?.state ?? ""), a = this._ent(e, "binary_sensor", `rule_${r}`)?.state === "on";
 			return h`<div class="rule">
                 <span class="dot ${a ? "on" : ""}"></span>
-                <span>${n}</span>
+                <span>${n()}</span>
                 <span class="gap">${Number.isNaN(i) ? "—" : `${i} °C`}</span>
-                <span class="muted">démarre ≥ ${t.delta} · s'arrête &lt; ${t.tolerance} · ${a ? "demande la circulation" : "inactive"}</span>
+                <span class="muted">${S("heatingSystemsCard.rule_status", {
+				delta: t.delta,
+				tolerance: t.tolerance,
+				state: S(a ? "heatingSystemsCard.rule_on" : "heatingSystemsCard.rule_off")
+			})}</span>
               </div>`;
 		})}
           </div>` : _}
-      <div class="switches">${this._toggle(e, "force", "Forçage manuel")}</div>
+      <div class="switches">${this._toggle(e, "force", S("heatingSystemsCard.manual_override"))}</div>
       ${this._renderChart(e)}
     `;
 	}
@@ -10341,20 +12092,20 @@ var na, ra = 7, ia = 3e5, aa = {
       <div class="head">
         <div class="info">
           <div class="name">🔥 ${e.name}</div>
-          <div class="muted">Boiler · ${this._scope(e)}</div>
+          <div class="muted">${S("heatingSystemsCard.boiler")} · ${this._scope(e)}</div>
         </div>
         <div class="pills">
           <span class="pill ${t ? "on" : ""}" title=${e.contact ?? ""}>
             <svg viewBox="0 0 24 24"><path d=${t ? lt : ut}></path></svg>
-            ${t ? "En marche" : "Arrêtée"}
+            ${S(t ? "heatingSystemsCard.boiler_on" : "heatingSystemsCard.boiler_off")}
           </span>
-          <span class="pill ${n ? "on" : ""}">${n ? "Demande" : "Pas de demande"}</span>
-          ${e.aggressive ? h`<span class="pill"><svg viewBox="0 0 24 24"><path d=${kt}></path></svg>Agressif</span>` : _}
+          <span class="pill ${n ? "on" : ""}">${S(n ? "heatingSystemsCard.demand" : "heatingSystemsCard.no_demand")}</span>
+          ${e.aggressive ? h`<span class="pill"><svg viewBox="0 0 24 24"><path d=${kt}></path></svg>${S("heatingSystemsCard.aggressive")}</span>` : _}
         </div>
       </div>
       <div class="tiles">
         <div class="tile">
-          <div class="label">Active aujourd'hui</div>
+          <div class="label">${S("heatingSystemsCard.boiler_active_today")}</div>
           <div class="value">${Number.isNaN(i) ? "—" : this._dur(i)}</div>
         </div>
       </div>
@@ -10364,13 +12115,13 @@ var na, ra = 7, ia = 3e5, aa = {
 	render() {
 		let e = this.systems.filter((e) => e.type === "boiler" || e.type === "buffer_tank");
 		return e.length ? h`<div class="card">
-      <div class="card-title">Systèmes de chauffage</div>
+      <div class="card-title">${S("heatingSystemsCard.title")}</div>
       ${e.map((e) => h`<div class="system">
           ${e.type === "buffer_tank" ? this._renderTank(e) : this._renderBoiler(e)}
         </div>`)}
     </div>` : _;
 	}
-}, na.styles = [D, o`
+}, Oa.styles = [O, o`
       :host {
         display: block;
       }
@@ -10548,10 +12299,10 @@ var na, ra = 7, ia = 3e5, aa = {
         font-size: 14px;
         color: var(--secondary-text-color);
       }
-    `], na);
-O([b({ attribute: !1 })], oa.prototype, "hass", void 0), O([b({ attribute: !1 })], oa.prototype, "systems", void 0), O([b({ attribute: !1 })], oa.prototype, "zones", void 0), O([x()], oa.prototype, "_days", void 0), O([x()], oa.prototype, "_hover", void 0), oa = O([y("homex-heating-systems-card")], oa);
+    `], Oa);
+k([b({ attribute: !1 })], Ma.prototype, "hass", void 0), k([b({ attribute: !1 })], Ma.prototype, "systems", void 0), k([b({ attribute: !1 })], Ma.prototype, "zones", void 0), k([x()], Ma.prototype, "_days", void 0), k([x()], Ma.prototype, "_hover", void 0), Ma = k([y("homex-heating-systems-card")], Ma);
 // src/components/homex-climate-dashboard.ts
-var sa, ca = "select.homex_climate_tolerance_mode", la = (sa = class extends v {
+var Na, Pa = "select.homex_climate_tolerance_mode", Fa = (Na = class extends v {
 	constructor(...e) {
 		super(...e), this.rooms = [], this._zones = [], this._systems = [], this._enabledLocal = !0, this._loaded = !1, this._busy = !1, this._roomBusy = /* @__PURE__ */ new Set();
 	}
@@ -10564,7 +12315,7 @@ var sa, ca = "select.homex_climate_tolerance_mode", la = (sa = class extends v {
 	}
 	async _load() {
 		try {
-			let e = await bn(this.hass);
+			let e = await er(this.hass);
 			this._zones = e.zones ?? [], this._systems = e.systems ?? [], this._enabledLocal = e.enabled ?? !0;
 		} catch {
 			this._zones = [];
@@ -10575,9 +12326,9 @@ var sa, ca = "select.homex_climate_tolerance_mode", la = (sa = class extends v {
 		this._busy = !0;
 		try {
 			let e = !this._enabled;
-			await Nn(this.hass, e), this._enabledLocal = e;
+			await pr(this.hass, e), this._enabledLocal = e;
 		} catch (e) {
-			alert("Erreur Homex : " + C(e));
+			alert(S("common.error", { message: w(e) }));
 		} finally {
 			this._busy = !1;
 		}
@@ -10586,12 +12337,12 @@ var sa, ca = "select.homex_climate_tolerance_mode", la = (sa = class extends v {
 		let t = this.hass.states[e]?.state === "on";
 		return h`<span class="pill ${t ? "heating" : ""}" title=${e}>
       <svg viewBox="0 0 24 24"><path d=${t ? lt : ut}></path></svg>
-      ${t ? "Heating" : "Idle"}
+      ${S(t ? "climateDashboard.heating_status" : "climateDashboard.idle")}
     </span>`;
 	}
 	_zoneRooms(e) {
 		let t = new Set(this._zones.flatMap((e) => e.rooms)), n = (e.id === "default" ? this.rooms.map((e) => e.room_id).filter((e) => !t.has(e)) : e.rooms).map((e) => this.rooms.find((t) => t.room_id === e)?.name ?? e);
-		return n.length ? n.join(", ") : "Aucune pièce";
+		return n.length ? n.join(", ") : S("climateDashboard.no_rooms");
 	}
 	_renderZone(e) {
 		let t = `select.homex_heating_${e.id}`, n = this.hass.states[t], r = n?.attributes?.options ?? [];
@@ -10603,7 +12354,7 @@ var sa, ca = "select.homex_climate_tolerance_mode", la = (sa = class extends v {
       ${this._demandPill(`binary_sensor.homex_heating_needed_${e.id}`)}
       <homex-select
         class="zone-mode"
-        title="Mode de la zone"
+        title=${S("climateDashboard.zone_mode")}
         .value=${n?.state ?? ""}
         ?disabled=${!n}
         .options=${r.map((e) => ({
@@ -10615,8 +12366,8 @@ var sa, ca = "select.homex_climate_tolerance_mode", la = (sa = class extends v {
 			option: e.detail.value
 		})}
       ></homex-select>
-      ${this.hass.states[`${ca}_${e.id}`] ? h`<span class="zone-tol" title="Tolérance de la zone">
-            ${this._btnGroup(`${ca}_${e.id}`)}
+      ${this.hass.states[`${Pa}_${e.id}`] ? h`<span class="zone-tol" title=${S("climateDashboard.zone_tolerance")}>
+            ${this._btnGroup(`${Pa}_${e.id}`)}
           </span>` : ""}
     </div>`;
 	}
@@ -10637,26 +12388,26 @@ var sa, ca = "select.homex_climate_tolerance_mode", la = (sa = class extends v {
     </div>`;
 	}
 	render() {
-		if (!this._loaded) return h`<div class="muted">Chargement…</div>`;
-		let e = this.hass.states[ca];
+		if (!this._loaded) return h`<div class="muted">${S("common.loading")}</div>`;
+		let e = this.hass.states[Pa];
 		return h`
       <div class="card">
-        <div class="card-title">Chauffage</div>
+        <div class="card-title">${S("climateDashboard.heating")}</div>
         <div class="global">
           <span class="state ${this._enabled ? "on" : ""}">
-            ${this._enabled ? "Activé" : "Désactivé"}
+            ${this._enabled ? S("climateDashboard.enabled") : S("climateDashboard.disabled")}
           </span>
           <div class="pills">
             ${this._demandPill("binary_sensor.homex_heating_needed")}
           </div>
           <button ?disabled=${this._busy} @click=${this._toggle}>
-            ${this._enabled ? "Désactiver" : "Activer"}
+            ${this._enabled ? S("climateDashboard.disable") : S("climateDashboard.enable")}
           </button>
         </div>
         <div class="options">
-          ${e ? h`<div class="field-select" title=${ca}>
-                <span>Tolérance</span>
-                ${this._btnGroup(ca)}
+          ${e ? h`<div class="field-select" title=${Pa}>
+                <span>${S("climateDashboard.tolerance")}</span>
+                ${this._btnGroup(Pa)}
               </div>` : ""}
         </div>
       </div>
@@ -10666,7 +12417,7 @@ var sa, ca = "select.homex_climate_tolerance_mode", la = (sa = class extends v {
         .zones=${this._zones}
       ></homex-heating-systems-card>
       <div class="card">
-        <div class="card-title">Zones</div>
+        <div class="card-title">${S("climateDashboard.zones")}</div>
         ${this._zones.map((e) => this._renderZone(e))}
       </div>
       ${this._renderRooms()}
@@ -10675,7 +12426,7 @@ var sa, ca = "select.homex_climate_tolerance_mode", la = (sa = class extends v {
 	_renderRooms() {
 		let e = this.rooms.filter((e) => (e.modules ?? []).includes("heating"));
 		return e.length ? h`<div class="card">
-      <div class="card-title">Pièces</div>
+      <div class="card-title">${S("climateDashboard.rooms")}</div>
       ${e.map((e) => this._renderRoom(e))}
     </div>` : "";
 	}
@@ -10685,48 +12436,48 @@ var sa, ca = "select.homex_climate_tolerance_mode", la = (sa = class extends v {
 		return t === n ? `${r(t)} °C` : `${r(t)}–${r(n)} °C`;
 	}
 	_renderRoom(e) {
-		let t = e.heating?.radiators ?? [], n = e.heating?.enabled !== !1, r = t.map((e) => Gn(this.hass, e.device_id)).map((e) => e ? this.hass.states[e] : void 0).filter((e) => e && !["unknown", "unavailable"].includes(e.state)), i = (e) => typeof e == "number" ? [e] : [], a = r.filter((e) => e.state !== "off").flatMap((e) => i(e.attributes.temperature)), o = r.length > 0 && r.every((e) => e.state === "off"), s = a.length ? this._fmt(a) : o ? "coupé" : "—", c = this.hass.states[`sensor.homex_${e.room_id}_temperature`], l = parseFloat(c?.state), u = Number.isNaN(l) ? this._fmt(r.flatMap((e) => i(e.attributes.current_temperature))) : `${l} °C`, d = Zn(this.hass, e), f = Xn(this.hass, e), p = Yn(this.hass, e), m = this._roomBusy.has(e.room_id);
+		let t = e.heating?.radiators ?? [], n = e.heating?.enabled !== !1, r = t.map((e) => Tr(this.hass, e.device_id)).map((e) => e ? this.hass.states[e] : void 0).filter((e) => e && !["unknown", "unavailable"].includes(e.state)), i = (e) => typeof e == "number" ? [e] : [], a = r.filter((e) => e.state !== "off").flatMap((e) => i(e.attributes.temperature)), o = r.length > 0 && r.every((e) => e.state === "off"), s = a.length ? this._fmt(a) : o ? S("climateDashboard.off") : "—", c = this.hass.states[`sensor.homex_${e.room_id}_temperature`], l = parseFloat(c?.state), u = Number.isNaN(l) ? this._fmt(r.flatMap((e) => i(e.attributes.current_temperature))) : `${l} °C`, d = jr(this.hass, e), f = Ar(this.hass, e), p = kr(this.hass, e), m = this._roomBusy.has(e.room_id);
 		return h`<div class="room ${n ? "" : "off"}">
-      <label class="room-switch" title=${t.length ? "Chauffage de la pièce" : "Aucun radiateur"}>
-        ${j(n, (t) => this._setRoomHeating(e, t), m || !t.length)}
+      <label class="room-switch" title=${t.length ? S("climateDashboard.room_heating") : S("climateDashboard.no_radiator")}>
+        ${M(n, (t) => this._setRoomHeating(e, t), m || !t.length)}
       </label>
       <div class="info">
         <div class="name">${e.name}</div>
         <div class="muted">
-          ${t.length} radiateur(s)${d ? h` · ${d.mode}` : ""}
+          ${S("climateDashboard.radiators", { count: t.length })}${d ? h` · ${d.mode}` : ""}
         </div>
       </div>
       <div class="temps">
-        <span title="Consigne">🎯 ${s}</span>
-        <span title="Température actuelle">🌡 ${u}</span>
+        <span title=${S("climateDashboard.setpoint")}>🎯 ${s}</span>
+        <span title=${S("climateDashboard.current_temperature")}>🌡 ${u}</span>
       </div>
       ${t.length ? h`<span class="pill ${f ? "heating" : ""}">
             <svg viewBox="0 0 24 24"><path d=${f ? lt : ut}></path></svg>
-            ${f ? "Heating" : "Idle"}
+            ${S(f ? "climateDashboard.heating_status" : "climateDashboard.idle")}
           </span>` : ""}
       ${p ? h`<span class="pill warning" title=${p}>
-            <svg viewBox="0 0 24 24"><path d=${Xe}></path></svg>Vanne ?
+            <svg viewBox="0 0 24 24"><path d=${Xe}></path></svg>${S("climateDashboard.valve_warning")}
           </span>` : ""}
     </div>`;
 	}
 	async _setRoomHeating(e, t) {
 		this._roomBusy = /* @__PURE__ */ new Set([...this._roomBusy, e.room_id]);
 		try {
-			await cn(this.hass, {
+			await Hn(this.hass, {
 				entry_id: e.entry_id,
 				heating: {
 					radiators: e.heating?.radiators ?? [],
 					enabled: t
 				}
-			}), S(this);
+			}), C(this);
 		} catch (e) {
-			alert("Erreur Homex : " + C(e));
+			alert(S("common.error", { message: w(e) }));
 		} finally {
 			let t = new Set(this._roomBusy);
 			t.delete(e.room_id), this._roomBusy = t;
 		}
 	}
-}, sa.styles = [D, o`
+}, Na.styles = [O, o`
       .card {
         border: 1px solid var(--divider-color, #e0e0e0);
         border-radius: 12px;
@@ -10879,33 +12630,33 @@ var sa, ca = "select.homex_climate_tolerance_mode", la = (sa = class extends v {
           width: 100%;
         }
       }
-    `], sa);
-O([b({ attribute: !1 })], la.prototype, "hass", void 0), O([b({ attribute: !1 })], la.prototype, "rooms", void 0), O([x()], la.prototype, "_zones", void 0), O([x()], la.prototype, "_systems", void 0), O([x()], la.prototype, "_enabledLocal", void 0), O([x()], la.prototype, "_loaded", void 0), O([x()], la.prototype, "_busy", void 0), O([x()], la.prototype, "_roomBusy", void 0), la = O([y("homex-climate-dashboard")], la);
+    `], Na);
+k([b({ attribute: !1 })], Fa.prototype, "hass", void 0), k([b({ attribute: !1 })], Fa.prototype, "rooms", void 0), k([x()], Fa.prototype, "_zones", void 0), k([x()], Fa.prototype, "_systems", void 0), k([x()], Fa.prototype, "_enabledLocal", void 0), k([x()], Fa.prototype, "_loaded", void 0), k([x()], Fa.prototype, "_busy", void 0), k([x()], Fa.prototype, "_roomBusy", void 0), Fa = k([y("homex-climate-dashboard")], Fa);
 // src/homex-panel.ts
-var ua, da = "206", $ = (ua = class extends v {
+var Ia, La = "207", $ = (Ia = class extends v {
 	constructor(...e) {
 		super(...e), this.narrow = !1, this._rooms = null, this._error = null, this._createOpen = !1, this._exportOpen = !1, this._menuOpen = !1, this._dashTab = localStorage.getItem("homex_dash_tab") === "climate" ? "climate" : "general", this._expanded = localStorage.getItem("homex_expanded") || null, this._loaded = !1, this._onToggleExpand = (e) => {
 			let t = e.detail.entry_id;
 			this._expanded = this._expanded === t ? null : t, this._expanded ? localStorage.setItem("homex_expanded", this._expanded) : localStorage.removeItem("homex_expanded");
 		}, this._reload = async () => {
 			try {
-				this._rooms = await en(this.hass), this._error = null;
+				this._rooms = await Fn(this.hass), this._error = null;
 			} catch (e) {
-				this._error = C(e);
+				this._error = w(e);
 			}
-		}, this._backToRooms = () => E(this._prefix), this._onOpenSwitchAdd = (e) => {
+		}, this._backToRooms = () => D(this._prefix), this._onOpenSwitchAdd = (e) => {
 			let t = e.detail?.room_id;
-			T(w(this._prefix, "switches", "switches", "new") + (t ? `?room=${encodeURIComponent(t)}` : ""));
+			E(T(this._prefix, "switches", "switches", "new") + (t ? `?room=${encodeURIComponent(t)}` : ""));
 		};
 	}
 	connectedCallback() {
-		super.connectedCallback(), this.addEventListener(Lt, this._reload), this.addEventListener("homex-toggle-expand", this._onToggleExpand);
+		super.connectedCallback(), _n(), this._unlisten = an(() => this.requestUpdate()), this.addEventListener(vn, this._reload), this.addEventListener("homex-toggle-expand", this._onToggleExpand);
 	}
 	disconnectedCallback() {
-		this.removeEventListener(Lt, this._reload), this.removeEventListener("homex-toggle-expand", this._onToggleExpand), super.disconnectedCallback();
+		this._unlisten?.(), this.removeEventListener(vn, this._reload), this.removeEventListener("homex-toggle-expand", this._onToggleExpand), super.disconnectedCallback();
 	}
 	get _segs() {
-		return zn(this.route?.path);
+		return yr(this.route?.path);
 	}
 	get _view() {
 		let e = this._segs[0];
@@ -10915,12 +12666,12 @@ var ua, da = "206", $ = (ua = class extends v {
 		return this.route?.prefix || "/homex";
 	}
 	updated(e) {
-		if (e.has("hass") && this.hass && !this._loaded && (this._loaded = !0, Rn().then(() => this.requestUpdate()), this._reload()), this._segs[0] === "heating") {
-			T(w(this._prefix, "climate", ...this._segs), !0);
+		if (e.has("hass") && cn(this.hass), e.has("hass") && this.hass && !this._loaded && (this._loaded = !0, pn(this.hass), vr().then(() => this.requestUpdate()), this._reload()), this._segs[0] === "heating") {
+			E(T(this._prefix, "climate", ...this._segs), !0);
 			return;
 		}
 		let t = e.get("route");
-		t && this._loaded && this._view === "rooms" && zn(t.path).length && this._reload();
+		t && this._loaded && this._view === "rooms" && yr(t.path).length && this._reload();
 	}
 	_renderDashboard(e) {
 		if (!(this._rooms ?? []).some((e) => (e.modules ?? []).includes("heating"))) return e;
@@ -10933,10 +12684,10 @@ var ua, da = "206", $ = (ua = class extends v {
 		return h`
       <div class="dash-tabs">
         <span class="dash-tab ${t === "general" ? "active" : ""}" @click=${() => n("general")}
-          >General</span
+          >${S("panel.tab_general")}</span
         >
         <span class="dash-tab ${t === "climate" ? "active" : ""}" @click=${() => n("climate")}
-          >Climate</span
+          >${S("panel.tab_climate")}</span
         >
       </div>
       ${t === "climate" ? h`<homex-climate-dashboard
@@ -10970,14 +12721,25 @@ var ua, da = "206", $ = (ua = class extends v {
 			byFloor: t
 		};
 	}
+	async _setLanguage(e) {
+		this._menuOpen = !1;
+		try {
+			await this.hass.callWS({
+				type: "homex/settings/set",
+				language: e
+			}), ln(e), setTimeout(() => this._reload(), 3e3);
+		} catch (e) {
+			alert(S("common.error", { message: w(e) }));
+		}
+	}
 	render() {
+		return Xt(dn(), this._render());
+	}
+	_render() {
 		let e;
-		if (this._error) e = h`<div class="msg err">Erreur : ${this._error}</div>`;
-		else if (!this._rooms) e = h`<div class="msg">Chargement…</div>`;
-		else if (!this._rooms.length) e = h`<div class="msg">
-        Aucune pièce. Clique sur <strong>＋ Nouvelle pièce</strong> en haut à
-        droite pour en créer une.
-      </div>`;
+		if (this._error) e = h`<div class="msg err">${S("panel.error", { message: this._error })}</div>`;
+		else if (!this._rooms) e = h`<div class="msg">${S("common.loading")}</div>`;
+		else if (!this._rooms.length) e = h`<div class="msg">${S("panel.no_rooms", { button: S("panel.new_room") })}</div>`;
 		else {
 			let { ungrouped: t, floors: n, byFloor: r } = this._grouped();
 			e = h`
@@ -10995,7 +12757,7 @@ var ua, da = "206", $ = (ua = class extends v {
         <div class="wrap">
           <homex-switch-manager
             .hass=${this.hass}
-            .base=${w(this._prefix, "switches")}
+            .base=${T(this._prefix, "switches")}
             .subpath=${this._segs.slice(1).join("/")}
             @close=${this._backToRooms}
           ></homex-switch-manager>
@@ -11004,7 +12766,7 @@ var ua, da = "206", $ = (ua = class extends v {
         <div class="wrap">
           <homex-climate-manager
             .hass=${this.hass}
-            .base=${w(this._prefix, "climate")}
+            .base=${T(this._prefix, "climate")}
             .subpath=${this._segs.slice(1).join("/")}
             @close=${this._backToRooms}
           ></homex-climate-manager>
@@ -11013,7 +12775,7 @@ var ua, da = "206", $ = (ua = class extends v {
         <div class="wrap">
           <homex-shutter-manager
             .hass=${this.hass}
-            .base=${w(this._prefix, "shutters")}
+            .base=${T(this._prefix, "shutters")}
             .subpath=${this._segs.slice(1).join("/")}
             @close=${this._backToRooms}
           ></homex-shutter-manager>
@@ -11024,21 +12786,21 @@ var ua, da = "206", $ = (ua = class extends v {
           <div class="title">
             ${this.narrow ? h`<button
                   class="menu-btn"
-                  title="Menu"
+                  title=${S("panel.menu")}
                   @click=${this._toggleSidebar}
                 >
                   <svg viewBox="0 0 24 24"><path d=${vt}></path></svg>
                 </button>` : ""}
-            <h1>Homex <span class="ver">v${da}</span></h1>
+            <h1>${hn(28)} Homex <span class="ver">v${La}</span></h1>
           </div>
           <div class="header-actions">
             <button class="primary" @click=${() => this._createOpen = !0}>
-              ＋ Nouvelle pièce
+              ＋ ${S("panel.new_room")}
             </button>
             <div class="menu-wrap">
               <button
                 class="kebab"
-                title="Menu"
+                title=${S("panel.menu")}
                 @click=${() => this._menuOpen = !this._menuOpen}
               >
                 ⋮
@@ -11055,7 +12817,7 @@ var ua, da = "206", $ = (ua = class extends v {
 		}}
                       >
                         <svg class="ico" viewBox="0 0 24 24"><path d=${Et}></path></svg>
-                        Rafraîchir
+                        ${S("panel.refresh")}
                       </button>
                       <button
                         ?disabled=${!this._rooms?.length}
@@ -11064,30 +12826,41 @@ var ua, da = "206", $ = (ua = class extends v {
 		}}
                       >
                         <svg class="ico" viewBox="0 0 24 24"><path d=${st}></path></svg>
-                        Exporter
+                        ${S("panel.export")}
                       </button>
                       <div class="menu-sep"></div>
                       <button
                         @click=${() => {
-			this._menuOpen = !1, T(w(this._prefix, "switches"));
+			this._menuOpen = !1, E(T(this._prefix, "switches"));
 		}}
                       >
-                        🎛 Switch Manager
+                        🎛 ${S("panel.switch_manager")}
                       </button>
                       <button
                         @click=${() => {
-			this._menuOpen = !1, T(w(this._prefix, "shutters"));
+			this._menuOpen = !1, E(T(this._prefix, "shutters"));
 		}}
                       >
-                        🪟 Shutter Manager
+                        🪟 ${S("panel.shutter_manager")}
                       </button>
                       <button
                         @click=${() => {
-			this._menuOpen = !1, T(w(this._prefix, "climate"));
+			this._menuOpen = !1, E(T(this._prefix, "climate"));
 		}}
                       >
-                        🌡 Climate Manager
+                        🌡 ${S("panel.climate_manager")}
                       </button>
+                      <div class="menu-sep"></div>
+                      <div class="menu-label">
+                        <svg class="ico" viewBox="0 0 24 24"><path d=${Mt}></path></svg>
+                        ${S("common.language")}
+                      </div>
+                      ${["auto", ...Qt].map((e) => h`<button class="lang" @click=${() => this._setLanguage(e)}>
+                          <svg class="ico" viewBox="0 0 24 24" style=${un() === e ? "" : "visibility:hidden"}>
+                            <path d=${tt}></path>
+                          </svg>
+                          ${S(`common.language_${e}`)}
+                        </button>`)}
                     </div>
                   ` : ""}
             </div>
@@ -11108,7 +12881,7 @@ var ua, da = "206", $ = (ua = class extends v {
       ></homex-export-dialog>
     `;
 	}
-}, ua.styles = o`
+}, Ia.styles = o`
     .wrap {
       max-width: 1000px;
       margin: 0 auto;
@@ -11274,6 +13047,18 @@ var ua, da = "206", $ = (ua = class extends v {
     .floor-header ha-icon {
       color: var(--secondary-text-color);
     }
+    h1 .homex-logo {
+      vertical-align: -5px;
+      margin-right: 4px;
+    }
+    .menu-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px 4px;
+      font-size: 12px;
+      color: var(--secondary-text-color);
+    }
     .msg {
       padding: 24px;
       text-align: center;
@@ -11285,6 +13070,6 @@ var ua, da = "206", $ = (ua = class extends v {
     a {
       color: var(--primary-color);
     }
-  `, ua);
-O([b({ attribute: !1 })], $.prototype, "hass", void 0), O([b({ attribute: !1 })], $.prototype, "narrow", void 0), O([b({ attribute: !1 })], $.prototype, "route", void 0), O([b({ attribute: !1 })], $.prototype, "panel", void 0), O([x()], $.prototype, "_rooms", void 0), O([x()], $.prototype, "_error", void 0), O([x()], $.prototype, "_createOpen", void 0), O([x()], $.prototype, "_exportOpen", void 0), O([x()], $.prototype, "_menuOpen", void 0), O([x()], $.prototype, "_dashTab", void 0), O([x()], $.prototype, "_expanded", void 0), $ = O([y("homex-panel")], $);
+  `, Ia);
+k([b({ attribute: !1 })], $.prototype, "hass", void 0), k([b({ attribute: !1 })], $.prototype, "narrow", void 0), k([b({ attribute: !1 })], $.prototype, "route", void 0), k([b({ attribute: !1 })], $.prototype, "panel", void 0), k([x()], $.prototype, "_rooms", void 0), k([x()], $.prototype, "_error", void 0), k([x()], $.prototype, "_createOpen", void 0), k([x()], $.prototype, "_exportOpen", void 0), k([x()], $.prototype, "_menuOpen", void 0), k([x()], $.prototype, "_dashTab", void 0), k([x()], $.prototype, "_expanded", void 0), $ = k([y("homex-panel")], $);
 export { $ as HomexPanel };

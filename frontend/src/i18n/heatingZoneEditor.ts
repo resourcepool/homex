@@ -1,0 +1,31 @@
+/** Strings of components/homex-heating-zone-editor.ts. */
+export default {
+  en: {
+    delete_confirm: "Delete the zone “{name}”? Its rooms go back to the default zone.",
+    name: "Name",
+    name_placeholder: "Studio",
+    id: "Id",
+    id_label: "Id: {id}",
+    control_entity: "Control entity:",
+    rooms: "Rooms",
+    default_hint: "Contains every room that is in no other zone.",
+    rooms_hint: "A room belongs to one zone only: ticking it removes it from its current zone.",
+    triggers: "Triggers per mode",
+    triggers_hint: "Each trigger switches the zone to the matching mode. Switch buttons can also be set up in the Switch Manager (🔥 Climate module).",
+    trigger_count: "· {count} trigger(s)",
+  } as Record<string, string>,
+  fr: {
+    delete_confirm: "Supprimer la zone « {name} » ? Ses pièces repassent dans la zone par défaut.",
+    name: "Nom",
+    name_placeholder: "Studio",
+    id: "Id",
+    id_label: "Id : {id}",
+    control_entity: "Entité de commande :",
+    rooms: "Pièces",
+    default_hint: "Contient toutes les pièces qui ne sont dans aucune autre zone.",
+    rooms_hint: "Une pièce n'appartient qu'à une zone : la cocher la retire de sa zone actuelle.",
+    triggers: "Déclencheurs par mode",
+    triggers_hint: "Chaque déclencheur passe la zone dans le mode correspondant. Les boutons d'interrupteurs se configurent aussi dans la Gestion des interrupteurs (module 🔥 Climat).",
+    trigger_count: "· {count} déclencheur(s)",
+  } as Record<string, string>,
+};

@@ -7,6 +7,7 @@ import {
 } from "@mdi/js";
 import type { HomeAssistant, Unit } from "../types";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 
 /** Round lightbulb on/off toggle + title (name, id, active scene) for a unit. */
 @customElement("homex-unit-controls")
@@ -160,10 +161,12 @@ export class HomexUnitControls extends LitElement {
     const light = this._lightState(on);
     const title =
       light === "lit"
-        ? `Allumée${this.activeScene ? ` · ${this.activeScene}` : ""} — éteindre`
+        ? this.activeScene
+          ? t("unitControls.lit_scene_turn_off", { scene: this.activeScene })
+          : t("unitControls.lit_turn_off")
         : light === "stray"
-          ? "Éteinte, mais au moins une lumière est allumée — allumer"
-          : "Allumer";
+          ? t("unitControls.stray_turn_on")
+          : t("unitControls.turn_on");
     return html`
       <div class="controls">
         ${this.hideToggle

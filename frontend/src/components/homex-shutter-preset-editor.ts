@@ -15,6 +15,7 @@ import {
   saveShutterPreset,
 } from "../api";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import "./homex-select";
 import { textField } from "../lib/fields";
 import { slugify } from "../lib/slug";
@@ -354,7 +355,7 @@ export class HomexShutterPresetEditor extends LitElement {
       picker = !fields.length
         ? html`<input
             class="field-name"
-            placeholder="champ, ex. motor_run_status"
+            placeholder=${t("shutterPresetEditor.field_placeholder")}
             .value=${cond.field ?? ""}
             @change=${(e: Event) =>
               onChange({
@@ -363,7 +364,7 @@ export class HomexShutterPresetEditor extends LitElement {
               })}
           />`
         : html`<homex-select
-        placeholder="Champ Zigbee2MQTT…"
+        placeholder=${t("shutterPresetEditor.z2m_field")}
         .value=${cond.field ?? ""}
         .options=${[
           ...(cond.field && !known ? [{ value: cond.field, label: cond.field }] : []),
@@ -377,7 +378,7 @@ export class HomexShutterPresetEditor extends LitElement {
       const selected =
         cond.domain && cond.suffix ? `${cond.domain}|${cond.suffix}` : "";
       picker = html`<homex-select
-        placeholder="Capteur…"
+        placeholder=${t("shutterPresetEditor.sensor")}
         .value=${selected}
         .options=${this._refSensors().map((s) => ({
           value: s.key,
@@ -401,7 +402,7 @@ export class HomexShutterPresetEditor extends LitElement {
               @click=${() =>
                 onChange({ ...HomexShutterPresetEditor.EMPTY, state: cond.state })}
             >
-              Capteur HA
+              ${t("shutterPresetEditor.source_ha")}
             </button>
             <button
               class="src ${z2m ? "on" : ""}"
@@ -413,14 +414,14 @@ export class HomexShutterPresetEditor extends LitElement {
                   state: cond.state,
                 })}
             >
-              État Zigbee2MQTT
+              ${t("shutterPresetEditor.source_z2m")}
             </button>
           </div>`
         : ""}
       <div class="cond-row">
         ${picker}
         <input
-          placeholder="valeur"
+          placeholder=${t("shutterPresetEditor.value")}
           list=${listId}
           .value=${cond.state}
           @change=${(e: Event) =>
@@ -431,11 +432,7 @@ export class HomexShutterPresetEditor extends LitElement {
         </datalist>
       </div>
       ${z2m && this._z2m?.available && !this._z2m.fields.length
-        ? html`<p class="hint">
-            Aucun état reçu de Zigbee2MQTT pour cet appareil pour l'instant
-            (il est publié à chaque changement : bouge le volet puis rouvre ce
-            preset pour voir la liste des champs), ou saisis le nom du champ.
-          </p>`
+        ? html`<p class="hint">${t("shutterPresetEditor.z2m_no_state")}</p>`
         : ""}
     </div>`;
   }
@@ -448,11 +445,11 @@ export class HomexShutterPresetEditor extends LitElement {
     const name = this._name.trim();
     const id = this._id.trim();
     if (!name || !id) {
-      alert("Nom et id du preset requis.");
+      alert(t("shutterPresetEditor.name_id_required"));
       return;
     }
     if (!this._modelKey || !this._deviceId) {
-      alert("Choisis un modèle et un device de référence.");
+      alert(t("shutterPresetEditor.choose_model_device"));
       return;
     }
     // Values are matched case-insensitively → store them lowercased.
@@ -476,19 +473,19 @@ export class HomexShutterPresetEditor extends LitElement {
       this._close();
     } catch (err) {
       this._busy = false;
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   }
   private async _delete() {
     if (!this.preset) return;
-    if (!confirm(`Supprimer le preset "${this.preset.name}" ?`)) return;
+    if (!confirm(t("shutterPresetEditor.confirm_delete", { name: this.preset.name }))) return;
     this._busy = true;
     try {
       await deleteShutterPreset(this.hass, this.preset.id);
       this._close();
     } catch (err) {
       this._busy = false;
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   }
 
@@ -496,27 +493,27 @@ export class HomexShutterPresetEditor extends LitElement {
     const editing = !!this.preset;
     const model = this._model();
     return html`
-      ${textField("Nom du preset", this._name, (v) => this._onName(v), "Volet salon")}
-      ${editing ? html`<div class="section">Id : ${this.preset!.id}</div>` : ""}
+      ${textField(t("shutterPresetEditor.name"), this._name, (v) => this._onName(v), t("shutterPresetEditor.name_placeholder"))}
+      ${editing ? html`<div class="section">${t("shutterPresetEditor.id", { id: this.preset!.id })}</div>` : ""}
 
-      <div class="section">Modèle de volet</div>
+      <div class="section">${t("shutterPresetEditor.shutter_model")}</div>
       ${this._models.length
         ? html`<homex-select
-            placeholder="Choisir un modèle…"
+            placeholder=${t("shutterPresetEditor.choose_model")}
             .value=${this._modelKey}
             .options=${this._models.map((m) => ({
               value: m.model,
               label: m.label,
-              tertiary: `${m.count} appareil(s)`,
+              tertiary: t("shutterPresetEditor.devices_count", { count: m.count }),
             }))}
             @value-changed=${(e: CustomEvent) => this._onModel(e.detail.value)}
           ></homex-select>`
-        : html`<p class="hint">Aucun volet (device avec entité cover) détecté.</p>`}
+        : html`<p class="hint">${t("shutterPresetEditor.no_shutters")}</p>`}
 
       ${model
         ? html`
-            <div class="section">Device de référence</div>
-            <p class="hint">Les capteurs/actions sont tirés de ce device.</p>
+            <div class="section">${t("shutterPresetEditor.ref_device")}</div>
+            <p class="hint">${t("shutterPresetEditor.ref_device_hint")}</p>
             <homex-select
               .value=${this._deviceId}
               .options=${model.devices.map((d) => ({ value: d.device_id, label: d.name }))}
@@ -529,7 +526,7 @@ export class HomexShutterPresetEditor extends LitElement {
             ></homex-select>
 
             <label class="toggle-row">
-              <span>Implémenter la permutation intelligente</span>
+              <span>${t("shutterPresetEditor.smart_toggle")}</span>
               <span class="toggle ${this._smart ? "on" : ""}">
                 <input
                   type="checkbox"
@@ -540,33 +537,27 @@ export class HomexShutterPresetEditor extends LitElement {
                 <span class="knob"></span>
               </span>
             </label>
-            <p class="hint">
-              Si activée, indique comment détecter l'état du volet : un capteur
-              Home Assistant, ou un champ de l'état Zigbee2MQTT de l'appareil
-              (ex. motor_run_status), avec une valeur précise. « Permuter »
-              arrête alors un volet en mouvement, et relance un volet arrêté
-              dans le sens inverse de son dernier mouvement.
-            </p>
+            <p class="hint">${t("shutterPresetEditor.smart_toggle_hint")}</p>
             ${this._smart
               ? html`
                   ${this._condEditor(
                     "up",
-                    "Montée (volet en mouvement vers le haut)",
-                    "Le volet est en train de monter quand ce capteur vaut :",
+                    t("shutterPresetEditor.up_title"),
+                    t("shutterPresetEditor.up_hint"),
                     this._up,
                     (v) => (this._up = v)
                   )}
                   ${this._condEditor(
                     "down",
-                    "Descente (volet en mouvement vers le bas)",
-                    "Le volet est en train de descendre quand ce capteur vaut :",
+                    t("shutterPresetEditor.down_title"),
+                    t("shutterPresetEditor.down_hint"),
                     this._down,
                     (v) => (this._down = v)
                   )}
                   ${this._condEditor(
                     "stopped",
-                    "Arrêt (volet à l'arrêt)",
-                    "Le volet est à l'arrêt quand ce capteur vaut :",
+                    t("shutterPresetEditor.stopped_title"),
+                    t("shutterPresetEditor.stopped_hint"),
                     this._stopped,
                     (v) => (this._stopped = v)
                   )}
@@ -578,12 +569,12 @@ export class HomexShutterPresetEditor extends LitElement {
       <div class="actions">
         ${editing
           ? html`<button class="danger" ?disabled=${this._busy} @click=${this._delete}>
-              Supprimer
+              ${t("common.delete")}
             </button>`
           : ""}
-        <button @click=${this._close}>Annuler</button>
+        <button @click=${this._close}>${t("common.cancel")}</button>
         <button class="primary" ?disabled=${this._busy} @click=${this._save}>
-          ${editing ? "Enregistrer" : "Créer le preset"}
+          ${editing ? t("common.save") : t("shutterPresetEditor.create_preset")}
         </button>
       </div>
     `;

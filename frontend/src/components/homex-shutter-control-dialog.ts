@@ -5,6 +5,7 @@ import type { HomeAssistant, Room, ShutterGroup } from "../types";
 import { errorMessage, roomShutter, type ShutterService } from "../api";
 import { coverPosition, defaultShutterGroup, shutterSummary } from "../lib/shutter";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import "./homex-dialog";
 
 /** Quick control of a room's shutters: live state, open / stop / close. */
@@ -115,7 +116,7 @@ export class HomexShutterControlDialog extends LitElement {
     try {
       await roomShutter(this.hass, this.room.entry_id, this._groupId, service);
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     } finally {
       this._busy = false;
     }
@@ -135,7 +136,7 @@ export class HomexShutterControlDialog extends LitElement {
       <homex-dialog
         compact
         .open=${this.open}
-        .heading=${`Volets · ${this.room.name}`}
+        .heading=${t("shutterControlDialog.heading", { room: this.room.name })}
         @dialog-closed=${this._close}
       >
         ${groups.length > 1
@@ -155,19 +156,19 @@ export class HomexShutterControlDialog extends LitElement {
           <div>
             <div class="state">${sum.label}</div>
             <div class="pos">
-              ${sum.position !== null ? `Position moyenne : ${sum.position} %` : ""}
+              ${sum.position !== null ? t("shutterControlDialog.avg_position", { position: sum.position }) : ""}
             </div>
           </div>
         </div>
         <div class="controls">
           <button ?disabled=${this._busy || !group} @click=${() => this._run("open_cover")}>
-            <svg viewBox="0 0 24 24"><path d=${mdiArrowUp}></path></svg>Ouvrir
+            <svg viewBox="0 0 24 24"><path d=${mdiArrowUp}></path></svg>${t("shutterControlDialog.open")}
           </button>
           <button ?disabled=${this._busy || !group} @click=${() => this._run("stop_cover")}>
-            <svg viewBox="0 0 24 24"><path d=${mdiStop}></path></svg>Stop
+            <svg viewBox="0 0 24 24"><path d=${mdiStop}></path></svg>${t("shutterControlDialog.stop")}
           </button>
           <button ?disabled=${this._busy || !group} @click=${() => this._run("close_cover")}>
-            <svg viewBox="0 0 24 24"><path d=${mdiArrowDown}></path></svg>Fermer
+            <svg viewBox="0 0 24 24"><path d=${mdiArrowDown}></path></svg>${t("shutterControlDialog.close")}
           </button>
         </div>
         ${covers.map((id) => {
@@ -181,7 +182,7 @@ export class HomexShutterControlDialog extends LitElement {
             <span class="val">${one.label}${pos !== null ? ` · ${pos} %` : ""}</span>
           </div>`;
         })}
-        <button slot="actions" @click=${this._close}>Terminé</button>
+        <button slot="actions" @click=${this._close}>${t("shutterControlDialog.done")}</button>
       </homex-dialog>
     `;
   }

@@ -3,6 +3,7 @@ import { customElement, property, state } from "lit/decorators.js";
 import type { HomeAssistant, LayoutShape, SwitchLayout } from "../types";
 import { deleteLayout, errorMessage, saveLayout } from "../api";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import { textField } from "../lib/fields";
 import { slugify } from "../lib/slug";
 
@@ -561,7 +562,7 @@ export class HomexLayoutEditor extends LitElement {
     const name = this._name.trim();
     const id = this._id.trim();
     if (!name || !id) {
-      alert("Nom et id du layout requis.");
+      alert(t("layoutEditor.name_id_required"));
       return;
     }
     // Auto-center the shape, then emit everything in center-origin coords.
@@ -602,19 +603,19 @@ export class HomexLayoutEditor extends LitElement {
       this._close();
     } catch (err) {
       this._busy = false;
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   }
   private async _delete() {
     if (!this.layout) return;
-    if (!confirm(`Supprimer le layout "${this.layout.name}" ?`)) return;
+    if (!confirm(t("layoutEditor.confirm_delete", { name: this.layout.name }))) return;
     this._busy = true;
     try {
       await deleteLayout(this.hass, this.layout.id);
       this._close();
     } catch (err) {
       this._busy = false;
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   }
 
@@ -651,45 +652,40 @@ export class HomexLayoutEditor extends LitElement {
     return html`
       <div class="cols">
         <div class="form">
-          ${textField("Nom", this._name, (v) => this._onName(v), "Rond 2 boutons")}
-          <div class="section">Forme principale</div>
+          ${textField(t("layoutEditor.name"), this._name, (v) => this._onName(v), t("layoutEditor.name_placeholder"))}
+          <div class="section">${t("layoutEditor.main_shape")}</div>
           <div class="shapes">
             <button class="shape-btn ${this._shape === "round" ? "on" : ""}"
-              @click=${() => this._setShape("round")}>● Rond</button>
+              @click=${() => this._setShape("round")}>${t("layoutEditor.shape_round")}</button>
             <button class="shape-btn ${this._shape === "square" ? "on" : ""}"
-              @click=${() => this._setShape("square")}>■ Carré</button>
+              @click=${() => this._setShape("square")}>${t("layoutEditor.shape_square")}</button>
             <button class="shape-btn ${this._shape === "vrect" ? "on" : ""}"
-              @click=${() => this._setShape("vrect")}>▮ Rect. vertical</button>
+              @click=${() => this._setShape("vrect")}>${t("layoutEditor.shape_vrect")}</button>
           </div>
           <div class="fields">
             <div class="field">
-              <label>Boutons</label>
+              <label>${t("layoutEditor.buttons")}</label>
               <input class="num" type="number" min="1" .value=${String(this._buttons)}
                 @change=${(e: Event) =>
                   this._setButtons(Number((e.target as HTMLInputElement).value))} />
             </div>
             <div class="field">
-              <label>Colonnes</label>
+              <label>${t("layoutEditor.columns")}</label>
               <input class="num" type="number" min="1" .value=${String(this._columns)}
                 @change=${(e: Event) =>
                   this._setColumns(Number((e.target as HTMLInputElement).value))} />
             </div>
             <div class="field">
-              <label>Lignes</label>
+              <label>${t("layoutEditor.rows")}</label>
               <input class="num" type="number" min="1" .value=${String(this._rows)}
                 @change=${(e: Event) =>
                   this._setRows(Number((e.target as HTMLInputElement).value))} />
             </div>
           </div>
           <button class="center-btn" @click=${() => this._recenterShape()}>
-            ⊕ Centrer la forme
+            ${t("layoutEditor.center_shape")}
           </button>
-          <p class="hint">
-            Grille aimantée 20×20. Un bouton occupe une zone (cadran) délimitée par
-            les séparateurs. Glisse un chiffre pour l'assigner à un cadran (il
-            s'échange avec l'occupant) ou vers la zone « Invisible » pour le
-            retirer du visuel. La forme est recentrée à la sauvegarde.
-          </p>
+          <p class="hint">${t("layoutEditor.hint")}</p>
         </div>
 
         <div class="stage">
@@ -746,7 +742,7 @@ export class HomexLayoutEditor extends LitElement {
           </svg>
 
           <div class="tray ${dragNum && this._overTray ? "over" : ""}">
-            <span class="tray-label">Invisible</span>
+            <span class="tray-label">${t("layoutEditor.invisible")}</span>
             ${invisible.length
               ? invisible.map(
                   (n) => html`<span
@@ -757,7 +753,7 @@ export class HomexLayoutEditor extends LitElement {
                   >`
                 )
               : html`<span class="tray-empty">
-                  Glisse un bouton ici pour le rendre invisible
+                  ${t("layoutEditor.tray_empty")}
                 </span>`}
           </div>
         </div>
@@ -775,12 +771,12 @@ export class HomexLayoutEditor extends LitElement {
       <div class="actions">
         ${this.layout
           ? html`<button class="danger" ?disabled=${this._busy} @click=${this._delete}>
-              Supprimer
+              ${t("common.delete")}
             </button>`
           : ""}
-        <button @click=${this._close}>Annuler</button>
+        <button @click=${this._close}>${t("common.cancel")}</button>
         <button class="primary" ?disabled=${this._busy} @click=${this._save}>
-          ${this.layout ? "Enregistrer" : "Créer le layout"}
+          ${this.layout ? t("common.save") : t("layoutEditor.create_layout")}
         </button>
       </div>
     `;

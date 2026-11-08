@@ -1,6 +1,7 @@
 /** Shared helpers of the Homex Lovelace cards. */
 import { html, svg } from "lit";
 import type { HomeAssistant, Room } from "../types";
+import { t } from "../lib/i18n";
 
 /** The Homex rooms (radiators, shutters, scenes, metrics), fetched once per
  * page load and shared by every card. */
@@ -33,7 +34,9 @@ export const AIR_LEVELS = {
   pm10: [45, 100],
 } as const;
 export type AirKey = keyof typeof AIR_LEVELS;
-export const LEVEL_NAMES = ["Bon", "Moyen", "Mauvais"];
+/** The name of an air quality level (0 good, 1 fair, 2 poor). */
+export const levelName = (level: number) =>
+  t(`cardRoomTile.level_${["good", "fair", "poor"][level]}`);
 
 /** 0 = good, 1 = fair, 2 = poor, and a severity ratio to compare metrics. */
 export const airLevel = (key: AirKey, value: number) => {

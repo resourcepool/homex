@@ -1,27 +1,45 @@
 /** Visual editor of custom:homex-room-tile: the room, its switch, the name,
  * and which scenes to show. */
-import { LitElement, css, html, nothing } from "lit";
+import { LitElement, css, html, nothing, type PropertyValues } from "lit";
 import { property, state } from "lit/decorators.js";
 import type { HomeAssistant, Room } from "../types";
 import { homexRooms } from "./shared";
 import { tileColor, type RoomTileConfig } from "./room-tile";
+import { loadLanguageSetting, onLanguageChange, syncHass, t } from "../lib/i18n";
 
 /** HA theme colours offered in the editor (var(--<name>-color)). */
-const COLORS: [string, string][] = [
-  ["red", "Rouge"], ["pink", "Rose"], ["purple", "Violet"], ["deep-purple", "Violet foncé"],
-  ["indigo", "Indigo"], ["blue", "Bleu"], ["light-blue", "Bleu clair"], ["cyan", "Cyan"],
-  ["teal", "Sarcelle"], ["green", "Vert"], ["light-green", "Vert clair"], ["lime", "Citron vert"],
-  ["yellow", "Jaune"], ["amber", "Ambre"], ["orange", "Orange"], ["deep-orange", "Orange foncé"],
-  ["brown", "Marron"], ["grey", "Gris"], ["blue-grey", "Gris bleu"],
+const COLORS = [
+  "red", "pink", "purple", "deep-purple", "indigo", "blue", "light-blue", "cyan", "teal", "green",
+  "light-green", "lime", "yellow", "amber", "orange", "deep-orange", "brown", "grey", "blue-grey",
 ];
+const colorName = (c: string) => t(`cardRoomTileEditor.color_${c.replace(/-/g, "_")}`);
 
 export class HomexRoomTileEditor extends LitElement {
   @property({ attribute: false }) hass!: HomeAssistant;
   @state() private _config?: RoomTileConfig;
   @state() private _rooms: Room[] = [];
+  private _unlisten?: () => void;
 
   setConfig(config: RoomTileConfig) {
     this._config = config;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this._unlisten = onLanguageChange(() => this.requestUpdate());
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._unlisten?.();
+    this._unlisten = undefined;
+  }
+
+  willUpdate(changed: PropertyValues) {
+    if (changed.has("hass") && this.hass) {
+      syncHass(this.hass);
+      loadLanguageSetting(this.hass);
+    }
   }
 
   firstUpdated() {
@@ -59,8 +77,8 @@ export class HomexRoomTileEditor extends LitElement {
     const id = this._config.room;
     const switches = id
       ? [
-          [`switch.homex_${id}_lights_toggle`, "Lumières"],
-          [`switch.homex_${id}_heating`, "Chauffage"],
+          [`switch.homex_${id}_lights_toggle`, t("cardRoomTileEditor.lights")],
+          [`switch.homex_${id}_heating`, t("cardRoomTileEditor.heating")],
         ].filter(([e]) => this.hass.states[e])
       : [];
     const entity = this._config.entity || `switch.homex_${id}_lights_toggle`;
@@ -68,17 +86,17 @@ export class HomexRoomTileEditor extends LitElement {
     const shown = this._config.scenes;
     const climate = this._config.mode === "climate";
     const color = this._config.color;
-    const named = !!color && COLORS.some(([v]) => v === color);
+    const named = !!color && COLORS.includes(color);
     return html`
       <label>
-        Pièce Homex
+        ${t("cardRoomTileEditor.room")}
         <select @change=${(e: Event) => this._set({ room: (e.target as HTMLSelectElement).value, scenes: undefined, entity: undefined })}>
           <option value="" ?selected=${!id}>—</option>
           ${this._rooms.map((r) => html`<option value=${r.room_id} ?selected=${r.room_id === id}>${r.name}</option>`)}
         </select>
       </label>
       <label>
-        Variante
+        ${t("cardRoomTileEditor.variant")}
         <select
           @change=${(e: Event) => {
             const v = (e.target as HTMLSelectElement).value;
@@ -90,13 +108,13 @@ export class HomexRoomTileEditor extends LitElement {
             );
           }}
         >
-          <option value="default" ?selected=${!climate}>Défaut — lumières, qualité de l'air, volets, scènes</option>
-          <option value="climate" ?selected=${climate}>Climat — chauffage et consigne</option>
+          <option value="default" ?selected=${!climate}>${t("cardRoomTileEditor.variant_default")}</option>
+          <option value="climate" ?selected=${climate}>${t("cardRoomTileEditor.variant_climate")}</option>
         </select>
       </label>
       ${!climate && switches.length > 1
         ? html`<label>
-            Interrupteur de la tuile
+            ${t("cardRoomTileEditor.tile_switch")}
             <select
               @change=${(e: Event) => {
                 const v = (e.target as HTMLSelectElement).value;
@@ -108,7 +126,7 @@ export class HomexRoomTileEditor extends LitElement {
           </label>`
         : nothing}
       <label>
-        Nom (optionnel)
+        ${t("cardRoomTileEditor.name")}
         <input
           .value=${this._config.name ?? ""}
           placeholder=${room?.name ?? ""}
@@ -117,16 +135,18 @@ export class HomexRoomTileEditor extends LitElement {
       </label>
       <div class="color-row">
         <label>
-          Couleur active
+          ${t("cardRoomTileEditor.active_color")}
           <select
             @change=${(e: Event) => {
               const v = (e.target as HTMLSelectElement).value;
               this._set({ color: v === "custom" ? (this._config!.color?.startsWith("#") ? this._config!.color : "#ff8100") : v || undefined });
             }}
           >
-            <option value="" ?selected=${!color}>Défaut (${climate ? "orange chauffage" : "ambre lumières"})</option>
-            ${COLORS.map(([v, l]) => html`<option value=${v} ?selected=${color === v}>${l}</option>`)}
-            <option value="custom" ?selected=${!!color && !named}>Personnalisée…</option>
+            <option value="" ?selected=${!color}>${t("cardRoomTileEditor.color_default", {
+              color: t(climate ? "cardRoomTileEditor.color_default_heating" : "cardRoomTileEditor.color_default_lights"),
+            })}</option>
+            ${COLORS.map((v) => html`<option value=${v} ?selected=${color === v}>${colorName(v)}</option>`)}
+            <option value="custom" ?selected=${!!color && !named}>${t("cardRoomTileEditor.color_custom")}</option>
           </select>
         </label>
         ${color && !named
@@ -138,7 +158,7 @@ export class HomexRoomTileEditor extends LitElement {
           : html`<span class="swatch" style="background: ${color ? tileColor(color) : climate ? "var(--state-climate-heat-color, #ff8100)" : "var(--state-light-active-color, var(--amber-color, #ffc107))"}"></span>`}
       </div>
       <div class="toggle-row">
-        <span>${climate ? "Activer / désactiver le chauffage au clic" : "Allumer / éteindre au clic"}</span>
+        <span>${climate ? t("cardRoomTileEditor.toggle_heating") : t("cardRoomTileEditor.toggle_lights")}</span>
         <label class="switch">
           <input
             type="checkbox"
@@ -150,7 +170,7 @@ export class HomexRoomTileEditor extends LitElement {
       </div>
       ${!climate && scenes.length > 1
         ? html`<div class="toggle-row">
-              <span>Afficher les scènes</span>
+              <span>${t("cardRoomTileEditor.show_scenes")}</span>
               <label class="switch">
                 <input
                   type="checkbox"
@@ -163,13 +183,13 @@ export class HomexRoomTileEditor extends LitElement {
             </div>
             ${this._config.show_scenes === true
               ? html`<div class="scene-list">
-                  <div class="hint">Scènes du widget — décocher pour masquer, libellé facultatif</div>
+                  <div class="hint">${t("cardRoomTileEditor.scenes_hint")}</div>
                   ${scenes.map((s) => {
                     const included = !shown || shown.includes(s.key);
                     return html`<div class="scene-row ${included ? "" : "excluded"}">
                       <input
                         type="checkbox"
-                        title=${included ? "Retirer du widget" : "Ajouter au widget"}
+                        title=${included ? t("cardRoomTileEditor.remove_scene") : t("cardRoomTileEditor.add_scene")}
                         .checked=${included}
                         @change=${(e: Event) => this._include(scenes.map((x) => x.key), s.key, (e.target as HTMLInputElement).checked)}
                       />

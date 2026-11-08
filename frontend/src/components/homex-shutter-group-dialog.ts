@@ -9,6 +9,7 @@ import {
   updateShutterGroup,
 } from "../api";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import { textField } from "../lib/fields";
 import "./homex-dialog";
 import "./homex-entity-picker";
@@ -68,7 +69,7 @@ export class HomexShutterGroupDialog extends LitElement {
   private async _save() {
     const name = this._name.trim();
     if (!name) {
-      alert("Nom du groupe requis.");
+      alert(t("shutterGroupDialog.name_required"));
       return;
     }
     this._busy = true;
@@ -96,13 +97,13 @@ export class HomexShutterGroupDialog extends LitElement {
       this._close_();
     } catch (err) {
       this._busy = false;
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   }
 
   private async _delete() {
     if (!this.group) return;
-    if (!confirm(`Supprimer le groupe de volets "${this.group.name}" ?`)) return;
+    if (!confirm(t("shutterGroupDialog.confirm_delete", { name: this.group.name }))) return;
     this._busy = true;
     try {
       await deleteShutterGroup(this.hass, this.room.entry_id, this.group.id);
@@ -110,7 +111,7 @@ export class HomexShutterGroupDialog extends LitElement {
       this._close_();
     } catch (err) {
       this._busy = false;
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   }
 
@@ -135,11 +136,11 @@ export class HomexShutterGroupDialog extends LitElement {
     return html`
       <homex-dialog
         .open=${this.open}
-        heading=${editing ? "Modifier le groupe de volets" : "Nouveau groupe de volets"}
+        heading=${editing ? t("shutterGroupDialog.edit_heading") : t("shutterGroupDialog.new_heading")}
         @dialog-closed=${this._close_}
       >
-        ${textField("Nom", this._name, (v) => (this._name = v), "Salon")}
-        <div class="section">Volets (entités cover)</div>
+        ${textField(t("shutterGroupDialog.name"), this._name, (v) => (this._name = v), t("shutterGroupDialog.name_placeholder"))}
+        <div class="section">${t("shutterGroupDialog.covers")}</div>
         <homex-entity-picker
           .hass=${this.hass}
           .includeDomains=${["cover"]}
@@ -147,24 +148,22 @@ export class HomexShutterGroupDialog extends LitElement {
           @value-changed=${(e: CustomEvent) => (this._devices = e.detail.value)}
         ></homex-entity-picker>
 
-        <div class="section">Déclencheurs du groupe</div>
-        <p class="hint">
-          Chaque déclencheur pilote les volets de ce groupe.
-        </p>
-        ${this._trigGroup("Permuter (ouvrir / fermer)", this._toggle, (v) => (this._toggle = v))}
-        ${this._trigGroup("Ouvrir", this._openT, (v) => (this._openT = v))}
-        ${this._trigGroup("Fermer", this._close, (v) => (this._close = v))}
-        ${this._trigGroup("Stop", this._stop, (v) => (this._stop = v))}
+        <div class="section">${t("shutterGroupDialog.triggers")}</div>
+        <p class="hint">${t("shutterGroupDialog.triggers_hint")}</p>
+        ${this._trigGroup(t("shutterGroupDialog.toggle"), this._toggle, (v) => (this._toggle = v))}
+        ${this._trigGroup(t("shutterGroupDialog.open"), this._openT, (v) => (this._openT = v))}
+        ${this._trigGroup(t("shutterGroupDialog.close"), this._close, (v) => (this._close = v))}
+        ${this._trigGroup(t("shutterGroupDialog.stop"), this._stop, (v) => (this._stop = v))}
 
         <span slot="actions">
           ${canDelete
             ? html`<button class="danger" ?disabled=${this._busy} @click=${this._delete}>
-                Supprimer
+                ${t("common.delete")}
               </button>`
             : ""}
-          <button @click=${this._close_}>Annuler</button>
+          <button @click=${this._close_}>${t("common.cancel")}</button>
           <button class="primary" ?disabled=${this._busy} @click=${this._save}>
-            ${editing ? "Enregistrer" : "Créer le groupe"}
+            ${editing ? t("common.save") : t("shutterGroupDialog.create_group")}
           </button>
         </span>
       </homex-dialog>

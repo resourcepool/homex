@@ -21,6 +21,25 @@ from .room import HomexHub, RoomController
 from functools import partial
 
 from .heating_systems import systems_manager
+from .i18n import tr
+
+# User-facing strings (see i18n.py): metric labels.
+_STRINGS = {
+    "en": {
+        "temperature": "Temperature",
+        "humidity": "Humidity",
+        "pm25": "PM2.5",
+        "pm10": "PM10",
+        "co2": "CO₂",
+    },
+    "fr": {
+        "temperature": "Température",
+        "humidity": "Humidité",
+        "pm25": "PM2.5",
+        "pm10": "PM10",
+        "co2": "CO₂",
+    },
+}
 
 
 async def async_setup_entry(
@@ -74,9 +93,11 @@ class RoomMetricSensor(SensorEntity):
             for s in cfg.get("sensors", [])
             if s.get("entity_id")
         ]
-        device_class, label = METRICS[metric]
+        device_class, _label = METRICS[metric]
         self._attr_device_class = SensorDeviceClass(device_class)
-        self._attr_name = hx_name("Climate", controller.room_name, label)
+        self._attr_name = hx_name(
+            "Climate", controller.room_name, tr(controller.hass, _STRINGS, metric)
+        )
         self._attr_unique_id = f"homex_{controller.room_id}_{metric}"
         self.entity_id = f"sensor.homex_{controller.room_id}_{metric}"
         self._used = 0

@@ -1,6 +1,9 @@
 import { LitElement, css, html } from "lit";
-import { mdiDownload, mdiMenu, mdiRefresh } from "@mdi/js";
+import { mdiCheck, mdiDownload, mdiMenu, mdiRefresh, mdiTranslate } from "@mdi/js";
 import { customElement, property, state } from "lit/decorators.js";
+import { keyed } from "lit/directives/keyed.js";
+import { LANGUAGES, language, languageSetting, loadLanguageSetting, onLanguageChange, setLanguageSetting, syncHass, t, type LangSetting } from "./lib/i18n";
+import { logo, registerIconset } from "./lib/logo";
 import type { HomeAssistant, Room } from "./types";
 import { HOMEX_CHANGED } from "./types";
 import { errorMessage, fetchRooms } from "./api";
@@ -16,7 +19,7 @@ import "./components/homex-climate-dashboard";
 
 // Bump together with PANEL_VERSION in panel.py. Shown in the header so you can
 // confirm a full page reload picked up the latest build.
-const BUILD = "206";
+const BUILD = "207";
 
 /** Homex sidebar panel: lists rooms and orchestrates loading / reloading. */
 @customElement("homex-panel")
@@ -206,6 +209,18 @@ export class HomexPanel extends LitElement {
     .floor-header ha-icon {
       color: var(--secondary-text-color);
     }
+    h1 .homex-logo {
+      vertical-align: -5px;
+      margin-right: 4px;
+    }
+    .menu-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px 4px;
+      font-size: 12px;
+      color: var(--secondary-text-color);
+    }
     .msg {
       padding: 24px;
       text-align: center;
@@ -219,12 +234,17 @@ export class HomexPanel extends LitElement {
     }
   `;
 
+  private _unlisten?: () => void;
+
   connectedCallback() {
     super.connectedCallback();
+    registerIconset();
+    this._unlisten = onLanguageChange(() => this.requestUpdate());
     this.addEventListener(HOMEX_CHANGED, this._reload);
     this.addEventListener("homex-toggle-expand", this._onToggleExpand);
   }
   disconnectedCallback() {
+    this._unlisten?.();
     this.removeEventListener(HOMEX_CHANGED, this._reload);
     this.removeEventListener("homex-toggle-expand", this._onToggleExpand);
     super.disconnectedCallback();
@@ -252,8 +272,10 @@ export class HomexPanel extends LitElement {
   }
 
   updated(changed: Map<string, unknown>) {
+    if (changed.has("hass")) syncHass(this.hass);
     if (changed.has("hass") && this.hass && !this._loaded) {
       this._loaded = true;
+      loadLanguageSetting(this.hass);
       // Pull HA's native form elements into the registry, then load data.
       loadHaComponents().then(() => this.requestUpdate());
       this._reload();
@@ -303,10 +325,10 @@ export class HomexPanel extends LitElement {
     return html`
       <div class="dash-tabs">
         <span class="dash-tab ${tab === "general" ? "active" : ""}" @click=${() => pick("general")}
-          >General</span
+          >${t("panel.tab_general")}</span
         >
         <span class="dash-tab ${tab === "climate" ? "active" : ""}" @click=${() => pick("climate")}
-          >Climate</span
+          >${t("panel.tab_climate")}</span
         >
       </div>
       ${tab === "climate"
@@ -361,17 +383,33 @@ export class HomexPanel extends LitElement {
     return { ungrouped, floors, byFloor };
   }
 
+  /** Language from the panel menu: saved in the Homex options (Homex
+   * reloads so entity and scene names follow), applied right away. */
+  private async _setLanguage(value: LangSetting) {
+    this._menuOpen = false;
+    try {
+      await this.hass.callWS({ type: "homex/settings/set", language: value });
+      setLanguageSetting(value);
+      setTimeout(() => this._reload(), 3000);
+    } catch (err) {
+      alert(t("common.error", { message: errorMessage(err) }));
+    }
+  }
+
   render() {
+    // Re-create the whole tree when the language changes (children render
+    // their strings on their own updates only).
+    return keyed(language(), this._render());
+  }
+
+  private _render() {
     let body;
     if (this._error) {
-      body = html`<div class="msg err">Erreur : ${this._error}</div>`;
+      body = html`<div class="msg err">${t("panel.error", { message: this._error })}</div>`;
     } else if (!this._rooms) {
-      body = html`<div class="msg">Chargement…</div>`;
+      body = html`<div class="msg">${t("common.loading")}</div>`;
     } else if (!this._rooms.length) {
-      body = html`<div class="msg">
-        Aucune pièce. Clique sur <strong>＋ Nouvelle pièce</strong> en haut à
-        droite pour en créer une.
-      </div>`;
+      body = html`<div class="msg">${t("panel.no_rooms", { button: t("panel.new_room") })}</div>`;
     } else {
       const { ungrouped, floors, byFloor } = this._grouped();
       body = html`
@@ -434,22 +472,22 @@ export class HomexPanel extends LitElement {
             ${this.narrow
               ? html`<button
                   class="menu-btn"
-                  title="Menu"
+                  title=${t("panel.menu")}
                   @click=${this._toggleSidebar}
                 >
                   <svg viewBox="0 0 24 24"><path d=${mdiMenu}></path></svg>
                 </button>`
               : ""}
-            <h1>Homex <span class="ver">v${BUILD}</span></h1>
+            <h1>${logo(28)} Homex <span class="ver">v${BUILD}</span></h1>
           </div>
           <div class="header-actions">
             <button class="primary" @click=${() => (this._createOpen = true)}>
-              ＋ Nouvelle pièce
+              ＋ ${t("panel.new_room")}
             </button>
             <div class="menu-wrap">
               <button
                 class="kebab"
-                title="Menu"
+                title=${t("panel.menu")}
                 @click=${() => (this._menuOpen = !this._menuOpen)}
               >
                 ⋮
@@ -468,7 +506,7 @@ export class HomexPanel extends LitElement {
                         }}
                       >
                         <svg class="ico" viewBox="0 0 24 24"><path d=${mdiRefresh}></path></svg>
-                        Rafraîchir
+                        ${t("panel.refresh")}
                       </button>
                       <button
                         ?disabled=${!this._rooms?.length}
@@ -478,7 +516,7 @@ export class HomexPanel extends LitElement {
                         }}
                       >
                         <svg class="ico" viewBox="0 0 24 24"><path d=${mdiDownload}></path></svg>
-                        Exporter
+                        ${t("panel.export")}
                       </button>
                       <div class="menu-sep"></div>
                       <button
@@ -487,7 +525,7 @@ export class HomexPanel extends LitElement {
                           navigate(joinPath(this._prefix, "switches"));
                         }}
                       >
-                        🎛 Switch Manager
+                        🎛 ${t("panel.switch_manager")}
                       </button>
                       <button
                         @click=${() => {
@@ -495,7 +533,7 @@ export class HomexPanel extends LitElement {
                           navigate(joinPath(this._prefix, "shutters"));
                         }}
                       >
-                        🪟 Shutter Manager
+                        🪟 ${t("panel.shutter_manager")}
                       </button>
                       <button
                         @click=${() => {
@@ -503,8 +541,21 @@ export class HomexPanel extends LitElement {
                           navigate(joinPath(this._prefix, "climate"));
                         }}
                       >
-                        🌡 Climate Manager
+                        🌡 ${t("panel.climate_manager")}
                       </button>
+                      <div class="menu-sep"></div>
+                      <div class="menu-label">
+                        <svg class="ico" viewBox="0 0 24 24"><path d=${mdiTranslate}></path></svg>
+                        ${t("common.language")}
+                      </div>
+                      ${(["auto", ...LANGUAGES] as LangSetting[]).map(
+                        (l) => html`<button class="lang" @click=${() => this._setLanguage(l)}>
+                          <svg class="ico" viewBox="0 0 24 24" style=${languageSetting() === l ? "" : "visibility:hidden"}>
+                            <path d=${mdiCheck}></path>
+                          </svg>
+                          ${t(`common.language_${l}`)}
+                        </button>`
+                      )}
                     </div>
                   `
                 : ""}

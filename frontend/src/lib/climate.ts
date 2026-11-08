@@ -1,4 +1,5 @@
 import type { HomeAssistant, Room } from "../types";
+import { t } from "./i18n";
 
 /** A radiator device's climate entity (its main one: shortest id). */
 export function radiatorClimate(hass: HomeAssistant, deviceId: string): string | undefined {
@@ -42,8 +43,7 @@ export function roomStuckValves(hass: HomeAssistant, room: Room): string[] {
 export function stuckWarning(hass: HomeAssistant, room: Room): string {
   const names = roomStuckValves(hass, room);
   return names.length
-    ? `Chauffe alors que la température dépasse la consigne : ${names.join(", ")}. ` +
-        "Vanne bloquée ouverte ou état non rafraîchi — vérifie le radiateur."
+    ? t("lib.stuck_warning", { names: names.join(", ") })
     : "";
 }
 
@@ -72,7 +72,7 @@ export function roomZoneMode(
   if (!st || st.state === "unavailable" || st.state === "unknown") return undefined;
   const zone = String(st.attributes?.zone_name ?? st.attributes?.zone_id ?? "");
   if (room.heating?.enabled === false) {
-    return { zone, mode: st.attributes?.modes?.unheated ?? "Unheated", own: true };
+    return { zone, mode: st.attributes?.modes?.unheated ?? t("lib.unheated"), own: true };
   }
   return { zone, mode: st.state, own: false };
 }

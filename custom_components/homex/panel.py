@@ -21,6 +21,7 @@ from homeassistant.helpers.storage import Store
 from homeassistant.setup import async_setup_component
 from homeassistant.util.yaml import load_yaml, save_yaml
 
+from .i18n import CONF_LANGUAGE, LANGUAGE_AUTO, LANGUAGES, language, language_setting, tr
 from .const import (
     CONF_HEATING,
     CONF_METRICS,
@@ -45,7 +46,6 @@ from .const import (
     CONF_TRIGGERS,
     DEFAULT_MODULES,
     DEFAULT_SHUTTER_GROUP,
-    DEFAULT_SHUTTER_GROUP_NAME,
     DOMAIN,
     HUB_DATA,
     MODULE_LIGHTS,
@@ -62,16 +62,78 @@ from .heating_systems import WS_COMMANDS as HEATING_SYSTEM_WS_COMMANDS
 from .heating_zones import WS_COMMANDS as HEATING_ZONE_WS_COMMANDS
 from .room import (
     RoomController,
+    default_name,
     device_action_label,
+    is_default_name,
     normalize_trigger_specs,
     remove_scene_entities,
 )
+
+# User-facing strings (see i18n.py).
+_STRINGS = {
+    "en": {
+        "not_installed": "Homex is not installed",
+        "unknown_room": "Unknown room",
+        "invalid_room_id": "Invalid room id",
+        "room_exists": "A room with this id exists",
+        "invalid_group_id": "Invalid group id",
+        "group_exists": "Group id already exists",
+        "unknown_group": "Unknown group",
+        "default_group_not_removable": "The default group cannot be deleted.",
+        "invalid_layout_id": "Invalid layout id",
+        "invalid_preset_id": "Invalid preset id",
+        "invalid_switch_id": "Invalid switch id",
+        "gswitch_exists": "A switch with the id “{id}” already exists.",
+        "switch_exists": "Switch id already exists",
+        "unknown_switch": "Unknown switch",
+        "invalid_scene_name": "Invalid scene name",
+        "scene_exists": "Scene already exists",
+        "scene_not_found": "Scene not found",
+        "default_scene": "Default scene",
+        "order_mismatch": "Order keys mismatch",
+        "name_required": "Name required",
+        "unknown_scene": "Unknown scene",
+        "unknown_model": "unknown model",
+        "tap_single": "Single",
+        "tap_double": "Double",
+        "tap_long": "Long",
+        "switch_button": "{switch} · Button {button} ({tap}){suffix}",
+    },
+    "fr": {
+        "not_installed": "Homex n'est pas installé",
+        "unknown_room": "Pièce inconnue",
+        "invalid_room_id": "Id de pièce invalide",
+        "room_exists": "Une pièce avec cet id existe déjà",
+        "invalid_group_id": "Id de groupe invalide",
+        "group_exists": "Cet id de groupe existe déjà",
+        "unknown_group": "Groupe inconnu",
+        "default_group_not_removable": "Le groupe par défaut ne peut pas être supprimé.",
+        "invalid_layout_id": "Id de disposition invalide",
+        "invalid_preset_id": "Id de preset invalide",
+        "invalid_switch_id": "Id d'interrupteur invalide",
+        "gswitch_exists": "Un interrupteur avec l'id « {id} » existe déjà.",
+        "switch_exists": "Cet id d'interrupteur existe déjà",
+        "unknown_switch": "Interrupteur inconnu",
+        "invalid_scene_name": "Nom de scène invalide",
+        "scene_exists": "Cette scène existe déjà",
+        "scene_not_found": "Scène introuvable",
+        "default_scene": "Scène par défaut",
+        "order_mismatch": "L'ordre ne correspond pas aux scènes",
+        "name_required": "Nom requis",
+        "unknown_scene": "Scène inconnue",
+        "unknown_model": "modèle inconnu",
+        "tap_single": "Simple",
+        "tap_double": "Double",
+        "tap_long": "Long",
+        "switch_button": "{switch} · Bouton {button} ({tap}){suffix}",
+    },
+}
 
 _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "206"
+PANEL_VERSION = "207"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -213,6 +275,8 @@ async def async_register_homex_panel(hass: HomeAssistant) -> None:
         ws_scene_rename,
         ws_scene_next,
         ws_scene_activate,
+        ws_settings_get,
+        ws_settings_set,
         *HEATING_WS_COMMANDS,
         *HEATING_ZONE_WS_COMMANDS,
         *HEATING_SYSTEM_WS_COMMANDS,
@@ -244,7 +308,7 @@ async def async_register_homex_panel(hass: HomeAssistant) -> None:
         webcomponent_name="homex-panel",
         module_url=f"{STATIC_URL}/homex-panel.js?v={PANEL_VERSION}",
         sidebar_title="Homex",
-        sidebar_icon="mdi:home-lightbulb",
+        sidebar_icon="homex:logo",
         require_admin=False,
     )
     # Lovelace cards (custom:homex-room-tile), loaded on every dashboard.
@@ -325,7 +389,7 @@ async def ws_device_triggers(hass: HomeAssistant, connection, msg) -> None:
     connection.send_result(msg["id"], {"triggers": out})
 
 
-_TAP_LABELS = {"single": "Simple", "double": "Double", "long": "Long"}
+_TAP_LABELS = {"single": "tap_single", "double": "tap_double", "long": "tap_long"}
 
 
 async def _switch_triggers_for_room(hass: HomeAssistant, room_id: str) -> dict:
@@ -373,10 +437,22 @@ async def _switch_triggers_for_room(hass: HomeAssistant, room_id: str) -> dict:
                     continue
                 action = entry.get("action") or {}
                 kind = action.get("kind")
-                tap = _TAP_LABELS.get(tap_mode, tap_mode)
+                tap = (
+                    tr(hass, _STRINGS, _TAP_LABELS[tap_mode])
+                    if tap_mode in _TAP_LABELS
+                    else tap_mode
+                )
                 dev_actions = (bindings.get(tap_mode) or {}).get(btn) or []
                 suffix = f" → {', '.join(dev_actions)}" if dev_actions else ""
-                label = f"{sw.get('name', '?')} · Bouton {btn} ({tap}){suffix}"
+                label = tr(
+                    hass,
+                    _STRINGS,
+                    "switch_button",
+                    switch=sw.get("name", "?"),
+                    button=btn,
+                    tap=tap,
+                    suffix=suffix,
+                )
                 if kind in ("toggle", "scene_next", "dim_up", "dim_down"):
                     out[kind].append(label)
                 elif kind == "scene":
@@ -439,6 +515,39 @@ async def ws_list_rooms(hass: HomeAssistant, connection, msg) -> None:
             }
         )
     connection.send_result(msg["id"], {"rooms": rooms})
+
+
+# -- Settings ------------------------------------------------------------------
+
+
+@websocket_api.websocket_command({vol.Required("type"): "homex/settings/get"})
+@callback
+def ws_settings_get(hass: HomeAssistant, connection, msg) -> None:
+    """Homex settings the panel and cards need (any user: cards read it)."""
+    connection.send_result(
+        msg["id"], {"language": language_setting(hass), "active_language": language(hass)}
+    )
+
+
+@websocket_api.require_admin
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/settings/set",
+        vol.Required("language"): vol.In([LANGUAGE_AUTO, *LANGUAGES]),
+    }
+)
+@websocket_api.async_response
+async def ws_settings_set(hass: HomeAssistant, connection, msg) -> None:
+    """Set the Homex language ("auto" follows Home Assistant). Reloads Homex
+    so entity and scene names follow."""
+    hub = _hub_entry(hass)
+    if hub is None:
+        connection.send_error(msg["id"], "not_installed", tr(hass, _STRINGS, "not_installed"))
+        return
+    hass.config_entries.async_update_entry(
+        hub, options={**hub.options, CONF_LANGUAGE: msg["language"]}
+    )
+    connection.send_result(msg["id"], {"language": msg["language"]})
 
 
 # -- Helpers for mutations -------------------------------------------------
@@ -530,7 +639,8 @@ def _room_scenes(controller: RoomController) -> list[dict]:
             scenes.append(
                 {
                     "key": "turn_on",
-                    "name": scene.get("name", "Allumé"),
+                    "name": scene.get("name")
+                    or default_name(controller.hass, "scene_on_default"),
                     "config_id": f"homex_{slug}_turn_on",
                     "removable": False,
                     "orderable": True,
@@ -570,13 +680,13 @@ def _scenes_value(
     """Build the stored scenes list: ordered non-off + the (renamable) off.
 
     The off scene is persisted when it has a custom name OR its own triggers
-    (otherwise it stays implicit with the default 'Éteint' label).
+    (otherwise it stays implicit with the default 'Éteint' / 'Off' label).
     """
     off = controller.off_name if off_name is None else off_name
     if off_triggers is None:
         off_triggers = controller.scene_trigger_specs_for("turn_off")
     scenes = [dict(s) for s in ordered]
-    if (off and off != "Éteint") or off_triggers:
+    if (off and not is_default_name("scene_off_default", off)) or off_triggers:
         scenes.append(
             {"key": "turn_off", "name": off, "triggers": list(off_triggers or [])}
         )
@@ -731,14 +841,14 @@ async def _attach_existing_scene(
 async def ws_room_create(hass: HomeAssistant, connection, msg) -> None:
     room_id = msg["room_id"].strip().lower()
     if not ID_RE.match(room_id):
-        connection.send_error(msg["id"], "invalid_id", "Invalid room id")
+        connection.send_error(msg["id"], "invalid_id", tr(hass, _STRINGS, "invalid_room_id"))
         return
     hub = _hub_entry(hass)
     if hub is None:
-        connection.send_error(msg["id"], "not_installed", "Homex is not installed")
+        connection.send_error(msg["id"], "not_installed", tr(hass, _STRINGS, "not_installed"))
         return
     if _find_subentry(hub, room_id):
-        connection.send_error(msg["id"], "id_exists", "A room with this id exists")
+        connection.send_error(msg["id"], "id_exists", tr(hass, _STRINGS, "room_exists"))
         return
 
     data = {
@@ -786,7 +896,7 @@ async def ws_room_delete(hass: HomeAssistant, connection, msg) -> None:
     hub = _hub_entry(hass)
     sub = _find_subentry(hub, msg["entry_id"]) if hub else None
     if hub is None or sub is None:
-        connection.send_error(msg["id"], "not_found", "Unknown room")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_room"))
         return
 
     controller = _controller(hass, hub, dict(sub.data))
@@ -834,17 +944,17 @@ async def ws_room_update(hass: HomeAssistant, connection, msg) -> None:
     hub = _hub_entry(hass)
     sub = _find_subentry(hub, msg["entry_id"]) if hub else None
     if hub is None or sub is None:
-        connection.send_error(msg["id"], "not_found", "Unknown room")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_room"))
         return
 
     room = dict(sub.data)
     old_id = room.get(CONF_ROOM_ID)
     new_id = msg.get("room_id", old_id).strip().lower()
     if not ID_RE.match(new_id):
-        connection.send_error(msg["id"], "invalid_id", "Invalid room id")
+        connection.send_error(msg["id"], "invalid_id", tr(hass, _STRINGS, "invalid_room_id"))
         return
     if new_id != old_id and _find_subentry(hub, new_id):
-        connection.send_error(msg["id"], "id_exists", "A room with this id exists")
+        connection.send_error(msg["id"], "id_exists", tr(hass, _STRINGS, "room_exists"))
         return
 
     if new_id != old_id:
@@ -904,7 +1014,7 @@ async def ws_room_sync_labels(hass: HomeAssistant, connection, msg) -> None:
     hub = _hub_entry(hass)
     sub = _find_subentry(hub, msg["entry_id"]) if hub else None
     if hub is None or sub is None:
-        connection.send_error(msg["id"], "not_found", "Unknown room")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_room"))
         return
     live = hass.data.get(DOMAIN, {}).get(HUB_DATA)
     controller = (
@@ -931,7 +1041,7 @@ async def ws_room_dim(hass: HomeAssistant, connection, msg) -> None:
     hub = _hub_entry(hass)
     sub = _find_subentry(hub, msg["entry_id"]) if hub else None
     if hub is None or sub is None:
-        connection.send_error(msg["id"], "not_found", "Unknown room")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_room"))
         return
     live = hass.data.get(DOMAIN, {}).get(HUB_DATA)
     controller = (
@@ -957,7 +1067,7 @@ async def ws_room_shutter(hass: HomeAssistant, connection, msg) -> None:
     hub = _hub_entry(hass)
     sub = _find_subentry(hub, msg["entry_id"]) if hub else None
     if hub is None or sub is None:
-        connection.send_error(msg["id"], "not_found", "Unknown room")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_room"))
         return
     live = hass.data.get(DOMAIN, {}).get(HUB_DATA)
     controller = (
@@ -986,18 +1096,18 @@ async def ws_group_add(hass: HomeAssistant, connection, msg) -> None:
     hub = _hub_entry(hass)
     sub = _find_subentry(hub, msg["entry_id"]) if hub else None
     if hub is None or sub is None:
-        connection.send_error(msg["id"], "not_found", "Unknown room")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_room"))
         return
     room = dict(sub.data)
 
     group_id = msg["group_id"].strip().lower()
     if not ID_RE.match(group_id):
-        connection.send_error(msg["id"], "invalid_id", "Invalid group id")
+        connection.send_error(msg["id"], "invalid_id", tr(hass, _STRINGS, "invalid_group_id"))
         return
 
     groups = [dict(g) for g in room.get(CONF_GROUPS, [])]
     if any(g[CONF_GROUP_ID] == group_id for g in groups):
-        connection.send_error(msg["id"], "group_exists", "Group id already exists")
+        connection.send_error(msg["id"], "group_exists", tr(hass, _STRINGS, "group_exists"))
         return
 
     groups.append(
@@ -1035,14 +1145,14 @@ async def ws_group_update(hass: HomeAssistant, connection, msg) -> None:
     hub = _hub_entry(hass)
     sub = _find_subentry(hub, msg["entry_id"]) if hub else None
     if hub is None or sub is None:
-        connection.send_error(msg["id"], "not_found", "Unknown room")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_room"))
         return
     room = dict(sub.data)
 
     groups = [dict(g) for g in room.get(CONF_GROUPS, [])]
     group = next((g for g in groups if g[CONF_GROUP_ID] == msg["group_id"]), None)
     if group is None:
-        connection.send_error(msg["id"], "not_found", "Unknown group")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_group"))
         return
 
     if "name" in msg:
@@ -1076,7 +1186,7 @@ async def ws_group_delete(hass: HomeAssistant, connection, msg) -> None:
     hub = _hub_entry(hass)
     sub = _find_subentry(hub, msg["entry_id"]) if hub else None
     if hub is None or sub is None:
-        connection.send_error(msg["id"], "not_found", "Unknown room")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_room"))
         return
     room = dict(sub.data)
 
@@ -1111,7 +1221,7 @@ def _room_for_msg(hass, connection, msg):
     hub = _hub_entry(hass)
     sub = _find_subentry(hub, msg["entry_id"]) if hub else None
     if hub is None or sub is None:
-        connection.send_error(msg["id"], "not_found", "Unknown room")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_room"))
         return None, None, None
     return hub, sub, dict(sub.data)
 
@@ -1131,7 +1241,7 @@ async def ws_shutter_group_add(hass: HomeAssistant, connection, msg) -> None:
         return
     groups = [dict(g) for g in room.get(CONF_SHUTTER_GROUPS, [])]
     taken = {g.get("id") for g in groups} | {DEFAULT_SHUTTER_GROUP}
-    base = _slugify(msg["name"]) or "groupe"
+    base = _slugify(msg["name"]) or "group"
     gid, i = base, 2
     while gid in taken:
         gid, i = f"{base}_{i}", i + 1
@@ -1178,7 +1288,7 @@ async def ws_shutter_group_update(hass: HomeAssistant, connection, msg) -> None:
         group = {
             "id": gid,
             "name": (
-                DEFAULT_SHUTTER_GROUP_NAME
+                default_name(hass, "shutter_group_default")
                 if gid == DEFAULT_SHUTTER_GROUP
                 else gid
             ),
@@ -1217,7 +1327,7 @@ async def ws_shutter_group_delete(hass: HomeAssistant, connection, msg) -> None:
         return
     if msg["group_id"] == DEFAULT_SHUTTER_GROUP:
         connection.send_error(
-            msg["id"], "not_removable", "Le groupe par défaut ne peut pas être supprimé."
+            msg["id"], "not_removable", tr(hass, _STRINGS, "default_group_not_removable")
         )
         return
     room[CONF_SHUTTER_GROUPS] = [
@@ -1250,7 +1360,7 @@ async def ws_layout_save(hass: HomeAssistant, connection, msg) -> None:
     layout = dict(msg["layout"])
     layout_id = str(layout.get("id") or "").strip().lower()
     if not ID_RE.match(layout_id):
-        connection.send_error(msg["id"], "invalid_id", "Invalid layout id")
+        connection.send_error(msg["id"], "invalid_id", tr(hass, _STRINGS, "invalid_layout_id"))
         return
     layout["id"] = layout_id
     layouts = [l for l in await _get_layouts(hass) if l.get("id") != layout_id]
@@ -1330,7 +1440,7 @@ async def ws_switch_devices(hass: HomeAssistant, connection, msg) -> None:
                 "model_label": " ".join(
                     p for p in (dev.manufacturer, dev.model) if p
                 )
-                or "modèle inconnu",
+                or tr(hass, _STRINGS, "unknown_model"),
             }
         )
     connection.send_result(
@@ -1363,7 +1473,7 @@ async def ws_switch_models(hass: HomeAssistant, connection, msg) -> None:
                 "label": " ".join(
                     p for p in (dev.manufacturer, dev.model) if p
                 )
-                or "modèle inconnu",
+                or tr(hass, _STRINGS, "unknown_model"),
                 "device_id": dev_id,  # a sample device to resolve the actions
                 "count": 1,
             }
@@ -1402,7 +1512,7 @@ async def ws_shutter_models(hass: HomeAssistant, connection, msg) -> None:
                 "label": " ".join(
                     p for p in (dev.manufacturer, dev.model) if p
                 )
-                or "modèle inconnu",
+                or tr(hass, _STRINGS, "unknown_model"),
                 "device_id": entity.device_id,
                 "devices": [],
             },
@@ -1474,7 +1584,7 @@ async def ws_shutter_preset_save(hass: HomeAssistant, connection, msg) -> None:
     preset = dict(msg["preset"])
     pid = str(preset.get("id") or "").strip().lower()
     if not ID_RE.match(pid):
-        connection.send_error(msg["id"], "invalid_id", "Invalid preset id")
+        connection.send_error(msg["id"], "invalid_id", tr(hass, _STRINGS, "invalid_preset_id"))
         return
     preset["id"] = pid
     presets = [p for p in await _get_shutter_presets(hass) if p.get("id") != pid]
@@ -1524,7 +1634,7 @@ async def ws_preset_save(hass: HomeAssistant, connection, msg) -> None:
     preset = dict(msg["preset"])
     pid = str(preset.get("id") or "").strip().lower()
     if not ID_RE.match(pid):
-        connection.send_error(msg["id"], "invalid_id", "Invalid preset id")
+        connection.send_error(msg["id"], "invalid_id", tr(hass, _STRINGS, "invalid_preset_id"))
         return
     preset["id"] = pid
     presets = [p for p in await _get_presets(hass) if p.get("id") != pid]
@@ -1577,13 +1687,13 @@ async def ws_gswitch_save(hass: HomeAssistant, connection, msg) -> None:
     sw = dict(msg["switch"])
     sw_id = str(sw.get("id") or "").strip().lower()
     if not ID_RE.match(sw_id):
-        connection.send_error(msg["id"], "invalid_id", "Invalid switch id")
+        connection.send_error(msg["id"], "invalid_id", tr(hass, _STRINGS, "invalid_switch_id"))
         return
     sw["id"] = sw_id
     existing = await _get_gswitches(hass)
     if msg["create"] and any(s.get("id") == sw_id for s in existing):
         connection.send_error(
-            msg["id"], "id_exists", f"Un interrupteur avec l'id « {sw_id} » existe déjà."
+            msg["id"], "id_exists", tr(hass, _STRINGS, "gswitch_exists", id=sw_id)
         )
         return
     switches = [s for s in existing if s.get("id") != sw_id]
@@ -1648,17 +1758,17 @@ async def ws_switch_add(hass: HomeAssistant, connection, msg) -> None:
     hub = _hub_entry(hass)
     sub = _find_subentry(hub, msg["entry_id"]) if hub else None
     if hub is None or sub is None:
-        connection.send_error(msg["id"], "not_found", "Unknown room")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_room"))
         return
     room = dict(sub.data)
 
     switch_id = msg["switch_id"].strip().lower()
     if not ID_RE.match(switch_id):
-        connection.send_error(msg["id"], "invalid_id", "Invalid switch id")
+        connection.send_error(msg["id"], "invalid_id", tr(hass, _STRINGS, "invalid_switch_id"))
         return
     switches = [dict(s) for s in room.get(CONF_SWITCHES, [])]
     if any(s.get("id") == switch_id for s in switches):
-        connection.send_error(msg["id"], "switch_exists", "Switch id already exists")
+        connection.send_error(msg["id"], "switch_exists", tr(hass, _STRINGS, "switch_exists"))
         return
 
     switches.append({**_switch_fields(msg), "id": switch_id})
@@ -1688,7 +1798,7 @@ async def ws_switch_update(hass: HomeAssistant, connection, msg) -> None:
     hub = _hub_entry(hass)
     sub = _find_subentry(hub, msg["entry_id"]) if hub else None
     if hub is None or sub is None:
-        connection.send_error(msg["id"], "not_found", "Unknown room")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_room"))
         return
     room = dict(sub.data)
 
@@ -1697,7 +1807,7 @@ async def ws_switch_update(hass: HomeAssistant, connection, msg) -> None:
         (s for s in switches if s.get("id") == msg["switch_id"]), None
     )
     if target is None:
-        connection.send_error(msg["id"], "not_found", "Unknown switch")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_switch"))
         return
     for key in (
         "name", "buttons", "dim", "columns", "rows", "layout", "rooms", "triggers"
@@ -1722,7 +1832,7 @@ async def ws_switch_delete(hass: HomeAssistant, connection, msg) -> None:
     hub = _hub_entry(hass)
     sub = _find_subentry(hub, msg["entry_id"]) if hub else None
     if hub is None or sub is None:
-        connection.send_error(msg["id"], "not_found", "Unknown room")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_room"))
         return
     room = dict(sub.data)
     room[CONF_SWITCHES] = [
@@ -1747,21 +1857,21 @@ async def ws_scene_add(hass: HomeAssistant, connection, msg) -> None:
     hub = _hub_entry(hass)
     sub = _find_subentry(hub, msg["entry_id"]) if hub else None
     if hub is None or sub is None:
-        connection.send_error(msg["id"], "not_found", "Unknown room")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_room"))
         return
     room = dict(sub.data)
 
     name = msg["name"].strip()
     key = _slugify(name)
     if not name or not key or key in ("turn_on", "turn_off"):
-        connection.send_error(msg["id"], "invalid_id", "Invalid scene name")
+        connection.send_error(msg["id"], "invalid_id", tr(hass, _STRINGS, "invalid_scene_name"))
         return
 
     controller = _controller(hass, hub, room)
     # scene_order already includes turn_on, so persisting it keeps the order.
     order = [dict(s) for s in controller.scene_order]
     if any(s["key"] == key for s in order):
-        connection.send_error(msg["id"], "scene_exists", "Scene already exists")
+        connection.send_error(msg["id"], "scene_exists", tr(hass, _STRINGS, "scene_exists"))
         return
 
     attach = msg.get("attach")
@@ -1770,7 +1880,7 @@ async def ws_scene_add(hass: HomeAssistant, connection, msg) -> None:
         if not await _attach_existing_scene(
             hass, attach, controller.extra_scene_id(key)
         ):
-            connection.send_error(msg["id"], "scene_not_found", "Scene not found")
+            connection.send_error(msg["id"], "scene_not_found", tr(hass, _STRINGS, "scene_not_found"))
             return
 
     order.append({"key": key, "name": name, "triggers": msg.get("triggers", [])})
@@ -1792,13 +1902,13 @@ async def ws_scene_delete(hass: HomeAssistant, connection, msg) -> None:
     hub = _hub_entry(hass)
     sub = _find_subentry(hub, msg["entry_id"]) if hub else None
     if hub is None or sub is None:
-        connection.send_error(msg["id"], "not_found", "Unknown room")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_room"))
         return
     room = dict(sub.data)
 
     key = msg["key"]
     if key in ("turn_on", "turn_off"):
-        connection.send_error(msg["id"], "not_removable", "Default scene")
+        connection.send_error(msg["id"], "not_removable", tr(hass, _STRINGS, "default_scene"))
         return
     controller = _controller(hass, hub, room)
     scene_id = controller.extra_scene_id(key)
@@ -1824,7 +1934,7 @@ async def ws_scene_reorder(hass: HomeAssistant, connection, msg) -> None:
     hub = _hub_entry(hass)
     sub = _find_subentry(hub, msg["entry_id"]) if hub else None
     if hub is None or sub is None:
-        connection.send_error(msg["id"], "not_found", "Unknown room")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_room"))
         return
     room = dict(sub.data)
 
@@ -1832,7 +1942,7 @@ async def ws_scene_reorder(hass: HomeAssistant, connection, msg) -> None:
     by_key = {s["key"]: s for s in controller.scene_order}
     new_keys = msg["order"]
     if set(new_keys) != set(by_key):
-        connection.send_error(msg["id"], "invalid_order", "Order keys mismatch")
+        connection.send_error(msg["id"], "invalid_order", tr(hass, _STRINGS, "order_mismatch"))
         return
 
     order = [by_key[k] for k in new_keys]
@@ -1854,7 +1964,7 @@ async def ws_scene_next(hass: HomeAssistant, connection, msg) -> None:
     hub = _hub_entry(hass)
     sub = _find_subentry(hub, msg["entry_id"]) if hub else None
     if hub is None or sub is None:
-        connection.send_error(msg["id"], "not_found", "Unknown room")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_room"))
         return
     room = dict(sub.data)
     live = hass.data.get(DOMAIN, {}).get(HUB_DATA)
@@ -1878,7 +1988,7 @@ async def ws_scene_activate(hass: HomeAssistant, connection, msg) -> None:
     live = hass.data.get(DOMAIN, {}).get(HUB_DATA)
     controller = live.controllers.get(msg["room_id"]) if live else None
     if controller is None:
-        connection.send_error(msg["id"], "not_found", "Unknown room")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_room"))
         return
     await controller.async_activate_scene_key(msg["key"])
     connection.send_result(msg["id"], {"ok": True})
@@ -1899,14 +2009,14 @@ async def ws_scene_rename(hass: HomeAssistant, connection, msg) -> None:
     hub = _hub_entry(hass)
     sub = _find_subentry(hub, msg["entry_id"]) if hub else None
     if hub is None or sub is None:
-        connection.send_error(msg["id"], "not_found", "Unknown room")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_room"))
         return
     room = dict(sub.data)
 
     key = msg["key"]
     name = msg["name"].strip()
     if not name:
-        connection.send_error(msg["id"], "invalid_name", "Name required")
+        connection.send_error(msg["id"], "invalid_name", tr(hass, _STRINGS, "name_required"))
         return
 
     triggers = msg.get("triggers")  # None = leave unchanged
@@ -1921,7 +2031,7 @@ async def ws_scene_rename(hass: HomeAssistant, connection, msg) -> None:
 
     order = [dict(s) for s in controller.scene_order]
     if not any(s["key"] == key for s in order):
-        connection.send_error(msg["id"], "not_found", "Unknown scene")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_scene"))
         return
     for scene in order:
         if scene["key"] == key:

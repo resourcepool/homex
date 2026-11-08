@@ -4,6 +4,7 @@ import type { Group, HomeAssistant, Room, TriggerSpec } from "../types";
 import { fireChanged } from "../types";
 import { addGroup, deleteGroup, errorMessage, updateGroup } from "../api";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import { textField } from "../lib/fields";
 import { slugify } from "../lib/slug";
 import "./homex-dialog";
@@ -119,7 +120,7 @@ export class HomexGroupDialog extends LitElement {
     const name = this._name.trim();
     const group_id = this._id.trim();
     if (!name || !group_id) {
-      alert("Nom et id du groupe requis.");
+      alert(t("groupDialog.name_id_required"));
       return;
     }
     const triggers: TriggerSpec[] = this._triggers;
@@ -153,13 +154,13 @@ export class HomexGroupDialog extends LitElement {
       this._close();
     } catch (err) {
       this._busy = false;
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   }
 
   private async _delete() {
     if (!this.group) return;
-    if (!confirm(`Supprimer le groupe "${this.group.name || this.group.group_id}" ?`)) return;
+    if (!confirm(t("groupDialog.confirm_delete", { name: this.group.name || this.group.group_id }))) return;
     this._busy = true;
     try {
       await deleteGroup(this.hass, this.room.entry_id, this.group.group_id);
@@ -167,7 +168,7 @@ export class HomexGroupDialog extends LitElement {
       this._close();
     } catch (err) {
       this._busy = false;
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   }
 
@@ -176,14 +177,14 @@ export class HomexGroupDialog extends LitElement {
     return html`
       <homex-dialog
         .open=${this.open}
-        heading=${editing ? "Modifier le groupe" : "Nouveau groupe"}
+        heading=${editing ? t("groupDialog.heading_edit") : t("groupDialog.heading_new")}
         @dialog-closed=${this._close}
       >
-        ${textField("Nom", this._name, (v) => this._onName(v), "Table de chevet L")}
+        ${textField(t("groupDialog.name"), this._name, (v) => this._onName(v), t("groupDialog.name_placeholder"))}
         ${editing
-          ? html`<div class="section">Id : ${this.group!.group_id}</div>`
-          : textField("Id", this._id, (v) => this._onId(v), "bedside_l")}
-        <div class="section">Appareils (parmi la pièce)</div>
+          ? html`<div class="section">${t("groupDialog.id_label", { id: this.group!.group_id })}</div>`
+          : textField(t("groupDialog.id"), this._id, (v) => this._onId(v), "bedside_l")}
+        <div class="section">${t("groupDialog.devices")}</div>
         <homex-entity-picker
           .hass=${this.hass}
           .includeEntities=${this.room.devices}
@@ -191,7 +192,7 @@ export class HomexGroupDialog extends LitElement {
           @value-changed=${(e: CustomEvent) => (this._devices = e.detail.value)}
         ></homex-entity-picker>
         <label class="dim-toggle">
-          <span class="dim-name">Activer le dimming du groupe</span>
+          <span class="dim-name">${t("groupDialog.enable_dim")}</span>
           <span class="toggle ${this._dim ? "on" : ""}">
             <input
               type="checkbox"
@@ -202,7 +203,7 @@ export class HomexGroupDialog extends LitElement {
             <span class="knob"></span>
           </span>
         </label>
-        <div class="section">Déclencheurs</div>
+        <div class="section">${t("groupDialog.triggers")}</div>
         <homex-trigger-selector
           .hass=${this.hass}
           .value=${this._triggers}
@@ -219,21 +220,15 @@ export class HomexGroupDialog extends LitElement {
         
         ${this._dim
           ? html`
-              <div class="section">Dimmer + (monter la luminosité)</div>
-              <p class="hint">
-                Chaque déclenchement ajoute 20 à la luminosité des lumières du
-                groupe.
-              </p>
+              <div class="section">${t("groupDialog.dim_up_title")}</div>
+              <p class="hint">${t("groupDialog.dim_up_hint")}</p>
               <homex-trigger-selector
                 .hass=${this.hass}
                 .value=${this._dimUp}
                 @value-changed=${(e: CustomEvent) => (this._dimUp = e.detail.value)}
               ></homex-trigger-selector>
-              <div class="section">Dimmer − (baisser la luminosité)</div>
-              <p class="hint">
-                Chaque déclenchement retire 20 à la luminosité des lumières du
-                groupe.
-              </p>
+              <div class="section">${t("groupDialog.dim_down_title")}</div>
+              <p class="hint">${t("groupDialog.dim_down_hint")}</p>
               <homex-trigger-selector
                 .hass=${this.hass}
                 .value=${this._dimDown}
@@ -246,12 +241,12 @@ export class HomexGroupDialog extends LitElement {
         <span slot="actions">
           ${editing
             ? html`<button class="danger" ?disabled=${this._busy} @click=${this._delete}>
-                Supprimer
+                ${t("common.delete")}
               </button>`
             : ""}
-          <button @click=${this._close}>Annuler</button>
+          <button @click=${this._close}>${t("common.cancel")}</button>
           <button class="primary" ?disabled=${this._busy} @click=${this._save}>
-            ${editing ? "Enregistrer" : "Créer le groupe"}
+            ${editing ? t("common.save") : t("groupDialog.create")}
           </button>
         </span>
       </homex-dialog>

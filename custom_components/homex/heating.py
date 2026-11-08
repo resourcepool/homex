@@ -48,9 +48,76 @@ from .const import (
     HUB_DATA,
     MODULE_HEATING,
 )
+from .i18n import tr
 from .shutter import condition_entity
 
 _LOGGER = logging.getLogger(__name__)
+
+# User-facing strings (see i18n.py).
+_STRINGS = {
+    "en": {
+        "preset_normal": "Normal",
+        "preset_unheated": "Unheated",
+        "group_default": "Default",
+        "temp_out_of_range": "Temperature out of range ({min}–{max} °C)",
+        "name_id_required": "Name and id required (a-z, 0-9, _)",
+        "preset_exists": "A mode with the id “{id}” already exists.",
+        "preset_builtin": "Default mode: cannot be deleted",
+        "group_exists": "A setpoint with the id “{id}” already exists.",
+        "group_builtin": "Default setpoint: cannot be deleted",
+        "unsupported_domain": "Unsupported domain: {domain}",
+        "entity_not_found": "entity not found",
+        "unknown_model": "unknown model",
+        "domain_not_allowed": "{key}: domain {domain} not allowed",
+        "device_preset_required": "Name, id and model required",
+        "device_preset_exists": "A device preset with the id “{id}” already exists.",
+        "device_preset_unknown": "Unknown device preset",
+        "unknown_room": "Unknown room",
+    },
+    "fr": {
+        "preset_normal": "Normal",
+        "preset_unheated": "Non chauffé",
+        "group_default": "Défaut",
+        "temp_out_of_range": "Température hors plage ({min}–{max} °C)",
+        "name_id_required": "Nom et id requis (a-z, 0-9, _)",
+        "preset_exists": "Un mode avec l'id « {id} » existe déjà.",
+        "preset_builtin": "Mode par défaut : non supprimable",
+        "group_exists": "Un setpoint avec l'id « {id} » existe déjà.",
+        "group_builtin": "Setpoint par défaut : non supprimable",
+        "unsupported_domain": "Domaine non géré : {domain}",
+        "entity_not_found": "entité introuvable",
+        "unknown_model": "modèle inconnu",
+        "domain_not_allowed": "{key} : domaine {domain} non autorisé",
+        "device_preset_required": "Nom, id et modèle requis",
+        "device_preset_exists": "Un device preset avec l'id « {id} » existe déjà.",
+        "device_preset_unknown": "Device preset inconnu",
+        "unknown_room": "Pièce inconnue",
+    },
+}
+
+# Built-in item id -> its default-name key: a built-in still carrying the
+# default name of any language is shown in the active language.
+_BUILTIN_PRESET_NAMES = {"normal": "preset_normal", "unheated": "preset_unheated"}
+
+
+def _localized(hass: HomeAssistant, key: str, name: str | None) -> str:
+    if not name or name in {_STRINGS[lang][key] for lang in _STRINGS}:
+        return tr(hass, _STRINGS, key)
+    return name
+
+
+def preset_name(hass: HomeAssistant, preset: dict) -> str:
+    """A heating mode's display name (built-in default names translated)."""
+    key = _BUILTIN_PRESET_NAMES.get(preset.get("id"))
+    name = preset.get("name") or preset.get("id") or ""
+    return _localized(hass, key, name) if key else name
+
+
+def group_name(hass: HomeAssistant, group: dict) -> str:
+    """A setpoint group's display name (the default group's translated)."""
+    if group.get("id") == DEFAULT_GROUP:
+        return _localized(hass, "group_default", group.get("name"))
+    return group.get("name") or group.get("id") or ""
 
 STORE_KEY = "homex_heating"
 STORE_HANDLE = "_heating_store"
@@ -148,11 +215,13 @@ async def _save(hass: HomeAssistant) -> None:
     await _store(hass).async_save(await _doc(hass))
 
 
-def _temp(value) -> float:
+def _temp(hass: HomeAssistant, value) -> float:
     """A setpoint rounded to the 0.5 °C step, within the allowed range."""
     temp = round(float(value) / TEMP_STEP) * TEMP_STEP
     if not TEMP_MIN <= temp <= TEMP_MAX:
-        raise vol.Invalid(f"Température hors plage ({TEMP_MIN}–{TEMP_MAX} °C)")
+        raise vol.Invalid(
+            tr(hass, _STRINGS, "temp_out_of_range", min=TEMP_MIN, max=TEMP_MAX)
+        )
     return temp
 
 
@@ -166,16 +235,20 @@ def _clean_id(value) -> str | None:
 @websocket_api.async_response
 async def ws_heating(hass: HomeAssistant, connection, msg) -> None:
     """Heating presets and heating groups."""
-    from .heating_zones import ensure_zones  # lazy: heating_zones imports us
+    from .heating_zones import ensure_zones, zone_label  # lazy: imports us
 
     doc = await _doc(hass)
     connection.send_result(
         msg["id"],
         {
-            "presets": doc["presets"],
-            "groups": doc["groups"],
+            "presets": [
+                {**p, "name": preset_name(hass, p)} for p in doc["presets"]
+            ],
+            "groups": [{**g, "name": group_name(hass, g)} for g in doc["groups"]],
             "device_presets": doc["device_presets"],
-            "zones": ensure_zones(doc),
+            "zones": [
+                {**z, "name": zone_label(hass, z)} for z in ensure_zones(doc)
+            ],
             "enabled": doc.get("enabled", True),
             "systems": doc.get("systems", []),
         },
@@ -203,13 +276,13 @@ async def ws_heating_preset_save(hass: HomeAssistant, connection, msg) -> None:
     pid = _clean_id(msg["preset"].get("id"))
     name = str(msg["preset"].get("name") or "").strip()
     if not pid or not name:
-        connection.send_error(msg["id"], "invalid", "Nom et id requis (a-z, 0-9, _)")
+        connection.send_error(msg["id"], "invalid", tr(hass, _STRINGS, "name_id_required"))
         return
     doc = await _doc(hass)
     existing = next((p for p in doc["presets"] if p.get("id") == pid), None)
     if existing is not None and msg["create"]:
         connection.send_error(
-            msg["id"], "id_exists", f"Un mode avec l'id « {pid} » existe déjà."
+            msg["id"], "id_exists", tr(hass, _STRINGS, "preset_exists", id=pid)
         )
         return
     if existing is not None:
@@ -235,7 +308,7 @@ async def ws_heating_preset_delete(hass: HomeAssistant, connection, msg) -> None
     pid = msg["preset_id"]
     preset = next((p for p in doc["presets"] if p.get("id") == pid), None)
     if preset is not None and preset.get("builtin"):
-        connection.send_error(msg["id"], "builtin", "Mode par défaut : non supprimable")
+        connection.send_error(msg["id"], "builtin", tr(hass, _STRINGS, "preset_builtin"))
         return
     doc["presets"] = [p for p in doc["presets"] if p.get("id") != pid]
     for group in doc["groups"]:
@@ -263,19 +336,19 @@ async def ws_heating_group_save(hass: HomeAssistant, connection, msg) -> None:
     gid = _clean_id(raw.get("id"))
     name = str(raw.get("name") or "").strip()
     if not gid or not name:
-        connection.send_error(msg["id"], "invalid", "Nom et id requis (a-z, 0-9, _)")
+        connection.send_error(msg["id"], "invalid", tr(hass, _STRINGS, "name_id_required"))
         return
     doc = await _doc(hass)
     existing = next((g for g in doc["groups"] if g.get("id") == gid), None)
     if existing is not None and msg["create"]:
         connection.send_error(
-            msg["id"], "id_exists", f"Un setpoint avec l'id « {gid} » existe déjà."
+            msg["id"], "id_exists", tr(hass, _STRINGS, "group_exists", id=gid)
         )
         return
     preset_ids = {p["id"] for p in doc["presets"]}
     try:
         setpoints = {
-            pid: _temp(value)
+            pid: _temp(hass, value)
             for pid, value in (raw.get("setpoints") or {}).items()
             if pid in preset_ids and value is not None
         }
@@ -320,7 +393,7 @@ async def ws_heating_group_save(hass: HomeAssistant, connection, msg) -> None:
 async def ws_heating_group_delete(hass: HomeAssistant, connection, msg) -> None:
     """Delete a heating group; its rooms fall back to the default group."""
     if msg["group_id"] == DEFAULT_GROUP:
-        connection.send_error(msg["id"], "builtin", "Setpoint par défaut : non supprimable")
+        connection.send_error(msg["id"], "builtin", tr(hass, _STRINGS, "group_builtin"))
         return
     doc = await _doc(hass)
     doc["groups"] = [g for g in doc["groups"] if g.get("id") != msg["group_id"]]
@@ -380,7 +453,7 @@ async def _apply_param(hass: HomeAssistant, entity_id: str, value) -> None:
     elif domain == "lock":
         service = "lock" if str(value) == "locked" else "unlock"
     else:
-        raise ValueError(f"Domaine non géré : {domain}")
+        raise ValueError(tr(hass, _STRINGS, "unsupported_domain", domain=domain))
     await hass.services.async_call(domain, service, data, blocking=True)
 
 
@@ -467,7 +540,7 @@ async def async_apply_device_preset(hass: HomeAssistant, preset: dict) -> list[d
                 continue
             entity_id = _param_entity(hass, dev.id, param)
             if entity_id is None:
-                failed.append({"param": key, "error": "entité introuvable"})
+                failed.append({"param": key, "error": tr(hass, _STRINGS, "entity_not_found")})
                 continue
             try:
                 await _apply_param(hass, entity_id, param["value"])
@@ -513,7 +586,7 @@ async def async_enforce_device(
             continue
         entity_id = _param_entity(hass, device_id, param)
         if entity_id is None:
-            failed.append({"param": key, "error": "entité introuvable"})
+            failed.append({"param": key, "error": tr(hass, _STRINGS, "entity_not_found")})
             continue
         if _param_matches(hass, entity_id, param["value"]) is not False:
             continue
@@ -832,7 +905,7 @@ async def ws_heating_models(hass: HomeAssistant, connection, msg) -> None:
             {
                 "model": key,
                 "label": " ".join(p for p in (dev.manufacturer, dev.model) if p)
-                or "modèle inconnu",
+                or tr(hass, _STRINGS, "unknown_model"),
                 "devices": [],
             },
         )
@@ -848,14 +921,18 @@ async def ws_heating_models(hass: HomeAssistant, connection, msg) -> None:
     )
 
 
-def _clean_params(raw: dict) -> dict:
+def _clean_params(hass: HomeAssistant, raw: dict) -> dict:
     params = {}
     for key, domains in DEVICE_PARAMS.items():
         param = (raw or {}).get(key)
         if not param or param.get("value") in (None, ""):
             continue
         if param.get("domain") not in domains:
-            raise vol.Invalid(f"{key} : domaine {param.get('domain')} non autorisé")
+            raise vol.Invalid(
+                tr(
+                    hass, _STRINGS, "domain_not_allowed", key=key, domain=param.get("domain")
+                )
+            )
         value = param["value"]
         if param["domain"] == "number":
             value = float(value)
@@ -885,17 +962,17 @@ async def ws_heating_device_preset_save(hass: HomeAssistant, connection, msg) ->
     name = str(raw.get("name") or "").strip()
     model = str(raw.get("model") or "")
     if not pid or not name or not model:
-        connection.send_error(msg["id"], "invalid", "Nom, id et modèle requis")
+        connection.send_error(msg["id"], "invalid", tr(hass, _STRINGS, "device_preset_required"))
         return
     doc = await _doc(hass)
     existing = next((p for p in doc["device_presets"] if p.get("id") == pid), None)
     if existing is not None and msg["create"]:
         connection.send_error(
-            msg["id"], "id_exists", f"Un device preset avec l'id « {pid} » existe déjà."
+            msg["id"], "id_exists", tr(hass, _STRINGS, "device_preset_exists", id=pid)
         )
         return
     try:
-        params = _clean_params(raw.get("params"))
+        params = _clean_params(hass, raw.get("params"))
     except (vol.Invalid, TypeError, ValueError) as err:
         connection.send_error(msg["id"], "invalid_param", str(err))
         return
@@ -954,7 +1031,7 @@ async def ws_heating_device_preset_apply(hass: HomeAssistant, connection, msg) -
         (p for p in doc["device_presets"] if p.get("id") == msg["preset_id"]), None
     )
     if preset is None:
-        connection.send_error(msg["id"], "not_found", "Device preset inconnu")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "device_preset_unknown"))
         return
     results = await async_apply_device_preset(hass, preset)
     connection.send_result(msg["id"], {"ok": True, "results": results})
@@ -1023,10 +1100,10 @@ async def ws_heating_room_status(hass: HomeAssistant, connection, msg) -> None:
     room_id = msg["room_id"]
     heating = _room_heating_cfg(hass, room_id)
     if heating is None:
-        connection.send_error(msg["id"], "not_found", "Unknown room")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_room"))
         return
     mode = room_mode(hass, room_id, heating)
-    name = next((p["name"] for p in doc["presets"] if p["id"] == mode), mode)
+    name = next((preset_name(hass, p) for p in doc["presets"] if p["id"] == mode), mode)
     off = mode == UNHEATED and unheated_cuts(hass, room_id)
     connection.send_result(
         msg["id"],

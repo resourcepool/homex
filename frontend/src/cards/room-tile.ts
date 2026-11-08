@@ -28,7 +28,7 @@
  * heating) instead of its lights, shows the radiators' setpoint, and leaves
  * out air quality, shutters and scenes.
  */
-import { LitElement, css, html, nothing } from "lit";
+import { LitElement, css, html, nothing, type PropertyValues } from "lit";
 import { property, state } from "lit/decorators.js";
 import {
   mdiChartBubble,
@@ -60,6 +60,7 @@ import {
 } from "./shared";
 import "./room-detail";
 import type { HomexRoomDetail } from "./room-detail";
+import { loadLanguageSetting, onLanguageChange, syncHass, t } from "../lib/i18n";
 
 export interface RoomTileConfig {
   type: string;
@@ -93,6 +94,7 @@ export class HomexRoomTile extends LitElement {
   @state() private _config?: RoomTileConfig;
   @state() private _room?: Room;
   private _detail?: HomexRoomDetail;
+  private _unlisten?: () => void;
 
   static getStubConfig() {
     return { room: "" };
@@ -103,9 +105,21 @@ export class HomexRoomTile extends LitElement {
   }
 
   setConfig(config: RoomTileConfig) {
-    if (!config) throw new Error("homex-room-tile: configuration requise");
+    if (!config) throw new Error(t("cardRoomTile.config_required"));
     if (config.room !== this._config?.room) this._room = undefined;
     this._config = config;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this._unlisten = onLanguageChange(() => this.requestUpdate());
+  }
+
+  willUpdate(changed: PropertyValues) {
+    if (changed.has("hass") && this.hass) {
+      syncHass(this.hass);
+      loadLanguageSetting(this.hass);
+    }
   }
 
   updated() {
@@ -121,6 +135,8 @@ export class HomexRoomTile extends LitElement {
 
   disconnectedCallback() {
     super.disconnectedCallback();
+    this._unlisten?.();
+    this._unlisten = undefined;
     this._detail?.close();
   }
 
@@ -146,8 +162,8 @@ export class HomexRoomTile extends LitElement {
   /** The radiators' target temperature (the first valve's). */
   private _setpoint(): number | undefined {
     const valves = roomValves(this.hass, this._room).filter((v) => this.hass.states[v]);
-    const t = valves.length ? this.hass.states[valves[0]].attributes.temperature : undefined;
-    return typeof t === "number" ? t : undefined;
+    const temp = valves.length ? this.hass.states[valves[0]].attributes.temperature : undefined;
+    return typeof temp === "number" ? temp : undefined;
   }
 
   private get _isLights() {
@@ -256,13 +272,13 @@ export class HomexRoomTile extends LitElement {
     // The room heating switch is live; the fetched room config may be stale.
     const sw = this.hass.states[`switch.homex_${this._config!.room}_heating`];
     const enabled = sw ? sw.state !== "off" : this._room.heating.enabled !== false;
-    if (!enabled) return this._status(mdiFireOff, "off", "Pièce non chauffée");
+    if (!enabled) return this._status(mdiFireOff, "off", t("cardRoomTile.room_unheated"));
     const demand = roomValves(this.hass, this._room).some(
       (v) => this.hass.states[v]?.attributes.hvac_action === "heating"
     );
     return demand
-      ? this._status(mdiFire, "heat", "En chauffe")
-      : this._status(mdiFire, "", "Pas de demande de chauffe");
+      ? this._status(mdiFire, "heat", t("cardRoomTile.heating"))
+      : this._status(mdiFire, "", t("cardRoomTile.no_demand"));
   }
 
   private _shutterStatus() {
@@ -273,9 +289,9 @@ export class HomexRoomTile extends LitElement {
     if (!covers.length) return nothing;
     const pos = covers.map(coverPosition);
     const avg = Math.round(pos.reduce((a, b) => a + b, 0) / pos.length);
-    if (pos.every((p) => p === 0)) return this._status(mdiWindowShutter, "", "Volets fermés");
-    if (pos.every((p) => p === 100)) return this._status(mdiWindowShutterOpen, "", "Volets ouverts");
-    return this._status(SHUTTER_HALF, "", `Volets ouverts à ${avg} %`);
+    if (pos.every((p) => p === 0)) return this._status(mdiWindowShutter, "", t("cardRoomTile.shutters_closed"));
+    if (pos.every((p) => p === 100)) return this._status(mdiWindowShutterOpen, "", t("cardRoomTile.shutters_open"));
+    return this._status(SHUTTER_HALF, "", t("cardRoomTile.shutters_partial", { pos: avg }));
   }
 
   private _status(path: string, cls: string, title: string) {
@@ -284,7 +300,7 @@ export class HomexRoomTile extends LitElement {
 
   render() {
     if (!this._config || !this.hass) return nothing;
-    if (!this._config.room) return html`<ha-card class="empty">Choisir une pièce Homex</ha-card>`;
+    if (!this._config.room) return html`<ha-card class="empty">${t("cardRoomTile.choose_room")}</ha-card>`;
     const st = this.hass.states[this._entity];
     const on = st?.state === "on";
     const heating = this._entity.endsWith("_heating");
@@ -301,24 +317,24 @@ export class HomexRoomTile extends LitElement {
             ? mdiLightbulbOutline
             : undefined;
     const title = !st
-      ? "Introuvable"
+      ? t("cardRoomTile.not_found")
       : st.state === "unavailable"
-        ? "Indisponible"
+        ? t("cardRoomTile.unavailable")
         : this._climate
           ? on
-            ? "Pièce chauffée — ne plus chauffer"
-            : "Pièce non chauffée — chauffer"
+            ? t("cardRoomTile.heated_toggle")
+            : t("cardRoomTile.unheated_toggle")
           : light === "lit"
-          ? "Allumée — éteindre"
+          ? t("cardRoomTile.lit_toggle")
           : light === "stray"
-            ? "Éteinte, mais au moins une lumière est allumée — allumer"
+            ? t("cardRoomTile.stray_toggle")
             : light === "off"
-              ? "Éteinte — allumer"
+              ? t("cardRoomTile.off_toggle")
               : (this.hass.formatEntityState?.(st) ?? st.state);
     const noAction = this._noAction;
     const locked = !noAction && this._config.toggle === false;
     const missing = !noAction && (!st || st.state === "unavailable");
-    const t = roomMetric(this.hass, this._config.room, "temperature");
+    const temp = roomMetric(this.hass, this._config.room, "temperature");
     const h = roomMetric(this.hass, this._config.room, "humidity");
     const air = this._air();
     const scenes = this._scenes();
@@ -329,7 +345,7 @@ export class HomexRoomTile extends LitElement {
         : undefined;
     const heatingS = this._heatingStatus();
     const shutterS = this._shutterStatus();
-    const hasRight = t || h || heatingS !== nothing || shutterS !== nothing;
+    const hasRight = temp || h || heatingS !== nothing || shutterS !== nothing;
     return html`<ha-card
       class="${on && !noAction && !locked ? "on" : ""} ${noAction || locked ? "static" : ""}"
       style=${this._config.color
@@ -357,16 +373,16 @@ export class HomexRoomTile extends LitElement {
             ? html`<div class="sub setpoint">
                 ${on
                   ? setpoint !== undefined
-                    ? html`${icon(mdiThermostat)}<span>Consigne ${fmt(this.hass, setpoint, 1, 1)} °C</span>`
-                    : "Pièce chauffée"
-                  : "Pièce non chauffée"}
+                    ? html`${icon(mdiThermostat)}<span>${t("cardRoomTile.setpoint", { value: fmt(this.hass, setpoint, 1, 1) })}</span>`
+                    : t("cardRoomTile.room_heated")
+                  : t("cardRoomTile.room_unheated")}
               </div>`
             : nothing}
           ${air.length
             ? html`<div class="pills">
                 ${air.map(
                   (p) =>
-                    html`<span class="pill l${p!.level}" title=${`${p!.label} : ${fmt(this.hass, p!.value, 1)} ${p!.unit ?? ""}`}
+                    html`<span class="pill l${p!.level}" title=${t("cardRoomTile.metric_title", { label: p!.label, value: fmt(this.hass, p!.value, 1), unit: p!.unit ?? "" })}
                       ><span class="picto">${icon(p!.path)}${p!.tag ? html`<small>${p!.tag}</small>` : nothing}</span
                       ><span class="pval">${fmt(this.hass, p!.value, 0)}</span></span
                     >`
@@ -375,11 +391,11 @@ export class HomexRoomTile extends LitElement {
             : nothing}
         </div>
         ${hasRight
-          ? html`<button class="right" title="État de la pièce" @click=${this._openDetail}>
+          ? html`<button class="right" title=${t("cardRoomTile.room_status")} @click=${this._openDetail}>
               <span class="statuses">${shutterS}${heatingS}</span>
-              ${t || h
+              ${temp || h
                 ? html`<span class="readings">
-                    ${t ? html`<span class="temp">${fmt(this.hass, t.value, 1, 1)} ${t.unit ?? "°C"}</span>` : nothing}
+                    ${temp ? html`<span class="temp">${fmt(this.hass, temp.value, 1, 1)} ${temp.unit ?? "°C"}</span>` : nothing}
                     ${h ? html`<span class="hum">${fmt(this.hass, h.value, 0)} %</span>` : nothing}
                   </span>`
                 : nothing}
@@ -388,7 +404,7 @@ export class HomexRoomTile extends LitElement {
       </div>
       ${scenes.length
         ? html`<div class="scenes" @click=${(e: Event) => e.stopPropagation()}>
-            <span class="scenes-icon" title="Scènes">${icon(mdiPalette)}</span>
+            <span class="scenes-icon" title=${t("cardRoomTile.scenes")}>${icon(mdiPalette)}</span>
             <div class="group">
             ${scenes.map(
               (s) =>

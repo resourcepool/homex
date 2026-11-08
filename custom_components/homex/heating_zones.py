@@ -55,8 +55,37 @@ from .heating import (
     _save,
     tolerance_mode,
 )
+from .i18n import tr
 
 _LOGGER = logging.getLogger(__name__)
+
+# User-facing strings (see i18n.py).
+_STRINGS = {
+    "en": {
+        "zone_default": "Default",
+        "global": "Global",
+        "entity_mode": "Mode",
+        "entity_tolerance": "Tolerance",
+        "entity_heating_needed": "Heating needed",
+        "unknown_zone_or_mode": "Unknown zone or mode: {zone} / {mode}",
+        "name_id_required": "Name and id required (a-z, 0-9, _)",
+        "zone_exists": "A zone with the id “{id}” already exists.",
+        "zone_builtin": "Default zone: cannot be deleted",
+        "unknown_zone": "Unknown zone",
+    },
+    "fr": {
+        "zone_default": "Défaut",
+        "global": "Global",
+        "entity_mode": "Mode",
+        "entity_tolerance": "Tolérance",
+        "entity_heating_needed": "Chauffage nécessaire",
+        "unknown_zone_or_mode": "Zone ou mode inconnu : {zone} / {mode}",
+        "name_id_required": "Nom et id requis (a-z, 0-9, _)",
+        "zone_exists": "Une zone avec l'id « {id} » existe déjà.",
+        "zone_builtin": "Zone par défaut : non supprimable",
+        "unknown_zone": "Zone inconnue",
+    },
+}
 
 HEATING_ZONES = "_heating_zones"
 TOLERANCE_PREFIX = "homex_climate_tolerance_mode_zone_"
@@ -82,13 +111,25 @@ def ensure_zones(doc: dict) -> list[dict]:
     return zones
 
 
+def zone_label(hass: HomeAssistant, zone: dict) -> str:
+    """A zone's display name: the default zone still carrying the default
+    name of any language is shown in the active language."""
+    name = zone.get("name") or zone.get("id") or ""
+    if zone.get("id") == DEFAULT_ZONE and (
+        not zone.get("name")
+        or name in {_STRINGS[lang]["zone_default"] for lang in _STRINGS}
+    ):
+        return tr(hass, _STRINGS, "zone_default")
+    return name
+
+
 def zone_name(hass: HomeAssistant, zone_id: str | None) -> str:
     """A zone's display name ("Global" for None), for entity names."""
     if zone_id is None:
-        return "Global"
+        return tr(hass, _STRINGS, "global")
     doc = hass.data.get(DOMAIN, {}).get(STORE_DATA) or {}
     zone = next((z for z in doc.get("zones", []) if z["id"] == zone_id), None)
-    return zone["name"] if zone else zone_id
+    return zone_label(hass, zone) if zone else zone_id
 
 
 def zones_manager(hass: HomeAssistant) -> "HeatingZones":
@@ -134,7 +175,9 @@ class HeatingZones:
     async def async_set_mode(self, zone_id: str, mode_id: str) -> None:
         zone = next((z for z in await self.zones() if z["id"] == zone_id), None)
         if zone is None or not any(m["id"] == mode_id for m in await self.modes()):
-            raise vol.Invalid(f"Zone ou mode inconnu : {zone_id} / {mode_id}")
+            raise vol.Invalid(
+                tr(self.hass, _STRINGS, "unknown_zone_or_mode", zone=zone_id, mode=mode_id)
+            )
         if zone.get("mode") == mode_id:
             return
         zone["mode"] = mode_id
@@ -452,7 +495,11 @@ class ZoneModeSelect(SelectEntity):
 
     @property
     def name(self) -> str:
-        return hx_name("Climate", zone_name(self.hass, self.zone_id), "Mode")
+        return hx_name(
+            "Climate",
+            zone_name(self.hass, self.zone_id),
+            tr(self.hass, _STRINGS, "entity_mode"),
+        )
 
     @property
     def options(self) -> list[str]:
@@ -499,7 +546,11 @@ class ZoneToleranceSelect(SelectEntity):
 
     @property
     def name(self) -> str:
-        return hx_name("Climate", zone_name(self.hass, self.zone_id), "Tolérance")
+        return hx_name(
+            "Climate",
+            zone_name(self.hass, self.zone_id),
+            tr(self.hass, _STRINGS, "entity_tolerance"),
+        )
 
     @property
     def current_option(self) -> str:
@@ -528,7 +579,11 @@ class HeatingNeededSensor(BinarySensorEntity):
 
     @property
     def name(self) -> str:
-        return hx_name("Climate", zone_name(self.hass, self.zone_id), "Chauffage nécessaire")
+        return hx_name(
+            "Climate",
+            zone_name(self.hass, self.zone_id),
+            tr(self.hass, _STRINGS, "entity_heating_needed"),
+        )
 
     @property
     def is_on(self) -> bool:
@@ -561,14 +616,14 @@ async def ws_heating_zone_save(hass: HomeAssistant, connection, msg) -> None:
     zid = _clean_id(raw.get("id"))
     name = str(raw.get("name") or "").strip()
     if not zid or not name:
-        connection.send_error(msg["id"], "invalid", "Nom et id requis (a-z, 0-9, _)")
+        connection.send_error(msg["id"], "invalid", tr(hass, _STRINGS, "name_id_required"))
         return
     manager = zones_manager(hass)
     zones = await manager.zones()
     existing = next((z for z in zones if z["id"] == zid), None)
     if existing is not None and msg["create"]:
         connection.send_error(
-            msg["id"], "id_exists", f"Une zone avec l'id « {zid} » existe déjà."
+            msg["id"], "id_exists", tr(hass, _STRINGS, "zone_exists", id=zid)
         )
         return
     mode_ids = {m["id"] for m in await manager.modes()}
@@ -616,7 +671,7 @@ async def ws_heating_zone_save(hass: HomeAssistant, connection, msg) -> None:
 async def ws_heating_zone_delete(hass: HomeAssistant, connection, msg) -> None:
     """Delete a zone; its rooms fall back to the default zone."""
     if msg["zone_id"] == DEFAULT_ZONE:
-        connection.send_error(msg["id"], "builtin", "Zone par défaut : non supprimable")
+        connection.send_error(msg["id"], "builtin", tr(hass, _STRINGS, "zone_builtin"))
         return
     manager = zones_manager(hass)
     doc = await _doc(hass)
@@ -659,7 +714,7 @@ async def ws_heating_room_zone(hass: HomeAssistant, connection, msg) -> None:
     manager = zones_manager(hass)
     zones = await manager.zones()
     if not any(z["id"] == msg["zone_id"] for z in zones):
-        connection.send_error(msg["id"], "not_found", "Zone inconnue")
+        connection.send_error(msg["id"], "not_found", tr(hass, _STRINGS, "unknown_zone"))
         return
     room_id = msg["room_id"]
     for zone in zones:

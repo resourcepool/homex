@@ -3,6 +3,7 @@ import { customElement, property, state } from "lit/decorators.js";
 import type { Room } from "../types";
 import { sharedStyles } from "../lib/styles";
 import "./homex-dialog";
+import { t } from "../lib/i18n";
 
 /** Double-quote a YAML scalar, escaping backslashes and quotes. */
 const yamlStr = (s: string): string =>
@@ -96,12 +97,12 @@ export class HomexExportDialog extends LitElement {
     return html`
       <homex-dialog
         .open=${this.open}
-        heading="Exposer les pièces (Google Assistant)"
+        heading=${t("exportDialog.heading")}
         @dialog-closed=${this._close}
       >
         <p class="hint">
-          Colle cet extrait dans <code>configuration.yaml</code> pour exposer le
-          toggle on/off de chaque pièce à Google Assistant.
+          ${t("exportDialog.hint_before")} <code>configuration.yaml</code>
+          ${t("exportDialog.hint_after")}
         </p>
         <textarea
           readonly
@@ -109,10 +110,10 @@ export class HomexExportDialog extends LitElement {
           @click=${(e: Event) => (e.target as HTMLTextAreaElement).select()}
         ></textarea>
         <span slot="actions">
-          <button @click=${this._download}>Télécharger .yaml</button>
-          <button @click=${this._close}>Fermer</button>
+          <button @click=${this._download}>${t("exportDialog.download")}</button>
+          <button @click=${this._close}>${t("common.close")}</button>
           <button class="primary" @click=${this._copy}>
-            ${this._copied ? "Copié ✓" : "Copier"}
+            ${this._copied ? t("exportDialog.copied") : t("exportDialog.copy")}
           </button>
         </span>
       </homex-dialog>

@@ -1,0 +1,31 @@
+/** Strings of components/homex-heating-group-editor.ts. */
+export default {
+  en: {
+    minus: "−0.5 °C",
+    plus: "+0.5 °C",
+    delete_confirm: "Delete the setpoint “{name}”? Its rooms go back to the default setpoint.",
+    name: "Name",
+    name_placeholder: "Bedrooms",
+    id: "Id",
+    id_label: "Id: {id}",
+    setpoints: "Temperature setpoints",
+    heating_off: "Heating off",
+    rooms: "Rooms",
+    default_hint: "Applies to every room that is in no other setpoint.",
+    rooms_hint: "A room belongs to one setpoint only: ticking it removes it from its current setpoint.",
+  } as Record<string, string>,
+  fr: {
+    minus: "−0,5 °C",
+    plus: "+0,5 °C",
+    delete_confirm: "Supprimer le setpoint « {name} » ? Ses pièces repassent dans le setpoint par défaut.",
+    name: "Nom",
+    name_placeholder: "Chambres",
+    id: "Id",
+    id_label: "Id : {id}",
+    setpoints: "Consignes de température",
+    heating_off: "Chauffage coupé",
+    rooms: "Pièces",
+    default_hint: "S'applique à toutes les pièces qui ne sont dans aucun autre setpoint.",
+    rooms_hint: "Une pièce n'appartient qu'à un setpoint : la cocher la retire de son setpoint actuel.",
+  } as Record<string, string>,
+};

@@ -9,6 +9,7 @@ import type {
 } from "../types";
 import { deleteHeatingZone, errorMessage, saveHeatingZone } from "../api";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import { textField, toggleSwitch } from "../lib/fields";
 import { slugify } from "../lib/slug";
 import "./homex-trigger-selector";
@@ -120,14 +121,14 @@ export class HomexHeatingZoneEditor extends LitElement {
       );
       this._close();
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
       this._busy = false;
     }
   }
 
   private async _delete() {
     if (!this.zone) return;
-    if (!confirm(`Supprimer la zone « ${this.zone.name} » ? Ses pièces repassent dans la zone par défaut.`)) {
+    if (!confirm(t("heatingZoneEditor.delete_confirm", { name: this.zone.name }))) {
       return;
     }
     this._busy = true;
@@ -135,7 +136,7 @@ export class HomexHeatingZoneEditor extends LitElement {
       await deleteHeatingZone(this.hass, this.zone.id);
       this._close();
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
       this._busy = false;
     }
   }
@@ -143,31 +144,26 @@ export class HomexHeatingZoneEditor extends LitElement {
   render() {
     const editing = !!this.zone;
     return html`
-      ${textField("Nom", this._name, (v) => {
+      ${textField(t("heatingZoneEditor.name"), this._name, (v) => {
         this._name = v;
         if (!this._idEdited) this._id = slugify(v);
-      }, "Studio")}
+      }, t("heatingZoneEditor.name_placeholder"))}
       ${editing
-        ? html`<div class="section">Id : ${this.zone!.id}</div>`
-        : textField("Id", this._id, (v) => {
+        ? html`<div class="section">${t("heatingZoneEditor.id_label", { id: this.zone!.id })}</div>`
+        : textField(t("heatingZoneEditor.id"), this._id, (v) => {
             this._idEdited = true;
             this._id = slugify(v);
           })}
       ${this._id
         ? html`<p class="hint">
-            Entité de commande : <code>select.homex_heating_${this._id}</code>
+            ${t("heatingZoneEditor.control_entity")} <code>select.homex_heating_${this._id}</code>
           </p>`
         : ""}
 
-      <div class="section">Pièces</div>
+      <div class="section">${t("heatingZoneEditor.rooms")}</div>
       ${this._isDefault
-        ? html`<p class="hint">
-            Contient toutes les pièces qui ne sont dans aucune autre zone.
-          </p>`
-        : html`<p class="hint">
-              Une pièce n'appartient qu'à une zone : la cocher la retire de sa zone
-              actuelle.
-            </p>
+        ? html`<p class="hint">${t("heatingZoneEditor.default_hint")}</p>`
+        : html`<p class="hint">${t("heatingZoneEditor.rooms_hint")}</p>
             <div class="rooms">
               ${this.rooms.map((r) => {
                 const other = this._otherZone(r.room_id);
@@ -185,17 +181,14 @@ export class HomexHeatingZoneEditor extends LitElement {
               })}
             </div>`}
 
-      <div class="section">Déclencheurs par mode</div>
-      <p class="hint">
-        Chaque déclencheur passe la zone dans le mode correspondant. Les boutons
-        d'interrupteurs se configurent aussi dans le Switch Manager (module 🔥 Climate).
-      </p>
+      <div class="section">${t("heatingZoneEditor.triggers")}</div>
+      <p class="hint">${t("heatingZoneEditor.triggers_hint")}</p>
       ${this.modes.map((m) => {
         const specs = this._triggers[m.id] ?? [];
         return html`<details class="mode" ?open=${specs.length > 0}>
           <summary>
             ${m.name}
-            <span class="count">· ${specs.length} déclencheur(s)</span>
+            <span class="count">${t("heatingZoneEditor.trigger_count", { count: specs.length })}</span>
           </summary>
           <homex-trigger-selector
             .hass=${this.hass}
@@ -212,12 +205,12 @@ export class HomexHeatingZoneEditor extends LitElement {
           ?disabled=${this._busy || !this._name.trim() || !this._id}
           @click=${this._save}
         >
-          Enregistrer
+          ${t("common.save")}
         </button>
-        <button ?disabled=${this._busy} @click=${this._close}>Annuler</button>
+        <button ?disabled=${this._busy} @click=${this._close}>${t("common.cancel")}</button>
         ${editing && !this.zone!.builtin
           ? html`<button class="danger" ?disabled=${this._busy} @click=${this._delete}>
-              Supprimer
+              ${t("common.delete")}
             </button>`
           : ""}
       </div>

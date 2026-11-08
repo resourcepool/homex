@@ -4,6 +4,7 @@ import { repeat } from "lit/directives/repeat.js";
 import { keyed } from "lit/directives/keyed.js";
 import type { HomeAssistant } from "../types";
 import { haComponentsLoaded } from "../lib/ha-elements";
+import { t } from "../lib/i18n";
 
 /**
  * Multi-entity selector. Uses Home Assistant's native `ha-entities-picker`
@@ -215,7 +216,7 @@ export class HomexEntityPicker extends LitElement {
             html`<span class="chip"
               >${this._friendly(id)}<button
                 class="chipx"
-                title="Retirer"
+                title=${t("entityPicker.remove")}
                 @click=${() => this._remove(id)}
               >
                 ×</button
@@ -225,7 +226,7 @@ export class HomexEntityPicker extends LitElement {
       </div>
       <input
         .value=${this._query}
-        placeholder="Rechercher une entité…"
+        placeholder=${t("entityPicker.search")}
         autocomplete="off"
         @focus=${() => (this._open = true)}
         @input=${(e: Event) => {
@@ -242,7 +243,7 @@ export class HomexEntityPicker extends LitElement {
                     <span>${this._friendly(id)}</span><span class="sid">${id}</span>
                   </div>`
                 )
-              : html`<div class="sugg empty">Aucune entité</div>`}
+              : html`<div class="sugg empty">${t("entityPicker.no_entity")}</div>`}
           </div>`
         : ""}
     `;

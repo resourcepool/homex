@@ -4,6 +4,7 @@ import { mdiMinus, mdiPlus } from "@mdi/js";
 import type { HeatingGroup, HeatingPreset, HomeAssistant, Room } from "../types";
 import { deleteHeatingGroup, errorMessage, saveHeatingGroup } from "../api";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import { textField, toggleSwitch } from "../lib/fields";
 import { slugify } from "../lib/slug";
 
@@ -161,11 +162,11 @@ export class HomexHeatingGroupEditor extends LitElement {
   }
 
   /** −/+ stepper (0.5 °C) for one heating mode's setpoint. */
-  private _stepper(presetId: string, t: number | undefined) {
+  private _stepper(presetId: string, temp: number | undefined) {
     return html`<div class="stepper">
       <button
-        title="−0,5 °C"
-        @click=${() => this._setTemp(presetId, (t ?? 20) - TEMP_STEP)}
+        title=${t("heatingGroupEditor.minus")}
+        @click=${() => this._setTemp(presetId, (temp ?? 20) - TEMP_STEP)}
       >
         <svg viewBox="0 0 24 24"><path d=${mdiMinus}></path></svg>
       </button>
@@ -175,14 +176,14 @@ export class HomexHeatingGroupEditor extends LitElement {
         min=${TEMP_MIN}
         max=${TEMP_MAX}
         step=${TEMP_STEP}
-        .value=${t != null ? String(t) : ""}
+        .value=${temp != null ? String(temp) : ""}
         placeholder="—"
         @change=${(e: Event) =>
           this._setTemp(presetId, parseFloat((e.target as HTMLInputElement).value))}
       />
       <button
-        title="+0,5 °C"
-        @click=${() => this._setTemp(presetId, (t ?? 20) + TEMP_STEP)}
+        title=${t("heatingGroupEditor.plus")}
+        @click=${() => this._setTemp(presetId, (temp ?? 20) + TEMP_STEP)}
       >
         <svg viewBox="0 0 24 24"><path d=${mdiPlus}></path></svg>
       </button>
@@ -215,14 +216,14 @@ export class HomexHeatingGroupEditor extends LitElement {
       );
       this._close();
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
       this._busy = false;
     }
   }
 
   private async _delete() {
     if (!this.group) return;
-    if (!confirm(`Supprimer le setpoint « ${this.group.name} » ? Ses pièces repassent dans le setpoint par défaut.`)) {
+    if (!confirm(t("heatingGroupEditor.delete_confirm", { name: this.group.name }))) {
       return;
     }
     this._busy = true;
@@ -230,7 +231,7 @@ export class HomexHeatingGroupEditor extends LitElement {
       await deleteHeatingGroup(this.hass, this.group.id);
       this._close();
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
       this._busy = false;
     }
   }
@@ -238,44 +239,39 @@ export class HomexHeatingGroupEditor extends LitElement {
   render() {
     const editing = !!this.group;
     return html`
-      ${textField("Nom", this._name, (v) => this._onName(v), "Chambres")}
+      ${textField(t("heatingGroupEditor.name"), this._name, (v) => this._onName(v), t("heatingGroupEditor.name_placeholder"))}
       ${editing
-        ? html`<div class="section">Id : ${this.group!.id}</div>`
-        : textField("Id", this._id, (v) => {
+        ? html`<div class="section">${t("heatingGroupEditor.id_label", { id: this.group!.id })}</div>`
+        : textField(t("heatingGroupEditor.id"), this._id, (v) => {
             this._idEdited = true;
             this._id = slugify(v);
           })}
 
-      <div class="section">Consignes de température</div>
+      <div class="section">${t("heatingGroupEditor.setpoints")}</div>
       ${this.presets.map((p) => {
-        const t = this._setpoints[p.id];
+        const temp = this._setpoints[p.id];
         if (p.unheated) {
           // Unheated: heating cut (no setpoint), or a temperature (frost guard…).
-          const cut = t == null;
+          const cut = temp == null;
           return html`<div class="setpoint">
             <span class="label">${p.name}</span>
             <label class="cut">
               ${toggleSwitch(cut, (on) => this._setUnheatedCut(p.id, on))}
-              Chauffage coupé
+              ${t("heatingGroupEditor.heating_off")}
             </label>
-            ${cut ? "" : this._stepper(p.id, t)}
+            ${cut ? "" : this._stepper(p.id, temp)}
           </div>`;
         }
         return html`<div class="setpoint">
           <span class="label">${p.name}</span>
-          ${this._stepper(p.id, t)}
+          ${this._stepper(p.id, temp)}
         </div>`;
       })}
 
-      <div class="section">Pièces</div>
+      <div class="section">${t("heatingGroupEditor.rooms")}</div>
       ${this._isDefault
-        ? html`<p class="hint">
-            S'applique à toutes les pièces qui ne sont dans aucun autre setpoint.
-          </p>`
-        : html`<p class="hint">
-              Une pièce n'appartient qu'à un setpoint : la cocher la retire de son
-              setpoint actuel.
-            </p>
+        ? html`<p class="hint">${t("heatingGroupEditor.default_hint")}</p>`
+        : html`<p class="hint">${t("heatingGroupEditor.rooms_hint")}</p>
             <div class="rooms">
               ${this.rooms.map((r) => {
                 const other = this._otherGroup(r.room_id);
@@ -299,12 +295,12 @@ export class HomexHeatingGroupEditor extends LitElement {
           ?disabled=${this._busy || !this._name.trim() || !this._id}
           @click=${this._save}
         >
-          Enregistrer
+          ${t("common.save")}
         </button>
-        <button ?disabled=${this._busy} @click=${this._close}>Annuler</button>
+        <button ?disabled=${this._busy} @click=${this._close}>${t("common.cancel")}</button>
         ${editing && !this.group!.builtin
           ? html`<button class="danger" ?disabled=${this._busy} @click=${this._delete}>
-              Supprimer
+              ${t("common.delete")}
             </button>`
           : ""}
       </div>

@@ -4,6 +4,7 @@ import type { HomeAssistant, ShutterPreset } from "../types";
 import { fetchShutterPresets } from "../api";
 import { goBack, joinPath, navigate, segments } from "../lib/router";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import "./homex-shutter-preset-editor";
 
 /** Shutter Manager page: manage Shutter Device Presets (per shutter model). */
@@ -125,18 +126,18 @@ export class HomexShutterManager extends LitElement {
       if (id && !edit) {
         return html`
           <div class="head">
-            <button @click=${this._onClosed}>← Presets</button>
+            <button @click=${this._onClosed}>← ${t("shutterManager.presets")}</button>
             <h2></h2>
           </div>
           <div class="msg">
-            ${this._loaded ? `« ${id} » introuvable.` : "Chargement…"}
+            ${this._loaded ? t("shutterManager.not_found", { id }) : t("common.loading")}
           </div>
         `;
       }
       return html`
         <div class="head">
-          <button @click=${this._onClosed}>← Presets</button>
-          <h2>${edit ? "Modifier le preset" : "Nouveau shutter device preset"}</h2>
+          <button @click=${this._onClosed}>← ${t("shutterManager.presets")}</button>
+          <h2>${edit ? t("shutterManager.edit_preset") : t("shutterManager.new_preset")}</h2>
         </div>
         <div class="editor">
           <homex-shutter-preset-editor
@@ -150,21 +151,18 @@ export class HomexShutterManager extends LitElement {
     return html`
       <div class="head">
         <button @click=${this._back}>← Homex</button>
-        <h2>Shutter Manager</h2>
+        <h2>${t("shutterManager.title")}</h2>
         <button
           class="primary"
           @click=${() => this._openEditor()}
         >
-          ＋ Preset
+          ${t("shutterManager.add_preset")}
         </button>
       </div>
       ${!this._loaded
-        ? html`<div class="msg">Chargement…</div>`
+        ? html`<div class="msg">${t("common.loading")}</div>`
         : !this._presets.length
-          ? html`<div class="msg">
-              Aucun shutter device preset. Clique sur « ＋ Preset » pour définir
-              le pilotage d'un modèle de volet.
-            </div>`
+          ? html`<div class="msg">${t("shutterManager.no_presets")}</div>`
           : html`<div class="grid">
               ${this._presets.map(
                 (p) => html`<div
@@ -175,7 +173,7 @@ export class HomexShutterManager extends LitElement {
                   <div class="info">
                     <div class="name">${p.name}</div>
                     <div class="meta">
-                      ${p.model_label}${p.smart_toggle ? " · permutation intelligente" : ""}
+                      ${p.model_label}${p.smart_toggle ? t("shutterManager.smart_toggle") : ""}
                     </div>
                   </div>
                 </div>`

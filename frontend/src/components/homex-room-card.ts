@@ -43,6 +43,7 @@ import { roomIsHeating, roomZoneMode, stuckWarning } from "../lib/climate";
 import { openHaPage } from "../lib/router";
 import { defaultShutterGroup, shutterSummary } from "../lib/shutter";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import "./homex-unit-controls";
 import "./homex-group-row";
 import "./homex-room-dialog";
@@ -527,7 +528,7 @@ export class HomexRoomCard extends LitElement {
       this._dialog = "";
       fireChanged(this);
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     } finally {
       this._deleting = false;
     }
@@ -539,11 +540,10 @@ export class HomexRoomCard extends LitElement {
     try {
       const res = await syncLabels(this.hass, this.room.entry_id);
       alert(
-        `Synchronisé : ${res.updated} entité(s) (area + labels), ` +
-          `${res.scenes_renamed} scène(s) renommée(s).`
+        t("roomCard.synced", { entities: res.updated, scenes: res.scenes_renamed })
       );
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     } finally {
       this._syncing = false;
     }
@@ -558,7 +558,7 @@ export class HomexRoomCard extends LitElement {
     try {
       await sceneNext(this.hass, this.room.entry_id);
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   };
 
@@ -567,7 +567,7 @@ export class HomexRoomCard extends LitElement {
     try {
       await dimRoom(this.hass, this.room.entry_id, delta);
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   };
 
@@ -582,12 +582,12 @@ export class HomexRoomCard extends LitElement {
   };
 
   private async _deleteScene(scene: Scene) {
-    if (!confirm(`Supprimer la scène "${scene.name}" ?`)) return;
+    if (!confirm(t("roomCard.confirm_delete_scene", { name: scene.name }))) return;
     try {
       await deleteScene(this.hass, this.room.entry_id, scene.key);
       fireChanged(this);
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   }
 
@@ -600,7 +600,7 @@ export class HomexRoomCard extends LitElement {
       await reorderScenes(this.hass, this.room.entry_id, keys);
       fireChanged(this);
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   }
 
@@ -625,24 +625,24 @@ export class HomexRoomCard extends LitElement {
     return html`
       <div class="scene-row">
         ${sc.orderable
-          ? html`<span class="handle" title="Glisser pour réordonner">
+          ? html`<span class="handle" title=${t("roomCard.drag_reorder")}>
               <svg viewBox="0 0 24 24"><path d=${mdiDrag}></path></svg>
             </span>`
-          : html`<span class="pin" title="Toujours en dernier">
+          : html`<span class="pin" title=${t("roomCard.always_last")}>
               <svg viewBox="0 0 24 24"><path d=${mdiPin}></path></svg>
             </span>`}
         <span class="scene-name">${sc.name}</span>
         ${sc.key === activeKey
-          ? html`<span class="active-tag">active</span>`
+          ? html`<span class="active-tag">${t("roomCard.active")}</span>`
           : ""}
         <span class="btn-group">
-          ${this._iconBtn(mdiOpenInNew, "Voir dans Home Assistant", (e) =>
+          ${this._iconBtn(mdiOpenInNew, t("roomCard.open_in_ha"), (e) =>
             this._openHa(sc, e)
           )}
-          ${this._iconBtn(mdiPencil, "Renommer", () => (this._renameScene = sc))}
+          ${this._iconBtn(mdiPencil, t("common.rename"), () => (this._renameScene = sc))}
           ${this._iconBtn(
             mdiDelete,
-            sc.removable ? "Supprimer" : "Scène par défaut",
+            sc.removable ? t("common.delete") : t("roomCard.default_scene"),
             () => this._deleteScene(sc),
             !sc.removable
           )}
@@ -673,7 +673,7 @@ export class HomexRoomCard extends LitElement {
     const hasDim = !!(r.dim_up_triggers?.length || r.dim_down_triggers?.length);
     return html`
       <ha-card class=${this.expanded ? "selected" : ""}>
-        <div class="head" @click=${this._toggleExpand} title="Plier / déplier">
+        <div class="head" @click=${this._toggleExpand} title=${t("roomCard.collapse_expand")}>
           <svg class="chevron" viewBox="0 0 24 24">
             <path d=${this.expanded ? mdiChevronUp : mdiChevronDown}></path>
           </svg>
@@ -691,14 +691,14 @@ export class HomexRoomCard extends LitElement {
               ? html`
                   <button
                     class="round"
-                    title="Baisser la luminosité (−20)"
+                    title=${t("roomCard.dim_down")}
                     @click=${(e: Event) => this._dim(-20, e)}
                   >
                     <svg viewBox="0 0 24 24"><path d=${mdiMinus}></path></svg>
                   </button>
                   <button
                     class="round"
-                    title="Monter la luminosité (+20)"
+                    title=${t("roomCard.dim_up")}
                     @click=${(e: Event) => this._dim(20, e)}
                   >
                     <svg viewBox="0 0 24 24"><path d=${mdiPlus}></path></svg>
@@ -708,7 +708,7 @@ export class HomexRoomCard extends LitElement {
             ${lightsOn && hasExtraScenes
               ? html`<button
                   class="round"
-                  title="Changer de scène"
+                  title=${t("roomCard.next_scene")}
                   @click=${(e: Event) => this._sceneNext(e)}
                 >
                   <svg viewBox="0 0 24 24"><path d=${mdiThemeLightDark}></path></svg>
@@ -717,7 +717,7 @@ export class HomexRoomCard extends LitElement {
             ${shuttersOn ? this._renderShutterButton(r) : ""}
             <button
               class="kebab"
-              title="Actions"
+              title=${t("roomCard.actions")}
               @click=${(e: Event) => {
                 e.stopPropagation();
                 this._menuOpen = true;
@@ -732,25 +732,25 @@ export class HomexRoomCard extends LitElement {
           ? html`
               <div class="menu-backdrop" @click=${() => (this._menuOpen = false)}></div>
               <div class="menu">
-                <button @click=${() => this._pick("room")}>✏️ Modifier la pièce</button>
+                <button @click=${() => this._pick("room")}>✏️ ${t("roomCard.edit_room")}</button>
                 ${lightsOn
                   ? html`
-                      <div class="menu-section">Lights</div>
+                      <div class="menu-section">${t("roomCard.module_lights")}</div>
                       <button @click=${() => this._pick("triggers")}>
-                        ⚡ Déclencheurs (${r.triggers.length + r.scene_triggers.length})
+                        ⚡ ${t("roomCard.triggers", { count: r.triggers.length + r.scene_triggers.length })}
                       </button>
                       <button @click=${() => this._pick("addgroup")}>
-                        ＋ Ajouter un groupe
+                        ＋ ${t("roomCard.add_group")}
                       </button>
                       <div class="sep"></div>
                     `
                   : ""}
                 <button ?disabled=${this._syncing} @click=${this._syncLabels}>
-                  🏷 ${this._syncing ? "Synchronisation…" : "Synchroniser les labels"}
+                  🏷 ${this._syncing ? t("roomCard.syncing") : t("roomCard.sync_labels")}
                 </button>
                 <div class="sep"></div>
                 <button class="danger-item" @click=${this._delete}>
-                  🗑 Supprimer la pièce
+                  🗑 ${t("roomCard.delete_room")}
                 </button>
               </div>
             `
@@ -803,15 +803,15 @@ export class HomexRoomCard extends LitElement {
         ? pill(
             mdiHomeThermometer,
             zm.mode,
-            zm.own ? "Chauffage désactivé dans la pièce" : `Mode de la zone ${zm.zone}`
+            zm.own ? t("roomCard.heating_disabled_room") : t("roomCard.zone_mode", { zone: zm.zone })
           )
         : ""}
       ${r.heating?.radiators?.length
         ? roomIsHeating(this.hass, r)
-          ? pill(mdiFire, "Heating", "Au moins une vanne chauffe", "heating")
-          : pill(mdiFireOff, "Idle", "Aucune vanne ne chauffe")
+          ? pill(mdiFire, t("roomCard.heating"), t("roomCard.heating_hint"), "heating")
+          : pill(mdiFireOff, t("roomCard.idle"), t("roomCard.idle_hint"))
         : ""}
-      ${stuck ? pill(mdiAlert, "Vanne ?", stuck, "warning") : ""}
+      ${stuck ? pill(mdiAlert, t("roomCard.valve_check"), stuck, "warning") : ""}
     `;
   }
 
@@ -828,40 +828,40 @@ export class HomexRoomCard extends LitElement {
     return html`
       ${lightsOn
         ? html`
-            <div class="module-title">Lights</div>
+            <div class="module-title">${t("roomCard.module_lights")}</div>
             <div class="stats">
-              <span class="stat">🔌 ${r.devices.length} lumière(s)</span>
-              <span class="stat">🎬 ${r.scenes.length} scène(s)</span>
+              <span class="stat">🔌 ${t("roomCard.lights_count", { count: r.devices.length })}</span>
+              <span class="stat">🎬 ${t("roomCard.scenes_count", { count: r.scenes.length })}</span>
               ${r.groups.length
-                ? html`<span class="stat">📦 ${r.groups.length} groupe(s)</span>`
+                ? html`<span class="stat">📦 ${t("roomCard.groups_count", { count: r.groups.length })}</span>`
                 : ""}
             </div>
           `
         : ""}
       ${switchesOn
         ? html`
-            <div class="module-title">Switches</div>
+            <div class="module-title">${t("roomCard.module_switches")}</div>
             <div class="stats">
-              <span class="stat">🎛 ${this._roomSwitches().length} interrupteur(s)</span>
-              <span class="stat">⚡ ${this._switchActionCount(r)} action(s)</span>
+              <span class="stat">🎛 ${t("roomCard.switches_count", { count: this._roomSwitches().length })}</span>
+              <span class="stat">⚡ ${t("roomCard.actions_count", { count: this._switchActionCount(r) })}</span>
             </div>
           `
         : ""}
       ${shuttersOn
         ? html`
-            <div class="module-title">Shutters</div>
+            <div class="module-title">${t("roomCard.module_shutters")}</div>
             <div class="stats">
-              <span class="stat">📦 ${(r.shutter_groups ?? []).length} groupe(s)</span>
-              <span class="stat">🪟 ${this._shutterCount(r)} volet(s)</span>
+              <span class="stat">📦 ${t("roomCard.groups_count", { count: (r.shutter_groups ?? []).length })}</span>
+              <span class="stat">🪟 ${t("roomCard.shutters_count", { count: this._shutterCount(r) })}</span>
             </div>
           `
         : ""}
       ${climateOn
         ? html`
-            <div class="module-title">Climate</div>
+            <div class="module-title">${t("roomCard.module_climate")}</div>
             <div class="stats">
-              <span class="stat">📈 ${metrics} métrique(s)</span>
-              <span class="stat">🔥 ${r.heating?.radiators?.length ?? 0} radiateur(s)</span>
+              <span class="stat">📈 ${t("roomCard.metrics_count", { count: metrics })}</span>
+              <span class="stat">🔥 ${t("roomCard.radiators_count", { count: r.heating?.radiators?.length ?? 0 })}</span>
               ${this._climatePills(r)}
             </div>
           `
@@ -880,23 +880,23 @@ export class HomexRoomCard extends LitElement {
     climateOn: boolean
   ) {
     const tabs: { key: string; label: string }[] = [];
-    if (lightsOn) tabs.push({ key: "lights", label: "Lights" });
-    if (switchesOn) tabs.push({ key: "switches", label: "Switches" });
-    if (shuttersOn) tabs.push({ key: "shutters", label: "Shutters" });
-    if (climateOn) tabs.push({ key: "climate", label: "Climate" });
+    if (lightsOn) tabs.push({ key: "lights", label: t("roomCard.module_lights") });
+    if (switchesOn) tabs.push({ key: "switches", label: t("roomCard.module_switches") });
+    if (shuttersOn) tabs.push({ key: "shutters", label: t("roomCard.module_shutters") });
+    if (climateOn) tabs.push({ key: "climate", label: t("roomCard.module_climate") });
     if (!tabs.length) {
-      return html`<div class="empty-body">Aucun module actif sur cette pièce.</div>`;
+      return html`<div class="empty-body">${t("roomCard.no_modules")}</div>`;
     }
-    const active = tabs.some((t) => t.key === this._activeTab)
+    const active = tabs.some((tab) => tab.key === this._activeTab)
       ? this._activeTab
       : tabs[0].key;
     return html`
       <div class="tabs">
         ${tabs.map(
-          (t) => html`<span
-            class="tab ${t.key === active ? "active" : ""}"
-            @click=${() => (this._activeTab = t.key)}
-            >${t.label}</span
+          (tab) => html`<span
+            class="tab ${tab.key === active ? "active" : ""}"
+            @click=${() => (this._activeTab = tab.key)}
+            >${tab.label}</span
           >`
         )}
       </div>
@@ -920,8 +920,8 @@ export class HomexRoomCard extends LitElement {
   ) {
     return html`
       <div class="section-row">
-        <span class="section">Scènes</span>
-        <button @click=${() => this._pick("addscene")}>＋ Scène</button>
+        <span class="section">${t("roomCard.scenes")}</span>
+        <button @click=${() => this._pick("addscene")}>＋ ${t("roomCard.add_scene")}</button>
       </div>
       <ha-sortable handle-selector=".handle" @item-moved=${this._sceneMoved}>
         <div>${orderable.map((sc) => this._sceneRow(sc, activeKey))}</div>
@@ -929,8 +929,8 @@ export class HomexRoomCard extends LitElement {
       ${pinned.map((sc) => this._sceneRow(sc, activeKey))}
 
       <div class="section-row">
-        <span class="section">Groupes</span>
-        <button @click=${() => this._pick("addgroup")}>＋ Groupe</button>
+        <span class="section">${t("roomCard.groups")}</span>
+        <button @click=${() => this._pick("addgroup")}>＋ ${t("roomCard.add_group_short")}</button>
       </div>
       ${r.groups.length
         ? html`<div class="groups">
@@ -942,10 +942,7 @@ export class HomexRoomCard extends LitElement {
               ></homex-group-row>`
             )}
           </div>`
-        : html`<div class="empty-body">
-            Aucun groupe. Un groupe pilote une partie des lumières de la pièce
-            (ex. une lampe de chevet).
-          </div>`}
+        : html`<div class="empty-body">${t("roomCard.no_groups")}</div>`}
     `;
   }
 
@@ -1006,8 +1003,8 @@ export class HomexRoomCard extends LitElement {
     const switches = this._roomSwitches();
     return html`
       <div class="section-row">
-        <span class="section">Interrupteurs</span>
-        <button @click=${() => this._openSwitchManagerAdd()}>＋ Interrupteur</button>
+        <span class="section">${t("roomCard.switches")}</span>
+        <button @click=${() => this._openSwitchManagerAdd()}>＋ ${t("roomCard.add_switch")}</button>
       </div>
       ${switches.length
         ? switches.map((sw) => {
@@ -1018,14 +1015,11 @@ export class HomexRoomCard extends LitElement {
             >
               <span class="switch-name">🎛 ${sw.name}</span>
               <span class="switch-meta">
-                ${preset ? preset.name : "aucun preset"}
+                ${preset ? preset.name : t("roomCard.no_preset")}
               </span>
             </div>`;
           })
-        : html`<div class="empty-body">
-            Aucun interrupteur associé. Clique sur « ＋ Interrupteur » pour en
-            créer un (via le Switch Manager) et l'associer à cette pièce.
-          </div>`}
+        : html`<div class="empty-body">${t("roomCard.no_switches", { button: t("roomCard.add_switch") })}</div>`}
     `;
   }
 
@@ -1038,8 +1032,8 @@ export class HomexRoomCard extends LitElement {
     const groups = r.shutter_groups ?? [];
     return html`
       <div class="section-row">
-        <span class="section">Groupes de volets</span>
-        <button @click=${() => this._openShutterGroup(null)}>＋ Groupe</button>
+        <span class="section">${t("roomCard.shutter_groups")}</span>
+        <button @click=${() => this._openShutterGroup(null)}>＋ ${t("roomCard.add_group_short")}</button>
       </div>
       ${groups.map(
         (g) => html`<div class="shutter-group">
@@ -1047,7 +1041,7 @@ export class HomexRoomCard extends LitElement {
             <span class="switch-name">📦 ${g.name}</span>
             <button
               class="cfg-btn"
-              title="Configurer le groupe"
+              title=${t("roomCard.configure_group")}
               @click=${() => this._openShutterGroup(g)}
             >
               ⚙
@@ -1059,7 +1053,7 @@ export class HomexRoomCard extends LitElement {
                   🪟 ${this._entityName(v)}
                 </div>`
               )
-            : html`<div class="shutter-cover empty">Aucun volet dans ce groupe.</div>`}
+            : html`<div class="shutter-cover empty">${t("roomCard.no_shutters_in_group")}</div>`}
         </div>`
       )}
     `;
@@ -1085,7 +1079,7 @@ export class HomexRoomCard extends LitElement {
     const sum = shutterSummary(this.hass, group.devices);
     return html`<button
       class="round shutter-btn ${sum.state}"
-      title=${`Volets (${group.name}) : ${sum.label}${
+      title=${`${t("roomCard.shutters_title", { name: group.name, state: sum.label })}${
         sum.position !== null ? ` · ${sum.position} %` : ""
       }`}
       @click=${(e: Event) => {
@@ -1171,11 +1165,8 @@ export class HomexRoomCard extends LitElement {
         }}
       >
         <div class="confirm-card" role="dialog" aria-modal="true">
-          <h3>Supprimer la pièce « ${r.name} » ?</h3>
-          <p class="confirm-text">
-            Le switch, le groupe de lumières et les déclencheurs de cette pièce
-            seront supprimés. Cette action est irréversible.
-          </p>
+          <h3>${t("roomCard.confirm_delete_room", { name: r.name })}</h3>
+          <p class="confirm-text">${t("roomCard.delete_room_text")}</p>
           <label class="toggle-row">
             <span class="toggle ${this._deleteScenes ? "on" : ""}">
               <input
@@ -1187,19 +1178,19 @@ export class HomexRoomCard extends LitElement {
               <span class="knob"></span>
             </span>
             <span class="toggle-label">
-              Supprimer aussi les ${r.scenes.length} scène(s) associée(s)
+              ${t("roomCard.delete_scenes_too", { count: r.scenes.length })}
             </span>
           </label>
           <div class="confirm-actions">
             <button @click=${this._close} ?disabled=${this._deleting}>
-              Annuler
+              ${t("common.cancel")}
             </button>
             <button
               class="danger"
               @click=${this._confirmDelete}
               ?disabled=${this._deleting}
             >
-              ${this._deleting ? "Suppression…" : "Supprimer"}
+              ${this._deleting ? t("roomCard.deleting") : t("common.delete")}
             </button>
           </div>
         </div>

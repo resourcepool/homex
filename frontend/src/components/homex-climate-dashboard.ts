@@ -7,6 +7,7 @@ import { errorMessage, fetchHeating, setHeatingEnabled, updateRoom } from "../ap
 import { radiatorClimate, roomIsHeating, roomZoneMode, stuckWarning } from "../lib/climate";
 import { toggleSwitch } from "../lib/fields";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import "./homex-select";
 import "./homex-heating-systems-card";
 
@@ -214,7 +215,7 @@ export class HomexClimateDashboard extends LitElement {
       await setHeatingEnabled(this.hass, target);
       this._enabledLocal = target;
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     } finally {
       this._busy = false;
     }
@@ -224,7 +225,7 @@ export class HomexClimateDashboard extends LitElement {
     const on = this.hass.states[entityId]?.state === "on";
     return html`<span class="pill ${on ? "heating" : ""}" title=${entityId}>
       <svg viewBox="0 0 24 24"><path d=${on ? mdiFire : mdiFireOff}></path></svg>
-      ${on ? "Heating" : "Idle"}
+      ${on ? t("climateDashboard.heating_status") : t("climateDashboard.idle")}
     </span>`;
   }
 
@@ -236,7 +237,7 @@ export class HomexClimateDashboard extends LitElement {
         ? this.rooms.map((r) => r.room_id).filter((id) => !listed.has(id))
         : zone.rooms;
     const names = ids.map((id) => this.rooms.find((r) => r.room_id === id)?.name ?? id);
-    return names.length ? names.join(", ") : "Aucune pièce";
+    return names.length ? names.join(", ") : t("climateDashboard.no_rooms");
   }
 
   private _renderZone(zone: HeatingZone) {
@@ -252,7 +253,7 @@ export class HomexClimateDashboard extends LitElement {
       ${this._demandPill(`binary_sensor.homex_heating_needed_${zone.id}`)}
       <homex-select
         class="zone-mode"
-        title="Mode de la zone"
+        title=${t("climateDashboard.zone_mode")}
         .value=${st?.state ?? ""}
         ?disabled=${!st}
         .options=${options.map((o) => ({ value: o, label: o }))}
@@ -263,7 +264,7 @@ export class HomexClimateDashboard extends LitElement {
           })}
       ></homex-select>
       ${this.hass.states[`${TOLERANCE_ENTITY}_${zone.id}`]
-        ? html`<span class="zone-tol" title="Tolérance de la zone">
+        ? html`<span class="zone-tol" title=${t("climateDashboard.zone_tolerance")}>
             ${this._btnGroup(`${TOLERANCE_ENTITY}_${zone.id}`)}
           </span>`
         : ""}
@@ -290,26 +291,26 @@ export class HomexClimateDashboard extends LitElement {
   }
 
   render() {
-    if (!this._loaded) return html`<div class="muted">Chargement…</div>`;
+    if (!this._loaded) return html`<div class="muted">${t("common.loading")}</div>`;
     const tolerance = this.hass.states[TOLERANCE_ENTITY];
     return html`
       <div class="card">
-        <div class="card-title">Chauffage</div>
+        <div class="card-title">${t("climateDashboard.heating")}</div>
         <div class="global">
           <span class="state ${this._enabled ? "on" : ""}">
-            ${this._enabled ? "Activé" : "Désactivé"}
+            ${this._enabled ? t("climateDashboard.enabled") : t("climateDashboard.disabled")}
           </span>
           <div class="pills">
             ${this._demandPill("binary_sensor.homex_heating_needed")}
           </div>
           <button ?disabled=${this._busy} @click=${this._toggle}>
-            ${this._enabled ? "Désactiver" : "Activer"}
+            ${this._enabled ? t("climateDashboard.disable") : t("climateDashboard.enable")}
           </button>
         </div>
         <div class="options">
           ${tolerance
             ? html`<div class="field-select" title=${TOLERANCE_ENTITY}>
-                <span>Tolérance</span>
+                <span>${t("climateDashboard.tolerance")}</span>
                 ${this._btnGroup(TOLERANCE_ENTITY)}
               </div>`
             : ""}
@@ -321,7 +322,7 @@ export class HomexClimateDashboard extends LitElement {
         .zones=${this._zones}
       ></homex-heating-systems-card>
       <div class="card">
-        <div class="card-title">Zones</div>
+        <div class="card-title">${t("climateDashboard.zones")}</div>
         ${this._zones.map((z) => this._renderZone(z))}
       </div>
       ${this._renderRooms()}
@@ -336,7 +337,7 @@ export class HomexClimateDashboard extends LitElement {
     const rooms = this.rooms.filter((r) => (r.modules ?? []).includes("heating"));
     if (!rooms.length) return "";
     return html`<div class="card">
-      <div class="card-title">Pièces</div>
+      <div class="card-title">${t("climateDashboard.rooms")}</div>
       ${rooms.map((r) => this._renderRoom(r))}
     </div>`;
   }
@@ -362,7 +363,7 @@ export class HomexClimateDashboard extends LitElement {
     // "coupé" only when the valves are actually off (Unheated without a
     // setpoint, heating disabled…); an Unheated setpoint shows its value.
     const cut = valves.length > 0 && valves.every((st) => st.state === "off");
-    const setpoint = targets.length ? this._fmt(targets) : cut ? "coupé" : "—";
+    const setpoint = targets.length ? this._fmt(targets) : cut ? t("climateDashboard.off") : "—";
     // Current temperature: the room's reference sensor, else the valves'.
     const ref = this.hass.states[`sensor.homex_${r.room_id}_temperature`];
     const refValue = parseFloat(ref?.state);
@@ -374,28 +375,28 @@ export class HomexClimateDashboard extends LitElement {
     const stuck = stuckWarning(this.hass, r);
     const busy = this._roomBusy.has(r.room_id);
     return html`<div class="room ${on ? "" : "off"}">
-      <label class="room-switch" title=${radiators.length ? "Chauffage de la pièce" : "Aucun radiateur"}>
+      <label class="room-switch" title=${radiators.length ? t("climateDashboard.room_heating") : t("climateDashboard.no_radiator")}>
         ${toggleSwitch(on, (v) => this._setRoomHeating(r, v), busy || !radiators.length)}
       </label>
       <div class="info">
         <div class="name">${r.name}</div>
         <div class="muted">
-          ${radiators.length} radiateur(s)${zm ? html` · ${zm.mode}` : ""}
+          ${t("climateDashboard.radiators", { count: radiators.length })}${zm ? html` · ${zm.mode}` : ""}
         </div>
       </div>
       <div class="temps">
-        <span title="Consigne">🎯 ${setpoint}</span>
-        <span title="Température actuelle">🌡 ${current}</span>
+        <span title=${t("climateDashboard.setpoint")}>🎯 ${setpoint}</span>
+        <span title=${t("climateDashboard.current_temperature")}>🌡 ${current}</span>
       </div>
       ${radiators.length
         ? html`<span class="pill ${heating ? "heating" : ""}">
             <svg viewBox="0 0 24 24"><path d=${heating ? mdiFire : mdiFireOff}></path></svg>
-            ${heating ? "Heating" : "Idle"}
+            ${heating ? t("climateDashboard.heating_status") : t("climateDashboard.idle")}
           </span>`
         : ""}
       ${stuck
         ? html`<span class="pill warning" title=${stuck}>
-            <svg viewBox="0 0 24 24"><path d=${mdiAlert}></path></svg>Vanne ?
+            <svg viewBox="0 0 24 24"><path d=${mdiAlert}></path></svg>${t("climateDashboard.valve_warning")}
           </span>`
         : ""}
     </div>`;
@@ -413,7 +414,7 @@ export class HomexClimateDashboard extends LitElement {
       });
       fireChanged(this); // the panel reloads the rooms
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     } finally {
       const next = new Set(this._roomBusy);
       next.delete(r.room_id);

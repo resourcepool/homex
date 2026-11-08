@@ -11,29 +11,23 @@ import { errorMessage, fetchHeating, updateRoom } from "../api";
 import { radiatorClimate, valveStuck } from "../lib/climate";
 import { navigate } from "../lib/router";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import "./homex-radiator-dialog";
 
-const METRICS: { key: MetricKey; icon: string; label: string }[] = [
-  { key: "temperature", icon: "🌡", label: "Température" },
-  { key: "humidity", icon: "💧", label: "Humidité" },
-  { key: "pm25", icon: "🌫", label: "PM2.5" },
-  { key: "pm10", icon: "🌫", label: "PM10" },
-  { key: "co2", icon: "🫧", label: "CO₂" },
+// Labels are catalog keys (roomClimate.metric_<key>), resolved at render.
+const METRICS: { key: MetricKey; icon: string }[] = [
+  { key: "temperature", icon: "🌡" },
+  { key: "humidity", icon: "💧" },
+  { key: "pm25", icon: "🌫" },
+  { key: "pm10", icon: "🌫" },
+  { key: "co2", icon: "🫧" },
 ];
-const RULE_LABELS: Record<string, string> = {
-  mean: "moyenne pondérée",
-  max: "max",
-  min: "min",
-};
+const RULES = ["mean", "max", "min"];
+const ruleLabel = (rule: string) => (RULES.includes(rule) ? t(`roomClimate.rule_${rule}`) : rule);
 // hvac_action when the valve reports it, else its HVAC mode.
-const ACTION_LABELS: Record<string, string> = {
-  heating: "🔥 Chauffe",
-  idle: "En veille",
-  off: "Éteint",
-  preheating: "Préchauffe",
-  heat: "Mode chauffage",
-  auto: "Mode auto",
-};
+const ACTIONS = ["heating", "idle", "off", "preheating", "heat", "auto"];
+const actionLabel = (action: string) =>
+  ACTIONS.includes(action) ? t(`roomClimate.action_${action}`) : action;
 
 /** The Climate tab of a room card: its Metrics (reference values and
  * sensors), then Heating (zone and radiators with their live state). */
@@ -204,9 +198,9 @@ export class HomexRoomClimate extends LitElement {
     const set = METRICS.filter((m) => r.metrics?.[m.key]?.sensors?.length);
     return html`
       <div class="section-row">
-        <span class="section">Metrics</span>
+        <span class="section">${t("roomClimate.metrics")}</span>
         <button @click=${() => navigate(`/homex/climate/metrics/${r.room_id}`)}>
-          Configurer
+          ${t("roomClimate.configure")}
         </button>
       </div>
       ${set.length
@@ -214,15 +208,15 @@ export class HomexRoomClimate extends LitElement {
             ${set.map((m) => {
               const cfg = r.metrics![m.key]!;
               return html`<div class="metric">
-                <div class="muted">${m.icon} ${m.label}</div>
+                <div class="muted">${m.icon} ${t(`roomClimate.metric_${m.key}`)}</div>
                 <div class="v">${this._state(`sensor.homex_${r.room_id}_${m.key}`)}</div>
                 <div class="muted">
-                  ${cfg.sensors.length} capteur(s) · ${RULE_LABELS[cfg.rule] ?? cfg.rule}
+                  ${t("roomClimate.sensor_count", { count: cfg.sensors.length })} · ${ruleLabel(cfg.rule)}
                 </div>
               </div>`;
             })}
           </div>`
-        : html`<div class="empty">Aucun capteur : « Configurer » pour en ajouter.</div>`}
+        : html`<div class="empty">${t("roomClimate.no_sensors")}</div>`}
     `;
   }
 
@@ -242,7 +236,7 @@ export class HomexRoomClimate extends LitElement {
       });
       fireChanged(this);
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     } finally {
       this._switching = false;
     }
@@ -250,14 +244,14 @@ export class HomexRoomClimate extends LitElement {
 
   private async _remove(index: number) {
     const radiators = [...(this.room.heating?.radiators ?? [])];
-    const name = this.hass.devices?.[radiators[index]?.device_id]?.name ?? "ce radiateur";
-    if (!confirm(`Retirer ${name} de la pièce ?`)) return;
+    const name = this.hass.devices?.[radiators[index]?.device_id]?.name ?? t("roomClimate.this_radiator");
+    if (!confirm(t("roomClimate.confirm_remove", { name }))) return;
     radiators.splice(index, 1);
     try {
       await updateRoom(this.hass, { entry_id: this.room.entry_id, heating: { ...this.room.heating, radiators } });
       fireChanged(this);
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   }
 
@@ -269,7 +263,7 @@ export class HomexRoomClimate extends LitElement {
     const a = st?.attributes ?? {};
     const action = a.hvac_action ?? st?.state;
     const unit = this.hass.config?.unit_system?.temperature ?? "°C";
-    const fmt = (t: unknown) => (t == null ? "—" : `${t} ${unit}`);
+    const fmt = (v: unknown) => (v == null ? "—" : `${v} ${unit}`);
     const preset = this._devicePresets.find((p) => p.id === rad.preset_id);
     const ext = rad.external_sensor
       ? this.hass.states[rad.external_sensor]?.attributes?.friendly_name || rad.external_sensor
@@ -278,26 +272,26 @@ export class HomexRoomClimate extends LitElement {
       <div class="info">
         <div class="name">${dev?.name_by_user || dev?.name || rad.device_id}</div>
         <div class="muted">
-          ${preset ? `Preset : ${preset.name}` : "Aucun preset"}
-          ${ext ? html` · Capteur : ${ext}` : ""}
+          ${preset ? t("roomClimate.preset", { name: preset.name }) : t("roomClimate.no_preset")}
+          ${ext ? html` · ${t("roomClimate.sensor", { name: ext })}` : ""}
         </div>
       </div>
       <span class=${action === "heating" ? "heating" : "muted"}>
-        ${!st || st.state === "unavailable" ? "Indisponible" : ACTION_LABELS[action] ?? action}
+        ${!st || st.state === "unavailable" ? t("roomClimate.unavailable") : actionLabel(action)}
         ${valveStuck(st)
           ? html`<span
               class="warning"
-              title="Chauffe alors que la température dépasse la consigne : vanne bloquée ouverte ou état non rafraîchi — vérifie le radiateur."
+              title=${t("roomClimate.valve_stuck")}
               >⚠</span
             >`
           : ""}
       </span>
       <div class="temps">
-        <span title="Température de consigne">🎯 ${fmt(a.temperature)}</span>
-        <span title="Température actuelle">🌡 ${fmt(a.current_temperature)}</span>
+        <span title=${t("roomClimate.target_temp")}>🎯 ${fmt(a.temperature)}</span>
+        <span title=${t("roomClimate.current_temp")}>🌡 ${fmt(a.current_temperature)}</span>
       </div>
-      <button title="Modifier" @click=${() => (this._dialogIndex = index)}>✏️</button>
-      <button title="Retirer" @click=${() => this._remove(index)}>✕</button>
+      <button title=${t("common.edit")} @click=${() => (this._dialogIndex = index)}>✏️</button>
+      <button title=${t("roomClimate.remove")} @click=${() => this._remove(index)}>✕</button>
     </div>`;
   }
 
@@ -305,15 +299,15 @@ export class HomexRoomClimate extends LitElement {
     const radiators = this.room.heating?.radiators ?? [];
     return html`
       <div class="section-row">
-        <span class="section">Heating</span>
+        <span class="section">${t("roomClimate.heating")}</span>
         ${radiators.length
           ? html`<label
               class="room-switch ${this._roomOn ? "on" : ""}"
               title=${this._roomOn
-                ? "Désactiver : la pièce passe en Unheated, ses vannes sur off"
-                : "Activer : la pièce reprend le mode de sa zone"}
+                ? t("roomClimate.disable_hint")
+                : t("roomClimate.enable_hint")}
             >
-              ${this._roomOn ? "Chauffage activé" : "Chauffage désactivé"}
+              ${this._roomOn ? t("roomClimate.heating_on") : t("roomClimate.heating_off")}
               <span class="toggle ${this._roomOn ? "on" : ""}">
                 <input
                   type="checkbox"
@@ -326,11 +320,11 @@ export class HomexRoomClimate extends LitElement {
               </span>
             </label>`
           : ""}
-        <button @click=${() => (this._dialogIndex = -1)}>＋ Radiateur</button>
+        <button @click=${() => (this._dialogIndex = -1)}>＋ ${t("roomClimate.add_radiator")}</button>
       </div>
       ${radiators.length
         ? radiators.map((_, i) => this._renderRadiator(i))
-        : html`<div class="empty">Aucun radiateur.</div>`}
+        : html`<div class="empty">${t("roomClimate.no_radiators")}</div>`}
     `;
   }
 

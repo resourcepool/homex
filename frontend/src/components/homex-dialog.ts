@@ -1,5 +1,6 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
+import { t } from "../lib/i18n";
 
 /**
  * Lightweight modal shell (backdrop + centered card). Self-contained so it does
@@ -101,7 +102,7 @@ export class HomexDialog extends LitElement {
         <div class="dialog" role="dialog" aria-modal="true">
           <header>
             <h2>${this.heading}</h2>
-            <button class="x" title="Fermer" @click=${this._close}>×</button>
+            <button class="x" title=${t("common.close")} @click=${this._close}>×</button>
           </header>
           <div class="content"><slot></slot></div>
           <div class="footer"><slot name="actions"></slot></div>

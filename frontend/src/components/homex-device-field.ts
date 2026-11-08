@@ -1,6 +1,7 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type { HomeAssistant } from "../types";
+import { t } from "../lib/i18n";
 
 /**
  * Single-device picker. Uses Home Assistant's native `ha-device-picker` when it
@@ -114,13 +115,13 @@ export class HomexDeviceField extends LitElement {
     if (this.value) {
       return html`<div class="selected">
         <span class="name">${this._name(this.value)}</span>
-        <button class="clear" title="Effacer" @click=${() => this._emit("")}>×</button>
+        <button class="clear" title=${t("deviceField.clear")} @click=${() => this._emit("")}>×</button>
       </div>`;
     }
     return html`
       <input
         .value=${this._query}
-        placeholder="Rechercher un appareil…"
+        placeholder=${t("deviceField.search")}
         autocomplete="off"
         @focus=${() => (this._open = true)}
         @input=${(e: Event) => {
@@ -145,7 +146,7 @@ export class HomexDeviceField extends LitElement {
                       ${this._name(id)}
                     </div>`
                 )
-              : html`<div class="sugg">Aucun appareil</div>`}
+              : html`<div class="sugg">${t("deviceField.no_device")}</div>`}
           </div>`
         : ""}
     `;

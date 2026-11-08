@@ -4,6 +4,7 @@ import type { HomeAssistant, Room, Scene, TriggerSpec } from "../types";
 import { fireChanged } from "../types";
 import { addScene, errorMessage, renameScene } from "../api";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import "./homex-select";
 import { textField } from "../lib/fields";
 import { slugify } from "../lib/slug";
@@ -107,7 +108,7 @@ export class HomexSceneDialog extends LitElement {
     const name = this._name.trim();
     if (!name || this._nameTaken) return;
     if (!this.scene && this._mode === "attach" && !this._attachId) {
-      alert("Choisis une scène existante à rattacher.");
+      alert(t("sceneDialog.pick_scene_required"));
       return;
     }
     this._busy = true;
@@ -129,7 +130,7 @@ export class HomexSceneDialog extends LitElement {
       this._close();
     } catch (err) {
       this._busy = false;
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   }
 
@@ -140,13 +141,13 @@ export class HomexSceneDialog extends LitElement {
     return html`
       <homex-dialog
         .open=${this.open}
-        heading=${editing ? "Renommer la scène" : "Nouvelle scène"}
+        heading=${editing ? t("sceneDialog.heading_rename") : t("sceneDialog.heading_new")}
         @dialog-closed=${this._close}
       >
-        ${textField("Nom de la scène", this._name, (v) => (this._name = v), "Nuit")}
-        ${taken ? html`<div class="err">Ce nom de scène existe déjà.</div>` : ""}
+        ${textField(t("sceneDialog.name"), this._name, (v) => (this._name = v), t("sceneDialog.name_placeholder"))}
+        ${taken ? html`<div class="err">${t("sceneDialog.name_taken")}</div>` : ""}
         ${editing ? "" : this._renderModePicker()}
-        <div class="section">Déclencheurs (activent cette scène)</div>
+        <div class="section">${t("sceneDialog.triggers")}</div>
         <homex-trigger-selector
           .hass=${this.hass}
           .value=${this._triggers}
@@ -160,13 +161,13 @@ export class HomexSceneDialog extends LitElement {
             ></homex-managed-triggers>`
           : ""}
         <span slot="actions">
-          <button @click=${this._close}>Annuler</button>
+          <button @click=${this._close}>${t("common.cancel")}</button>
           <button class="primary" ?disabled=${this._busy || !valid} @click=${this._save}>
             ${editing
-              ? "Renommer"
+              ? t("common.rename")
               : this._mode === "attach"
-                ? "Rattacher"
-                : "Créer la scène"}
+                ? t("sceneDialog.attach")
+                : t("sceneDialog.create")}
           </button>
         </span>
       </homex-dialog>
@@ -180,25 +181,21 @@ export class HomexSceneDialog extends LitElement {
           class=${this._mode === "new" ? "active" : ""}
           @click=${() => (this._mode = "new")}
         >
-          Nouvelle
+          ${t("sceneDialog.mode_new")}
         </button>
         <button
           class=${this._mode === "attach" ? "active" : ""}
           @click=${() => (this._mode = "attach")}
         >
-          Rattacher une existante
+          ${t("sceneDialog.mode_attach")}
         </button>
       </div>
       ${this._mode === "new"
-        ? html`<div class="section">
-            La scène est créée « tout éteint » ; édite-la ensuite dans Home Assistant.
-          </div>`
+        ? html`<div class="section">${t("sceneDialog.new_hint")}</div>`
         : html`
-            <div class="section">
-              Scène existante à adopter (elle sera renommée, son contenu conservé)
-            </div>
+            <div class="section">${t("sceneDialog.attach_hint")}</div>
             <homex-select
-              placeholder="Choisir une scène…"
+              placeholder=${t("sceneDialog.pick_scene")}
               .value=${this._attachId}
               .options=${this._availableScenes.map((s) => ({
                 value: s.config_id,

@@ -10,6 +10,7 @@ import { fetchGlobalSwitches, fetchLayouts, fetchPresets } from "../api";
 import { resolveSwitchPreset } from "../lib/device";
 import { goBack, joinPath, navigate, segments } from "../lib/router";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import "./homex-layout-editor";
 import "./homex-preset-editor";
 import "./homex-gswitch-editor";
@@ -301,7 +302,7 @@ export class HomexSwitchManager extends LitElement {
           <h2></h2>
         </div>
         <div class="msg">
-          ${this._loaded ? `« ${id} » introuvable.` : "Chargement…"}
+          ${this._loaded ? t("switchManager.not_found", { id }) : t("common.loading")}
         </div>
       `,
     };
@@ -311,33 +312,33 @@ export class HomexSwitchManager extends LitElement {
     const { section, editing } = this._route;
     if (editing && section === "layouts") {
       const back = () => this._onLayoutClosed();
-      const t = this._editTarget(this._layouts, back, "Layouts");
-      if ("page" in t) return t.page;
+      const target = this._editTarget(this._layouts, back, t("switchManager.layouts"));
+      if ("page" in target) return target.page;
       return html`
         <div class="head">
-          <button @click=${back}>← Layouts</button>
-          <h2>${t.item ? "Modifier le layout" : "Nouveau layout"}</h2>
+          <button @click=${back}>← ${t("switchManager.layouts")}</button>
+          <h2>${target.item ? t("switchManager.edit_layout") : t("switchManager.new_layout")}</h2>
         </div>
         <homex-layout-editor
           .hass=${this.hass}
-          .layout=${t.item}
+          .layout=${target.item}
           @layout-closed=${this._onLayoutClosed}
         ></homex-layout-editor>
       `;
     }
     if (editing && section === "presets") {
       const back = () => this._onPresetClosed();
-      const t = this._editTarget(this._presets, back, "Presets");
-      if ("page" in t) return t.page;
+      const target = this._editTarget(this._presets, back, t("switchManager.presets"));
+      if ("page" in target) return target.page;
       return html`
         <div class="head">
-          <button @click=${back}>← Presets</button>
-          <h2>${t.item ? "Modifier le preset" : "Nouveau device preset"}</h2>
+          <button @click=${back}>← ${t("switchManager.presets")}</button>
+          <h2>${target.item ? t("switchManager.edit_preset") : t("switchManager.new_preset")}</h2>
         </div>
         <div class="editor">
           <homex-preset-editor
             .hass=${this.hass}
-            .preset=${t.item}
+            .preset=${target.item}
             .layouts=${this._layouts}
             .prefillDevice=${this._prefillDevice}
             @preset-closed=${this._onPresetClosed}
@@ -347,17 +348,17 @@ export class HomexSwitchManager extends LitElement {
     }
     if (editing) {
       const back = () => this._onSwitchClosed();
-      const t = this._editTarget(this._gswitches, back, "Switches");
-      if ("page" in t) return t.page;
+      const target = this._editTarget(this._gswitches, back, t("switchManager.switches"));
+      if ("page" in target) return target.page;
       return html`
         <div class="head">
-          <button @click=${back}>← Switches</button>
-          <h2>${t.item ? "Modifier le switch" : "Nouveau switch"}</h2>
+          <button @click=${back}>← ${t("switchManager.switches")}</button>
+          <h2>${target.item ? t("switchManager.edit_switch") : t("switchManager.new_switch")}</h2>
         </div>
         <div class="editor">
           <homex-gswitch-editor
             .hass=${this.hass}
-            .sw=${t.item}
+            .sw=${target.item}
             .presets=${this._presets}
             .initialRooms=${this._addRooms}
             .draft=${this._switchDraft}
@@ -370,22 +371,22 @@ export class HomexSwitchManager extends LitElement {
 
     const addLabel =
       this._section === "layouts"
-        ? "＋ Layout"
+        ? t("switchManager.add_layout")
         : this._section === "presets"
-          ? "＋ Preset"
-          : "＋ Switch";
+          ? t("switchManager.add_preset")
+          : t("switchManager.add_switch");
     return html`
       <div class="head">
         <button @click=${this._back}>← Homex</button>
-        <h2>Switch Manager</h2>
+        <h2>${t("switchManager.title")}</h2>
         <button class="primary" @click=${this._add}>${addLabel}</button>
       </div>
       <div class="tabs">
         ${(
           [
-            ["switches", "Switches"],
-            ["presets", "Presets"],
-            ["layouts", "Layouts"],
+            ["switches", t("switchManager.switches")],
+            ["presets", t("switchManager.presets")],
+            ["layouts", t("switchManager.layouts")],
           ] as [Section, string][]
         ).map(
           ([key, label]) => html`<span
@@ -398,7 +399,7 @@ export class HomexSwitchManager extends LitElement {
         )}
       </div>
       ${!this._loaded
-        ? html`<div class="msg">Chargement…</div>`
+        ? html`<div class="msg">${t("common.loading")}</div>`
         : this._section === "layouts"
           ? this._renderLayouts()
           : this._section === "presets"
@@ -409,7 +410,7 @@ export class HomexSwitchManager extends LitElement {
 
   private _renderLayouts() {
     if (!this._layouts.length) {
-      return html`<div class="msg">Aucun layout. Clique sur « ＋ Layout ».</div>`;
+      return html`<div class="msg">${t("switchManager.no_layouts")}</div>`;
     }
     return html`<div class="grid">
       ${this._layouts.map(
@@ -420,7 +421,7 @@ export class HomexSwitchManager extends LitElement {
           ${this._preview(l)}
           <div class="info">
             <div class="name">${l.name}</div>
-            <div class="meta">${l.buttons} bouton(s) · ${l.shape}</div>
+            <div class="meta">${t("switchManager.layout_meta", { count: l.buttons, shape: t(`switchManager.shape_${l.shape}`) })}</div>
           </div>
         </div>`
       )}
@@ -429,10 +430,7 @@ export class HomexSwitchManager extends LitElement {
 
   private _renderPresets() {
     if (!this._presets.length) {
-      return html`<div class="msg">
-        Aucun preset. Clique sur « ＋ Preset » pour définir le mapping standard
-        d'un modèle d'appareil.
-      </div>`;
+      return html`<div class="msg">${t("switchManager.no_presets")}</div>`;
     }
     return html`<div class="grid">
       ${this._presets.map((p) => {
@@ -456,7 +454,7 @@ export class HomexSwitchManager extends LitElement {
 
   private _renderSwitches() {
     if (!this._gswitches.length) {
-      return html`<div class="msg">Aucun switch. Clique sur « ＋ Switch ».</div>`;
+      return html`<div class="msg">${t("switchManager.no_switches")}</div>`;
     }
     return html`<div class="grid">
       ${this._gswitches.map((s) => {
@@ -472,8 +470,8 @@ export class HomexSwitchManager extends LitElement {
           <div class="info">
             <div class="name">${s.name}</div>
             <div class="meta">
-              ${preset ? preset.name : "aucun preset"} ·
-              ${(s.rooms || []).length} pièce(s)
+              ${preset ? preset.name : t("switchManager.no_preset")} ·
+              ${t("switchManager.rooms_count", { count: (s.rooms || []).length })}
             </div>
           </div>
         </div>`;

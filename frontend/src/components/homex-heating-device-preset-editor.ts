@@ -16,13 +16,14 @@ import {
   saveHeatingDevicePreset,
 } from "../api";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import "./homex-select";
 import { textField, toggleSwitch } from "../lib/fields";
 import { slugify } from "../lib/slug";
 
 interface ParamDef {
   key: HeatingParamKey;
-  label: string;
+  label: () => string;
   domains: string[];
   /** Suffix pattern used to suggest the entity on a model change. */
   guess: RegExp;
@@ -33,20 +34,20 @@ interface ParamDef {
 const PARAMS: ParamDef[] = [
   {
     key: "tolerance",
-    label: "Tolérance / précision",
+    label: () => t("heatingDevicePresetEditor.param_tolerance"),
     domains: ["number"],
     guess: /accuracy|precision|hysteresis|tolerance/,
   },
-  { key: "mode", label: "Mode", domains: ["climate", "select"], guess: /.*/ },
+  { key: "mode", label: () => t("heatingDevicePresetEditor.param_mode"), domains: ["climate", "select"], guess: /.*/ },
   {
     key: "lock",
-    label: "Verrouillage",
+    label: () => t("heatingDevicePresetEditor.param_lock"),
     domains: ["switch", "lock"],
     guess: /child_lock|securite_enfants|verrou|lock/,
   },
   {
     key: "sensor",
-    label: "Capteur (interne / externe)",
+    label: () => t("heatingDevicePresetEditor.param_sensor"),
     domains: ["select", "switch"],
     guess: /sensor_select|temperature_sensor|capteur_de_temperature_externe|external.*sensor/,
   },
@@ -66,17 +67,15 @@ interface ParamDraft {
   valueAgressive?: string; // tolerance: the "agressive" tolerance mode value
 }
 
-const SWITCH_VALUES = [
-  ["on", "Activé"],
-  ["off", "Désactivé"],
+const SWITCH_VALUES = () => [
+  ["on", t("heatingDevicePresetEditor.switch_on")],
+  ["off", t("heatingDevicePresetEditor.switch_off")],
 ];
-const LOCK_VALUES = [
-  ["locked", "Verrouillé"],
-  ["unlocked", "Déverrouillé"],
+const LOCK_VALUES = () => [
+  ["locked", t("heatingDevicePresetEditor.locked")],
+  ["unlocked", t("heatingDevicePresetEditor.unlocked")],
 ];
-const PARAM_LABEL: Record<HeatingParamKey, string> = Object.fromEntries(
-  PARAMS.map((p) => [p.key, p.label])
-) as Record<HeatingParamKey, string>;
+const paramLabel = (key: HeatingParamKey) => PARAMS.find((p) => p.key === key)?.label() ?? key;
 
 /** Editor of a heating device preset: a thermostat model and the settings
  * (tolerance, mode, lock, sensor) to fix on all its devices. */
@@ -302,9 +301,9 @@ export class HomexHeatingDevicePresetEditor extends LitElement {
       case "climate":
         return (attrs.hvac_modes ?? []).map((o: string) => [o, o]);
       case "switch":
-        return SWITCH_VALUES;
+        return SWITCH_VALUES();
       case "lock":
-        return LOCK_VALUES;
+        return LOCK_VALUES();
       default:
         return [];
     }
@@ -406,7 +405,7 @@ export class HomexHeatingDevicePresetEditor extends LitElement {
       );
       this._created = true;
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     } finally {
       this._busy = false;
     }
@@ -418,7 +417,7 @@ export class HomexHeatingDevicePresetEditor extends LitElement {
     try {
       this._results = await applyHeatingDevicePreset(this.hass, this.preset.id);
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     } finally {
       this._busy = false;
     }
@@ -426,13 +425,13 @@ export class HomexHeatingDevicePresetEditor extends LitElement {
 
   private async _delete() {
     if (!this.preset) return;
-    if (!confirm(`Supprimer le device preset « ${this.preset.name} » ?`)) return;
+    if (!confirm(t("heatingDevicePresetEditor.delete_confirm", { name: this.preset.name }))) return;
     this._busy = true;
     try {
       await deleteHeatingDevicePreset(this.hass, this.preset.id);
       this._close();
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
       this._busy = false;
     }
   }
@@ -455,7 +454,7 @@ export class HomexHeatingDevicePresetEditor extends LitElement {
       /></span>`;
     }
     return html`<homex-select
-      placeholder="Choisir…"
+      placeholder=${t("heatingDevicePresetEditor.choose")}
       .value=${draft.value}
       .options=${choices.map(([v, label]) => ({ value: v, label }))}
       @value-changed=${(e: CustomEvent) => this._setParam(key, { value: e.detail.value })}
@@ -470,18 +469,18 @@ export class HomexHeatingDevicePresetEditor extends LitElement {
     return html`<div class="param">
       <label class="param-head">
         ${toggleSwitch(draft.enabled, (on) => this._setParam(def.key, { enabled: on }))}
-        ${def.label}
+        ${def.label()}
       </label>
       ${draft.enabled
         ? html`<div class="param-body">
             <label>
-              Entité (${def.domains.join(" / ")})
+              ${t("heatingDevicePresetEditor.entity", { domains: def.domains.join(" / ") })}
               <homex-select
-                placeholder="Choisir…"
+                placeholder=${t("heatingDevicePresetEditor.choose")}
                 .value=${draft.entity}
                 .options=${ents.map((e) => ({
                   value: e.key,
-                  label: e.suffix || "(entité principale)",
+                  label: e.suffix || t("heatingDevicePresetEditor.main_entity"),
                   secondary: e.entity_id,
                   tertiary: e.domain,
                 }))}
@@ -491,9 +490,9 @@ export class HomexHeatingDevicePresetEditor extends LitElement {
             ${def.key === "tolerance"
               ? this._renderToleranceValues(draft, ref, current)
               : html`<label>
-                  Valeur à fixer
+                  ${t("heatingDevicePresetEditor.value")}
                   ${this._renderValue(def.key, draft)}
-                  ${ref ? html`<span class="current">Actuel : ${current || "—"}</span>` : ""}
+                  ${ref ? html`<span class="current">${t("heatingDevicePresetEditor.current", { value: current || "—" })}</span>` : ""}
                 </label>`}
             ${def.key === "sensor" ? this._renderExtInput() : ""}
           </div>`
@@ -516,18 +515,18 @@ export class HomexHeatingDevicePresetEditor extends LitElement {
     /></span>`;
     return html`<div class="tolerances">
       <label>
-        Mode normal
+        ${t("heatingDevicePresetEditor.mode_normal")}
         ${input(draft.value, (v) => this._setParam("tolerance", { value: v }))}
       </label>
       <label>
-        Mode agressive
+        ${t("heatingDevicePresetEditor.mode_aggressive")}
         ${input(draft.valueAgressive ?? "", (v) =>
           this._setParam("tolerance", { valueAgressive: v })
         )}
       </label>
       ${ref
         ? html`<span class="current">
-            Actuel : ${current || "—"} · appliqué selon select.homex_climate_tolerance_mode
+            ${t("heatingDevicePresetEditor.current_tolerance", { value: current || "—" })}
           </span>`
         : ""}
     </div>`;
@@ -541,7 +540,7 @@ export class HomexHeatingDevicePresetEditor extends LitElement {
         ${toggleSwitch(!!this._extInput, (on) =>
           (this._extInput = on ? this._guessExtInput() || numbers[0]?.key || "" : "")
         )}
-        Capteur externe : la valeur choisie fait lire à la vanne une température externe
+        ${t("heatingDevicePresetEditor.external_sensor")}
       </span>
       ${this._extInput
         ? html`<homex-select
@@ -553,10 +552,7 @@ export class HomexHeatingDevicePresetEditor extends LitElement {
               }))}
               @value-changed=${(e: CustomEvent) => (this._extInput = e.detail.value)}
             ></homex-select>
-            <span class="current">
-              Entrée de température externe : le capteur choisi pour chaque radiateur
-              (dans la pièce) y est recopié à chaque mise à jour.
-            </span>`
+            <span class="current">${t("heatingDevicePresetEditor.external_input_hint")}</span>`
         : ""}
     </label>`;
   }
@@ -564,19 +560,19 @@ export class HomexHeatingDevicePresetEditor extends LitElement {
   private _renderResults() {
     const res = this._results!;
     if (!res.length) {
-      return html`<div class="results">Aucun appareil de ce modèle trouvé.</div>`;
+      return html`<div class="results">${t("heatingDevicePresetEditor.no_device")}</div>`;
     }
     return html`<div class="results">
-      <strong>Appliqué sur ${res.length} appareil(s)</strong>
+      <strong>${t("heatingDevicePresetEditor.applied_on", { count: res.length })}</strong>
       ${res.map(
         (r) => html`<div class="dev">
           ${r.failed.length ? html`<span class="ko">✗</span>` : html`<span class="ok">✓</span>`}
           ${r.name}
           ${r.applied.length
-            ? html` · ${r.applied.map((k) => PARAM_LABEL[k]).join(", ")}`
+            ? html` · ${r.applied.map((k) => paramLabel(k)).join(", ")}`
             : ""}
           ${r.failed.map(
-            (f) => html`<div class="ko">${PARAM_LABEL[f.param]} : ${f.error}</div>`
+            (f) => html`<div class="ko">${t("heatingDevicePresetEditor.failed", { param: paramLabel(f.param), error: f.error })}</div>`
           )}
         </div>`
       )}
@@ -591,48 +587,45 @@ export class HomexHeatingDevicePresetEditor extends LitElement {
       return p.enabled && p.entity && p.value !== "";
     });
     return html`
-      ${textField("Nom", this._name, (v) => {
+      ${textField(t("heatingDevicePresetEditor.name"), this._name, (v) => {
         this._name = v;
         this._nameTyped = true;
         if (!this._idEdited) this._id = slugify(v);
-      }, "Vanne thermostatique")}
+      }, t("heatingDevicePresetEditor.name_placeholder"))}
       ${editing || this._created
-        ? html`<div class="section">Id : ${this._id}</div>`
-        : textField("Id", this._id, (v) => {
+        ? html`<div class="section">${t("heatingDevicePresetEditor.id_label", { id: this._id })}</div>`
+        : textField(t("heatingDevicePresetEditor.id"), this._id, (v) => {
             this._idEdited = true;
             this._id = slugify(v);
           })}
 
-      <div class="section">Modèle de thermostat</div>
+      <div class="section">${t("heatingDevicePresetEditor.model")}</div>
       <homex-select
-        placeholder="Choisir un modèle…"
+        placeholder=${t("heatingDevicePresetEditor.choose_model")}
         .value=${this._modelKey}
         .options=${this._models.map((m) => ({
           value: m.model,
           label: m.label,
-          tertiary: `${m.count} appareil(s)`,
+          tertiary: t("heatingDevicePresetEditor.device_count", { count: m.count }),
         }))}
         @value-changed=${(e: CustomEvent) => this._onModel(e.detail.value)}
       ></homex-select>
 
       ${model
         ? html`
-            <div class="section">Appareil de référence</div>
-            <p class="hint">
-              Ses entités servent à choisir les réglages ; ils s'appliquent ensuite
-              aux ${model.count} appareil(s) du modèle.
-            </p>
+            <div class="section">${t("heatingDevicePresetEditor.reference_device")}</div>
+            <p class="hint">${t("heatingDevicePresetEditor.reference_hint", { count: model.count })}</p>
             <homex-select
               .value=${this._deviceId}
               .options=${model.devices.map((d) => ({ value: d.device_id, label: d.name }))}
               @value-changed=${(e: CustomEvent) => this._onDevice(e.detail.value)}
             ></homex-select>
 
-            <div class="section">Réglages à fixer</div>
+            <div class="section">${t("heatingDevicePresetEditor.settings")}</div>
             ${PARAMS.map((def) => this._renderParam(def))}
           `
         : this._modelKey
-          ? html`<p class="hint">Modèle introuvable (plus aucun appareil ?).</p>`
+          ? html`<p class="hint">${t("heatingDevicePresetEditor.model_not_found")}</p>`
           : ""}
 
       ${this._results ? this._renderResults() : ""}
@@ -643,19 +636,19 @@ export class HomexHeatingDevicePresetEditor extends LitElement {
           ?disabled=${this._busy || !this._name.trim() || !this._id || !model || !anyParam}
           @click=${this._save}
         >
-          ${this._busy ? "Application…" : "Enregistrer et appliquer"}
+          ${this._busy ? t("heatingDevicePresetEditor.applying") : t("heatingDevicePresetEditor.save_apply")}
         </button>
         ${editing
           ? html`<button ?disabled=${this._busy} @click=${this._apply}>
-              Appliquer maintenant
+              ${t("heatingDevicePresetEditor.apply_now")}
             </button>`
           : ""}
         <button ?disabled=${this._busy} @click=${this._close}>
-          ${this._results ? "Terminé" : "Annuler"}
+          ${this._results ? t("heatingDevicePresetEditor.done") : t("common.cancel")}
         </button>
         ${editing
           ? html`<button class="danger" ?disabled=${this._busy} @click=${this._delete}>
-              Supprimer
+              ${t("common.delete")}
             </button>`
           : ""}
       </div>

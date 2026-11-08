@@ -19,6 +19,7 @@ import {
 } from "../api";
 import { deviceModelKey, deviceModelLabel } from "../lib/device";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import "./homex-select";
 import { textField } from "../lib/fields";
 import { slugify } from "../lib/slug";
@@ -46,11 +47,14 @@ export class HomexPresetEditor extends LitElement {
   @state() private _busy = false;
   private _idEdited = false;
 
-  private static readonly TAP_MODES: { mode: TapMode; label: string }[] = [
-    { mode: "single", label: "Simple" },
-    { mode: "double", label: "Double" },
-    { mode: "long", label: "Long" },
+  private static readonly TAP_MODES: { mode: TapMode }[] = [
+    { mode: "single" },
+    { mode: "double" },
+    { mode: "long" },
   ];
+  private static _tapLabel(mode: TapMode): string {
+    return t(`presetEditor.tap_${mode}`);
+  }
 
   static styles = [
     sharedStyles,
@@ -234,7 +238,7 @@ export class HomexPresetEditor extends LitElement {
   private _enabledModes(): TapMode[] {
     const set = new Set<TapMode>();
     Object.values(this._taps).forEach((ms) => ms.forEach((m) => set.add(m)));
-    return HomexPresetEditor.TAP_MODES.map((t) => t.mode).filter((m) =>
+    return HomexPresetEditor.TAP_MODES.map((tm) => tm.mode).filter((m) =>
       set.has(m)
     );
   }
@@ -285,15 +289,15 @@ export class HomexPresetEditor extends LitElement {
     const name = this._name.trim();
     const id = this._id.trim();
     if (!name || !id) {
-      alert("Nom et id du preset requis.");
+      alert(t("presetEditor.name_id_required"));
       return;
     }
     if (!this._deviceId) {
-      alert("Choisis un appareil (modèle).");
+      alert(t("presetEditor.choose_device_model"));
       return;
     }
     if (!this._layoutId) {
-      alert("Sélectionne un layout.");
+      alert(t("presetEditor.select_layout"));
       return;
     }
     this._busy = true;
@@ -311,37 +315,34 @@ export class HomexPresetEditor extends LitElement {
       this._close(id);
     } catch (err) {
       this._busy = false;
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   }
   private async _delete() {
     if (!this.preset) return;
-    if (!confirm(`Supprimer le preset "${this.preset.name}" ?`)) return;
+    if (!confirm(t("presetEditor.confirm_delete", { name: this.preset.name }))) return;
     this._busy = true;
     try {
       await deletePreset(this.hass, this.preset.id);
       this._close();
     } catch (err) {
       this._busy = false;
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   }
 
   private _renderActions() {
     if (!this._deviceId) return "";
     if (!this._actions.length) {
-      return html`<p class="hint">Aucune action disponible pour cet appareil.</p>`;
+      return html`<p class="hint">${t("presetEditor.no_actions")}</p>`;
     }
     const modes = this._enabledModes();
     if (!modes.length) return "";
     const active = modes.includes(this._actionTab) ? this._actionTab : modes[0];
-    const label = (m: TapMode) =>
-      HomexPresetEditor.TAP_MODES.find((t) => t.mode === m)?.label ?? m;
+    const label = (m: TapMode) => HomexPresetEditor._tapLabel(m);
     return html`
-      <div class="section">Actions par bouton</div>
-      <p class="hint">
-        Pour chaque tap mode, associe chaque bouton aux actions standard du modèle.
-      </p>
+      <div class="section">${t("presetEditor.actions_per_button")}</div>
+      <p class="hint">${t("presetEditor.actions_hint")}</p>
       <div class="tabs">
         ${modes.map(
           (m) => html`<span
@@ -355,10 +356,10 @@ export class HomexPresetEditor extends LitElement {
         const current = this._bindings[active]?.[btn]?.[0] ?? "";
         const used = this._usedActions(active, btn);
         return html`<div class="bind-row">
-          <div class="btn-lbl">Bouton ${btn}</div>
+          <div class="btn-lbl">${t("presetEditor.button", { n: btn })}</div>
           <homex-select
             class="bind-select"
-            placeholder="Aucune action"
+            placeholder=${t("presetEditor.no_action")}
             .value=${current}
             .options=${this._actions
               .filter((a) => !used.has(a.label) || a.label === current)
@@ -373,36 +374,31 @@ export class HomexPresetEditor extends LitElement {
   render() {
     const editing = !!this.preset;
     return html`
-      ${textField("Nom du preset", this._name, (v) => this._onName(v), "Modèle X")}
+      ${textField(t("presetEditor.name"), this._name, (v) => this._onName(v), t("presetEditor.name_placeholder"))}
       ${editing
-        ? html`<div class="section">Id : ${this.preset!.id}</div>`
+        ? html`<div class="section">${t("presetEditor.id", { id: this.preset!.id })}</div>`
         : ""}
 
-      <div class="section">Modèle d'interrupteur</div>
+      <div class="section">${t("presetEditor.switch_model")}</div>
       ${this._models.length
         ? html`<homex-select
-            placeholder="Choisir un modèle…"
+            placeholder=${t("presetEditor.choose_model")}
             .value=${this._modelKey}
             .options=${this._models.map((m) => ({
               value: m.model,
               label: m.label,
-              tertiary: `${m.count} appareil(s)`,
+              tertiary: t("presetEditor.devices_count", { count: m.count }),
             }))}
             @value-changed=${(e: CustomEvent) => this._onModel(e.detail.value)}
           ></homex-select>`
-        : html`<p class="hint">
-            Aucun interrupteur détecté (appareil exposant des actions).
-          </p>`}
+        : html`<p class="hint">${t("presetEditor.no_switches")}</p>`}
 
       ${this._modelKey
-        ? html`<div class="section">Appareil de référence</div>
-            <p class="hint">
-              Appareil du modèle duquel les actions sont récupérées. Un même
-              modèle peut exposer des actions différentes selon l'appareil.
-            </p>
+        ? html`<div class="section">${t("presetEditor.ref_device")}</div>
+            <p class="hint">${t("presetEditor.ref_device_hint")}</p>
             ${this._devicesForModel().length
               ? html`<homex-select
-                  placeholder="Choisir un appareil…"
+                  placeholder=${t("presetEditor.choose_device")}
                   .value=${this._deviceId}
                   .options=${this._devicesForModel().map((d) => ({
                     value: d.device_id,
@@ -410,43 +406,41 @@ export class HomexPresetEditor extends LitElement {
                   }))}
                   @value-changed=${(e: CustomEvent) => this._onRefDevice(e.detail.value)}
                 ></homex-select>`
-              : html`<p class="hint">
-                  Aucun appareil détecté pour ce modèle.
-                </p>`}`
+              : html`<p class="hint">${t("presetEditor.no_devices_for_model")}</p>`}`
         : ""}
 
-      <div class="section">Layout</div>
+      <div class="section">${t("presetEditor.layout")}</div>
       ${this.layouts.length
         ? html`<homex-select
-            placeholder="Choisir un layout…"
+            placeholder=${t("presetEditor.choose_layout")}
             .value=${this._layoutId}
             .options=${this.layouts.map((l) => ({
               value: l.id,
               label: l.name,
-              tertiary: `${l.buttons} bouton(s)`,
+              tertiary: t("presetEditor.buttons_count", { count: l.buttons }),
             }))}
             @value-changed=${(e: CustomEvent) => this._onLayout(e.detail.value)}
           ></homex-select>`
-        : html`<p class="hint">Aucun layout. Crée-en un dans « Switch Layouts ».</p>`}
+        : html`<p class="hint">${t("presetEditor.no_layouts")}</p>`}
 
       ${this._selectedLayout()
         ? html`
-            <div class="section">Tap modes par bouton</div>
-            <p class="hint">Simple activé par défaut ; ajoute Double / Long au besoin.</p>
+            <div class="section">${t("presetEditor.tap_modes")}</div>
+            <p class="hint">${t("presetEditor.tap_modes_hint")}</p>
             ${Array.from(
               { length: this._selectedLayout()!.buttons },
               (_, i) => i + 1
             ).map(
               (btn) => html`<div class="btn-row">
-                <span class="btn-lbl">Bouton ${btn}</span>
+                <span class="btn-lbl">${t("presetEditor.button", { n: btn })}</span>
                 <div class="chips">
                   ${HomexPresetEditor.TAP_MODES.map(
-                    (t) => html`<span
-                      class="tap ${(this._taps[btn] ?? []).includes(t.mode)
+                    (tm) => html`<span
+                      class="tap ${(this._taps[btn] ?? []).includes(tm.mode)
                         ? "on"
                         : ""}"
-                      @click=${() => this._toggleTap(btn, t.mode)}
-                      >${t.label}</span
+                      @click=${() => this._toggleTap(btn, tm.mode)}
+                      >${HomexPresetEditor._tapLabel(tm.mode)}</span
                     >`
                   )}
                 </div>
@@ -459,12 +453,12 @@ export class HomexPresetEditor extends LitElement {
       <div class="actions">
         ${editing
           ? html`<button class="danger" ?disabled=${this._busy} @click=${this._delete}>
-              Supprimer
+              ${t("common.delete")}
             </button>`
           : ""}
-        <button @click=${this._close}>Annuler</button>
+        <button @click=${this._close}>${t("common.cancel")}</button>
         <button class="primary" ?disabled=${this._busy} @click=${this._save}>
-          ${editing ? "Enregistrer" : "Créer le preset"}
+          ${editing ? t("common.save") : t("presetEditor.create_preset")}
         </button>
       </div>
     `;

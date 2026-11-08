@@ -21,6 +21,13 @@ from .room import HomexHub, Unit
 from functools import partial
 
 from .heating_systems import systems_manager
+from .i18n import tr
+
+# User-facing strings (see i18n.py).
+_STRINGS = {
+    "en": {"global": "Global", "heating": "Heating"},
+    "fr": {"global": "Global", "heating": "Chauffage"},
+}
 
 
 async def async_setup_entry(
@@ -126,7 +133,9 @@ class RoomHeatingSwitch(SwitchEntity):
         self._heating = dict(controller._cfg(CONF_HEATING) or {})
         self._attr_unique_id = f"{ROOM_HEATING_PREFIX}{self._room_id}"
         self.entity_id = f"switch.homex_{self._room_id}_heating"
-        self._attr_name = hx_name("Climate", controller.room_name, "Chauffage")
+        self._attr_name = hx_name(
+            "Climate", controller.room_name, tr(controller.hass, _STRINGS, "heating")
+        )
 
     @property
     def is_on(self) -> bool:
@@ -287,7 +296,12 @@ class HeatingEnabledSwitch(SwitchEntity):
 
     def __init__(self) -> None:
         self.entity_id = "switch.homex_heating"
-        self._attr_name = hx_name("Climate", "Global", "Chauffage")
+
+    @property
+    def name(self) -> str:
+        return hx_name(
+            "Climate", tr(self.hass, _STRINGS, "global"), tr(self.hass, _STRINGS, "heating")
+        )
 
     @property
     def is_on(self) -> bool:

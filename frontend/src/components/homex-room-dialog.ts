@@ -10,6 +10,7 @@ import {
   updateRoom,
 } from "../api";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import "./homex-select";
 import { textField } from "../lib/fields";
 import { slugify } from "../lib/slug";
@@ -184,7 +185,7 @@ export class HomexRoomDialog extends LitElement {
     const name = this._name.trim();
     const room_id = this._id.trim();
     if (!name || !room_id) {
-      alert("Nom et id requis.");
+      alert(t("roomDialog.name_id_required"));
       return;
     }
     this._busy = true;
@@ -217,7 +218,7 @@ export class HomexRoomDialog extends LitElement {
       this._close();
     } catch (err) {
       this._busy = false;
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   }
 
@@ -226,49 +227,49 @@ export class HomexRoomDialog extends LitElement {
     return html`
       <homex-dialog
         .open=${this.open}
-        heading=${editing ? "Modifier la pièce" : "Nouvelle pièce"}
+        heading=${editing ? t("roomDialog.heading_edit") : t("roomDialog.heading_new")}
         @dialog-closed=${this._close}
       >
-        ${textField("Nom", this._name, (v) => this._onName(v), "Chambre")}
-        ${textField("Id", this._id, (v) => this._onId(v), "bedroom")}
-        <div class="section">Pièce Home Assistant (optionnel)</div>
+        ${textField(t("roomDialog.name"), this._name, (v) => this._onName(v), t("roomDialog.name_placeholder"))}
+        ${textField(t("roomDialog.id"), this._id, (v) => this._onId(v), "bedroom")}
+        <div class="section">${t("roomDialog.area")}</div>
         <homex-select
-          placeholder="Aucune"
+          placeholder=${t("roomDialog.area_none")}
           .value=${this._areaId}
           .options=${this._areas.map((a) => ({ value: a.area_id, label: a.name }))}
           @value-changed=${(e: CustomEvent) => (this._areaId = e.detail.value)}
         ></homex-select>
 
-        <div class="section">Modules</div>
+        <div class="section">${t("roomDialog.modules")}</div>
         ${this._moduleRow(
           "lights",
           "💡",
-          "Lights",
-          "Le module Lights gère l'allumage, les scènes et les groupes de la pièce."
+          t("roomDialog.module_lights"),
+          t("roomDialog.module_lights_hint")
         )}
         ${this._moduleRow(
           "switches",
           "🎛",
-          "Switches",
-          "Le module Switches gère les interrupteurs physiques de la pièce."
+          t("roomDialog.module_switches"),
+          t("roomDialog.module_switches_hint")
         )}
         ${this._moduleRow(
           "shutters",
           "🪟",
-          "Shutters",
-          "Le module Shutters gère les volets roulants de la pièce."
+          t("roomDialog.module_shutters"),
+          t("roomDialog.module_shutters_hint")
         )}
         ${this._moduleRow(
           "heating",
           "🔥",
-          "Climate",
-          "Le module Climate gère les capteurs et les radiateurs de la pièce (onglet Climate)."
+          t("roomDialog.module_climate"),
+          t("roomDialog.module_climate_hint")
         )}
 
         ${this._hasModule("lights")
           ? html`
-              <div class="tab">Lights</div>
-              <div class="section">Luminaires de la pièce</div>
+              <div class="tab">${t("roomDialog.module_lights")}</div>
+              <div class="section">${t("roomDialog.lights_devices")}</div>
               <homex-entity-picker
                 .hass=${this.hass}
                 .includeDomains=${DEVICE_DOMAINS}
@@ -277,47 +278,41 @@ export class HomexRoomDialog extends LitElement {
                   (this._devices = e.detail.value)}
               ></homex-entity-picker>
 
-              <div class="section">Scene switching strategy</div>
+              <div class="section">${t("roomDialog.strategy")}</div>
               <homex-select
                 .value=${this._strategy}
                 .options=${[
-                  { value: "recall_first", label: "Repart de zéro", secondary: "Première scène" },
-                  { value: "recall_last", label: "Dernière utilisée", secondary: "Reprend la dernière scène" },
+                  { value: "recall_first", label: t("roomDialog.strategy_first"), secondary: t("roomDialog.strategy_first_hint") },
+                  { value: "recall_last", label: t("roomDialog.strategy_last"), secondary: t("roomDialog.strategy_last_hint") },
                 ]}
                 @value-changed=${(e: CustomEvent) =>
                   (this._strategy = e.detail.value as SceneStrategy)}
               ></homex-select>
-              <p class="hint">
-                Quand un trigger scene-switching change de scène et que la pièce
-                était éteinte : repartir de la première scène, ou reprendre la
-                dernière utilisée.
-              </p>
+              <p class="hint">${t("roomDialog.strategy_hint")}</p>
             `
           : ""}
 
         ${this._hasModule("heating")
           ? html`
-              <div class="tab">Climate</div>
-              <div class="section">Zone de chauffage</div>
+              <div class="tab">${t("roomDialog.module_climate")}</div>
+              <div class="section">${t("roomDialog.heating_zone")}</div>
               <homex-select
                 .value=${this._zoneId}
                 .options=${this._zones.map((z) => ({
                   value: z.id,
                   label: z.name,
-                  secondary: z.id === "default" ? "Toutes les autres pièces" : undefined,
+                  secondary: z.id === "default" ? t("roomDialog.zone_default_hint") : undefined,
                 }))}
                 @value-changed=${(e: CustomEvent) => (this._zoneId = e.detail.value)}
               ></homex-select>
-              <p class="hint">
-                Capteurs et radiateurs se configurent dans l'onglet Climate de la pièce.
-              </p>
+              <p class="hint">${t("roomDialog.climate_hint")}</p>
             `
           : ""}
 
         <span slot="actions">
-          <button @click=${this._close}>Annuler</button>
+          <button @click=${this._close}>${t("common.cancel")}</button>
           <button class="primary" ?disabled=${this._busy} @click=${this._save}>
-            ${editing ? "Enregistrer" : "Créer la pièce"}
+            ${editing ? t("common.save") : t("roomDialog.create")}
           </button>
         </span>
       </homex-dialog>

@@ -4,6 +4,7 @@ import type { HomeAssistant, Room, TriggerSpec } from "../types";
 import { fireChanged } from "../types";
 import { errorMessage, updateRoom } from "../api";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import "./homex-dialog";
 import "./homex-trigger-selector";
 import "./homex-managed-triggers";
@@ -70,7 +71,7 @@ export class HomexTriggersDialog extends LitElement {
       this._close();
     } catch (err) {
       this._busy = false;
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   }
 
@@ -78,16 +79,14 @@ export class HomexTriggersDialog extends LitElement {
     return html`
       <homex-dialog
         .open=${this.open}
-        heading="Déclencheurs de la pièce"
+        heading=${t("triggersDialog.heading")}
         @dialog-closed=${this._close}
       >
         ${this._hasLights
           ? html`
               <div class="group">
-                <div class="section">Triggers toggle (allumer / éteindre)</div>
-                <p class="hint">
-                  Chaque déclenchement permute l'état on/off de la pièce.
-                </p>
+                <div class="section">${t("triggersDialog.toggle_title")}</div>
+                <p class="hint">${t("triggersDialog.toggle_hint")}</p>
                 <homex-trigger-selector
                   .hass=${this.hass}
                   .value=${this._toggle}
@@ -99,8 +98,8 @@ export class HomexTriggersDialog extends LitElement {
               </div>
 
               <div class="group">
-                <div class="section">Triggers scene switching</div>
-                <p class="hint">Chaque déclenchement passe à la scène suivante (cycle).</p>
+                <div class="section">${t("triggersDialog.scene_title")}</div>
+                <p class="hint">${t("triggersDialog.scene_hint")}</p>
                 <homex-trigger-selector
                   .hass=${this.hass}
                   .value=${this._scene}
@@ -109,17 +108,12 @@ export class HomexTriggersDialog extends LitElement {
                 <homex-managed-triggers
                   .triggers=${this.room?.switch_triggers?.scene_next ?? []}
                 ></homex-managed-triggers>
-                <p class="hint">
-                  La stratégie (repart de zéro / dernière utilisée) se règle dans
-                  « Modifier la pièce ».
-                </p>
+                <p class="hint">${t("triggersDialog.scene_strategy_hint")}</p>
               </div>
 
               <div class="group">
-                <div class="section">Dimmer + (monter la luminosité)</div>
-                <p class="hint">
-                  Chaque déclenchement ajoute 20 à la luminosité des lumières de la pièce.
-                </p>
+                <div class="section">${t("triggersDialog.dim_up_title")}</div>
+                <p class="hint">${t("triggersDialog.dim_up_hint")}</p>
                 <homex-trigger-selector
                   .hass=${this.hass}
                   .value=${this._dimUp}
@@ -131,10 +125,8 @@ export class HomexTriggersDialog extends LitElement {
               </div>
 
               <div class="group">
-                <div class="section">Dimmer − (baisser la luminosité)</div>
-                <p class="hint">
-                  Chaque déclenchement retire 20 à la luminosité des lumières de la pièce.
-                </p>
+                <div class="section">${t("triggersDialog.dim_down_title")}</div>
+                <p class="hint">${t("triggersDialog.dim_down_hint")}</p>
                 <homex-trigger-selector
                   .hass=${this.hass}
                   .value=${this._dimDown}
@@ -148,9 +140,9 @@ export class HomexTriggersDialog extends LitElement {
           : ""}
 
         <span slot="actions">
-          <button @click=${this._close}>Annuler</button>
+          <button @click=${this._close}>${t("common.cancel")}</button>
           <button class="primary" ?disabled=${this._busy} @click=${this._save}>
-            Enregistrer
+            ${t("common.save")}
           </button>
         </span>
       </homex-dialog>

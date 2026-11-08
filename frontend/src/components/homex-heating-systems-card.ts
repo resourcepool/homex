@@ -4,13 +4,14 @@ import { mdiFire, mdiFireOff, mdiHandBackRight, mdiPump, mdiPumpOff, mdiSpeedome
 import type { HeatingSystem, HeatingZone, HomeAssistant } from "../types";
 import { toggleSwitch } from "../lib/fields";
 import { sharedStyles } from "../lib/styles";
+import { locale, t } from "../lib/i18n";
 
 const DAYS = 7;
 const REFRESH_MS = 5 * 60 * 1000;
-const RULE_LABELS: Record<string, [string, string]> = {
-  setpoint_tank: ["Consigne − ballon", "setpoint_tank"],
-  flow_return: ["Départ − retour", "flow_return"],
-  delta: ["Consigne − ballon", "setpoint_tank"],
+const RULE_LABELS: Record<string, [() => string, string]> = {
+  setpoint_tank: [() => t("heatingSystemsCard.rule_setpoint_tank"), "setpoint_tank"],
+  flow_return: [() => t("heatingSystemsCard.rule_flow_return"), "flow_return"],
+  delta: [() => t("heatingSystemsCard.rule_setpoint_tank"), "setpoint_tank"],
 };
 
 interface Day {
@@ -296,7 +297,7 @@ export class HomexHeatingSystemsCard extends LitElement {
   private _scope(sys: HeatingSystem): string {
     const zones = sys.zones?.length ? sys.zones : ["global"];
     return zones
-      .map((z) => (z === "global" ? "Global" : this.zones.find((x) => x.id === z)?.name ?? z))
+      .map((z) => (z === "global" ? t("heatingSystemsCard.global") : this.zones.find((x) => x.id === z)?.name ?? z))
       .join(", ");
   }
 
@@ -326,7 +327,7 @@ export class HomexHeatingSystemsCard extends LitElement {
     const total = days.reduce((a, d) => a + d.minutes, 0);
     const hover = this._hover?.sid === sys.id ? days[this._hover.i] : undefined;
     const fmtDay = (d: Date) =>
-      d.toLocaleDateString(undefined, { weekday: "short", day: "numeric" });
+      d.toLocaleDateString(locale(), { weekday: "short", day: "numeric" });
     // A bar with a 4px rounded top, flat on the baseline.
     const bar = (x: number, h: number) => {
       if (h <= 0) return "";
@@ -336,11 +337,11 @@ export class HomexHeatingSystemsCard extends LitElement {
     };
     return html`<div class="chart">
       <div class="chart-head">
-        <span>Temps d'activité · ${DAYS} jours</span>
+        <span>${t("heatingSystemsCard.runtime_days", { days: DAYS })}</span>
         <span class="readout">
           ${hover
-            ? `${fmtDay(hover.date)} : ${this._dur(hover.minutes)}`
-            : `Total ${this._dur(total)} · moy. ${this._dur(total / DAYS)}/j`}
+            ? t("heatingSystemsCard.day_value", { day: fmtDay(hover.date), value: this._dur(hover.minutes) })
+            : t("heatingSystemsCard.total", { total: this._dur(total), avg: this._dur(total / DAYS) })}
         </span>
       </div>
       <svg
@@ -348,7 +349,7 @@ export class HomexHeatingSystemsCard extends LitElement {
         viewBox="0 0 ${W} ${H}"
         preserveAspectRatio="none"
         role="img"
-        aria-label=${`Temps d'activité quotidien de ${sys.name} sur ${DAYS} jours`}
+        aria-label=${t("heatingSystemsCard.chart_label", { name: sys.name, days: DAYS })}
         @pointerleave=${() => (this._hover = null)}
       >
         ${days.map((d, i) => {
@@ -364,7 +365,7 @@ export class HomexHeatingSystemsCard extends LitElement {
               height=${H}
               @pointerenter=${() => (this._hover = { sid: sys.id, i })}
             >
-              <title>${fmtDay(d.date)} : ${this._dur(d.minutes)}</title>
+              <title>${t("heatingSystemsCard.day_value", { day: fmtDay(d.date), value: this._dur(d.minutes) })}</title>
             </rect>`;
         })}
         ${svg`<line class="base" x1="0" x2=${W} y1=${H} y2=${H}></line>`}
@@ -374,7 +375,7 @@ export class HomexHeatingSystemsCard extends LitElement {
           (d, i) => html`<span
             @pointerenter=${() => (this._hover = { sid: sys.id, i })}
             @pointerleave=${() => (this._hover = null)}
-            >${d.date.toLocaleDateString(undefined, { weekday: "short" })}</span
+            >${d.date.toLocaleDateString(locale(), { weekday: "short" })}</span
           >`
         )}
       </div>
@@ -394,43 +395,43 @@ export class HomexHeatingSystemsCard extends LitElement {
       <div class="head">
         <div class="info">
           <div class="name">🛢️ ${sys.name}</div>
-          <div class="muted">Buffer Tank · ${this._scope(sys)} · min ${sys.min_runtime ?? 0} min</div>
+          <div class="muted">${t("heatingSystemsCard.buffer_tank")} · ${this._scope(sys)} · min ${sys.min_runtime ?? 0} min</div>
         </div>
         <div class="pills">
           <span class="pill ${running ? "on" : ""}" title=${sys.circulator ?? ""}>
             <svg viewBox="0 0 24 24"><path d=${running ? mdiPump : mdiPumpOff}></path></svg>
-            ${running ? "Circulation" : "Arrêté"}
+            ${running ? t("heatingSystemsCard.circulating") : t("heatingSystemsCard.stopped")}
           </span>
-          <span class="pill ${demand ? "on" : ""}" title="Demande de chauffe de la portée">
+          <span class="pill ${demand ? "on" : ""}" title=${t("heatingSystemsCard.demand_title")}>
             <svg viewBox="0 0 24 24"><path d=${demand ? mdiFire : mdiFireOff}></path></svg>
-            ${demand ? "Demande" : "Pas de demande"}
+            ${demand ? t("heatingSystemsCard.demand") : t("heatingSystemsCard.no_demand")}
           </span>
           ${forced
-            ? html`<span class="pill on"><svg viewBox="0 0 24 24"><path d=${mdiHandBackRight}></path></svg>Forcé</span>`
+            ? html`<span class="pill on"><svg viewBox="0 0 24 24"><path d=${mdiHandBackRight}></path></svg>${t("heatingSystemsCard.forced")}</span>`
             : nothing}
           ${sys.aggressive
-            ? html`<span class="pill"><svg viewBox="0 0 24 24"><path d=${mdiSpeedometer}></path></svg>Agressif</span>`
+            ? html`<span class="pill"><svg viewBox="0 0 24 24"><path d=${mdiSpeedometer}></path></svg>${t("heatingSystemsCard.aggressive")}</span>`
             : nothing}
         </div>
       </div>
       <div class="tiles">
-        <div class="tile"><div class="label">Consigne</div><div class="value">${this._temp(sys.setpoint_sensor)}</div></div>
+        <div class="tile"><div class="label">${t("heatingSystemsCard.setpoint")}</div><div class="value">${this._temp(sys.setpoint_sensor)}</div></div>
         ${sys.tank_sensor
-          ? html`<div class="tile"><div class="label">Ballon</div><div class="value">${this._temp(sys.tank_sensor)}</div></div>`
+          ? html`<div class="tile"><div class="label">${t("heatingSystemsCard.tank")}</div><div class="value">${this._temp(sys.tank_sensor)}</div></div>`
           : nothing}
         ${sys.flow_sensor
-          ? html`<div class="tile"><div class="label">Départ</div><div class="value">${this._temp(sys.flow_sensor)}</div></div>`
+          ? html`<div class="tile"><div class="label">${t("heatingSystemsCard.flow")}</div><div class="value">${this._temp(sys.flow_sensor)}</div></div>`
           : nothing}
         ${sys.return_sensor
-          ? html`<div class="tile"><div class="label">Retour</div><div class="value">${this._temp(sys.return_sensor)}</div></div>`
+          ? html`<div class="tile"><div class="label">${t("heatingSystemsCard.return")}</div><div class="value">${this._temp(sys.return_sensor)}</div></div>`
           : nothing}
         <div class="tile">
-          <div class="label">Actif aujourd'hui</div>
+          <div class="label">${t("heatingSystemsCard.tank_active_today")}</div>
           <div class="value">${Number.isNaN(today) ? "—" : this._dur(today)}</div>
         </div>
         ${left > 0
           ? html`<div class="tile">
-              <div class="label">Temps min. restant</div>
+              <div class="label">${t("heatingSystemsCard.min_time_left")}</div>
               <div class="value">${this._dur(left / 60)}</div>
             </div>`
           : nothing}
@@ -438,19 +439,19 @@ export class HomexHeatingSystemsCard extends LitElement {
       ${(sys.rules ?? []).length
         ? html`<div class="rules">
             ${(sys.rules ?? []).map((r) => {
-              const [label, key] = RULE_LABELS[r.type] ?? [r.type, r.type];
+              const [label, key] = RULE_LABELS[r.type] ?? [() => r.type, r.type];
               const gap = parseFloat(this._ent(sys, "sensor", `gap_${key}`)?.state ?? "");
               const on = this._ent(sys, "binary_sensor", `rule_${key}`)?.state === "on";
               return html`<div class="rule">
                 <span class="dot ${on ? "on" : ""}"></span>
-                <span>${label}</span>
+                <span>${label()}</span>
                 <span class="gap">${Number.isNaN(gap) ? "—" : `${gap} °C`}</span>
-                <span class="muted">démarre ≥ ${r.delta} · s'arrête &lt; ${r.tolerance} · ${on ? "demande la circulation" : "inactive"}</span>
+                <span class="muted">${t("heatingSystemsCard.rule_status", { delta: r.delta, tolerance: r.tolerance, state: on ? t("heatingSystemsCard.rule_on") : t("heatingSystemsCard.rule_off") })}</span>
               </div>`;
             })}
           </div>`
         : nothing}
-      <div class="switches">${this._toggle(sys, "force", "Forçage manuel")}</div>
+      <div class="switches">${this._toggle(sys, "force", t("heatingSystemsCard.manual_override"))}</div>
       ${this._renderChart(sys)}
     `;
   }
@@ -465,22 +466,22 @@ export class HomexHeatingSystemsCard extends LitElement {
       <div class="head">
         <div class="info">
           <div class="name">🔥 ${sys.name}</div>
-          <div class="muted">Boiler · ${this._scope(sys)}</div>
+          <div class="muted">${t("heatingSystemsCard.boiler")} · ${this._scope(sys)}</div>
         </div>
         <div class="pills">
           <span class="pill ${on ? "on" : ""}" title=${sys.contact ?? ""}>
             <svg viewBox="0 0 24 24"><path d=${on ? mdiFire : mdiFireOff}></path></svg>
-            ${on ? "En marche" : "Arrêtée"}
+            ${on ? t("heatingSystemsCard.boiler_on") : t("heatingSystemsCard.boiler_off")}
           </span>
-          <span class="pill ${demand ? "on" : ""}">${demand ? "Demande" : "Pas de demande"}</span>
+          <span class="pill ${demand ? "on" : ""}">${demand ? t("heatingSystemsCard.demand") : t("heatingSystemsCard.no_demand")}</span>
           ${sys.aggressive
-            ? html`<span class="pill"><svg viewBox="0 0 24 24"><path d=${mdiSpeedometer}></path></svg>Agressif</span>`
+            ? html`<span class="pill"><svg viewBox="0 0 24 24"><path d=${mdiSpeedometer}></path></svg>${t("heatingSystemsCard.aggressive")}</span>`
             : nothing}
         </div>
       </div>
       <div class="tiles">
         <div class="tile">
-          <div class="label">Active aujourd'hui</div>
+          <div class="label">${t("heatingSystemsCard.boiler_active_today")}</div>
           <div class="value">${Number.isNaN(today) ? "—" : this._dur(today)}</div>
         </div>
       </div>
@@ -492,7 +493,7 @@ export class HomexHeatingSystemsCard extends LitElement {
     const systems = this.systems.filter((s) => s.type === "boiler" || s.type === "buffer_tank");
     if (!systems.length) return nothing;
     return html`<div class="card">
-      <div class="card-title">Systèmes de chauffage</div>
+      <div class="card-title">${t("heatingSystemsCard.title")}</div>
       ${systems.map(
         (s) => html`<div class="system">
           ${s.type === "buffer_tank" ? this._renderTank(s) : this._renderBoiler(s)}

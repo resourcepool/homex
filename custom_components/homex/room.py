@@ -102,9 +102,64 @@ from .const import (
     STRATEGY_RECALL_LAST,
 )
 
+from .i18n import LANGUAGES, language, tr
+
 _LOGGER = logging.getLogger(__name__)
 
 ROOM_KEY = "room"
+
+# User-facing strings (see i18n.py).
+_STRINGS = {
+    "en": {
+        "scene_on_default": "On",
+        "scene_off_default": "Off",
+        "shutter_group_default": "General",
+        "room_toggle": "Toggle",
+        "group_toggle": "{group} toggle",
+        "room_light_group": "Light group",
+        "group_light_group": "{group} light group",
+        "scene_on": "Scene On",
+        "scene_off": "Scene Off",
+        "scene_named": "Scene {name}",
+        "group_scene_on": "{group} scene On",
+        "group_scene_off": "{group} scene Off",
+    },
+    "fr": {
+        "scene_on_default": "Allumé",
+        "scene_off_default": "Éteint",
+        "shutter_group_default": "Général",
+        "room_toggle": "Interrupteur",
+        "group_toggle": "Interrupteur {group}",
+        "room_light_group": "Groupe de lumières",
+        "group_light_group": "Groupe de lumières {group}",
+        "scene_on": "Scène On",
+        "scene_off": "Scène Off",
+        "scene_named": "Scène {name}",
+        "group_scene_on": "{group} scène On",
+        "group_scene_off": "{group} scène Off",
+    },
+}
+
+
+def _tr_lang(lang: str, key: str, **params) -> str:
+    """`key` in an explicit language (English fallback)."""
+    text = _STRINGS.get(lang, {}).get(key) or _STRINGS["en"][key]
+    return text.format(**params) if params else text
+
+
+def default_name(hass: HomeAssistant, key: str, name: str | None = None) -> str:
+    """Display a default-named item ("scene_on_default", "scene_off_default",
+    "shutter_group_default") in the active language: a missing name, or one
+    equal to the default of any language (never customized), is translated;
+    any other (user) name is returned unchanged."""
+    if not name or name in {_STRINGS[lang][key] for lang in _STRINGS}:
+        return tr(hass, _STRINGS, key)
+    return name
+
+
+def is_default_name(key: str, name: str | None) -> bool:
+    """Whether `name` is the default of `key` in any language."""
+    return name in {_STRINGS[lang][key] for lang in _STRINGS}
 
 
 async def _resolve_device_triggers(hass, device_id, labels) -> list[dict]:
@@ -226,7 +281,12 @@ class Unit:
     def switch_name(self) -> str:
         """HX - Lights - {room} - Toggle | {group} toggle."""
         room = self._controller.room_name
-        return hx_name("Lights", room, "Toggle" if self.is_room else f"{self.name} toggle")
+        label = (
+            tr(self.hass, _STRINGS, "room_toggle")
+            if self.is_room
+            else tr(self.hass, _STRINGS, "group_toggle", group=self.name)
+        )
+        return hx_name("Lights", room, label)
 
     @property
     def light_entity_id(self) -> str:
@@ -236,9 +296,12 @@ class Unit:
     def light_name(self) -> str:
         """HX - Lights - {room} - Light group | {group} light group."""
         room = self._controller.room_name
-        return hx_name(
-            "Lights", room, "Light group" if self.is_room else f"{self.name} light group"
+        label = (
+            tr(self.hass, _STRINGS, "room_light_group")
+            if self.is_room
+            else tr(self.hass, _STRINGS, "group_light_group", group=self.name)
         )
+        return hx_name("Lights", room, label)
 
     @property
     def scene_on_entity_id(self) -> str:
@@ -461,6 +524,11 @@ class RoomController:
                     "devices": [],
                 },
             )
+        for group in groups:
+            if group.get("id") == DEFAULT_SHUTTER_GROUP:
+                group["name"] = default_name(
+                    self.hass, "shutter_group_default", group.get("name")
+                )
         return groups
 
     def _shutter_group(self, group_id: str) -> dict | None:
@@ -610,7 +678,11 @@ class RoomController:
             if s.get("key") != "turn_off"
         ]
         if not any(s.get("key") == "turn_on" for s in stored):
-            stored = [{"key": "turn_on", "name": "Allumé"}, *stored]
+            stored = [{"key": "turn_on"}, *stored]
+        stored = [dict(s) for s in stored]
+        for scene in stored:
+            if scene.get("key") == "turn_on":
+                scene["name"] = default_name(self.hass, "scene_on_default", scene.get("name"))
         return stored
 
     @property
@@ -623,8 +695,8 @@ class RoomController:
         """Display label of the pinned off scene (renamable, default 'Éteint')."""
         for scene in self._cfg(CONF_SCENES, []) or []:
             if scene.get("key") == "turn_off":
-                return scene.get("name", "Éteint")
-        return "Éteint"
+                return default_name(self.hass, "scene_off_default", scene.get("name"))
+        return default_name(self.hass, "scene_off_default")
 
     def extra_scene_id(self, key: str) -> str:
         return f"homex_{self.room_id}_turn_on_{key}"
@@ -800,31 +872,44 @@ class RoomController:
             or f"scene.{config_id}"
         )
 
-    def _pretty_name(self, key: str, display: str | None = None) -> str:
-        """HA scene display name: HX - Lights - {room} - Scène On|Off|{name}."""
+    def _pretty_name(
+        self, key: str, display: str | None = None, lang: str | None = None
+    ) -> str:
+        """HA scene display name: HX - Lights - {room} - Scène On|Off|{name}
+        (in `lang`, else the active language)."""
+        lang = lang or language(self.hass)
         if key == "turn_on":
-            return hx_name("Lights", self.room_name, "Scène On")
+            return hx_name("Lights", self.room_name, _tr_lang(lang, "scene_on"))
         if key == "turn_off":
-            return hx_name("Lights", self.room_name, "Scène Off")
-        return hx_name("Lights", self.room_name, f"Scène {display or key}")
+            return hx_name("Lights", self.room_name, _tr_lang(lang, "scene_off"))
+        return hx_name(
+            "Lights", self.room_name, _tr_lang(lang, "scene_named", name=display or key)
+        )
 
-    def _legacy_pretty_targets(self) -> dict[str, str]:
-        """Scene id -> the former default display name (HX - {room} - on…),
-        so scenes still named so are moved to the current convention."""
+    def _legacy_pretty_targets(self) -> dict[str, set[str]]:
+        """Scene id -> former default display names (HX - {room} - on…, and the
+        convention name in the other languages), so scenes still named so are
+        moved to the current convention."""
         room = self.room_name
-        legacy = {
-            f"homex_{self.room_id}_turn_on": f"HX - {room} - on",
-            f"homex_{self.room_id}_turn_off": f"HX - {room} - off",
+        legacy: dict[str, set[str]] = {
+            f"homex_{self.room_id}_turn_on": {f"HX - {room} - on"},
+            f"homex_{self.room_id}_turn_off": {f"HX - {room} - off"},
         }
         for scene in self.extra_scenes:
-            legacy[self.extra_scene_id(scene["key"])] = (
+            legacy[self.extra_scene_id(scene["key"])] = {
                 f"HX - {room} - on - {scene.get('name') or scene['key']}"
-            )
+            }
         for unit in self.units:
             if unit.is_room:
                 continue
-            legacy[f"homex_{unit.slug}_turn_on"] = f"HX - {room} - {unit.name} - on"
-            legacy[f"homex_{unit.slug}_turn_off"] = f"HX - {room} - {unit.name} - off"
+            legacy[f"homex_{unit.slug}_turn_on"] = {f"HX - {room} - {unit.name} - on"}
+            legacy[f"homex_{unit.slug}_turn_off"] = {f"HX - {room} - {unit.name} - off"}
+        current = language(self.hass)
+        for lang in LANGUAGES:
+            if lang == current:
+                continue
+            for scene_id, name in self._pretty_targets(lang).items():
+                legacy.setdefault(scene_id, set()).add(name)
         return legacy
 
     def scene_entities(self) -> list[str]:
@@ -1253,31 +1338,33 @@ class RoomController:
             save_yaml(path, scenes)
         return changed
 
-    def _pretty_targets(self) -> dict[str, str]:
-        """Scene id -> pretty display name (room + group scenes)."""
+    def _pretty_targets(self, lang: str | None = None) -> dict[str, str]:
+        """Scene id -> pretty display name (room + group scenes), in `lang`
+        (else the active language)."""
+        lang = lang or language(self.hass)
         targets = {
-            f"homex_{self.room_id}_turn_on": self._pretty_name("turn_on"),
-            f"homex_{self.room_id}_turn_off": self._pretty_name("turn_off"),
+            f"homex_{self.room_id}_turn_on": self._pretty_name("turn_on", lang=lang),
+            f"homex_{self.room_id}_turn_off": self._pretty_name("turn_off", lang=lang),
         }
         for scene in self.extra_scenes:
             targets[self.extra_scene_id(scene["key"])] = self._pretty_name(
-                scene["key"], scene.get("name")
+                scene["key"], scene.get("name"), lang=lang
             )
         # Group scenes: HX - Lights - {room} - {group} scène On / Off.
         for unit in self.units:
             if unit.is_room:
                 continue
             targets[f"homex_{unit.slug}_turn_on"] = hx_name(
-                "Lights", self.room_name, f"{unit.name} scène On"
+                "Lights", self.room_name, _tr_lang(lang, "group_scene_on", group=unit.name)
             )
             targets[f"homex_{unit.slug}_turn_off"] = hx_name(
-                "Lights", self.room_name, f"{unit.name} scène Off"
+                "Lights", self.room_name, _tr_lang(lang, "group_scene_off", group=unit.name)
             )
         return targets
 
     @staticmethod
     def _prettify_scenes(
-        path: str, pretty: dict[str, str], legacy: dict[str, str] | None = None
+        path: str, pretty: dict[str, str], legacy: dict[str, set[str]] | None = None
     ) -> bool:
         """Set pretty names for scenes still named like their id, or still
         carrying the former default name (not customized). In executor."""
@@ -1291,9 +1378,9 @@ class RoomController:
             if not isinstance(scene, dict):
                 continue
             scene_id = scene.get("id")
-            if scene_id in pretty and scene.get("name") in (
-                scene_id,
-                (legacy or {}).get(scene_id),
+            name = scene.get("name")
+            if scene_id in pretty and name != pretty[scene_id] and (
+                name == scene_id or name in (legacy or {}).get(scene_id, ())
             ):
                 scene["name"] = pretty[scene_id]
                 changed = True

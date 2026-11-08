@@ -20,6 +20,7 @@ import {
 } from "../api";
 import { goBack, joinPath, navigate, segments } from "../lib/router";
 import { sharedStyles } from "../lib/styles";
+import { locale, t } from "../lib/i18n";
 import "./homex-select";
 import { textField } from "../lib/fields";
 import { slugify } from "../lib/slug";
@@ -32,29 +33,13 @@ import "./homex-heating-system-editor";
 
 type Section = "modes" | "setpoints" | "zones" | "devices" | "systems";
 const SECTIONS: Section[] = ["modes", "setpoints", "zones", "devices", "systems"];
-const SECTION_LABELS: Record<Section, string> = {
-  modes: "Heating Modes",
-  setpoints: "Setpoints",
-  zones: "Zones",
-  devices: "Device Presets",
-  systems: "Heating System",
-};
-const ADD_LABELS: Record<Section, string> = {
-  modes: "＋ Mode",
-  setpoints: "＋ Setpoint",
-  zones: "＋ Zone",
-  devices: "＋ Device preset",
-  systems: "＋ Système",
-};
-const PARAM_NAMES: Record<string, string> = {
-  tolerance: "Tolérance",
-  mode: "Mode",
-  lock: "Verrouillage",
-  sensor: "Capteur",
-};
+const sectionLabel = (s: Section) => t(`heatingManager.section_${s}`);
+const addLabel = (s: Section) => t(`heatingManager.add_${s}`);
+const PARAM_NAMES = ["tolerance", "mode", "lock", "sensor"];
+const paramName = (k: string) => (PARAM_NAMES.includes(k) ? t(`heatingManager.param_${k}`) : k);
 
-const formatTemp = (t: number | undefined) =>
-  t == null ? "—" : `${t.toLocaleString("fr-FR")} °C`;
+const formatTemp = (v: number | undefined) =>
+  v == null ? "—" : `${v.toLocaleString(locale())} °C`;
 
 /** Heating Manager: Heating Modes (presets), Setpoints (heating groups:
  * setpoints per rooms), Zones (rooms running their own mode) and Device
@@ -336,7 +321,7 @@ export class HomexHeatingManager extends LitElement {
       await setHeatingEnabled(this.hass, enabled);
       this._enabledLocal = enabled;
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     } finally {
       this._switching = false;
     }
@@ -369,19 +354,19 @@ export class HomexHeatingManager extends LitElement {
       );
       this._closeEditor("modes");
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
       this._busy = false;
     }
   }
 
   private async _deletePreset(preset: HeatingPreset) {
-    if (!confirm(`Supprimer le mode « ${preset.name} » et ses consignes ?`)) return;
+    if (!confirm(t("heatingManager.delete_mode_confirm", { name: preset.name }))) return;
     this._busy = true;
     try {
       await deleteHeatingPreset(this.hass, preset.id);
       this._closeEditor("modes");
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
       this._busy = false;
     }
   }
@@ -390,22 +375,22 @@ export class HomexHeatingManager extends LitElement {
     const cancel = () => this._closeEditor("modes");
     return html`
       <div class="head">
-        <button @click=${cancel}>← Heating Modes</button>
-        <h2>${preset ? "Modifier le mode" : "Nouveau mode de chauffage"}</h2>
+        <button @click=${cancel}>← ${sectionLabel("modes")}</button>
+        <h2>${preset ? t("heatingManager.edit_mode") : t("heatingManager.new_mode")}</h2>
       </div>
       <div class="editor">
-        ${textField("Nom", this._presetName, (v) => {
+        ${textField(t("heatingManager.name"), this._presetName, (v) => {
           this._presetName = v;
           if (!this._presetIdEdited) this._presetId = slugify(v);
-        }, "Vacances")}
+        }, t("heatingManager.name_placeholder"))}
         ${preset
-          ? html`<div class="section">Id : ${preset.id}</div>`
-          : textField("Id", this._presetId, (v) => {
+          ? html`<div class="section">${t("heatingManager.id_label", { id: preset.id })}</div>`
+          : textField(t("heatingManager.id"), this._presetId, (v) => {
               this._presetIdEdited = true;
               this._presetId = slugify(v);
             })}
         ${preset?.builtin
-          ? html`<p class="hint">Mode par défaut : il peut être renommé, pas supprimé.</p>`
+          ? html`<p class="hint">${t("heatingManager.builtin_hint")}</p>`
           : ""}
         <div class="actions">
           <button
@@ -413,16 +398,16 @@ export class HomexHeatingManager extends LitElement {
             ?disabled=${this._busy || !this._presetName.trim() || !this._presetId}
             @click=${() => this._savePreset(preset)}
           >
-            Enregistrer
+            ${t("common.save")}
           </button>
-          <button ?disabled=${this._busy} @click=${cancel}>Annuler</button>
+          <button ?disabled=${this._busy} @click=${cancel}>${t("common.cancel")}</button>
           ${preset && !preset.builtin
             ? html`<button
                 class="danger"
                 ?disabled=${this._busy}
                 @click=${() => this._deletePreset(preset)}
               >
-                Supprimer
+                ${t("common.delete")}
               </button>`
             : ""}
         </div>
@@ -439,7 +424,7 @@ export class HomexHeatingManager extends LitElement {
             <div>
               <div class="name">${p.name}</div>
               <div class="meta">
-                ${p.id}${p.builtin ? " · par défaut" : ""}${p.unheated ? " · coupé ou consigne" : ""}
+                ${p.id}${p.builtin ? t("heatingManager.builtin_tag") : ""}${p.unheated ? t("heatingManager.unheated_tag") : ""}
               </div>
             </div>
           </div>
@@ -460,10 +445,10 @@ export class HomexHeatingManager extends LitElement {
       const taken = new Set(all.flatMap((x) => x.rooms));
       const rest = this._rooms.filter((r) => !taken.has(r.room_id));
       return rest.length
-        ? `Autres pièces : ${rest.map((r) => r.name).join(", ")}`
-        : "Toutes les autres pièces (aucune pour l'instant)";
+        ? t("heatingManager.other_rooms", { rooms: rest.map((r) => r.name).join(", ") })
+        : t("heatingManager.all_other_rooms");
     }
-    if (!g.rooms.length) return "Aucune pièce";
+    if (!g.rooms.length) return t("heatingManager.no_rooms");
     return g.rooms
       .map((id) => this._rooms.find((r) => r.room_id === id)?.name ?? id)
       .join(", ");
@@ -484,7 +469,7 @@ export class HomexHeatingManager extends LitElement {
             ${this._presets.map(
               (p) => html`<span class="temp"
                 >${p.name} ·
-                ${p.unheated && g.setpoints[p.id] == null ? "coupé" : formatTemp(g.setpoints[p.id])}</span
+                ${p.unheated && g.setpoints[p.id] == null ? t("heatingManager.off") : formatTemp(g.setpoints[p.id])}</span
               >`
             )}
           </div>
@@ -498,14 +483,14 @@ export class HomexHeatingManager extends LitElement {
       await setHeatingZoneMode(this.hass, zone.id, modeId);
       this._zones = this._zones.map((z) => (z.id === zone.id ? { ...z, mode: modeId } : z));
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   }
 
   private _renderZones() {
     return html`<div class="grid">
       ${this._zones.map((z) => {
-        const triggers = Object.values(z.triggers ?? {}).reduce((n, t) => n + t.length, 0);
+        const triggers = Object.values(z.triggers ?? {}).reduce((n, list) => n + list.length, 0);
         return html`<div class="card" @click=${() => this._openEditor("zones", z.id)}>
           <div class="card-head">
             <div class="icon">🏠</div>
@@ -517,7 +502,7 @@ export class HomexHeatingManager extends LitElement {
             </div>
           </div>
           <label class="zone-mode" @click=${(e: Event) => e.stopPropagation()}>
-            Mode actif
+            ${t("heatingManager.active_mode")}
             <homex-select
               .value=${z.mode}
               .options=${this._presets.map((m) => ({ value: m.id, label: m.name }))}
@@ -525,7 +510,7 @@ export class HomexHeatingManager extends LitElement {
             ></homex-select>
           </label>
           <div class="meta">
-            select.homex_heating_${z.id} · ${triggers} déclencheur(s)
+            select.homex_heating_${z.id} · ${t("heatingManager.triggers", { count: triggers })}
           </div>
         </div>`;
       })}
@@ -534,13 +519,10 @@ export class HomexHeatingManager extends LitElement {
 
   private _renderSystems() {
     if (!this._systems.length) {
-      return html`<div class="msg">
-        Aucun système. Clique sur « ＋ Système » pour déclarer une chaudière (Boiler)
-        ou un ballon tampon (Buffer Tank).
-      </div>`;
+      return html`<div class="msg">${t("heatingManager.no_systems")}</div>`;
     }
     const zoneName = (id: string) =>
-      id === "global" ? "Global" : this._zones.find((z) => z.id === id)?.name ?? id;
+      id === "global" ? t("heatingManager.global") : this._zones.find((z) => z.id === id)?.name ?? id;
     return html`<div class="grid">
       ${this._systems.map((sys) => {
         if (sys.type === "buffer_tank") return this._renderTankCard(sys);
@@ -551,7 +533,7 @@ export class HomexHeatingManager extends LitElement {
             <div>
               <div class="name">${sys.name}</div>
               <div class="meta">
-                ${sys.type === "boiler" ? "Boiler" : "Heat Pump"} ·
+                ${sys.type === "boiler" ? t("heatingManager.boiler") : t("heatingManager.heat_pump")} ·
                 ${(sys.zones ?? ["global"]).map(zoneName).join(", ")}
               </div>
             </div>
@@ -559,11 +541,11 @@ export class HomexHeatingManager extends LitElement {
           ${sys.type === "boiler"
             ? html`<div class="temps">
                 <span class="temp">
-                  Contact :
+                  ${t("heatingManager.contact")}
                   ${contact?.attributes?.friendly_name ?? (sys.contact || "—")}
                   ${contact ? `(${contact.state})` : ""}
                 </span>
-                ${sys.aggressive ? html`<span class="temp">Agressif</span>` : ""}
+                ${sys.aggressive ? html`<span class="temp">${t("heatingManager.aggressive")}</span>` : ""}
               </div>`
             : ""}
         </div>`;
@@ -573,7 +555,7 @@ export class HomexHeatingManager extends LitElement {
 
   private _renderTankCard(sys: HeatingSystem) {
     const zoneName = (id: string) =>
-      id === "global" ? "Global" : this._zones.find((z) => z.id === id)?.name ?? id;
+      id === "global" ? t("heatingManager.global") : this._zones.find((z) => z.id === id)?.name ?? id;
     const temp = (id?: string) => {
       const st = id ? this.hass.states[id] : undefined;
       const v = parseFloat(st?.state ?? "");
@@ -587,29 +569,29 @@ export class HomexHeatingManager extends LitElement {
         <div>
           <div class="name">${sys.name}</div>
           <div class="meta">
-            Buffer Tank · ${(sys.zones ?? ["global"]).map(zoneName).join(", ")} ·
-            ${rules.length} règle(s) · min ${sys.min_runtime ?? 0} min
+            ${t("heatingManager.buffer_tank")} · ${(sys.zones ?? ["global"]).map(zoneName).join(", ")} ·
+            ${t("heatingManager.rules", { count: rules.length })} · min ${sys.min_runtime ?? 0} min
           </div>
         </div>
       </div>
       <div class="temps">
-        <span class="temp" title="Consigne">🎯 ${temp(sys.setpoint_sensor)}</span>
-        ${sys.tank_sensor ? html`<span class="temp" title="Ballon">🛢 ${temp(sys.tank_sensor)}</span>` : ""}
-        ${sys.flow_sensor ? html`<span class="temp" title="Départ">↗ ${temp(sys.flow_sensor)}</span>` : ""}
-        <span class="temp" title="Retour">↘ ${temp(sys.return_sensor)}</span>
-        ${sys.aggressive ? html`<span class="temp">Agressif</span>` : ""}
+        <span class="temp" title=${t("heatingManager.setpoint")}>🎯 ${temp(sys.setpoint_sensor)}</span>
+        ${sys.tank_sensor ? html`<span class="temp" title=${t("heatingManager.tank")}>🛢 ${temp(sys.tank_sensor)}</span>` : ""}
+        ${sys.flow_sensor ? html`<span class="temp" title=${t("heatingManager.flow")}>↗ ${temp(sys.flow_sensor)}</span>` : ""}
+        <span class="temp" title=${t("heatingManager.return")}>↘ ${temp(sys.return_sensor)}</span>
+        ${sys.aggressive ? html`<span class="temp">${t("heatingManager.aggressive")}</span>` : ""}
         ${this.hass.states[`switch.homex_system_${sys.id}_force`]?.state === "on"
-          ? html`<span class="temp" title="Forçage manuel activé">Forcé</span>`
+          ? html`<span class="temp" title=${t("heatingManager.forced_title")}>${t("heatingManager.forced")}</span>`
           : ""}
         ${(() => {
           const rt = parseFloat(this.hass.states[`sensor.homex_system_${sys.id}_runtime_today`]?.state ?? "");
           if (Number.isNaN(rt)) return "";
           const m = Math.round(rt);
           const txt = m >= 60 ? `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, "0")}` : `${m} min`;
-          return html`<span class="temp" title="Durée d'activité du circulateur aujourd'hui">⏱ ${txt}</span>`;
+          return html`<span class="temp" title=${t("heatingManager.runtime_title")}>⏱ ${txt}</span>`;
         })()}
         <span class="temp" title=${circ?.attributes?.friendly_name ?? sys.circulator ?? ""}>
-          Circulateur : ${circ ? (circ.state === "on" ? "en marche" : circ.state === "off" ? "arrêté" : circ.state) : "—"}
+          ${t("heatingManager.circulator")} ${circ ? (circ.state === "on" ? t("heatingManager.circulator_on") : circ.state === "off" ? t("heatingManager.circulator_off") : circ.state) : "—"}
         </span>
       </div>
     </div>`;
@@ -617,10 +599,7 @@ export class HomexHeatingManager extends LitElement {
 
   private _renderDevicePresets() {
     if (!this._devicePresets.length) {
-      return html`<div class="msg">
-        Aucun device preset. Clique sur « ＋ Device preset » pour fixer les réglages
-        d'un modèle de vanne thermostatique.
-      </div>`;
+      return html`<div class="msg">${t("heatingManager.no_device_presets")}</div>`;
     }
     return html`<div class="grid">
       ${this._devicePresets.map((p) => {
@@ -638,13 +617,13 @@ export class HomexHeatingManager extends LitElement {
               ? params.map(
                   ([k, v]) =>
                     html`<span class="temp"
-                      >${PARAM_NAMES[k] ?? k} ·
+                      >${paramName(k)} ·
                       ${String(v!.value)}${v!.value_agressive != null
                         ? ` / ${v!.value_agressive}`
                         : ""}</span
                     >`
                 )
-              : html`<span class="meta">Aucun réglage</span>`}
+              : html`<span class="meta">${t("heatingManager.no_settings")}</span>`}
           </div>
         </div>`;
       })}
@@ -655,11 +634,11 @@ export class HomexHeatingManager extends LitElement {
     return html`
       <div class="head">
         <button @click=${() => this._closeEditor(section)}>
-          ← ${SECTION_LABELS[section]}
+          ← ${sectionLabel(section)}
         </button>
         <h2></h2>
       </div>
-      <div class="msg">${this._loaded ? `« ${id} » introuvable.` : "Chargement…"}</div>
+      <div class="msg">${this._loaded ? t("heatingManager.not_found", { id }) : t("common.loading")}</div>
     `;
   }
 
@@ -675,8 +654,8 @@ export class HomexHeatingManager extends LitElement {
       if (id && !system) return this._notFound(section, id);
       return html`
         <div class="head">
-          <button @click=${() => this._closeEditor("systems")}>← Heating System</button>
-          <h2>${system ? "Modifier le système" : "Nouveau système de chauffage"}</h2>
+          <button @click=${() => this._closeEditor("systems")}>← ${sectionLabel("systems")}</button>
+          <h2>${system ? t("heatingManager.edit_system") : t("heatingManager.new_system")}</h2>
         </div>
         <div class="editor">
           <homex-heating-system-editor
@@ -693,8 +672,8 @@ export class HomexHeatingManager extends LitElement {
       if (id && !zone) return this._notFound(section, id);
       return html`
         <div class="head">
-          <button @click=${() => this._closeEditor("zones")}>← Zones</button>
-          <h2>${zone ? "Modifier la zone" : "Nouvelle zone"}</h2>
+          <button @click=${() => this._closeEditor("zones")}>← ${sectionLabel("zones")}</button>
+          <h2>${zone ? t("heatingManager.edit_zone") : t("heatingManager.new_zone")}</h2>
         </div>
         <div class="editor">
           <homex-heating-zone-editor
@@ -713,8 +692,8 @@ export class HomexHeatingManager extends LitElement {
       if (id && !preset) return this._notFound(section, id);
       return html`
         <div class="head">
-          <button @click=${() => this._closeEditor("devices")}>← Device Presets</button>
-          <h2>${preset ? "Modifier le device preset" : "Nouveau device preset"}</h2>
+          <button @click=${() => this._closeEditor("devices")}>← ${sectionLabel("devices")}</button>
+          <h2>${preset ? t("heatingManager.edit_device_preset") : t("heatingManager.new_device_preset")}</h2>
         </div>
         <div class="editor">
           <homex-heating-device-preset-editor
@@ -730,8 +709,8 @@ export class HomexHeatingManager extends LitElement {
       if (id && !group) return this._notFound(section, id);
       return html`
         <div class="head">
-          <button @click=${() => this._closeEditor("setpoints")}>← Setpoints</button>
-          <h2>${group ? "Modifier le setpoint" : "Nouveau setpoint"}</h2>
+          <button @click=${() => this._closeEditor("setpoints")}>← ${sectionLabel("setpoints")}</button>
+          <h2>${group ? t("heatingManager.edit_setpoint") : t("heatingManager.new_setpoint")}</h2>
         </div>
         <div class="editor">
           <homex-heating-group-editor
@@ -747,15 +726,15 @@ export class HomexHeatingManager extends LitElement {
     }
     return html`
       <div class="head">
-        <button @click=${this._back}>← Climate</button>
-        <h2>Heating</h2>
+        <button @click=${this._back}>${t("heatingManager.back_climate")}</button>
+        <h2>${t("heatingManager.title")}</h2>
         <label
           class="master ${this._enabled ? "on" : ""}"
           title=${this._enabled
-            ? "Désactiver : toutes les vannes passent sur off"
-            : "Activer : les presets sont ré-appliqués"}
+            ? t("heatingManager.disable_title")
+            : t("heatingManager.enable_title")}
         >
-          ${this._enabled ? "Chauffage activé" : "Chauffage désactivé"}
+          ${this._enabled ? t("heatingManager.heating_enabled") : t("heatingManager.heating_disabled")}
           <span class="toggle ${this._enabled ? "on" : ""}">
             <input
               type="checkbox"
@@ -768,7 +747,7 @@ export class HomexHeatingManager extends LitElement {
         </label>
       </div>
       <div class="tabs">
-        ${SECTIONS.map((key) => [key, SECTION_LABELS[key]] as [Section, string]).map(
+        ${SECTIONS.map((key) => [key, sectionLabel(key)] as [Section, string]).map(
           ([key, label]) => html`<span
             class="tab ${section === key ? "active" : ""}"
             @click=${() => {
@@ -782,18 +761,18 @@ export class HomexHeatingManager extends LitElement {
       <homex-select
         class="tab-picker"
         .value=${section}
-        .options=${SECTIONS.map((key) => ({ value: key, label: SECTION_LABELS[key] }))}
+        .options=${SECTIONS.map((key) => ({ value: key, label: sectionLabel(key) }))}
         @value-changed=${(e: CustomEvent) => {
           if (e.detail.value !== section) navigate(this._url(e.detail.value), true);
         }}
       ></homex-select>
       <div class="tab-actions">
         <button class="primary" @click=${() => this._openEditor(section)}>
-          ${ADD_LABELS[section]}
+          ${addLabel(section)}
         </button>
       </div>
       ${!this._loaded
-        ? html`<div class="msg">Chargement…</div>`
+        ? html`<div class="msg">${t("common.loading")}</div>`
         : section === "modes"
           ? this._renderPresets()
           : section === "setpoints"

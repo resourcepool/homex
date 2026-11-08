@@ -3,6 +3,7 @@ import { customElement, property, state } from "lit/decorators.js";
 import type { CirculationRule, HeatingSystem, HeatingZone, HomeAssistant } from "../types";
 import { deleteHeatingSystem, errorMessage, saveHeatingSystem } from "../api";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import { textField, toggleSwitch } from "../lib/fields";
 import { slugify } from "../lib/slug";
 import "./homex-select";
@@ -18,34 +19,39 @@ interface RuleDraft {
   delta: string;
   tolerance: string;
 }
-const TANK_SENSORS: [TankKey, string][] = [
-  ["setpoint_sensor", "Température de consigne"],
-  ["tank_sensor", "Température ballon"],
-  ["flow_sensor", "Température départ"],
-  ["return_sensor", "Température retour"],
+const TANK_SENSORS: [TankKey, () => string][] = [
+  ["setpoint_sensor", () => t("heatingSystemEditor.sensor_setpoint")],
+  ["tank_sensor", () => t("heatingSystemEditor.sensor_tank")],
+  ["flow_sensor", () => t("heatingSystemEditor.sensor_flow")],
+  ["return_sensor", () => t("heatingSystemEditor.sensor_return")],
 ];
 /** Per rule type: label, the gap's sensors (a - b) and their short names. */
-const RULES: Record<RuleType, { label: string; gap: [TankKey, TankKey]; a: string; b: string; init: [string, string] }> = {
+const RULES: Record<
+  RuleType,
+  { label: () => string; add: () => string; gap: [TankKey, TankKey]; a: () => string; b: () => string; init: [string, string] }
+> = {
   setpoint_tank: {
-    label: "Delta consigne / ballon",
+    label: () => t("heatingSystemEditor.rule_setpoint_tank"),
+    add: () => t("heatingSystemEditor.add_rule_setpoint_tank"),
     gap: ["setpoint_sensor", "tank_sensor"],
-    a: "consigne",
-    b: "ballon",
+    a: () => t("heatingSystemEditor.short_setpoint"),
+    b: () => t("heatingSystemEditor.short_tank"),
     init: ["6", "3"],
   },
   flow_return: {
-    label: "Delta départ / retour",
+    label: () => t("heatingSystemEditor.rule_flow_return"),
+    add: () => t("heatingSystemEditor.add_rule_flow_return"),
     gap: ["flow_sensor", "return_sensor"],
-    a: "départ",
-    b: "retour",
+    a: () => t("heatingSystemEditor.short_flow"),
+    b: () => t("heatingSystemEditor.short_return"),
     init: ["10", "5"],
   },
 };
 const LEGACY_RULES: Record<string, RuleType> = { delta: "setpoint_tank" };
 // Heat pumps are no longer offered (legacy documents still load).
-const TYPES: [HeatingSystem["type"], string][] = [
-  ["boiler", "Boiler"],
-  ["buffer_tank", "Buffer Tank"],
+const TYPES: [HeatingSystem["type"], () => string][] = [
+  ["boiler", () => t("heatingSystemEditor.type_boiler")],
+  ["buffer_tank", () => t("heatingSystemEditor.type_buffer_tank")],
 ];
 
 /** Editor of a heating system: a boiler (dry contact) or a buffer tank
@@ -219,7 +225,7 @@ export class HomexHeatingSystemEditor extends LitElement {
       const area = ent?.area_id || (ent?.device_id && this.hass.devices?.[ent.device_id]?.area_id) || "";
       byArea.set(area, [...(byArea.get(area) ?? []), id]);
     }
-    const label = (a: string) => (a ? this.hass.areas?.[a]?.name ?? a : "Sans pièce");
+    const label = (a: string) => (a ? this.hass.areas?.[a]?.name ?? a : t("heatingSystemEditor.no_area"));
     return [...byArea.entries()]
       .sort(([a], [b]) => (!a ? 1 : !b ? -1 : label(a).localeCompare(label(b))))
       .map(([a, list]) => ({
@@ -260,8 +266,8 @@ export class HomexHeatingSystemEditor extends LitElement {
   private _ruleError(r: { delta: string; tolerance: string }): string {
     const delta = parseFloat(r.delta);
     const tol = parseFloat(r.tolerance);
-    if (Number.isNaN(delta) || Number.isNaN(tol)) return "Delta et tolérance requis.";
-    if (delta <= 0 || tol < 0 || tol >= delta) return "Il faut delta > tolérance ≥ 0.";
+    if (Number.isNaN(delta) || Number.isNaN(tol)) return t("heatingSystemEditor.rule_required");
+    if (delta <= 0 || tol < 0 || tol >= delta) return t("heatingSystemEditor.rule_invalid");
     return "";
   }
 
@@ -319,20 +325,20 @@ export class HomexHeatingSystemEditor extends LitElement {
       await saveHeatingSystem(this.hass, system, !this.system);
       this._close();
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
       this._busy = false;
     }
   }
 
   private async _delete() {
     if (!this.system) return;
-    if (!confirm(`Supprimer le système « ${this.system.name} » ?`)) return;
+    if (!confirm(t("heatingSystemEditor.delete_confirm", { name: this.system.name }))) return;
     this._busy = true;
     try {
       await deleteHeatingSystem(this.hass, this.system.id);
       this._close();
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
       this._busy = false;
     }
   }
@@ -340,13 +346,10 @@ export class HomexHeatingSystemEditor extends LitElement {
   private _renderBoiler() {
     const name = (id: string) => this._name(id);
     return html`
-      <div class="section">Contact sec</div>
-      <p class="hint">
-        L'interrupteur commandé de la chaudière : activé dès que sa portée a besoin
-        d'être chauffée, désactivé sinon.
-      </p>
+      <div class="section">${t("heatingSystemEditor.dry_contact")}</div>
+      <p class="hint">${t("heatingSystemEditor.dry_contact_hint")}</p>
       <homex-select
-        placeholder="Choisir un interrupteur…"
+        placeholder=${t("heatingSystemEditor.choose_switch")}
         .value=${this._contact}
         .options=${this._contacts.map((id) => ({
           value: id,
@@ -356,7 +359,7 @@ export class HomexHeatingSystemEditor extends LitElement {
         @value-changed=${(e: CustomEvent) => (this._contact = e.detail.value)}
       ></homex-select>
 
-      ${this._renderScope("contact sec")}
+      ${this._renderScope(t("heatingSystemEditor.driven_contact"))}
     `;
   }
 
@@ -364,29 +367,28 @@ export class HomexHeatingSystemEditor extends LitElement {
   private _renderScope(driven: string) {
     const isGlobal = this._zones.includes(GLOBAL);
     return html`
-      <div class="section">Portée</div>
-      <p class="hint">Les zones dont la demande de chauffe compte pour ce système.</p>
+      <div class="section">${t("heatingSystemEditor.scope")}</div>
+      <p class="hint">${t("heatingSystemEditor.scope_hint")}</p>
       <div class="checks">
         <label>
           ${toggleSwitch(isGlobal, () => (this._zones = [GLOBAL]))}
-          Système global (toutes les zones)
+          ${t("heatingSystemEditor.global_system")}
         </label>
         ${this.zones.map(
           (z) => html`<label>
             ${toggleSwitch(!isGlobal && this._zones.includes(z.id), () =>
               this._toggleZone(z.id)
             )}
-            Zone ${z.name}
+            ${t("heatingSystemEditor.zone", { name: z.name })}
           </label>`
         )}
       </div>
 
-      <div class="section">Mode agressif</div>
+      <div class="section">${t("heatingSystemEditor.aggressive_mode")}</div>
       <div class="checks">
         <label>
           ${toggleSwitch(this._aggressive, (on) => (this._aggressive = on))}
-          Mode agressif : tolérance « agressive » sur la portée tant que le ${driven} est
-          actif
+          ${t("heatingSystemEditor.aggressive_hint", { driven })}
         </label>
       </div>
     `;
@@ -434,21 +436,25 @@ export class HomexHeatingSystemEditor extends LitElement {
       const tol = parseFloat(r.tolerance);
       explain =
         a == null
-          ? `Circule quand ballon ≤ consigne − ${r.delta} °C ; s'arrête quand ballon > consigne − ${r.tolerance} °C.`
-          : `Consigne ${fmt(a)} : circule quand ballon ≤ ${fmt(a - delta)} ; s'arrête quand ballon > ${fmt(a - tol)}.`;
+          ? t("heatingSystemEditor.explain_setpoint_tank", { delta: r.delta, tolerance: r.tolerance })
+          : t("heatingSystemEditor.explain_setpoint_tank_live", {
+              setpoint: fmt(a),
+              start: fmt(a - delta),
+              stop: fmt(a - tol),
+            });
     } else if (!err) {
-      explain = `Circule quand départ − retour ≥ ${r.delta} °C ; s'arrête quand départ − retour < ${r.tolerance} °C.`;
+      explain = t("heatingSystemEditor.explain_flow_return", { delta: r.delta, tolerance: r.tolerance });
     }
     const now =
       !err && a != null && b != null
-        ? ` Actuellement ${def.a} − ${def.b} = ${fmt(Math.max(0, a - b))}.`
+        ? t("heatingSystemEditor.currently", { a: def.a(), b: def.b(), value: fmt(Math.max(0, a - b)) })
         : "";
     return html`<div class="rule">
-      <div class="title">Règle ${i + 1} · ${def.label}</div>
-      ${this._num("Delta (°C)", r.delta, (v) => this._setRule(i, { delta: v }))}
-      ${this._num("Tolérance (°C)", r.tolerance, (v) => this._setRule(i, { tolerance: v }))}
+      <div class="title">${t("heatingSystemEditor.rule_title", { n: i + 1, label: def.label() })}</div>
+      ${this._num(t("heatingSystemEditor.delta"), r.delta, (v) => this._setRule(i, { delta: v }))}
+      ${this._num(t("heatingSystemEditor.tolerance"), r.tolerance, (v) => this._setRule(i, { tolerance: v }))}
       <button
-        title="Supprimer la règle"
+        title=${t("heatingSystemEditor.delete_rule")}
         @click=${() => (this._rules = this._rules.filter((_, j) => j !== i))}
       >
         ✕
@@ -467,15 +473,14 @@ export class HomexHeatingSystemEditor extends LitElement {
             this.hass.callService("switch", on ? "turn_on" : "turn_off", { entity_id: entity }),
             !st
           )}
-          Forçage manuel
+          ${t("heatingSystemEditor.manual_override")}
         </label>
       </div>
       <p class="hint">
-        Tant qu'il est activé, le circulateur tourne quelles que soient les règles et la
-        demande des radiateurs (si le chauffage est activé globalement).
+        ${t("heatingSystemEditor.force_hint")}
         ${st
-          ? html`Entité : <code>${entity}</code> (s'applique immédiatement).`
-          : "Disponible une fois le système enregistré."}
+          ? html`${t("heatingSystemEditor.force_entity")} <code>${entity}</code> ${t("heatingSystemEditor.force_entity_suffix")}`
+          : t("heatingSystemEditor.force_unavailable")}
       </p>`;
   }
 
@@ -484,12 +489,12 @@ export class HomexHeatingSystemEditor extends LitElement {
     const setpoints = this._grouped(this._tempSensors(true));
     const contacts = this._grouped(this._contacts);
     return html`
-      <div class="section">Capteurs</div>
+      <div class="section">${t("heatingSystemEditor.sensors")}</div>
       <div class="tank-grid">
         ${TANK_SENSORS.map(
           ([key, label]) => html`<homex-select
-            label=${this._required.has(key) ? `${label} (requis)` : label}
-            placeholder="Choisir un capteur…"
+            label=${this._required.has(key) ? t("heatingSystemEditor.required", { label: label() }) : label()}
+            placeholder=${t("heatingSystemEditor.choose_sensor")}
             .value=${this._tank[key]}
             .groups=${key === "setpoint_sensor" ? setpoints : sensors}
             @value-changed=${(e: CustomEvent) =>
@@ -498,17 +503,17 @@ export class HomexHeatingSystemEditor extends LitElement {
         )}
       </div>
 
-      <div class="section">Circulateur</div>
+      <div class="section">${t("heatingSystemEditor.circulator")}</div>
       <div class="tank-grid">
         <homex-select
-          label="Interrupteur commandé"
-          placeholder="Choisir un interrupteur…"
+          label=${t("heatingSystemEditor.controlled_switch")}
+          placeholder=${t("heatingSystemEditor.choose_switch")}
           .value=${this._circulator}
           .groups=${contacts}
           @value-changed=${(e: CustomEvent) => (this._circulator = e.detail.value)}
         ></homex-select>
         ${this._num(
-          "Temps d'exécution minimal (min)",
+          t("heatingSystemEditor.min_runtime"),
           this._minRuntime,
           (v) => (this._minRuntime = v),
           "1"
@@ -516,19 +521,14 @@ export class HomexHeatingSystemEditor extends LitElement {
       </div>
       ${this._renderForce()}
 
-      <div class="section">Règles de circulation</div>
-      <p class="hint">
-        Le circulateur tourne tant qu'au moins une règle le demande et qu'au moins un
-        radiateur a besoin de chauffer (chauffage activé globalement). Une fois lancé,
-        il tourne toujours au moins le temps d'exécution minimal, même si la
-        température remonte vite ou si plus rien ne demande de chauffe.
-      </p>
+      <div class="section">${t("heatingSystemEditor.rules")}</div>
+      <p class="hint">${t("heatingSystemEditor.rules_hint")}</p>
       ${this._rules.map((r, i) => this._renderRule(r, i))}
       <div class="rule-add">
         ${(Object.keys(RULES) as RuleType[])
-          .filter((t) => !this._rules.some((r) => r.type === t))
+          .filter((type) => !this._rules.some((r) => r.type === type))
           .map(
-          (t) => html`<button @click=${() => this._addRule(t)}>＋ Règle ${RULES[t].label.toLowerCase()}</button>`
+          (type) => html`<button @click=${() => this._addRule(type)}>${RULES[type].add()}</button>`
         )}
       </div>
     `;
@@ -537,25 +537,25 @@ export class HomexHeatingSystemEditor extends LitElement {
   render() {
     const editing = !!this.system;
     return html`
-      ${textField("Nom", this._sysName, (v) => {
+      ${textField(t("heatingSystemEditor.name"), this._sysName, (v) => {
         this._sysName = v;
         if (!this._idEdited) this._id = slugify(v);
-      }, "Chaudière")}
+      }, t("heatingSystemEditor.name_placeholder"))}
       ${editing
-        ? html`<div class="section">Id : ${this.system!.id}</div>`
-        : textField("Id", this._id, (v) => {
+        ? html`<div class="section">${t("heatingSystemEditor.id_label", { id: this.system!.id })}</div>`
+        : textField(t("heatingSystemEditor.id"), this._id, (v) => {
             this._idEdited = true;
             this._id = slugify(v);
           })}
 
-      <div class="section">Type</div>
+      <div class="section">${t("heatingSystemEditor.type")}</div>
       <div class="btn-group">
         ${TYPES.map(
           ([v, l]) => html`<button
             class=${this._type === v ? "active" : ""}
             @click=${() => (this._type = v)}
           >
-            ${l}
+            ${l()}
           </button>`
         )}
       </div>
@@ -563,10 +563,8 @@ export class HomexHeatingSystemEditor extends LitElement {
       ${this._type === "boiler"
         ? this._renderBoiler()
         : this._type === "buffer_tank"
-          ? html`${this._renderTank()}${this._renderScope("circulateur")}`
-          : html`<p class="hint">
-              Les pompes à chaleur ne sont plus proposées : choisis Boiler ou Buffer Tank.
-            </p>`}
+          ? html`${this._renderTank()}${this._renderScope(t("heatingSystemEditor.driven_circulator"))}`
+          : html`<p class="hint">${t("heatingSystemEditor.heat_pump_unavailable")}</p>`}
 
       <div class="actions">
         <button
@@ -577,12 +575,12 @@ export class HomexHeatingSystemEditor extends LitElement {
             (this._type === "buffer_tank" && !this._tankValid)}
           @click=${this._save}
         >
-          Enregistrer
+          ${t("common.save")}
         </button>
-        <button ?disabled=${this._busy} @click=${this._close}>Annuler</button>
+        <button ?disabled=${this._busy} @click=${this._close}>${t("common.cancel")}</button>
         ${editing
           ? html`<button class="danger" ?disabled=${this._busy} @click=${this._delete}>
-              Supprimer
+              ${t("common.delete")}
             </button>`
           : ""}
       </div>

@@ -1,4 +1,5 @@
 import type { DevicePreset, GlobalSwitch, HomeAssistant } from "../types";
+import { t } from "./i18n";
 
 /** A stable key identifying a device's model (manufacturer + model). */
 export function deviceModelKey(hass: HomeAssistant, deviceId: string): string {
@@ -13,7 +14,7 @@ export function deviceModelLabel(hass: HomeAssistant, deviceId: string): string 
   if (!d) return "";
   return (
     [d.manufacturer, d.model || d.model_id].filter(Boolean).join(" ") ||
-    "modèle inconnu"
+    t("lib.unknown_model")
   );
 }
 

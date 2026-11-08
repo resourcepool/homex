@@ -13,6 +13,13 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .const import DOMAIN, hx_name
 from .heating import TOLERANCE_MODES, _doc, tolerance_mode
 from .heating_zones import zones_manager
+from .i18n import tr
+
+# User-facing strings (see i18n.py).
+_STRINGS = {
+    "en": {"global": "Global", "tolerance": "Tolerance"},
+    "fr": {"global": "Global", "tolerance": "Tolérance"},
+}
 
 
 async def async_setup_entry(
@@ -43,7 +50,14 @@ class ToleranceModeSelect(SelectEntity):
 
     def __init__(self) -> None:
         self.entity_id = "select.homex_climate_tolerance_mode"
-        self._attr_name = hx_name("Climate", "Global", "Tolérance")
+
+    @property
+    def name(self) -> str:
+        return hx_name(
+            "Climate",
+            tr(self.hass, _STRINGS, "global"),
+            tr(self.hass, _STRINGS, "tolerance"),
+        )
 
     @property
     def current_option(self) -> str:

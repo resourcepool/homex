@@ -19,6 +19,7 @@ import {
   resolveSwitchPreset,
 } from "../lib/device";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import { areaNames, deviceArea, splitByArea } from "../lib/area";
 import "./homex-select";
 import { textField, toggleSwitch } from "../lib/fields";
@@ -253,11 +254,11 @@ export class HomexGswitchEditor extends LitElement {
     const name = this._name.trim();
     const id = this._id.trim();
     if (!name || !id) {
-      alert("Nom et id du switch requis.");
+      alert(t("gswitchEditor.name_id_required"));
       return;
     }
     if (!this._deviceId) {
-      alert("Choisis un appareil.");
+      alert(t("gswitchEditor.choose_device"));
       return;
     }
     this._busy = true;
@@ -277,19 +278,19 @@ export class HomexGswitchEditor extends LitElement {
       this._close();
     } catch (err) {
       this._busy = false;
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   }
   private async _delete() {
     if (!this.sw) return;
-    if (!confirm(`Supprimer le switch "${this.sw.name}" ?`)) return;
+    if (!confirm(t("gswitchEditor.confirm_delete", { name: this.sw.name }))) return;
     this._busy = true;
     try {
       await deleteGlobalSwitch(this.hass, this.sw.id);
       this._close();
     } catch (err) {
       this._busy = false;
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
     }
   }
 
@@ -298,25 +299,26 @@ export class HomexGswitchEditor extends LitElement {
     const ofModel = this._modelPresets();
     const modelLabel = deviceModelLabel(this.hass, this._deviceId);
     if (!ofModel.length) {
+      const [before, after] = t("gswitchEditor.no_preset_for_model").split("{model}");
       return html`<div class="preset-box">
         <div class="row">
-          <span>Aucun preset pour le modèle <b>${modelLabel}</b>.</span>
+          <span>${before}<b>${modelLabel}</b>${after}</span>
           <button class="primary" @click=${this._createPreset}>
-            ＋ Créer un preset
+            ${t("gswitchEditor.create_preset")}
           </button>
         </div>
       </div>`;
     }
     return html`<div class="preset-box ${preset ? "ok" : ""}">
-      <div class="section">Preset</div>
+      <div class="section">${t("gswitchEditor.preset")}</div>
       <homex-select
         .value=${preset?.id ?? ""}
         .options=${ofModel.map((p) => ({ value: p.id, label: p.name }))}
         @value-changed=${(e: CustomEvent) => (this._presetId = e.detail.value)}
       ></homex-select>
       <div class="row">
-        <span class="hint">Modèle : ${modelLabel}</span>
-        <button @click=${this._createPreset}>＋ Nouveau preset</button>
+        <span class="hint">${t("gswitchEditor.model", { model: modelLabel })}</span>
+        <button @click=${this._createPreset}>${t("gswitchEditor.new_preset")}</button>
       </div>
     </div>`;
   }
@@ -324,7 +326,7 @@ export class HomexGswitchEditor extends LitElement {
   /** Rooms multi-select: a dropdown of checkable rooms. */
   private _renderRooms() {
     if (!this._allRooms.length) {
-      return html`<p class="hint">Aucune pièce avec le module Switches.</p>`;
+      return html`<p class="hint">${t("gswitchEditor.no_rooms_with_module")}</p>`;
     }
     const selected = this._allRooms
       .filter((r) => this._rooms.includes(r.room_id))
@@ -332,7 +334,7 @@ export class HomexGswitchEditor extends LitElement {
     return html`<details class="multi">
       <summary>
         <span class=${selected.length ? "" : "placeholder"}>
-          ${selected.length ? selected.join(", ") : "— Aucune pièce —"}
+          ${selected.length ? selected.join(", ") : t("gswitchEditor.no_room")}
         </span>
         ▾
       </summary>
@@ -365,43 +367,41 @@ export class HomexGswitchEditor extends LitElement {
       secondary: d.model_label,
     });
     return html`
-      ${textField("Nom", this._name, (v) => this._onName(v), "Interrupteur chevet")}
-      ${editing ? html`<div class="section">Id : ${this.sw!.id}</div>` : ""}
+      ${textField(t("gswitchEditor.name"), this._name, (v) => this._onName(v), t("gswitchEditor.name_placeholder"))}
+      ${editing ? html`<div class="section">${t("gswitchEditor.id", { id: this.sw!.id })}</div>` : ""}
 
-      <div class="section">Interrupteur (appareil)</div>
+      <div class="section">${t("gswitchEditor.device")}</div>
       ${this._devices.length
         ? html`<homex-select
-            placeholder="Choisir un interrupteur…"
+            placeholder=${t("gswitchEditor.choose_switch")}
             .value=${this._deviceId}
             .options=${areaIds.length ? [] : this._devices.map(deviceOpt)}
             .groups=${areaIds.length
               ? [
                   ...(inArea.length
-                    ? [{ label: `Pièce : ${areaNames(this.hass, areaIds)}`, options: inArea.map(deviceOpt) }]
+                    ? [{ label: t("gswitchEditor.area", { names: areaNames(this.hass, areaIds) }), options: inArea.map(deviceOpt) }]
                     : []),
-                  { label: "Autres", options: others.map(deviceOpt) },
+                  { label: t("gswitchEditor.others"), options: others.map(deviceOpt) },
                 ]
               : []}
             @value-changed=${(e: CustomEvent) => this._onDevice(e.detail.value)}
           ></homex-select>`
-        : html`<p class="hint">
-            Aucun interrupteur détecté (appareil exposant des actions).
-          </p>`}
+        : html`<p class="hint">${t("gswitchEditor.no_devices")}</p>`}
 
       ${this._deviceId ? this._renderPreset(preset) : ""}
 
-      <div class="section">Pièces Homex assignées (0..n)</div>
+      <div class="section">${t("gswitchEditor.rooms")}</div>
       ${this._renderRooms()}
 
       <div class="actions">
         ${editing
           ? html`<button class="danger" ?disabled=${this._busy} @click=${this._delete}>
-              Supprimer
+              ${t("common.delete")}
             </button>`
           : ""}
-        <button @click=${this._close}>Annuler</button>
+        <button @click=${this._close}>${t("common.cancel")}</button>
         <button class="primary" ?disabled=${this._busy} @click=${this._save}>
-          ${editing ? "Enregistrer" : "Créer le switch"}
+          ${editing ? t("common.save") : t("gswitchEditor.create_switch")}
         </button>
       </div>
     `;

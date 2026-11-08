@@ -1,6 +1,7 @@
 import { LitElement, css, html, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { mdiCheck, mdiChevronDown } from "@mdi/js";
+import { t } from "../lib/i18n";
 
 export interface SelectOption {
   value: string;
@@ -384,7 +385,7 @@ export class HomexSelect extends LitElement {
                 ${g.options.map((o) => this._renderOption(o))}`
             )}
             ${!this._flat.length
-              ? html`<div class="empty">Aucune option</div>`
+              ? html`<div class="empty">${t("select.no_option")}</div>`
               : nothing}
           </div>`
         : nothing}

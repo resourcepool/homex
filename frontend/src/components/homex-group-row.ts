@@ -4,6 +4,7 @@ import { mdiLightbulbOn, mdiLightbulbOffOutline } from "@mdi/js";
 import type { Group, HomeAssistant, Room } from "../types";
 import { openHaPage } from "../lib/router";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import "./homex-unit-controls";
 import "./homex-group-dialog";
 
@@ -65,7 +66,7 @@ export class HomexGroupRow extends LitElement {
           class="scene-link"
           href="/config/scene/edit/homex_${slug}_turn_on"
           @click=${this._openScene}
-          title="Éditer la scène « allumé » du groupe"
+          title=${t("groupRow.edit_on_scene")}
         >
           <svg viewBox="0 0 24 24"><path d=${mdiLightbulbOn}></path></svg>
         </a>
@@ -73,11 +74,11 @@ export class HomexGroupRow extends LitElement {
           class="scene-link"
           href="/config/scene/edit/homex_${slug}_turn_off"
           @click=${this._openScene}
-          title="Éditer la scène « éteint » du groupe"
+          title=${t("groupRow.edit_off_scene")}
         >
           <svg viewBox="0 0 24 24"><path d=${mdiLightbulbOffOutline}></path></svg>
         </a>
-        <button title="Configurer le groupe" @click=${() => (this._open = true)}>
+        <button title=${t("groupRow.configure")} @click=${() => (this._open = true)}>
           ⚙︎
         </button>
       </div>

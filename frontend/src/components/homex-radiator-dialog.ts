@@ -16,6 +16,7 @@ import {
   updateRoom,
 } from "../api";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import { areaNames, deviceArea, entityArea, splitByArea } from "../lib/area";
 import "./homex-select";
 import "./homex-dialog";
@@ -119,7 +120,7 @@ export class HomexRadiatorDialog extends LitElement {
       fireChanged(this);
       this._close();
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
       this._busy = false;
     }
   }
@@ -157,27 +158,27 @@ export class HomexRadiatorDialog extends LitElement {
       tertiary: cur(id),
     });
     return html`
-      <div class="section">Capteur de température externe</div>
-      <p class="hint">Sa température est recopiée dans la vanne à chaque mise à jour.</p>
+      <div class="section">${t("radiatorDialog.external_sensor")}</div>
+      <p class="hint">${t("radiatorDialog.external_sensor_hint")}</p>
       <homex-select
-        placeholder="Choisir un capteur…"
+        placeholder=${t("radiatorDialog.choose_sensor")}
         .value=${sel}
         .groups=${[
           ...(hasRef
-            ? [{ label: "Référence de la pièce", options: [opt(ref, `Température de référence (${this.room.name})`)] }]
+            ? [{ label: t("radiatorDialog.room_reference"), options: [opt(ref, t("radiatorDialog.reference_temperature", { room: this.room.name }))] }]
             : []),
           ...(roomSensors.length
-            ? [{ label: "Capteurs de la pièce", options: roomSensors.map((id) => opt(id)) }]
+            ? [{ label: t("radiatorDialog.room_sensors"), options: roomSensors.map((id) => opt(id)) }]
             : []),
           ...(inArea.length
-            ? [{ label: `Pièce : ${areaNames(this.hass, [this.room.area_id])}`, options: inArea.map((id) => opt(id)) }]
+            ? [{ label: t("radiatorDialog.area", { area: areaNames(this.hass, [this.room.area_id]) }), options: inArea.map((id) => opt(id)) }]
             : []),
-          { label: "Autres", options: rest.map((id) => opt(id)) },
+          { label: t("radiatorDialog.others"), options: rest.map((id) => opt(id)) },
         ]}
         @value-changed=${(e: CustomEvent) =>
           (this._rad = { ...this._rad, external_sensor: e.detail.value })}
       ></homex-select>
-      ${sel ? "" : html`<p class="hint warn">Ce preset utilise un capteur externe : choisis-en un.</p>`}
+      ${sel ? "" : html`<p class="hint warn">${t("radiatorDialog.sensor_required")}</p>`}
     `;
   }
 
@@ -205,63 +206,63 @@ export class HomexRadiatorDialog extends LitElement {
       value: d.device_id,
       label: d.name,
       secondary: d.label,
-      tertiary: used.has(d.device_id) ? "déjà dans la pièce" : undefined,
+      tertiary: used.has(d.device_id) ? t("radiatorDialog.already_in_room") : undefined,
       disabled: used.has(d.device_id),
     });
     return html`
       <homex-dialog
         compact
         .open=${this.open}
-        .heading=${editing ? "Modifier le radiateur" : "Ajouter un radiateur"}
+        .heading=${editing ? t("radiatorDialog.edit_title") : t("radiatorDialog.add_title")}
         @dialog-closed=${this._close}
       >
-        <div class="section">Radiateur</div>
+        <div class="section">${t("radiatorDialog.radiator")}</div>
         <homex-select
-          placeholder="Choisir un radiateur…"
+          placeholder=${t("radiatorDialog.choose_radiator")}
           .value=${this._rad.device_id}
           ?disabled=${editing}
           .options=${areaId ? [] : this._thermostats.map(thermostatOpt)}
           .groups=${areaId
             ? [
                 ...(inArea.length
-                  ? [{ label: `Pièce : ${areaName ?? areaId}`, options: inArea.map(thermostatOpt) }]
+                  ? [{ label: t("radiatorDialog.area", { area: areaName ?? areaId }), options: inArea.map(thermostatOpt) }]
                   : []),
-                { label: "Autres", options: others.map(thermostatOpt) },
+                { label: t("radiatorDialog.others"), options: others.map(thermostatOpt) },
               ]
             : []}
           @value-changed=${(e: CustomEvent) => this._onDevice(e.detail.value)}
         ></homex-select>
-        ${other ? html`<p class="hint warn">Déjà dans la pièce « ${other.name} ».</p>` : ""}
+        ${other ? html`<p class="hint warn">${t("radiatorDialog.already_in_other_room", { room: other.name })}</p>` : ""}
 
-        <div class="section">Device preset</div>
+        <div class="section">${t("radiatorDialog.device_preset")}</div>
         <homex-select
-          placeholder="Aucun preset"
+          placeholder=${t("radiatorDialog.no_preset")}
           .value=${this._rad.preset_id}
           ?disabled=${!this._rad.device_id}
           .options=${presets.map((p) => ({
             value: p.id,
             label: p.name,
-            tertiary: p.external_input ? "capteur externe" : undefined,
+            tertiary: p.external_input ? t("radiatorDialog.external_sensor_tag") : undefined,
           }))}
           @value-changed=${(e: CustomEvent) =>
             (this._rad = { ...this._rad, preset_id: e.detail.value })}
         ></homex-select>
         <p class="hint">
           ${this._rad.device_id && !presets.length
-            ? "Aucun device preset pour ce modèle (Climate Manager → Heating → Device Presets)."
-            : "Le preset est appliqué en continu (vérifié et ré-appliqué toutes les 10 minutes)."}
+            ? t("radiatorDialog.no_preset_for_model")
+            : t("radiatorDialog.preset_applied")}
         </p>
 
         ${this._preset?.external_input ? this._renderExternalSensor() : ""}
 
         <span slot="actions">
-          <button @click=${this._close}>Annuler</button>
+          <button @click=${this._close}>${t("common.cancel")}</button>
           <button
             class="primary"
             ?disabled=${this._busy || !this._rad.device_id}
             @click=${this._save}
           >
-            ${editing ? "Enregistrer" : "Ajouter"}
+            ${editing ? t("common.save") : t("common.add")}
           </button>
         </span>
       </homex-dialog>

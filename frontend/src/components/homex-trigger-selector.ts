@@ -5,6 +5,7 @@ import type { HomeAssistant, TriggerSpec } from "../types";
 import type { DeviceTrigger } from "../api";
 import { fetchDeviceTriggers } from "../api";
 import { TRIGGER_DOMAINS } from "../lib/domains";
+import { t } from "../lib/i18n";
 import "./homex-device-field";
 import "./homex-select";
 
@@ -302,7 +303,7 @@ export class HomexTriggerSelector extends LitElement {
       .filter((id) => TRIGGER_DOMAINS.includes(id.split(".")[0]))
       .sort();
     return html`<homex-select
-      placeholder="Sélectionnez une entité"
+      placeholder=${t("triggerSelector.select_entity")}
       .value=${value ?? ""}
       .options=${ids.map((id) => ({
         value: id,
@@ -314,13 +315,13 @@ export class HomexTriggerSelector extends LitElement {
   }
 
   private _entityTypeField(cfg: TriggerSpec, i: number) {
-    const t = this._entityType(cfg);
-    return html`<label class="field"><span>Type</span>
+    const type = this._entityType(cfg);
+    return html`<label class="field"><span>${t("triggerSelector.type")}</span>
       <homex-select
-        .value=${t}
+        .value=${type}
         .options=${[
-          { value: "state", label: "État" },
-          { value: "numeric", label: "État numérique" },
+          { value: "state", label: t("triggerSelector.type_state") },
+          { value: "numeric", label: t("triggerSelector.type_numeric") },
         ]}
         @value-changed=${(e: CustomEvent) =>
           this._setEntityType(i, cfg, e.detail.value as "state" | "numeric")}
@@ -332,9 +333,9 @@ export class HomexTriggerSelector extends LitElement {
     const id = this._entityOf(cfg);
     const attrs = Object.keys(this.hass.states[id]?.attributes || {});
     const cur = cfg.attribute || "";
-    return html`<label class="field"><span>Attribut (facultatif)</span>
+    return html`<label class="field"><span>${t("triggerSelector.attribute")}</span>
       <homex-select
-        placeholder="(état de l'entité)"
+        placeholder=${t("triggerSelector.attribute_none")}
         .value=${cur}
         .options=${attrs.map((a) => ({ value: a, label: a }))}
         @value-changed=${(e: CustomEvent) => this._setKey(i, cfg, "attribute", e.detail.value)}
@@ -411,7 +412,7 @@ export class HomexTriggerSelector extends LitElement {
       @change=${(e: Event) =>
         this._setForPart(cfg, i, part, Number((e.target as HTMLInputElement).value))}
     />`;
-    return html`<label class="field"><span>Pendant (facultatif)</span>
+    return html`<label class="field"><span>${t("triggerSelector.for")}</span>
       <div class="dur-row">
         ${inp("h", p.h, "hh")}<span>:</span>${inp("m", p.m, "mm")}<span>:</span>${inp("s", p.s, "ss")}
       </div>
@@ -425,10 +426,10 @@ export class HomexTriggerSelector extends LitElement {
       ${this._entityTypeField(cfg, i)}
       ${this._attrField(cfg, i)}
       ${numeric
-        ? html`${this._numField(cfg, i, "above", "Au-dessus de (facultatif)")}
-            ${this._numField(cfg, i, "below", "En-dessous de (facultatif)")}`
-        : html`${this._stateValueField(cfg, i, "from", "De (facultatif)")}
-            ${this._stateValueField(cfg, i, "to", "À (facultatif)")}`}
+        ? html`${this._numField(cfg, i, "above", t("triggerSelector.above"))}
+            ${this._numField(cfg, i, "below", t("triggerSelector.below"))}`
+        : html`${this._stateValueField(cfg, i, "from", t("triggerSelector.from"))}
+            ${this._stateValueField(cfg, i, "to", t("triggerSelector.to"))}`}
       ${this._forField(cfg, i)}
     `;
   }
@@ -452,7 +453,7 @@ export class HomexTriggerSelector extends LitElement {
     const list = this._devTriggers[cfg.device_id] || [];
     const current = this._deviceTriggerIndex(cfg);
     return html`<homex-select
-      placeholder="Sélectionnez une action"
+      placeholder=${t("triggerSelector.select_action")}
       .value=${current >= 0 ? String(current) : ""}
       .options=${list.map((d, idx) => ({ value: String(idx), label: d.label }))}
       @value-changed=${(e: CustomEvent) => {
@@ -467,18 +468,18 @@ export class HomexTriggerSelector extends LitElement {
     return html`<div class="card">
       <div class="head">
         <svg viewBox="0 0 24 24"><path d=${isDevice ? mdiDevices : mdiShape}></path></svg>
-        <span class="title">${isDevice ? "Appareil" : "Entité"}</span>
-        <button class="icon-btn" title="Supprimer" @click=${() => this._remove(i)}>
+        <span class="title">${isDevice ? t("triggerSelector.device") : t("triggerSelector.entity")}</span>
+        <button class="icon-btn" title=${t("common.delete")} @click=${() => this._remove(i)}>
           <svg viewBox="0 0 24 24"><path d=${mdiClose}></path></svg>
         </button>
       </div>
       <div class="body">
         ${isDevice
-          ? html`<label class="field"><span>Appareil</span>${this._deviceField(cfg, i)}</label>
+          ? html`<label class="field"><span>${t("triggerSelector.device")}</span>${this._deviceField(cfg, i)}</label>
               ${cfg.device_id
-                ? html`<label class="field"><span>Action</span>${this._actionField(cfg, i)}</label>`
+                ? html`<label class="field"><span>${t("triggerSelector.action")}</span>${this._actionField(cfg, i)}</label>`
                 : ""}`
-          : html`<label class="field"><span>Entité</span>${this._entityField(cfg, i)}</label>
+          : html`<label class="field"><span>${t("triggerSelector.entity")}</span>${this._entityField(cfg, i)}</label>
               ${this._entityBody(cfg, i)}`}
       </div>
     </div>`;
@@ -490,17 +491,17 @@ export class HomexTriggerSelector extends LitElement {
       <div class="add-wrap">
         <button class="add-btn" @click=${() => (this._menuOpen = !this._menuOpen)}>
           <svg viewBox="0 0 24 24"><path d=${mdiPlus}></path></svg>
-          Ajouter un déclencheur
+          ${t("triggerSelector.add_trigger")}
         </button>
         ${this._menuOpen
           ? html`
               <div class="backdrop" @click=${() => (this._menuOpen = false)}></div>
               <div class="menu">
                 <button @click=${() => this._add("entity")}>
-                  <svg viewBox="0 0 24 24"><path d=${mdiShape}></path></svg> Entité
+                  <svg viewBox="0 0 24 24"><path d=${mdiShape}></path></svg> ${t("triggerSelector.entity")}
                 </button>
                 <button @click=${() => this._add("device")}>
-                  <svg viewBox="0 0 24 24"><path d=${mdiDevices}></path></svg> Appareil
+                  <svg viewBox="0 0 24 24"><path d=${mdiDevices}></path></svg> ${t("triggerSelector.device")}
                 </button>
               </div>
             `

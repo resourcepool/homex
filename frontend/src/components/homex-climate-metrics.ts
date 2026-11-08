@@ -11,6 +11,7 @@ import type {
 import { errorMessage, fetchRooms, updateRoom } from "../api";
 import { goBack, joinPath, navigate, segments } from "../lib/router";
 import { sharedStyles } from "../lib/styles";
+import { t } from "../lib/i18n";
 import { entityArea } from "../lib/area";
 import "./homex-select";
 
@@ -18,24 +19,36 @@ const CLIMATE_MODULE = "heating"; // the Climate module's key
 
 interface MetricDef {
   key: MetricKey;
-  label: string;
+  label: () => string;
   icon: string;
   deviceClass: string;
-  section: string;
+  section: () => string;
 }
 
 const METRIC_DEFS: MetricDef[] = [
-  { key: "temperature", label: "Température", icon: "🌡", deviceClass: "temperature", section: "Température" },
-  { key: "humidity", label: "Humidité", icon: "💧", deviceClass: "humidity", section: "Humidité" },
-  { key: "pm25", label: "PM2.5", icon: "🌫", deviceClass: "pm25", section: "Qualité de l'air" },
-  { key: "pm10", label: "PM10", icon: "🌫", deviceClass: "pm10", section: "Qualité de l'air" },
-  { key: "co2", label: "CO₂", icon: "🫧", deviceClass: "carbon_dioxide", section: "CO₂" },
+  {
+    key: "temperature",
+    label: () => t("climateMetrics.temperature"),
+    icon: "🌡",
+    deviceClass: "temperature",
+    section: () => t("climateMetrics.temperature"),
+  },
+  {
+    key: "humidity",
+    label: () => t("climateMetrics.humidity"),
+    icon: "💧",
+    deviceClass: "humidity",
+    section: () => t("climateMetrics.humidity"),
+  },
+  { key: "pm25", label: () => "PM2.5", icon: "🌫", deviceClass: "pm25", section: () => t("climateMetrics.air_quality") },
+  { key: "pm10", label: () => "PM10", icon: "🌫", deviceClass: "pm10", section: () => t("climateMetrics.air_quality") },
+  { key: "co2", label: () => "CO₂", icon: "🫧", deviceClass: "carbon_dioxide", section: () => "CO₂" },
 ];
 
-const RULES: [MetricRule, string][] = [
-  ["mean", "Moyenne pondérée"],
-  ["max", "Maximum"],
-  ["min", "Minimum"],
+const RULES: [MetricRule, () => string][] = [
+  ["mean", () => t("climateMetrics.rule_mean")],
+  ["max", () => t("climateMetrics.rule_max")],
+  ["min", () => t("climateMetrics.rule_min")],
 ];
 
 /** Combine (value, weight) pairs like the backend (sensor.py). */
@@ -256,7 +269,7 @@ export class HomexClimateMetrics extends LitElement {
 
   private async _openRoom(room: Room) {
     if (!this._hasClimate(room)) {
-      if (!confirm(`Activer le module Climate sur la pièce « ${room.name} » ?`)) return;
+      if (!confirm(t("climateMetrics.enable_module", { room: room.name }))) return;
       try {
         await updateRoom(this.hass, {
           entry_id: room.entry_id,
@@ -264,7 +277,7 @@ export class HomexClimateMetrics extends LitElement {
         });
         await this._load();
       } catch (err) {
-        alert("Erreur Homex : " + errorMessage(err));
+        alert(t("common.error", { message: errorMessage(err) }));
         return;
       }
     }
@@ -338,7 +351,7 @@ export class HomexClimateMetrics extends LitElement {
       await this._load();
       goBack(this.base);
     } catch (err) {
-      alert("Erreur Homex : " + errorMessage(err));
+      alert(t("common.error", { message: errorMessage(err) }));
       this._busy = false;
     }
   }
@@ -357,7 +370,7 @@ export class HomexClimateMetrics extends LitElement {
     });
     return html`<div class="metric">
       <div class="metric-head">
-        <span class="title">${def.icon} ${def.label}</span>
+        <span class="title">${def.icon} ${def.label()}</span>
         ${cfg.sensors.length
           ? html`<span class="ref">${this._reference(def.key)}</span>`
           : ""}
@@ -365,9 +378,9 @@ export class HomexClimateMetrics extends LitElement {
       ${cfg.sensors.length > 1
         ? html`<homex-select
             class="rule"
-            label="Calcul de la valeur de référence"
+            label=${t("climateMetrics.rule_label")}
             .value=${cfg.rule}
-            .options=${RULES.map(([v, l]) => ({ value: v, label: l }))}
+            .options=${RULES.map(([v, l]) => ({ value: v, label: l() }))}
             @value-changed=${(e: CustomEvent) =>
               this._setCfg(def.key, { ...cfg, rule: e.detail.value as MetricRule })}
           ></homex-select>`
@@ -381,7 +394,7 @@ export class HomexClimateMetrics extends LitElement {
                 type="number"
                 min="0"
                 step="0.1"
-                title="Poids"
+                title=${t("climateMetrics.weight")}
                 .value=${String(s.weight)}
                 @change=${(e: Event) => {
                   const w = Math.max(0, parseFloat((e.target as HTMLInputElement).value) || 0);
@@ -393,7 +406,7 @@ export class HomexClimateMetrics extends LitElement {
               />`
             : html`<span></span>`}
           <button
-            title="Retirer"
+            title=${t("climateMetrics.remove")}
             @click=${() =>
               this._setCfg(def.key, {
                 ...cfg,
@@ -406,13 +419,13 @@ export class HomexClimateMetrics extends LitElement {
       )}
       <homex-select
         class="add"
-        placeholder="＋ Ajouter un capteur…"
+        placeholder=${t("climateMetrics.add_sensor")}
         value=""
         .groups=${[
           ...(area.length
-            ? [{ label: `Pièce : ${areaName ?? room.area_id}`, options: area.map((id) => sensorOpt(id)) }]
+            ? [{ label: t("climateMetrics.area", { area: areaName ?? room.area_id ?? "" }), options: area.map((id) => sensorOpt(id)) }]
             : []),
-          { label: "Autres", options: others.map((id) => sensorOpt(id)) },
+          { label: t("climateMetrics.others"), options: others.map((id) => sensorOpt(id)) },
         ]}
         @value-changed=${(e: CustomEvent) => {
           this._addSensor(def.key, e.detail.value);
@@ -426,15 +439,16 @@ export class HomexClimateMetrics extends LitElement {
     let lastSection = "";
     return html`
       <div class="head">
-        <button @click=${() => goBack(this.base)}>← Metrics</button>
+        <button @click=${() => goBack(this.base)}>${t("climateMetrics.back_metrics")}</button>
         <h2>${room.name}</h2>
         <button class="primary" ?disabled=${this._busy} @click=${() => this._save(room)}>
-          Enregistrer
+          ${t("common.save")}
         </button>
       </div>
       ${METRIC_DEFS.map((def) => {
-        const title = def.section !== lastSection ? def.section : "";
-        lastSection = def.section;
+        const section = def.section();
+        const title = section !== lastSection ? section : "";
+        lastSection = section;
         return html`${title ? html`<div class="section-title">${title}</div>` : ""}
           ${this._renderMetric(def, room)}`;
       })}
@@ -444,7 +458,7 @@ export class HomexClimateMetrics extends LitElement {
   /** The room's reference values (its sensor.homex_<room>_<metric> entities). */
   private _roomValues(room: Room) {
     const set = METRIC_DEFS.filter((d) => room.metrics?.[d.key]?.sensors?.length);
-    if (!set.length) return html`<span class="meta">Aucun capteur</span>`;
+    if (!set.length) return html`<span class="meta">${t("climateMetrics.no_sensor")}</span>`;
     return html`<div class="values">
       ${set.map(
         (d) => html`<span class="value">
@@ -455,25 +469,25 @@ export class HomexClimateMetrics extends LitElement {
   }
 
   render() {
-    if (!this._loaded) return html`<div class="msg">Chargement…</div>`;
+    if (!this._loaded) return html`<div class="msg">${t("common.loading")}</div>`;
     const roomId = this._roomId;
     if (roomId) {
       const room = this._rooms.find((r) => r.room_id === roomId);
       if (!room || !this._hasClimate(room)) {
         return html`<div class="head">
-            <button @click=${() => goBack(this.base)}>← Metrics</button>
+            <button @click=${() => goBack(this.base)}>${t("climateMetrics.back_metrics")}</button>
             <h2></h2>
           </div>
           <div class="msg">
-            ${room ? "Le module Climate n'est pas activé sur cette pièce." : `« ${roomId} » introuvable.`}
+            ${room ? t("climateMetrics.module_not_enabled") : t("climateMetrics.room_not_found", { room: roomId })}
           </div>`;
       }
       return this._renderRoom(room);
     }
     return html`
       <div class="head">
-        <button @click=${() => this.dispatchEvent(new CustomEvent("close"))}>← Climate</button>
-        <h2>Metrics</h2>
+        <button @click=${() => this.dispatchEvent(new CustomEvent("close"))}>${t("climateMetrics.back_climate")}</button>
+        <h2>${t("climateMetrics.title")}</h2>
       </div>
       <div class="list">
         ${this._rooms.map((room) => {
@@ -482,9 +496,9 @@ export class HomexClimateMetrics extends LitElement {
           return html`<div class="row ${on ? "" : "off"}" @click=${() => this._openRoom(room)}>
             <div class="info">
               <div class="name">${room.name}</div>
-              <div class="meta">${area ?? "Aucune pièce HA associée"}</div>
+              <div class="meta">${area ?? t("climateMetrics.no_ha_area")}</div>
             </div>
-            ${on ? this._roomValues(room) : html`<span class="meta">Module Climate désactivé</span>`}
+            ${on ? this._roomValues(room) : html`<span class="meta">${t("climateMetrics.module_disabled")}</span>`}
             <span class="chevron">›</span>
           </div>`;
         })}

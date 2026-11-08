@@ -1,5 +1,6 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
+import { t } from "../lib/i18n";
 
 /** Read-only list of triggers that come from the Switches module. Shown next to
  * the editable trigger selectors in the Lights-module dialogs. */
@@ -45,10 +46,10 @@ export class HomexManagedTriggers extends LitElement {
     if (!this.triggers?.length) return html``;
     return html`<div class="list">
       ${this.triggers.map(
-        (t) => html`<div class="row">
+        (trig) => html`<div class="row">
           <span class="icon">🎛</span>
-          <span class="lbl">${t}</span>
-          <span class="tag">Géré par le module Switches</span>
+          <span class="lbl">${trig}</span>
+          <span class="tag">${t("managedTriggers.managed_by_switches")}</span>
         </div>`
       )}
     </div>`;

@@ -7,6 +7,7 @@ import {
   mdiWindowShutterOpen,
 } from "@mdi/js";
 import type { HomeAssistant, Room, ShutterGroup } from "../types";
+import { t } from "./i18n";
 
 export type ShutterState =
   | "open"
@@ -33,14 +34,8 @@ const ICONS: Record<ShutterState, string> = {
   unavailable: mdiWindowShutterAlert,
 };
 
-const LABELS: Record<ShutterState, string> = {
-  open: "Ouvert",
-  closed: "Fermé",
-  partial: "Entrouvert",
-  opening: "Ouverture…",
-  closing: "Fermeture…",
-  unavailable: "Indisponible",
-};
+/** A shutter state's label (resolved when called: the language can change). */
+const label = (state: ShutterState) => t(`lib.shutter_${state}`);
 
 /** Position of one cover entity (0..100), from its attribute or its state. */
 export function coverPosition(hass: HomeAssistant, entityId: string): number | null {
@@ -76,7 +71,7 @@ export function shutterSummary(hass: HomeAssistant, covers: string[]): ShutterSu
           : positions.every((p) => p === 100)
             ? "open"
             : "partial";
-  return { state, position, icon: ICONS[state], label: LABELS[state] };
+  return { state, position, icon: ICONS[state], label: label(state) };
 }
 
 /** The shutter group the room's quick button drives: the default group
