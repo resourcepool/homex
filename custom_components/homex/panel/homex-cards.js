@@ -29,7 +29,7 @@ var e = globalThis, t = e.ShadowRoot && (e.ShadyCSS === void 0 || e.ShadyCSS.nat
 	let t = "";
 	for (let n of e.cssRules) t += n.cssText;
 	return a(t);
-})(e) : e, { is: l, defineProperty: u, getOwnPropertyDescriptor: d, getOwnPropertyNames: f, getOwnPropertySymbols: ee, getPrototypeOf: p } = Object, m = globalThis, h = m.trustedTypes, te = h ? h.emptyScript : "", ne = m.reactiveElementPolyfillSupport, g = (e, t) => e, _ = {
+})(e) : e, { is: l, defineProperty: u, getOwnPropertyDescriptor: d, getOwnPropertyNames: f, getOwnPropertySymbols: p, getPrototypeOf: ee } = Object, m = globalThis, h = m.trustedTypes, te = h ? h.emptyScript : "", ne = m.reactiveElementPolyfillSupport, g = (e, t) => e, _ = {
 	toAttribute(e, t) {
 		switch (t) {
 			case Boolean:
@@ -104,13 +104,13 @@ var y = class extends HTMLElement {
 	}
 	static _$Ei() {
 		if (this.hasOwnProperty(g("elementProperties"))) return;
-		let e = p(this);
+		let e = ee(this);
 		e.finalize(), e.l !== void 0 && (this.l = [...e.l]), this.elementProperties = new Map(e.elementProperties);
 	}
 	static finalize() {
 		if (this.hasOwnProperty(g("finalized"))) return;
 		if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(g("properties"))) {
-			let e = this.properties, t = [...f(e), ...ee(e)];
+			let e = this.properties, t = [...f(e), ...p(e)];
 			for (let n of t) this.createProperty(n, e[n]);
 		}
 		let e = this[Symbol.metadata];
@@ -1111,7 +1111,7 @@ var it, at = "M3 4H21V6H20V20H18V6H6V20H4V6H3V4M7 7H17V9H7V7M7 10H17V12H7V10M7 1
 		return !this._climate && !this._config.entity && !this.hass.states[`switch.homex_${this._config.room}_lights_toggle`] && (!this._room || !this._room.modules?.includes("lights"));
 	}
 	_toggle() {
-		if (this._noAction) return;
+		if (this._noAction || this._config.toggle === !1) return;
 		let e = this.hass.states[this._entity];
 		if (!e) return;
 		let t = this._isLights ? this._lightState() === "lit" : e.state === "on";
@@ -1176,11 +1176,11 @@ var it, at = "M3 4H21V6H20V20H18V6H6V20H4V6H3V4M7 7H17V9H7V7M7 10H17V12H7V10M7 1
 	render() {
 		if (!this._config || !this.hass) return M;
 		if (!this._config.room) return A`<ha-card class="empty">Choisir une pièce Homex</ha-card>`;
-		let e = this.hass.states[this._entity], t = e?.state === "on", n = this._entity.endsWith("_heating"), r = this._isLights ? this._lightState() : void 0, i = this._climate ? t ? He : Ue : r === "lit" ? Le : r === "stray" ? Ie : r === "off" ? Re : void 0, a = e ? e.state === "unavailable" ? "Indisponible" : this._climate ? t ? "Pièce chauffée — ne plus chauffer" : "Pièce non chauffée — chauffer" : r === "lit" ? "Allumée — éteindre" : r === "stray" ? "Éteinte, mais au moins une lumière est allumée — allumer" : r === "off" ? "Éteinte — allumer" : this.hass.formatEntityState?.(e) ?? e.state : "Introuvable", o = this._noAction, s = !o && (!e || e.state === "unavailable"), c = q(this.hass, this._config.room, "temperature"), l = q(this.hass, this._config.room, "humidity"), u = this._air(), d = this._scenes(), f = this._climate && t && !s ? this._setpoint() : void 0, ee = this._lightState() === "lit" ? this.hass.states[`switch.homex_${this._config.room}_lights_toggle`]?.attributes.active_scene : void 0, p = this._heatingStatus(), m = this._shutterStatus(), h = c || l || p !== M || m !== M;
+		let e = this.hass.states[this._entity], t = e?.state === "on", n = this._entity.endsWith("_heating"), r = this._isLights ? this._lightState() : void 0, i = this._climate ? t ? He : Ue : r === "lit" ? Le : r === "stray" ? Ie : r === "off" ? Re : void 0, a = e ? e.state === "unavailable" ? "Indisponible" : this._climate ? t ? "Pièce chauffée — ne plus chauffer" : "Pièce non chauffée — chauffer" : r === "lit" ? "Allumée — éteindre" : r === "stray" ? "Éteinte, mais au moins une lumière est allumée — allumer" : r === "off" ? "Éteinte — allumer" : this.hass.formatEntityState?.(e) ?? e.state : "Introuvable", o = this._noAction, s = !o && this._config.toggle === !1, c = !o && (!e || e.state === "unavailable"), l = q(this.hass, this._config.room, "temperature"), u = q(this.hass, this._config.room, "humidity"), d = this._air(), f = this._scenes(), p = this._climate && t && !c ? this._setpoint() : void 0, ee = this._lightState() === "lit" ? this.hass.states[`switch.homex_${this._config.room}_lights_toggle`]?.attributes.active_scene : void 0, m = this._heatingStatus(), h = this._shutterStatus(), te = l || u || m !== M || h !== M;
 		return A`<ha-card
-      class=${o ? "static" : t ? "on" : ""}
+      class="${t && !o ? "on" : ""} ${o || s ? "static" : ""}"
       style=${n ? "--tile-color: var(--state-climate-heat-color, #ff8100)" : ""}
-      title=${o ? this._name() : a}
+      title=${o ? this._name() : s ? a.split(" — ")[0] : a}
       @click=${this._toggle}
     >
       <div class="main">
@@ -1189,29 +1189,29 @@ var it, at = "M3 4H21V6H20V20H18V6H6V20H4V6H3V4M7 7H17V9H7V7M7 10H17V12H7V10M7 1
         </div>
         <div class="info">
           <div class="name">${this._name()}</div>
-          ${s ? A`<div class="sub">${a}</div>` : M}
-          ${this._climate && !s ? A`<div class="sub setpoint">
-                ${t ? f === void 0 ? "Pièce chauffée" : A`${K(Ke)}<span>Consigne ${G(this.hass, f, 1, 1)} °C</span>` : "Pièce non chauffée"}
+          ${c ? A`<div class="sub">${a}</div>` : M}
+          ${this._climate && !c ? A`<div class="sub setpoint">
+                ${t ? p === void 0 ? "Pièce chauffée" : A`${K(Ke)}<span>Consigne ${G(this.hass, p, 1, 1)} °C</span>` : "Pièce non chauffée"}
               </div>` : M}
-          ${u.length ? A`<div class="pills">
-                ${u.map((e) => A`<span class="pill l${e.level}" title=${`${e.label} : ${G(this.hass, e.value, 1)} ${e.unit ?? ""}`}
+          ${d.length ? A`<div class="pills">
+                ${d.map((e) => A`<span class="pill l${e.level}" title=${`${e.label} : ${G(this.hass, e.value, 1)} ${e.unit ?? ""}`}
                       ><span class="picto">${K(e.path)}${e.tag ? A`<small>${e.tag}</small>` : M}</span
                       ><span class="pval">${G(this.hass, e.value, 0)}</span></span
                     >`)}
               </div>` : M}
         </div>
-        ${h ? A`<button class="right" title="État de la pièce" @click=${this._openDetail}>
-              <span class="statuses">${m}${p}</span>
-              ${c || l ? A`<span class="readings">
-                    ${c ? A`<span class="temp">${G(this.hass, c.value, 1, 1)} ${c.unit ?? "°C"}</span>` : M}
-                    ${l ? A`<span class="hum">${G(this.hass, l.value, 0)} %</span>` : M}
+        ${te ? A`<button class="right" title="État de la pièce" @click=${this._openDetail}>
+              <span class="statuses">${h}${m}</span>
+              ${l || u ? A`<span class="readings">
+                    ${l ? A`<span class="temp">${G(this.hass, l.value, 1, 1)} ${l.unit ?? "°C"}</span>` : M}
+                    ${u ? A`<span class="hum">${G(this.hass, u.value, 0)} %</span>` : M}
                   </span>` : M}
             </button>` : M}
       </div>
-      ${d.length ? A`<div class="scenes" @click=${(e) => e.stopPropagation()}>
+      ${f.length ? A`<div class="scenes" @click=${(e) => e.stopPropagation()}>
             <span class="scenes-icon" title="Scènes">${K(Be)}</span>
             <div class="group">
-            ${d.map((e) => A`<button
+            ${f.map((e) => A`<button
                   class="scene ${e.key === ee ? "active" : ""}"
                   title=${this._config.scene_names?.[e.key] || e.name}
                   @click=${(t) => this._activateScene(t, e.key)}
@@ -1538,6 +1538,17 @@ var ot, Q = class extends z {
           @change=${(e) => this._set({ name: e.target.value })}
         />
       </label>
+      <div class="toggle-row">
+        <span>${o ? "Activer / désactiver le chauffage au clic" : "Allumer / éteindre au clic"}</span>
+        <label class="switch">
+          <input
+            type="checkbox"
+            .checked=${this._config.toggle !== !1}
+            @change=${(e) => this._set({ toggle: e.target.checked ? void 0 : !1 })}
+          />
+          <span></span>
+        </label>
+      </div>
       ${!o && i.length > 1 ? A`<div class="toggle-row">
               <span>Afficher les scènes</span>
               <label class="switch">

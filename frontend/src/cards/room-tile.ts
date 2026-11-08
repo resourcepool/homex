@@ -21,6 +21,7 @@
  *   scenes: [turn_on, film]              # optional: scene keys shown
  *   scene_names: { turn_on: Normal }     # optional: scene labels
  *   mode: climate                        # optional variant (default: default)
+ *   toggle: false                        # optional: no tap action
  *
  * The "climate" variant toggles the room's heating (switch.homex_<room>_
  * heating) instead of its lights, shows the radiators' setpoint, and leaves
@@ -72,6 +73,9 @@ export interface RoomTileConfig {
   /** Variant: "default" (lights, air, shutters, scenes) or "climate"
    * (heating toggle and setpoint). */
   mode?: "default" | "climate";
+  /** false: no tap action (e.g. rooms whose heating must not be turned off
+   * from the dashboard). */
+  toggle?: boolean;
 }
 
 // A shutter half-way: frame + slats on the top half only.
@@ -175,7 +179,7 @@ export class HomexRoomTile extends LitElement {
   }
 
   private _toggle() {
-    if (this._noAction) return;
+    if (this._noAction || this._config!.toggle === false) return;
     const st = this.hass.states[this._entity];
     if (!st) return;
     // Lights, as on the Homex dashboard: turn the room on (apply its scene)
@@ -306,6 +310,7 @@ export class HomexRoomTile extends LitElement {
               ? "Éteinte — allumer"
               : (this.hass.formatEntityState?.(st) ?? st.state);
     const noAction = this._noAction;
+    const locked = !noAction && this._config.toggle === false;
     const missing = !noAction && (!st || st.state === "unavailable");
     const t = roomMetric(this.hass, this._config.room, "temperature");
     const h = roomMetric(this.hass, this._config.room, "humidity");
@@ -320,9 +325,9 @@ export class HomexRoomTile extends LitElement {
     const shutterS = this._shutterStatus();
     const hasRight = t || h || heatingS !== nothing || shutterS !== nothing;
     return html`<ha-card
-      class=${noAction ? "static" : on ? "on" : ""}
+      class="${on && !noAction ? "on" : ""} ${noAction || locked ? "static" : ""}"
       style=${heating ? "--tile-color: var(--state-climate-heat-color, #ff8100)" : ""}
-      title=${noAction ? this._name() : title}
+      title=${noAction ? this._name() : locked ? title.split(" — ")[0] : title}
       @click=${this._toggle}
     >
       <div class="main">

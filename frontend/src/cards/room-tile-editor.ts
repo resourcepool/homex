@@ -104,6 +104,17 @@ export class HomexRoomTileEditor extends LitElement {
           @change=${(e: Event) => this._set({ name: (e.target as HTMLInputElement).value })}
         />
       </label>
+      <div class="toggle-row">
+        <span>${climate ? "Activer / désactiver le chauffage au clic" : "Allumer / éteindre au clic"}</span>
+        <label class="switch">
+          <input
+            type="checkbox"
+            .checked=${this._config.toggle !== false}
+            @change=${(e: Event) => this._set({ toggle: (e.target as HTMLInputElement).checked ? undefined : false })}
+          />
+          <span></span>
+        </label>
+      </div>
       ${!climate && scenes.length > 1
         ? html`<div class="toggle-row">
               <span>Afficher les scènes</span>
