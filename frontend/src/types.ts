@@ -405,7 +405,18 @@ export interface PlanOpening {
   out?: boolean;
   /** Window / glass door: the roller shutter (cover entity) fitted on it. */
   cover?: string | null;
+  /** Look: door plain / panel / glazed, sliding door plain / glazed / pocket,
+   * window and glass door casement / tilt / fixed / sliding. */
+  style?: string;
+  /** Frame / leaf colour (CSS colour), unset: default. */
+  color?: string;
+  /** The fitted shutter: roller (default) or hinged, and its colour. */
+  cover_type?: ShutterType;
+  cover_color?: string;
 }
+
+export type ShutterType = "roller" | "hinged";
+export type StairShape = "straight" | "l" | "u" | "spiral";
 
 /** A radiator on the plan: a `length` cm long body centred at x, y (cm),
  * turned by `angle` degrees; `device_id` is the room's radiator device. */
@@ -428,13 +439,19 @@ export interface PlanStair {
   dir: "up" | "down" | "left" | "right";
   /** Leads up to the floor above (default) or down to the floor below. */
   goes?: "up" | "down";
+  /** Straight (default), quarter turn (L), half turn (U) or spiral. */
+  shape?: StairShape;
+  /** L / U / spiral: turns to the right (default) or to the left. */
+  turn?: "left" | "right";
+  color?: string;
 }
 
 export type LightKind = "point" | "linear";
-export type LightMount = "ceiling" | "furniture" | "wall";
+export type LightMount = "ceiling" | "floor" | "wall";
+export type LightType = "ceiling_light" | "pendant" | "spot" | "sconce" | "floor_lamp" | "table_lamp" | "led_strip";
 
 /** A light on the plan: one HA light made of spots (`points`) or of strips
- * (`lines`), mounted on the ceiling, on furniture or on a wall. */
+ * (`lines`), mounted on the ceiling, on the floor or on a wall. */
 export interface PlanLight {
   id: string;
   entity_id: string;
@@ -442,6 +459,12 @@ export interface PlanLight {
   mount: LightMount;
   points: PlanPoint[];
   lines: [PlanPoint, PlanPoint][];
+  /** Fixture: depends on the mount; a LED strip is linear, the rest point. */
+  type?: LightType;
+  /** Fixture style: round (default) or square body, with a lampshade, colour. */
+  shape?: "round" | "square";
+  shade?: boolean;
+  color?: string;
 }
 
 export interface PlanLevel {

@@ -8,13 +8,16 @@ Stored as one document in the ``homex_plan`` store::
          "rooms": [{"id": "s_...", "room_id": "<homex room id>" | None,
                     "name": "...", "points": [[x, y], ...]}],  # cm
          "openings": [{"id", "type": "door" | "sliding_door" | "window" | "glass_door",
-                       "shape", "edge", "t", "width", "flip", "out"}],
-         "stairs": [{"id", "x", "y", "w", "h", "dir": "up" | ..., "goes": "up" | "down"}],
+                       "shape", "edge", "t", "width", "flip", "out",
+                       "style", "color", "cover", "cover_type", "cover_color"}],
+         "stairs": [{"id", "x", "y", "w", "h", "dir": "up" | ..., "goes": "up" | "down",
+                     "shape": "straight" | "l" | "u" | "spiral", "turn", "color"}],
          # Fixtures: shutters are the openings' "cover" (entity id).
          "radiators": [{"id", "device_id", "x", "y", "angle", "length"}],
          "lights": [{"id", "entity_id", "kind": "point" | "linear",
-                     "mount": "ceiling" | "furniture" | "wall",
-                     "points": [[x, y]], "lines": [[[x, y], [x, y]]]}]},
+                     "mount": "ceiling" | "floor" | "wall",
+                     "points": [[x, y]], "lines": [[[x, y], [x, y]]],
+                     "type", "shape", "shade", "color"}]},
     ]}
 """
 
@@ -31,6 +34,7 @@ from .const import DOMAIN
 STORE_KEY = "homex_plan"
 STORE_DATA = "_plan_store_data"
 
+_COLOR = vol.Any(None, vol.All(str, vol.Length(max=32)))
 _POINT = vol.All([vol.Coerce(float)], vol.Length(min=2, max=2))
 _SHAPE = vol.Schema(
     {
@@ -52,6 +56,10 @@ _OPENING = vol.Schema(
         vol.Optional("flip"): bool,
         vol.Optional("out"): bool,
         vol.Optional("cover"): vol.Any(None, str),
+        vol.Optional("style"): vol.Any(None, str),
+        vol.Optional("color"): _COLOR,
+        vol.Optional("cover_type"): vol.In(["roller", "hinged"]),
+        vol.Optional("cover_color"): _COLOR,
     },
     extra=vol.ALLOW_EXTRA,
 )
@@ -64,6 +72,9 @@ _STAIR = vol.Schema(
         vol.Required("h"): vol.All(vol.Coerce(float), vol.Range(min=1)),
         vol.Required("dir"): vol.In(["up", "down", "left", "right"]),
         vol.Optional("goes", default="up"): vol.In(["up", "down"]),
+        vol.Optional("shape"): vol.In(["straight", "l", "u", "spiral"]),
+        vol.Optional("turn"): vol.In(["left", "right"]),
+        vol.Optional("color"): _COLOR,
     },
     extra=vol.ALLOW_EXTRA,
 )
@@ -83,9 +94,19 @@ _LIGHT = vol.Schema(
         vol.Required("id"): str,
         vol.Required("entity_id"): str,
         vol.Required("kind"): vol.In(["point", "linear"]),
-        vol.Required("mount"): vol.In(["ceiling", "furniture", "wall"]),
+        # "furniture" was renamed "floor".
+        vol.Required("mount"): vol.All(
+            vol.In(["ceiling", "floor", "furniture", "wall"]),
+            lambda v: "floor" if v == "furniture" else v,
+        ),
         vol.Optional("points", default=list): [_POINT],
         vol.Optional("lines", default=list): [vol.All([_POINT], vol.Length(min=2, max=2))],
+        vol.Optional("type"): vol.In(
+            ["ceiling_light", "pendant", "spot", "sconce", "floor_lamp", "table_lamp", "led_strip"]
+        ),
+        vol.Optional("shape"): vol.In(["round", "square"]),
+        vol.Optional("shade"): bool,
+        vol.Optional("color"): _COLOR,
     },
     extra=vol.ALLOW_EXTRA,
 )

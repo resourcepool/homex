@@ -9,8 +9,10 @@ import type {
   PlanPoint,
   PlanRadiator,
   PlanLight,
-  LightKind,
   LightMount,
+  LightType,
+  ShutterType,
+  StairShape,
   PlanShape,
   PlanStair,
   Room,
@@ -31,9 +33,14 @@ import {
   openingGeometry,
   remapInsert,
   remapRemove,
-  stairArrow,
-  stairPoints,
-  stairTreads,
+  LIGHT_TYPES,
+  OPENING_STYLES,
+  SHADED,
+  STAIR_SHAPES,
+  lightKindOf,
+  lightType,
+  openingStyle,
+  stairDrawing,
   type WallSpot,
 } from "../lib/plan-items";
 import type { HaFloor } from "./homex-builder-level-dialog";
@@ -98,6 +105,12 @@ const GLAZED: OpeningType[] = ["window", "glass_door", "sliding_door"];
 const MIN_K = 0.05;
 const MAX_K = 4;
 const UNDO_MAX = 60;
+/** Colour presets (frames / doors, stairs, light fixtures). */
+const FRAME_COLORS = ["#f4f4f4", "#9e9e9e", "#3c4045", "#1d1d1d", "#b8864e", "#6b4423"];
+const STAIR_COLORS = ["#d9b98a", "#b8864e", "#6b4423", "#f4f4f4", "#9e9e9e", "#1d1d1d"];
+const LIGHT_COLORS = ["#f4f4f4", "#1d1d1d", "#c9a227", "#b87333", "#b8864e", "#9e9e9e"];
+
+type OpeningOpts = { width: number; flip: boolean; out: boolean; style?: string; color?: string };
 
 /**
  * 3D Builder (2D first): draw each level's rooms on a 50 cm grid, with
@@ -126,7 +139,7 @@ export class HomexBuilder extends LitElement {
   /** Opening tools: where the opening would go. */
   @state() private _wallHover: WallSpot | null = null;
   /** Settings of the next door / window / glass door / stairs placed. */
-  @state() private _openingOpts: Record<OpeningType, { width: number; flip: boolean; out: boolean }> = {
+  @state() private _openingOpts: Record<OpeningType, OpeningOpts> = {
     door: { width: OPENING_WIDTH.door, flip: false, out: false },
     window: { width: OPENING_WIDTH.window, flip: false, out: false },
     glass_door: { width: OPENING_WIDTH.glass_door, flip: false, out: false },
@@ -135,14 +148,19 @@ export class HomexBuilder extends LitElement {
   @state() private _stairDir: PlanStair["dir"] = "up";
   /** Next stairs go up to the floor above, or down to the one below. */
   @state() private _stairGoes: "up" | "down" = "up";
+  /** Shape, turn and colour of the next stairs. */
+  @state() private _stairStyle: { shape: StairShape; turn: "left" | "right"; color?: string } = {
+    shape: "straight",
+    turn: "right",
+  };
   /** Structure (rooms, openings, stairs) or fixtures (shutters, radiators). */
   @state() private _mode: "structure" | "fixtures" = "structure";
   /** Light being drawn: clicks add its spots / strips. */
   @state() private _placing: string | null = null;
   /** Linear light: the first end of the strip being drawn. */
   @state() private _lineStart: PlanPoint | null = null;
-  /** Kind and mount of the next light placed. */
-  @state() private _lightKind: LightKind = "point";
+  /** Fixture and mount of the next light placed. */
+  @state() private _lightType: LightType = "ceiling_light";
   @state() private _lightMount: LightMount = "ceiling";
 
   private _undo: string[] = [];
@@ -182,6 +200,9 @@ export class HomexBuilder extends LitElement {
         if (typeof l.level !== "number") l.level = i;
       });
       plan.levels.sort((a, b) => a.level - b.level);
+      // Lights "on furniture" became "on the floor".
+      for (const l of plan.levels.flatMap((x) => x.lights ?? []))
+        if ((l.mount as string) === "furniture") l.mount = "floor";
       this._plan = plan;
       this._rooms = rooms;
       if (!this._level) this._levelId = this._defaultLevel()?.id ?? null;
@@ -494,6 +515,8 @@ export class HomexBuilder extends LitElement {
         t: spot.t,
         width: opts.width,
         ...(directed(type) ? { flip: opts.flip, out: opts.out } : {}),
+        ...(opts.style ? { style: opts.style } : {}),
+        ...(opts.color ? { color: opts.color } : {}),
       };
       const level = this._level;
       this._commit(() => (level.openings = [...(level.openings ?? []), o]));
@@ -857,7 +880,15 @@ export class HomexBuilder extends LitElement {
 
   private _addStair(r: { x: number; y: number; w: number; h: number }) {
     const level = this._level!;
-    const st: PlanStair = { id: uid("st"), ...r, dir: this._stairDir, goes: this._stairGoes };
+    const { shape, turn, color } = this._stairStyle;
+    const st: PlanStair = {
+      id: uid("st"),
+      ...r,
+      dir: this._stairDir,
+      goes: this._stairGoes,
+      ...(shape !== "straight" ? { shape, turn } : {}),
+      ...(color ? { color } : {}),
+    };
     this._commit(() => (level.stairs = [...(level.stairs ?? []), st]));
   }
 
@@ -1089,7 +1120,8 @@ export class HomexBuilder extends LitElement {
     const level = this._level!;
     let l = level.lights?.find((x) => x.entity_id === entityId);
     if (!l) {
-      l = { id: uid("li"), entity_id: entityId, kind: this._lightKind, mount: this._lightMount, points: [], lines: [] };
+      const type = LIGHT_TYPES[this._lightMount].includes(this._lightType) ? this._lightType : LIGHT_TYPES[this._lightMount][0];
+      l = { id: uid("li"), entity_id: entityId, kind: lightKindOf(type), mount: this._lightMount, type, points: [], lines: [] };
       const nl = l;
       this._commit((plan) => {
         for (const x of plan.levels) x.lights = (x.lights ?? []).filter((y) => y.entity_id !== entityId);
@@ -1172,27 +1204,45 @@ export class HomexBuilder extends LitElement {
     return snapPoint(raw, { vertices, edges: [], anchors: anchor ? [anchor] : [], tolerance: tol, grid: 10 });
   }
 
-  private _setLightOpt(key: "kind" | "mount", value: string) {
-    if (key === "kind") this._lightKind = value as LightKind;
-    else this._lightMount = value as LightMount;
+  /** Mount or fixture of the selected light (and of the next ones): the
+   * fixture fits the mount, a LED strip is drawn as strips, the rest as spots. */
+  private _setLightOpt(key: "type" | "mount", value: string) {
     const sel = this._selItem();
-    if (sel?.kind === "light") {
-      const l = sel.item;
-      this._commit(() => {
-        if (key === "kind" && l.kind !== value) {
-          // Spots become 60 cm strips and back (their centre / start).
-          if (value === "linear") {
-            l.lines = l.points.map((p) => [[p[0] - 30, p[1]], [p[0] + 30, p[1]]] as [PlanPoint, PlanPoint]);
-            l.points = [];
-          } else {
-            l.points = l.lines.map(([a, b]) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2] as PlanPoint);
-            l.lines = [];
-          }
-          l.kind = value as LightKind;
-        } else if (key === "mount") l.mount = value as LightMount;
-      });
-      this._lineStart = null;
-    }
+    const l = sel?.kind === "light" ? sel.item : undefined;
+    const mount = (key === "mount" ? value : (l?.mount ?? this._lightMount)) as LightMount;
+    let type = (key === "type" ? value : l ? lightType(l) : this._lightType) as LightType;
+    if (!LIGHT_TYPES[mount].includes(type)) type = type === "led_strip" ? "led_strip" : LIGHT_TYPES[mount][0];
+    const kind = lightKindOf(type);
+    this._lightMount = mount;
+    this._lightType = type;
+    if (!l) return;
+    this._commit(() => {
+      if (l.kind !== kind) {
+        // Spots become 60 cm strips and back (their centre / start).
+        if (kind === "linear") {
+          l.lines = l.points.map((p) => [[p[0] - 30, p[1]], [p[0] + 30, p[1]]] as [PlanPoint, PlanPoint]);
+          l.points = [];
+        } else {
+          l.points = l.lines.map(([a, b]) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2] as PlanPoint);
+          l.lines = [];
+        }
+        l.kind = kind;
+      }
+      l.mount = mount;
+      l.type = type;
+      if (!SHADED.includes(type)) delete l.shade;
+    });
+    this._lineStart = null;
+  }
+
+  /** Style fields of an item (undefined / false / "" clears one). */
+  private _setStyle<T extends object>(item: T, patch: Partial<T>) {
+    this._commit(() => {
+      for (const [k, v] of Object.entries(patch)) {
+        if (v === undefined || v === false || v === "") delete (item as Record<string, unknown>)[k];
+        else (item as Record<string, unknown>)[k] = v;
+      }
+    });
   }
 
   // -- Keyboard -----------------------------------------------------------------------
@@ -1509,61 +1559,94 @@ export class HomexBuilder extends LitElement {
       fixtures && glazed && !o.cover ? "needs-cover" : ""
     } ${o.id === this._dropTarget ? "drop" : ""} ${fixtures && !glazed ? "locked" : ""}`;
     const off = (p: PlanPoint, d: number): PlanPoint => [p[0] + n[0] * d, p[1] + n[1] * d];
+    const shift = (p: PlanPoint, d: number): PlanPoint => [p[0] + u[0] * d, p[1] + u[1] * d];
     const line = (p: PlanPoint, q: PlanPoint, c2 = "") =>
       svg`<line class=${c2} x1=${p[0]} y1=${p[1]} x2=${q[0]} y2=${q[1]}></line>`;
+    const poly = (pts: PlanPoint[], c2: string, style = "") =>
+      svg`<polygon class=${c2} style=${style} points=${pts.map((x) => x.join(",")).join(" ")}></polygon>`;
+    /** Swing arc of a leaf hinged at h, from its closed tip to its open one. */
+    const swing = (h: PlanPoint, closed: PlanPoint, open: PlanPoint) => {
+      const r = Math.hypot(closed[0] - h[0], closed[1] - h[1]);
+      const cross = (closed[0] - h[0]) * (open[1] - h[1]) - (closed[1] - h[1]) * (open[0] - h[0]);
+      return svg`<path class="swing" d="M ${closed[0]} ${closed[1]} A ${r} ${r} 0 0 ${cross > 0 ? 1 : 0} ${open[0]} ${open[1]}"></path>`;
+    };
+    const style = openingStyle(o);
+    const w = Math.hypot(b[0] - a[0], b[1] - a[1]);
     let body;
     if (o.type === "door") {
       const hinge = o.flip ? b : a;
       const other = o.flip ? a : b;
       const side = o.out ? -1 : 1;
-      const w = Math.hypot(b[0] - a[0], b[1] - a[1]);
       const leaf: PlanPoint = [hinge[0] + n[0] * side * w, hinge[1] + n[1] * side * w];
-      const cross = (other[0] - hinge[0]) * (leaf[1] - hinge[1]) - (other[1] - hinge[1]) * (leaf[0] - hinge[0]);
-      body = svg`${line(hinge, leaf, "leaf")}
-        <path class="swing" d="M ${other[0]} ${other[1]} A ${w} ${w} 0 0 ${cross > 0 ? 1 : 0} ${leaf[0]} ${leaf[1]}"></path>`;
+      // Panel / glazed doors: a 4 cm thick leaf.
+      const d: PlanPoint = [(other[0] - hinge[0]) / w, (other[1] - hinge[1]) / w];
+      const thick = (p: PlanPoint): PlanPoint => [p[0] + d[0] * 4, p[1] + d[1] * 4];
+      body = svg`${style === "plain"
+          ? line(hinge, leaf, "leaf")
+          : poly([hinge, leaf, thick(leaf), thick(hinge)], `leaf-body ${style}`)}
+        ${style === "glazed" ? line(thick([(hinge[0] * 3 + leaf[0]) / 4, (hinge[1] * 3 + leaf[1]) / 4]), thick([(hinge[0] + leaf[0] * 3) / 4, (hinge[1] + leaf[1] * 3) / 4]), "pane") : nothing}
+        ${swing(hinge, other, leaf)}`;
     } else if (o.type === "sliding_door") {
-      // Leaf along the wall on one side, its open position dashed, an arrow
-      // the way it slides.
+      // Leaf along the wall on one side, its open position dashed (inside
+      // the wall for a pocket door), an arrow the way it slides.
       const side = o.out ? -1 : 1;
       const dir = o.flip ? -1 : 1;
-      const w = Math.hypot(b[0] - a[0], b[1] - a[1]);
-      const shift = (p: PlanPoint, d: number): PlanPoint => [p[0] + u[0] * d, p[1] + u[1] * d];
-      const leaf = (p: PlanPoint, q: PlanPoint) =>
-        [off(p, side * 3), off(q, side * 3), off(q, side * 8), off(p, side * 8)].map((x) => x.join(",")).join(" ");
+      const leaf = (p: PlanPoint, q: PlanPoint, d0: number, d1: number) => [off(p, d0), off(q, d0), off(q, d1), off(p, d1)];
       const from = off(c, side * 18);
       const to = shift(from, dir * w * 0.45);
-      const k = this._view.k;
-      const hs = 7 / k;
-      const head = [to, off(shift(to, -dir * hs), hs * 0.6), off(shift(to, -dir * hs), -hs * 0.6)]
-        .map((x) => x.join(","))
-        .join(" ");
-      body = svg`<polygon class="slide-leaf" points=${leaf(a, b)}></polygon>
-        <polygon class="slide-open" points=${leaf(shift(a, dir * w), shift(b, dir * w))}></polygon>
+      const hs = 7 / this._view.k;
+      const head = [to, off(shift(to, -dir * hs), hs * 0.6), off(shift(to, -dir * hs), -hs * 0.6)];
+      const pocket = style === "pocket";
+      body = svg`${poly(leaf(a, b, side * 3, side * 8), `slide-leaf ${style}`)}
+        ${poly(pocket ? leaf(shift(a, dir * w), shift(b, dir * w), -3, 3) : leaf(shift(a, dir * w), shift(b, dir * w), side * 3, side * 8), "slide-open")}
         ${line(from, to, "slide-arrow")}
-        <polygon class="slide-head" points=${head}></polygon>`;
+        ${poly(head, "slide-head")}`;
     } else {
       const t = 6;
-      body = svg`<polygon class="frame" points=${[off(a, t), off(b, t), off(b, -t), off(a, -t)].map((p) => p.join(",")).join(" ")}></polygon>
-        ${line(a, b, "pane")}
-        ${o.type === "glass_door" ? line(off(c, -t), off(c, t), "pane") : nothing}`;
+      const frame = poly([off(a, t), off(b, t), off(b, -t), off(a, -t)], "frame");
+      let panes;
+      if (style === "sliding") {
+        // Two leaves sliding past each other.
+        panes = svg`${line(off(a, -2), off(shift(a, w * 0.55), -2), "pane")}${line(off(b, 2), off(shift(b, -w * 0.55), 2), "pane")}`;
+      } else {
+        const mullion = o.type === "glass_door" || (style !== "fixed" && w > 70);
+        panes = svg`${line(a, b, "pane")}${mullion ? line(off(c, -t), off(c, t), "pane") : nothing}`;
+        if (style === "casement" || style === "tilt") {
+          // Leaves opening inwards: one when narrow, else two.
+          const leaves: [PlanPoint, PlanPoint][] = w > 70 ? [[a, c], [b, c]] : [[a, b]];
+          panes = svg`${panes}${leaves.map(([h, tip]) => {
+            const lw = Math.hypot(tip[0] - h[0], tip[1] - h[1]);
+            return swing(h, tip, off(h, lw));
+          })}`;
+          if (style === "tilt") panes = svg`${panes}<path class="swing tilt" d="M ${a[0]} ${a[1]} L ${off(c, Math.min(30, w / 3))[0]} ${off(c, Math.min(30, w / 3))[1]} L ${b[0]} ${b[1]}"></path>`;
+        }
+      }
+      body = svg`${frame}${panes}`;
     }
     let shutter: unknown = nothing;
     if (o.cover && glazed) {
-      // Roller shutter on the outside face, shaded by how closed it is.
+      // Shutter on the outside face, shaded by how closed it is: a roller
+      // box, or two hinged leaves (folded against the wall when open).
       const st = this.hass.states[o.cover];
       const pos = st?.attributes.current_position as number | undefined;
       const closed = pos !== undefined ? 1 - pos / 100 : st?.state === "closed" ? 1 : 0;
       const k = this._view.k;
-      const bar = [off(a, -9), off(b, -9), off(b, -15), off(a, -15)].map((x) => x.join(",")).join(" ");
       const lp = off(c, -26);
-      shutter = svg`<polygon class="shutter" style="fill-opacity:${0.25 + closed * 0.65}" points=${bar}></polygon>
+      const col = o.cover_color ? `--cc:${o.cover_color};` : "";
+      const leaves =
+        o.cover_type === "hinged"
+          ? closed >= 0.5
+            ? svg`${poly([off(a, -9), off(c, -9), off(c, -13), off(a, -13)], "shutter hinged", col)}${poly([off(c, -9), off(b, -9), off(b, -13), off(c, -13)], "shutter hinged", col)}`
+            : svg`${poly([off(a, -9), off(shift(a, -w / 2), -9), off(shift(a, -w / 2), -13), off(a, -13)], "shutter hinged", col)}${poly([off(b, -9), off(shift(b, w / 2), -9), off(shift(b, w / 2), -13), off(b, -13)], "shutter hinged", col)}`
+          : poly([off(a, -9), off(b, -9), off(b, -15), off(a, -15)], "shutter", `${col}fill-opacity:${0.25 + closed * 0.65}`);
+      shutter = svg`${leaves}
         ${fixtures || sel
           ? svg`<text class="fx-tag" x=${lp[0]} y=${lp[1]} font-size=${10 / k} text-anchor="middle" dominant-baseline="middle">${
               pos !== undefined ? `${pos} %` : st?.state ?? "?"
             }</text>`
           : nothing}`;
     }
-    return svg`<g class=${cls}>
+    return svg`<g class=${cls} style=${o.color ? `--oc:${o.color}` : ""}>
       ${line(a, b, "gap")}
       ${body}
       ${shutter}
@@ -1607,18 +1690,51 @@ export class HomexBuilder extends LitElement {
     const { on, color } = this._lightColor(l.entity_id);
     const sel = l.id === this._selected;
     const r = 7 / k;
+    const type = lightType(l);
+    const square = l.shape === "square";
+    const body = (p: PlanPoint, rr: number) =>
+      square
+        ? svg`<rect class="lp" x=${p[0] - rr} y=${p[1] - rr} width=${rr * 2} height=${rr * 2} rx=${rr * 0.2}></rect>`
+        : svg`<circle class="lp" cx=${p[0]} cy=${p[1]} r=${rr}></circle>`;
+    const dot = (p: PlanPoint, rr: number) => svg`<circle class="lp-dot" cx=${p[0]} cy=${p[1]} r=${rr}></circle>`;
+    const x = (p: PlanPoint, rr: number, plus = false) =>
+      plus
+        ? svg`<line class="lp-x" x1=${p[0] - rr} y1=${p[1]} x2=${p[0] + rr} y2=${p[1]}></line>
+            <line class="lp-x" x1=${p[0]} y1=${p[1] - rr} x2=${p[0]} y2=${p[1] + rr}></line>`
+        : svg`<line class="lp-x" x1=${p[0] - rr * 0.7} y1=${p[1] - rr * 0.7} x2=${p[0] + rr * 0.7} y2=${p[1] + rr * 0.7}></line>
+            <line class="lp-x" x1=${p[0] - rr * 0.7} y1=${p[1] + rr * 0.7} x2=${p[0] + rr * 0.7} y2=${p[1] - rr * 0.7}></line>`;
     const marker = (p: PlanPoint, i: number) => {
       const hit = svg`<circle class="light-hit" data-kind="light-pt" data-id=${l.id} data-index=${i} cx=${p[0]} cy=${p[1]} r=${r * 1.8}></circle>`;
-      if (l.mount === "furniture")
-        return svg`<rect class="lp" x=${p[0] - r} y=${p[1] - r} width=${r * 2} height=${r * 2} rx=${r * 0.4} transform="rotate(45 ${p[0]} ${p[1]})"></rect>${hit}`;
-      if (l.mount === "wall")
-        return svg`<circle class="lp" cx=${p[0]} cy=${p[1]} r=${r}></circle><circle class="lp-dot" cx=${p[0]} cy=${p[1]} r=${r * 0.35}></circle>${hit}`;
-      return svg`<circle class="lp" cx=${p[0]} cy=${p[1]} r=${r}></circle>
-        <line class="lp-x" x1=${p[0] - r * 0.7} y1=${p[1] - r * 0.7} x2=${p[0] + r * 0.7} y2=${p[1] + r * 0.7}></line>
-        <line class="lp-x" x1=${p[0] - r * 0.7} y1=${p[1] + r * 0.7} x2=${p[0] + r * 0.7} y2=${p[1] - r * 0.7}></line>${hit}`;
+      const shade =
+        l.shade && SHADED.includes(type)
+          ? square
+            ? svg`<rect class="lp-shade" x=${p[0] - r * 1.5} y=${p[1] - r * 1.5} width=${r * 3} height=${r * 3}></rect>`
+            : svg`<circle class="lp-shade" cx=${p[0]} cy=${p[1]} r=${r * 1.5}></circle>`
+          : nothing;
+      let mark;
+      switch (type) {
+        case "pendant": // a body hanging from its rose
+          mark = svg`${body(p, r)}<circle class="lp-in" cx=${p[0]} cy=${p[1]} r=${r * 0.45}></circle>`;
+          break;
+        case "spot":
+          mark = svg`${body(p, r * 0.6)}${dot(p, r * 0.25)}`;
+          break;
+        case "sconce":
+          mark = svg`${body(p, r)}${dot(p, r * 0.35)}`;
+          break;
+        case "floor_lamp":
+          mark = svg`${body(p, r)}${x(p, r * 0.7, true)}`;
+          break;
+        case "table_lamp":
+          mark = svg`${body(p, r * 0.75)}${dot(p, r * 0.3)}`;
+          break;
+        default: // ceiling light
+          mark = svg`${body(p, r)}${x(p, r)}`;
+      }
+      return svg`${shade}${mark}${hit}`;
     };
     const label = l.points[0] ?? l.lines[0]?.[0];
-    return svg`<g class="light ${on ? "on" : ""} ${sel ? "selected" : ""} m-${l.mount}" style="--lc:${color}">
+    return svg`<g class="light ${on ? "on" : ""} ${sel ? "selected" : ""} m-${l.mount} t-${type}" style="--lc:${color};${l.color ? `--fc:${l.color}` : ""}">
       ${on ? l.points.map((p) => svg`<circle class="glow" cx=${p[0]} cy=${p[1]} r=${r * 3}></circle>`) : nothing}
       ${l.lines.map(
         ([a, b], i) => svg`${on ? svg`<line class="glow-line" x1=${a[0]} y1=${a[1]} x2=${b[0]} y2=${b[1]}></line>` : nothing}
@@ -1679,12 +1795,14 @@ export class HomexBuilder extends LitElement {
   }
 
   private _stair(st: PlanStair, mode: "own" | "ghost" | "arrival" = "own", from?: PlanLevel) {
-    const pts = stairPoints(st).map((p) => p.join(",")).join(" ");
+    const d = stairDrawing(st);
+    const pts = d.outline.map((p) => p.join(",")).join(" ");
     // The arrow is the way of travel (dir), up or down alike.
-    const [from0, to] = stairArrow(st);
+    const to = d.path[d.path.length - 1];
+    const before = d.path[d.path.length - 2];
     const down = (st.goes ?? "up") === "down";
     const k = this._view.k;
-    const ang = Math.atan2(to[1] - from0[1], to[0] - from0[0]);
+    const ang = Math.atan2(to[1] - before[1], to[0] - before[0]);
     const hs = 9 / k;
     const head = [
       to,
@@ -1699,15 +1817,22 @@ export class HomexBuilder extends LitElement {
         : mode === "own"
           ? t(down ? "builder.stairs_tag_down" : "builder.stairs_tag_up")
           : "";
-    const cx = st.x + st.w / 2;
-    const cy = st.y + st.h / 2;
-    return svg`<g class="stair ${mode === "ghost" ? "ghost-stair" : ""} ${mode === "arrival" ? "arrival" : ""} ${down ? "down" : ""} ${st.id === this._selected && mode === "own" ? "selected" : ""}">
+    // Label: on the first flight, the centre for a spiral.
+    const [lx, ly] =
+      st.shape === "spiral" || !st.shape || st.shape === "straight"
+        ? [st.x + st.w / 2, st.y + st.h / 2]
+        : [(d.path[0][0] + d.path[1][0]) / 2, (d.path[0][1] + d.path[1][1]) / 2];
+    const cls = `stair ${mode === "ghost" ? "ghost-stair" : ""} ${mode === "arrival" ? "arrival" : ""} ${down ? "down" : ""} ${
+      st.id === this._selected && mode === "own" ? "selected" : ""
+    } ${st.color ? "styled" : ""}`;
+    return svg`<g class=${cls} style=${st.color ? `--sc:${st.color}` : ""}>
       <polygon class="stair-bg" data-kind=${mode === "own" ? "stair" : ""} data-id=${st.id} points=${pts}></polygon>
-      ${stairTreads(st).map(([p, q]) => svg`<line class="tread" x1=${p[0]} y1=${p[1]} x2=${q[0]} y2=${q[1]}></line>`)}
-      <line class="arrow" x1=${from0[0]} y1=${from0[1]} x2=${to[0]} y2=${to[1]}></line>
+      ${d.treads.map(([p, q]) => svg`<line class="tread" x1=${p[0]} y1=${p[1]} x2=${q[0]} y2=${q[1]}></line>`)}
+      ${d.edges.map(([p, q]) => svg`<line class="tread edge" x1=${p[0]} y1=${p[1]} x2=${q[0]} y2=${q[1]}></line>`)}
+      <polyline class="arrow" points=${d.path.map((p) => p.join(",")).join(" ")}></polyline>
       <polygon class="arrow-head" points=${head}></polygon>
       ${label
-        ? svg`<text class="stair-tag" x=${cx} y=${cy} font-size=${10 / k} text-anchor="middle" dominant-baseline="middle">${label}</text>`
+        ? svg`<text class="stair-tag" x=${lx} y=${ly} font-size=${10 / k} text-anchor="middle" dominant-baseline="middle">${label}</text>`
         : nothing}
     </g>`;
   }
@@ -1964,6 +2089,56 @@ export class HomexBuilder extends LitElement {
     }
   }
 
+  /** Segmented choice; labels from builder.<prefix>_<value>. */
+  private _choice(label: string, values: string[], current: string, prefix: string, set: (v: string) => void) {
+    return html`<div class="field">
+      <span>${label}</span>
+      <div class="seg wrap">
+        ${values.map(
+          (v) => html`<button class=${v === current ? "on" : ""} @click=${() => v !== current && set(v)}>
+            ${t(`builder.${prefix}_${v}`)}
+          </button>`
+        )}
+      </div>
+    </div>`;
+  }
+
+  /** Colour: presets, a picker, or the default (unset). */
+  private _colorControl(value: string | undefined, presets: string[], set: (v: string | undefined) => void, label = t("builder.style_color")) {
+    return html`<div class="field">
+      <span>${label}</span>
+      <div class="swatches">
+        <button class="swatch none ${value ? "" : "on"}" title=${t("builder.style_color_default")} @click=${() => set(undefined)}></button>
+        ${presets.map(
+          (c) => html`<button class="swatch ${value === c ? "on" : ""}" style="--sw:${c}" title=${c} @click=${() => set(c)}></button>`
+        )}
+        <label class="swatch picker ${value && !presets.includes(value) ? "on" : ""}" title=${t("builder.style_color_custom")} style=${value && !presets.includes(value) ? `--sw:${value}` : ""}>
+          <input type="color" .value=${value ?? "#888888"} @change=${(e: Event) => set((e.target as HTMLInputElement).value)} />
+        </label>
+      </div>
+    </div>`;
+  }
+
+  /** Style and colour of a door / window (the next one, or one placed). */
+  private _openingStyleControls(type: OpeningType, item: { style?: string; color?: string }, set: (patch: { style?: string; color?: string }) => void) {
+    return html`${this._choice(t("builder.style"), OPENING_STYLES[type], openingStyle({ type, style: item.style }), `style_${type}`, (v) =>
+        set({ style: v })
+      )}
+      ${this._colorControl(item.color, FRAME_COLORS, (v) => set({ color: v }))}`;
+  }
+
+  /** Shape, turn and colour of stairs. */
+  private _stairStyleControls(item: { shape?: StairShape; turn?: "left" | "right"; color?: string }, set: (patch: { shape?: StairShape; turn?: "left" | "right"; color?: string }) => void) {
+    const shape = item.shape ?? "straight";
+    return html`${this._choice(t("builder.stairs_shape"), STAIR_SHAPES, shape, "stairs_shape", (v) =>
+        set({ shape: v as StairShape, turn: v === "straight" ? undefined : (item.turn ?? "right") })
+      )}
+      ${shape === "straight"
+        ? nothing
+        : this._choice(t("builder.stairs_side"), ["left", "right"], item.turn ?? "right", "stairs_side", (v) => set({ turn: v as "left" | "right" }))}
+      ${this._colorControl(item.color, STAIR_COLORS, (v) => set({ color: v }))}`;
+  }
+
   private _widthControl(width: number, set: (v: number) => void) {
     return html`<div class="field">
       <span>${t("builder.width_cm")}</span>
@@ -2002,6 +2177,11 @@ export class HomexBuilder extends LitElement {
           (this._openingOpts = { ...this._openingOpts, [target.type]: { ...opts, width: v } })
         )}
         ${directed(target.type) ? this._orientButtons(false) : nothing}
+        ${this._openingStyleControls(target.type, opts, (patch) => {
+          const next = { ...this._openingOpts[target.type], ...patch };
+          if (next.style === OPENING_STYLES[target.type][0]) delete next.style;
+          this._openingOpts = { ...this._openingOpts, [target.type]: next };
+        })}
         <p class="keys">${directed(target.type) ? t("builder.keys_door") : t("builder.keys_width")}</p>
       </div>`;
     }
@@ -2011,6 +2191,9 @@ export class HomexBuilder extends LitElement {
         ${this._goesControl(this._stairGoes)}
         <p class="stats">${t("builder.stairs_climb")} <strong class="dir">${ARROW[this._stairDir]}</strong></p>
         ${this._orientButtons(true)}
+        ${this._stairStyleControls(this._stairStyle, (patch) => {
+          this._stairStyle = { ...this._stairStyle, ...patch, turn: patch.turn ?? this._stairStyle.turn };
+        })}
         <p class="keys">${t("builder.keys_stairs")}</p>
       </div>`;
     }
@@ -2124,25 +2307,36 @@ export class HomexBuilder extends LitElement {
             <strong>${st.attributes.current_position !== undefined ? `${st.attributes.current_position} %` : st.state}</strong>
           </p>`
         : nothing}
+      ${o.cover
+        ? html`${this._choice(t("builder.shutter_type"), ["roller", "hinged"], o.cover_type ?? "roller", "shutter_type", (v) =>
+              this._setStyle(o, { cover_type: v === "roller" ? undefined : (v as ShutterType) })
+            )}
+            ${this._colorControl(o.cover_color, FRAME_COLORS, (v) => this._setStyle(o, { cover_color: v }))}`
+        : nothing}
     </div>`;
   }
 
   private _lightPanel(l: PlanLight) {
     const placing = this._placing === l.id;
     const { on } = this._lightColor(l.entity_id);
-    const seg = (key: "kind" | "mount", values: string[], current: string) => html`<div class="seg">
-      ${values.map(
-        (v) => html`<button class=${v === current ? "on" : ""} @click=${() => this._setLightOpt(key, v)}>
-          ${t(`builder.light_${key}_${v}`)}
-        </button>`
-      )}
-    </div>`;
+    const type = lightType(l);
     const parts = l.kind === "point" ? l.points.length : l.lines.length;
     return html`<div class="selection">
       ${this._panelHead(this._lightName(l.entity_id))}
       <p class="stats">${on ? t("builder.fx_on") : t("builder.fx_off")}</p>
-      <div class="field"><span>${t("builder.light_kind")}</span>${seg("kind", ["point", "linear"], l.kind)}</div>
-      <div class="field"><span>${t("builder.light_mount")}</span>${seg("mount", ["ceiling", "furniture", "wall"], l.mount)}</div>
+      ${this._choice(t("builder.light_mount"), ["ceiling", "floor", "wall"], l.mount, "light_mount", (v) => this._setLightOpt("mount", v))}
+      ${this._choice(t("builder.light_type"), LIGHT_TYPES[l.mount], type, "light_type", (v) => this._setLightOpt("type", v))}
+      ${type === "led_strip"
+        ? nothing
+        : this._choice(t("builder.light_shape"), ["round", "square"], l.shape ?? "round", "light_shape", (v) =>
+            this._setStyle(l, { shape: v === "round" ? undefined : (v as "square") })
+          )}
+      ${SHADED.includes(type)
+        ? this._choice(t("builder.light_shade"), ["no", "yes"], l.shade ? "yes" : "no", "light_shade", (v) =>
+            this._setStyle(l, { shade: v === "yes" })
+          )
+        : nothing}
+      ${this._colorControl(l.color, LIGHT_COLORS, (v) => this._setStyle(l, { color: v }), t("builder.light_color"))}
       <p class="stats">
         ${t(l.kind === "point" ? "builder.light_points" : "builder.light_lines", { count: parts })}
       </p>
@@ -2224,6 +2418,9 @@ export class HomexBuilder extends LitElement {
       ${this._panelHead(t(`builder.tool_${o.type}`))}
       ${this._widthControl(o.width, (v) => this._commit(() => (o.width = v)))}
       ${directed(o.type) ? this._orientButtons(false) : nothing}
+      ${this._openingStyleControls(o.type, o, (patch) =>
+        this._setStyle(o, { ...patch, ...(patch.style === OPENING_STYLES[o.type][0] ? { style: undefined } : {}) })
+      )}
       <p class="keys">${directed(o.type) ? t("builder.keys_door") : t("builder.keys_width")}</p>
       <button class="danger-link" @click=${() => this._deleteSelected()}>${t("builder.item_delete")}</button>
     </div>`;
@@ -2237,6 +2434,9 @@ export class HomexBuilder extends LitElement {
       ${this._cmInput(t("builder.length_cm"), st.h, (v) => (st.h = v), 40)}
       <p class="stats">${t("builder.stairs_climb")} <strong class="dir">${ARROW[st.dir]}</strong></p>
       ${this._orientButtons(true)}
+      ${this._stairStyleControls(st, (patch) =>
+        this._setStyle(st, { ...patch, ...(patch.shape === "straight" ? { shape: undefined, turn: undefined } : {}) })
+      )}
       <p class="keys">${t("builder.keys_stairs")}</p>
       <button class="danger-link" @click=${() => this._deleteSelected()}>${t("builder.item_delete")}</button>
     </div>`;
@@ -2768,8 +2968,19 @@ export class HomexBuilder extends LitElement {
         stroke-width: 5;
       }
       .op .leaf {
-        stroke: var(--primary-text-color);
+        stroke: var(--oc, var(--primary-text-color));
         stroke-width: 2;
+      }
+      .op .leaf-body {
+        stroke: var(--oc, var(--primary-text-color));
+        stroke-width: 1.5;
+        fill: color-mix(in srgb, var(--oc, #9e9e9e) 60%, transparent);
+      }
+      .op .leaf-body.glazed {
+        fill: color-mix(in srgb, #4fc3f7 30%, transparent);
+      }
+      .op .swing.tilt {
+        stroke-dasharray: 2 3;
       }
       .op .swing {
         stroke: var(--secondary-text-color);
@@ -2777,7 +2988,7 @@ export class HomexBuilder extends LitElement {
         stroke-dasharray: 4 3;
       }
       .op .frame {
-        stroke: #4fc3f7;
+        stroke: var(--oc, #4fc3f7);
         stroke-width: 1.5;
       }
       .op.glass_door .frame {
@@ -2788,9 +2999,12 @@ export class HomexBuilder extends LitElement {
         stroke-width: 1.5;
       }
       .op .slide-leaf {
-        stroke: var(--primary-text-color);
+        stroke: var(--oc, var(--primary-text-color));
         stroke-width: 1.5;
-        fill: rgba(127, 127, 127, 0.35);
+        fill: color-mix(in srgb, var(--oc, #7f7f7f) 45%, transparent);
+      }
+      .op .slide-leaf.glazed {
+        fill: color-mix(in srgb, #4fc3f7 30%, transparent);
       }
       .op .slide-open {
         stroke: var(--secondary-text-color);
@@ -2846,6 +3060,15 @@ export class HomexBuilder extends LitElement {
         fill: var(--primary-text-color);
         pointer-events: none;
       }
+      .stair.styled .stair-bg {
+        fill: color-mix(in srgb, var(--sc) 50%, transparent);
+      }
+      .stair .tread.edge {
+        stroke-opacity: 0.9;
+      }
+      .stair .arrow {
+        fill: none;
+      }
       .stair.selected .stair-bg {
         stroke: var(--accent-color, #ff9800);
         stroke-width: 3;
@@ -2866,8 +3089,8 @@ export class HomexBuilder extends LitElement {
         margin-top: 18px;
       }
       .op .shutter {
-        fill: #7e57c2;
-        stroke: #7e57c2;
+        fill: var(--cc, #7e57c2);
+        stroke: var(--cc, #7e57c2);
         stroke-width: 1;
         vector-effect: non-scaling-stroke;
       }
@@ -2912,7 +3135,7 @@ export class HomexBuilder extends LitElement {
         stroke-width: 3;
       }
       .light .lp {
-        fill: var(--card-background-color, #1c1c1c);
+        fill: var(--fc, var(--card-background-color, #1c1c1c));
         stroke: var(--lc);
         stroke-width: 2;
         vector-effect: non-scaling-stroke;
@@ -2932,6 +3155,22 @@ export class HomexBuilder extends LitElement {
       .light .lp-dot {
         fill: var(--lc);
       }
+      .light .lp-in {
+        fill: none;
+        stroke: var(--lc);
+        stroke-width: 1.5;
+        vector-effect: non-scaling-stroke;
+      }
+      .light.on .lp-in {
+        stroke: var(--card-background-color, #1c1c1c);
+      }
+      .light .lp-shade {
+        fill: none;
+        stroke: var(--fc, var(--secondary-text-color));
+        stroke-width: 1.5;
+        stroke-dasharray: 3 2;
+        vector-effect: non-scaling-stroke;
+      }
       .light.on .lp-dot {
         fill: var(--card-background-color, #1c1c1c);
       }
@@ -2941,7 +3180,10 @@ export class HomexBuilder extends LitElement {
         stroke-linecap: round;
         vector-effect: non-scaling-stroke;
       }
-      .light.m-furniture .ll {
+      .light:not(.on) .ll {
+        stroke: var(--fc, var(--lc));
+      }
+      .light.m-floor .ll {
         stroke-dasharray: 8 4;
       }
       .light.m-wall .ll {
@@ -3012,6 +3254,58 @@ export class HomexBuilder extends LitElement {
         flex: 1;
         border-radius: 0;
         background: transparent;
+      }
+      .seg.wrap {
+        flex-wrap: wrap;
+      }
+      .seg.wrap button {
+        flex: 1 1 auto;
+        font-size: 12px;
+        padding: 6px 8px;
+      }
+      .swatches {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 6px;
+        align-items: center;
+      }
+      .swatch {
+        flex: 0 0 24px;
+        width: 24px;
+        height: 24px;
+        min-width: 0;
+        min-height: 0;
+        max-height: 24px;
+        line-height: 0;
+        font-size: 0;
+        padding: 0;
+        margin: 0;
+        border-radius: 50%;
+        border: 2px solid var(--divider-color, rgba(127, 127, 127, 0.5));
+        background: var(--sw, transparent);
+        cursor: pointer;
+        box-sizing: border-box;
+        position: relative;
+        overflow: hidden;
+      }
+      .swatch.on {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 40%, transparent);
+      }
+      .swatch.none {
+        background: linear-gradient(135deg, transparent 45%, var(--error-color, #db4437) 45% 55%, transparent 55%);
+      }
+      .swatch.picker {
+        background: var(--sw, conic-gradient(red, yellow, lime, cyan, blue, magenta, red));
+      }
+      .swatch.picker input {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
       }
       .seg button.on {
         background: var(--primary-color);
