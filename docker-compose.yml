@@ -14,7 +14,7 @@ services:
     environment:
       - TZ=Europe/Paris
 
-  # MQTT broker to emulate Zigbee2MQTT devices (fake test devices with actions).
+  # MQTT broker of the Zigbee2MQTT simulator.
   mosquitto:
     container_name: homex-mosquitto
     image: eclipse-mosquitto:2
@@ -23,3 +23,15 @@ services:
     ports:
       - "1884:1883"
     restart: unless-stopped
+
+  # Zigbee2MQTT simulator: the mock house (dev/mock/house.py) published like
+  # Zigbee2MQTT does, with lights, switches, shutters, valves and sensors.
+  z2m-sim:
+    container_name: homex-z2m-sim
+    build: ./dev/mock
+    environment:
+      - MQTT_HOST=mosquitto
+    depends_on:
+      - mosquitto
+    restart: unless-stopped
+
