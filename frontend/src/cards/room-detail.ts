@@ -165,7 +165,7 @@ export class HomexRoomDetail extends LitElement {
       ? { cls: "off", path: mdiFireOff, text: "Radiateurs éteints" }
       : demand
         ? { cls: "heat", path: mdiFire, text: "Radiateurs en chauffe" }
-        : { cls: "", path: mdiFire, text: "Radiateurs inactifs — consigne atteinte" };
+        : { cls: "", path: mdiFire, text: "Radiateurs inactifs" };
     return html`<section class="heating">
       <div class="head">
         <h3>Chauffage</h3>

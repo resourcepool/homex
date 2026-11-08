@@ -716,7 +716,7 @@ var nt, rt = [
 		} : {
 			cls: "",
 			path: U,
-			text: "Radiateurs inactifs — consigne atteinte"
+			text: "Radiateurs inactifs"
 		} : {
 			cls: "off",
 			path: Pe,
