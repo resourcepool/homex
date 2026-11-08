@@ -127,10 +127,18 @@ async def main():
                     floors[name] = (await ws.call(type="config/floor_registry/create",
                                                   name=name, level=level, icon=icon))["floor_id"]
             floor_by_key = {fid: floors[name] for fid, (name, _l, _i) in HOUSE["floors"].items()}
-            areas = {a["name"] for a in await ws.call(type="config/area_registry/list")}
+            # Onboarding creates default areas (Living Room, Kitchen, Bedroom):
+            # align the ones of the house, drop the others.
+            areas = {a["name"]: a["area_id"] for a in await ws.call(type="config/area_registry/list")}
+            for name, area_id in areas.items():
+                if name not in HOUSE["areas"]:
+                    await ws.call(type="config/area_registry/delete", area_id=area_id)
             for name, (floor, icon) in HOUSE["areas"].items():
-                if name not in areas:
-                    extra = {"floor_id": floor_by_key[floor]} if floor else {}
+                extra = {"floor_id": floor_by_key[floor]} if floor else {}
+                if name in areas:
+                    await ws.call(type="config/area_registry/update", area_id=areas[name], icon=icon,
+                                  floor_id=extra.get("floor_id"))
+                else:
                     await ws.call(type="config/area_registry/create", name=name, icon=icon, **extra)
             print(f"{len(HOUSE['floors'])} floors, {len(HOUSE['areas'])} areas")
         await flow(s, h, "mqtt", [{

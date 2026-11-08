@@ -16,10 +16,11 @@ import "./components/homex-switch-manager";
 import "./components/homex-shutter-manager";
 import "./components/homex-climate-manager";
 import "./components/homex-climate-dashboard";
+import "./components/homex-setup-wizard";
 
 // Bump together with PANEL_VERSION in panel.py. Shown in the header so you can
 // confirm a full page reload picked up the latest build.
-const BUILD = "207";
+const BUILD = "208";
 
 /** Homex sidebar panel: lists rooms and orchestrates loading / reloading. */
 @customElement("homex-panel")
@@ -409,7 +410,12 @@ export class HomexPanel extends LitElement {
     } else if (!this._rooms) {
       body = html`<div class="msg">${t("common.loading")}</div>`;
     } else if (!this._rooms.length) {
-      body = html`<div class="msg">${t("panel.no_rooms", { button: t("panel.new_room") })}</div>`;
+      // No room yet: the setup wizard (import the HA areas or create one).
+      body = html`<homex-setup-wizard
+        .hass=${this.hass}
+        .rooms=${this._rooms}
+        @wizard-create-room=${() => (this._createOpen = true)}
+      ></homex-setup-wizard>`;
     } else {
       const { ungrouped, floors, byFloor } = this._grouped();
       body = html`

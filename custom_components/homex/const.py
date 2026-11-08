@@ -116,3 +116,6 @@ def hx_name(module: str, place: str, name: str) -> str:
     """Display name of every entity Homex creates: HX - {module} - {place} - {name}
     (place: the room, else the heating zone or "Global")."""
     return f"HX - {module} - {place} - {name}"
+
+# hass.data[DOMAIN] flag: hold the hub reload while a batch of rooms is added.
+HOLD_RELOAD = "hold_reload"

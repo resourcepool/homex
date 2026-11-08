@@ -96,6 +96,12 @@ export interface RoomCreate {
 export const createRoom = (hass: HomeAssistant, payload: RoomCreate) =>
   hass.callWS({ type: "homex/room/create", ...payload });
 
+/** Create several rooms at once (setup wizard import); Homex reloads once. */
+export const importRooms = (
+  hass: HomeAssistant,
+  rooms: { name: string; room_id: string; area_id?: string | null }[]
+): Promise<{ created: string[] }> => hass.callWS({ type: "homex/rooms/import", rooms });
+
 export const deleteRoom = (
   hass: HomeAssistant,
   entry_id: string,

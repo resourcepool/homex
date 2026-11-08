@@ -10,6 +10,7 @@ from homeassistant.core import HomeAssistant
 
 from .const import (
     DOMAIN,
+    HOLD_RELOAD,
     HUB_DATA,
     PLATFORMS,
     SCENES_LOCK,
@@ -86,7 +87,12 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Reload everything when the room list (options) changes."""
+    """Reload everything when the room list (options) changes.
+
+    A batch of room additions (setup wizard import) holds the reloads and
+    reloads once at the end (see panel.ws_rooms_import)."""
+    if hass.data.get(DOMAIN, {}).get(HOLD_RELOAD):
+        return
     await hass.config_entries.async_reload(entry.entry_id)
 
 

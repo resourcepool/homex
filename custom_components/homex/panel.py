@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 import re
@@ -47,6 +48,7 @@ from .const import (
     DEFAULT_MODULES,
     DEFAULT_SHUTTER_GROUP,
     DOMAIN,
+    HOLD_RELOAD,
     HUB_DATA,
     MODULE_LIGHTS,
     SCENES_FILE,
@@ -133,7 +135,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "207"
+PANEL_VERSION = "208"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -239,6 +241,7 @@ async def async_register_homex_panel(hass: HomeAssistant) -> None:
         ws_list_rooms,
         ws_device_triggers,
         ws_room_create,
+        ws_rooms_import,
         ws_room_update,
         ws_room_delete,
         ws_room_sync_labels,
@@ -875,6 +878,83 @@ async def ws_room_create(hass: HomeAssistant, connection, msg) -> None:
         ),
     )
     connection.send_result(msg["id"], {"ok": True})
+
+
+def _new_room_data(room_id: str, name: str, area_id: str | None) -> dict:
+    """Stored data of a new room with the default modules and nothing wired."""
+    return {
+        CONF_ROOM_ID: room_id,
+        CONF_ROOM_NAME: name,
+        CONF_AREA_ID: area_id or None,
+        CONF_MODULES: list(DEFAULT_MODULES),
+        CONF_HEATING: _clean_heating(None),
+        CONF_METRICS: _clean_metrics(None),
+        CONF_DEVICES: [],
+        CONF_TRIGGERS: [],
+        CONF_SCENE_TRIGGERS: [],
+        CONF_SCENE_STRATEGY: STRATEGY_RECALL_FIRST,
+        CONF_GROUPS: [],
+        CONF_SCENES: [],
+    }
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/rooms/import",
+        vol.Required("rooms"): [
+            {
+                vol.Required("name"): str,
+                vol.Required("room_id"): str,
+                vol.Optional("area_id"): vol.Any(str, None),
+            }
+        ],
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_rooms_import(hass: HomeAssistant, connection, msg) -> None:
+    """Create several rooms at once (setup wizard: import the HA areas).
+
+    Every room is validated first (nothing is created when one is invalid),
+    then added with Homex's reload held, and Homex reloads once."""
+    hub = _hub_entry(hass)
+    if hub is None:
+        connection.send_error(msg["id"], "not_installed", tr(hass, _STRINGS, "not_installed"))
+        return
+    seen: set[str] = set()
+    rooms = []
+    for room in msg["rooms"]:
+        room_id = room["room_id"].strip().lower()
+        if not ID_RE.match(room_id):
+            connection.send_error(msg["id"], "invalid_id", tr(hass, _STRINGS, "invalid_room_id"))
+            return
+        if room_id in seen or _find_subentry(hub, room_id):
+            connection.send_error(msg["id"], "id_exists", tr(hass, _STRINGS, "room_exists"))
+            return
+        seen.add(room_id)
+        rooms.append((room_id, room["name"].strip() or room_id, room.get("area_id")))
+    if not rooms:
+        connection.send_result(msg["id"], {"created": []})
+        return
+    domain_data = hass.data.setdefault(DOMAIN, {})
+    domain_data[HOLD_RELOAD] = True
+    try:
+        for room_id, name, area_id in rooms:
+            hass.config_entries.async_add_subentry(
+                hub,
+                ConfigSubentry(
+                    data=_new_room_data(room_id, name, area_id),
+                    subentry_type="room",
+                    title=name,
+                    unique_id=room_id,
+                ),
+            )
+        # The update listeners run as tasks: let them see the hold first.
+        await asyncio.sleep(0.5)
+        await hass.config_entries.async_reload(hub.entry_id)
+    finally:
+        domain_data[HOLD_RELOAD] = False
+    connection.send_result(msg["id"], {"created": [r[0] for r in rooms]})
 
 
 @websocket_api.websocket_command(
