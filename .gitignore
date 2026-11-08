@@ -36,3 +36,6 @@ config/blueprints/
 
 # OS / editor
 .DS_Store
+
+# Homex backups written by the dev instance (safety copies before a restore)
+config/homex_backups/

@@ -1,5 +1,5 @@
 import { LitElement, css, html } from "lit";
-import { mdiCheck, mdiDownload, mdiMenu, mdiRefresh, mdiTranslate } from "@mdi/js";
+import { mdiBackupRestore, mdiCheck, mdiContentSave, mdiDownload, mdiMenu, mdiRefresh, mdiTranslate } from "@mdi/js";
 import { customElement, property, state } from "lit/decorators.js";
 import { keyed } from "lit/directives/keyed.js";
 import { LANGUAGES, language, languageSetting, loadLanguageSetting, onLanguageChange, setLanguageSetting, syncHass, t, type LangSetting } from "./lib/i18n";
@@ -17,10 +17,12 @@ import "./components/homex-shutter-manager";
 import "./components/homex-climate-manager";
 import "./components/homex-climate-dashboard";
 import "./components/homex-setup-wizard";
+import "./components/homex-backup-dialog";
+import { downloadBackup } from "./components/homex-backup-dialog";
 
 // Bump together with PANEL_VERSION in panel.py. Shown in the header so you can
 // confirm a full page reload picked up the latest build.
-const BUILD = "213";
+const BUILD = "214";
 
 /** Homex sidebar panel: lists rooms and orchestrates loading / reloading. */
 @customElement("homex-panel")
@@ -34,6 +36,7 @@ export class HomexPanel extends LitElement {
   @state() private _error: string | null = null;
   @state() private _createOpen = false;
   @state() private _exportOpen = false;
+  @state() private _restoreOpen = false;
   @state() private _menuOpen = false;
   // Dashboard tab (General: rooms; Climate: heating context), remembered.
   @state() private _dashTab: "general" | "climate" =
@@ -524,6 +527,28 @@ export class HomexPanel extends LitElement {
                         <svg class="ico" viewBox="0 0 24 24"><path d=${mdiDownload}></path></svg>
                         ${t("panel.export")}
                       </button>
+                      <button
+                        @click=${async () => {
+                          this._menuOpen = false;
+                          try {
+                            await downloadBackup(this.hass);
+                          } catch (err) {
+                            alert(t("backup.backup_failed", { message: errorMessage(err) }));
+                          }
+                        }}
+                      >
+                        <svg class="ico" viewBox="0 0 24 24"><path d=${mdiContentSave}></path></svg>
+                        ${t("backup.backup")}
+                      </button>
+                      <button
+                        @click=${() => {
+                          this._menuOpen = false;
+                          this._restoreOpen = true;
+                        }}
+                      >
+                        <svg class="ico" viewBox="0 0 24 24"><path d=${mdiBackupRestore}></path></svg>
+                        ${t("backup.restore_menu")}
+                      </button>
                       <div class="menu-sep"></div>
                       <button
                         @click=${() => {
@@ -576,6 +601,11 @@ export class HomexPanel extends LitElement {
         .open=${this._createOpen}
         @dialog-closed=${() => (this._createOpen = false)}
       ></homex-room-dialog>
+      <homex-backup-dialog
+        .hass=${this.hass}
+        .open=${this._restoreOpen}
+        @dialog-closed=${() => (this._restoreOpen = false)}
+      ></homex-backup-dialog>
       <homex-export-dialog
         .rooms=${this._rooms || []}
         .open=${this._exportOpen}

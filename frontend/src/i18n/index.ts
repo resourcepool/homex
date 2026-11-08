@@ -1,6 +1,7 @@
 /** All translation catalogs, by namespace (see lib/i18n.ts). Each catalog
  * file exports `{ en: {...}, fr: {...} }` with the same keys. */
 import common from "./common";
+import backup from "./backup";
 import panel from "./panel";
 import climateDashboard from "./climateDashboard";
 import climateManager from "./climateManager";
@@ -44,6 +45,7 @@ import lib from "./lib";
 
 export const CATALOGS: Record<string, { en: Record<string, string>; fr: Record<string, string> }> = {
   common,
+  backup,
   panel,
   climateDashboard,
   climateManager,

@@ -79,6 +79,10 @@ from .room import (
 _STRINGS = {
     "en": {
         "not_installed": "Homex is not installed",
+        "backup_not_a_backup": "This file is not a Homex backup.",
+        "backup_unsupported_version": "This backup comes from a newer Homex: update Homex first.",
+        "backup_invalid_rooms": "The rooms of this backup are invalid.",
+        "backup_invalid_content": "This backup is damaged.",
         "unknown_room": "Unknown room",
         "invalid_room_id": "Invalid room id",
         "room_exists": "A room with this id exists",
@@ -107,6 +111,10 @@ _STRINGS = {
     },
     "fr": {
         "not_installed": "Homex n'est pas installé",
+        "backup_not_a_backup": "Ce fichier n'est pas une sauvegarde Homex.",
+        "backup_unsupported_version": "Cette sauvegarde vient d'un Homex plus récent : mets d'abord Homex à jour.",
+        "backup_invalid_rooms": "Les pièces de cette sauvegarde sont invalides.",
+        "backup_invalid_content": "Cette sauvegarde est endommagée.",
         "unknown_room": "Pièce inconnue",
         "invalid_room_id": "Id de pièce invalide",
         "room_exists": "Une pièce avec cet id existe déjà",
@@ -139,7 +147,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "213"
+PANEL_VERSION = "214"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -286,6 +294,9 @@ async def async_register_homex_panel(hass: HomeAssistant) -> None:
         ws_scene_activate,
         ws_settings_get,
         ws_settings_set,
+        ws_backup_create,
+        ws_backup_check,
+        ws_backup_restore,
         *HEATING_WS_COMMANDS,
         *HEATING_ZONE_WS_COMMANDS,
         *HEATING_SYSTEM_WS_COMMANDS,
@@ -524,6 +535,64 @@ async def ws_list_rooms(hass: HomeAssistant, connection, msg) -> None:
             }
         )
     connection.send_result(msg["id"], {"rooms": rooms})
+
+
+# -- Backup / restore ----------------------------------------------------------
+
+
+@websocket_api.websocket_command({vol.Required("type"): "homex/backup/create"})
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_backup_create(hass: HomeAssistant, connection, msg) -> None:
+    """The whole Homex configuration and data, as a backup document."""
+    from .backup import async_create_backup, summarize
+
+    hub = _hub_entry(hass)
+    if hub is None:
+        connection.send_error(msg["id"], "not_installed", tr(hass, _STRINGS, "not_installed"))
+        return
+    backup = await async_create_backup(hass, hub)
+    connection.send_result(msg["id"], {"backup": backup, "summary": summarize(backup)})
+
+
+@websocket_api.websocket_command(
+    {vol.Required("type"): "homex/backup/check", vol.Required("backup"): dict}
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_backup_check(hass: HomeAssistant, connection, msg) -> None:
+    """Validate a backup document and summarize it (before restoring it)."""
+    from .backup import summarize, validate
+
+    error = validate(msg["backup"])
+    if error:
+        connection.send_error(msg["id"], error, tr(hass, _STRINGS, f"backup_{error}"))
+        return
+    connection.send_result(msg["id"], {"summary": summarize(msg["backup"])})
+
+
+@websocket_api.websocket_command(
+    {vol.Required("type"): "homex/backup/restore", vol.Required("backup"): dict}
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_backup_restore(hass: HomeAssistant, connection, msg) -> None:
+    """Replace Homex's configuration and data by a backup's (a safety backup
+    of the current state is written first)."""
+    from .backup import async_restore_backup, validate
+
+    hub = _hub_entry(hass)
+    if hub is None:
+        connection.send_error(msg["id"], "not_installed", tr(hass, _STRINGS, "not_installed"))
+        return
+    error = validate(msg["backup"])
+    if error:
+        connection.send_error(msg["id"], error, tr(hass, _STRINGS, f"backup_{error}"))
+        return
+    safety = await async_restore_backup(hass, hub, msg["backup"])
+    connection.send_result(
+        msg["id"], {"safety_backup": os.path.relpath(safety, hass.config.config_dir)}
+    )
 
 
 # -- Settings ------------------------------------------------------------------
