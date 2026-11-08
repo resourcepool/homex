@@ -1,8 +1,19 @@
-import { LitElement, css, html, nothing } from "lit";
+import { LitElement, css, html, nothing, svg } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { mdiCheckCircle, mdiHomeImportOutline, mdiHomePlusOutline } from "@mdi/js";
 import type { HomeAssistant, Room } from "../types";
-import { errorMessage, importRooms, saveShutterPreset, shutterPlan, type ShutterPlanModel } from "../api";
+import {
+  errorMessage,
+  importRooms,
+  saveLayout,
+  savePreset,
+  saveShutterPreset,
+  shutterPlan,
+  switchPlan,
+  type ShutterPlanModel,
+  type SwitchPlanModel,
+} from "../api";
+import type { SwitchLayout } from "../types";
 import { fireChanged } from "../types";
 import { t } from "../lib/i18n";
 import { logo } from "../lib/logo";
@@ -29,7 +40,20 @@ export class HomexSetupWizard extends LitElement {
 
   /** choose: import or create; import: pick the areas; options: what to
    * import with them (lights, shutters); done: summary. */
-  @state() private _step: "choose" | "import" | "options" | "shutters" | "done" = "choose";
+  @state() private _step:
+    | "choose"
+    | "import"
+    | "options"
+    | "shutters"
+    | "switches_intro"
+    | "switches"
+    | "done" = "choose";
+  /** Areas of the imported rooms (the switches step looks there). */
+  private _importedAreas: string[] = [];
+  /** Switch models of the imported rooms, and the presets to create. */
+  @state() private _switchPlan: SwitchPlanModel[] | null = null;
+  @state() private _createPresets = new Set<string>();
+  @state() private _presetsCreated = 0;
   /** What to bring along with the rooms (step "options"). */
   @state() private _withLights = true;
   @state() private _withShutters = true;
@@ -216,12 +240,160 @@ export class HomexSetupWizard extends LitElement {
       }
       const res = await importRooms(this.hass, this._roomIds(areas));
       this._created = res.created.length;
+      this._importedAreas = areas.map((a) => a.area_id);
+      // Step 2: the switches of these rooms (configure or skip).
+      this._switchPlan = (await switchPlan(this.hass, this._importedAreas)).models;
+      this._createPresets = new Set(this._switchPlan.filter((m) => m.preset).map((m) => m.model));
+      this._step = "switches_intro";
+    } catch (err) {
+      alert(t("common.error", { message: errorMessage(err) }));
+    } finally {
+      this._busy = false;
+    }
+  }
+
+  /** Create the checked suggested presets (with their layouts). */
+  private async _createSwitchPresets() {
+    this._busy = true;
+    try {
+      let n = 0;
+      for (const m of this._switchPlan ?? []) {
+        if (!m.preset || !m.layout || !this._createPresets.has(m.model)) continue;
+        await saveLayout(this.hass, m.layout);
+        await savePreset(this.hass, m.preset);
+        n++;
+      }
+      this._presetsCreated = n;
       this._step = "done";
     } catch (err) {
       alert(t("common.error", { message: errorMessage(err) }));
     } finally {
       this._busy = false;
     }
+  }
+
+  /** A small drawing of a layout, its buttons named after the model's. */
+  private _layoutPreview(layout: SwitchLayout, names: string[]) {
+    const b = layout.bounds;
+    const outline =
+      layout.shape === "round"
+        ? svg`<circle cx=${b.x + b.w / 2} cy=${b.y + b.h / 2} r=${Math.max(b.w, b.h) / 2} class="plate"></circle>`
+        : svg`<rect x=${b.x} y=${b.y} width=${b.w} height=${b.h} rx=${layout.shape === "vrect" ? 2.5 : 2} class="plate"></rect>`;
+    return html`<svg class="layout" viewBox="-11 -11 22 22" aria-hidden="true">
+      ${outline}
+      ${layout.zones.map(
+        (z) => svg`<rect x=${z.x + 0.6} y=${z.y + 0.6} width=${z.w - 1.2} height=${z.h - 1.2} rx="1" class="zone"></rect>
+          <text x=${z.x + z.w / 2} y=${z.y + z.h / 2} class="zone-label">${this._buttonLabel(names[z.n - 1] ?? String(z.n))}</text>`
+      )}
+    </svg>`;
+  }
+
+  private _buttonLabel(name: string) {
+    const short: Record<string, string> = { arrow_left: "◀", arrow_right: "▶", left: "L", right: "R", main: "●", up: "+", down: "−" };
+    return short[name] ?? (name.length > 3 ? name.slice(0, 3) : name);
+  }
+
+  /** A detected button's name, readable (known names translated). */
+  private _buttonName(name: string) {
+    const key = `setupWizard.btn_${name}`;
+    const label = t(key);
+    return label === key ? name.replace(/_/g, " ") : label;
+  }
+
+  private _tapNames(taps: string[]) {
+    return taps.map((tp) => t(`setupWizard.tap_${tp}`)).join(", ");
+  }
+
+  /** Step 2 intro: what presets are, configure or skip. */
+  private _switchesIntro() {
+    const models = this._switchPlan ?? [];
+    const devices = models.reduce((n, m) => n + m.devices.length, 0);
+    return html`
+      <div class="done inline">
+        <span class="done-icon">${this._icon(mdiCheckCircle)}</span>
+        <span>${t(this._created === 1 ? "setupWizard.done_one" : "setupWizard.done_other", { count: this._created })}</span>
+      </div>
+      <p class="lead">${t("setupWizard.switches_intro")}</p>
+      <div class="concepts">
+        <div class="concept">
+          <span class="concept-title">${t("setupWizard.concept_layout")}</span>
+          <span class="option-desc">${t("setupWizard.concept_layout_text")}</span>
+        </div>
+        <div class="concept">
+          <span class="concept-title">${t("setupWizard.concept_preset")}</span>
+          <span class="option-desc">${t("setupWizard.concept_preset_text")}</span>
+        </div>
+        <div class="concept">
+          <span class="concept-title">${t("setupWizard.concept_switch")}</span>
+          <span class="option-desc">${t("setupWizard.concept_switch_text")}</span>
+        </div>
+      </div>
+      <p class="lead">
+        ${devices
+          ? t("setupWizard.switches_found", { devices, models: models.length })
+          : t("setupWizard.switches_none")}
+      </p>
+      <div class="actions">
+        ${devices
+          ? html`<button class="secondary" @click=${() => (this._step = "done")}>${t("setupWizard.skip")}</button>
+              <button class="primary" @click=${() => (this._step = "switches")}>${t("setupWizard.configure_switches")}</button>`
+          : html`<button class="primary" @click=${() => (this._step = "done")}>${t("setupWizard.next")}</button>`}
+      </div>
+    `;
+  }
+
+  /** Step 2: one card per switch model (existing preset or suggestion). */
+  private _switches() {
+    const models = this._switchPlan ?? [];
+    const toCreate = models.filter((m) => m.preset && this._createPresets.has(m.model)).length;
+    return html`
+      <p class="lead">${t("setupWizard.switches_pick")}</p>
+      ${models.map((m) => {
+        const names = m.buttons.map((b) => b.name);
+        const devices = m.devices.map((d) => (d.area ? `${d.name} (${d.area})` : d.name));
+        return html`<div class="switch-model">
+          ${m.layout ? this._layoutPreview(m.layout, names) : html`<div class="layout placeholder"></div>`}
+          <div class="option-text">
+            <span class="option-title">${m.label} <span class="count">× ${m.devices.length}</span></span>
+            <span class="option-desc">
+              ${m.existing
+                ? t("setupWizard.preset_existing", { name: m.existing.name })
+                : m.buttons.length
+                  ? m.buttons.map((b) => `${this._buttonName(b.name)} (${this._tapNames(b.taps)})`).join(" · ")
+                  : t("setupWizard.actions_unknown")}
+            </span>
+            <span class="devices">${devices.join(", ")}</span>
+          </div>
+          ${m.preset
+            ? html`<label class="smart">
+                <span>${t("setupWizard.create_preset")}</span>
+                <span class="switch">
+                  <input
+                    type="checkbox"
+                    .checked=${this._createPresets.has(m.model)}
+                    @change=${(e: Event) => {
+                      const next = new Set(this._createPresets);
+                      if ((e.target as HTMLInputElement).checked) next.add(m.model);
+                      else next.delete(m.model);
+                      this._createPresets = next;
+                    }}
+                  />
+                  <span></span>
+                </span>
+              </label>`
+            : nothing}
+        </div>`;
+      })}
+      <p class="hint">${t("setupWizard.presets_hint")}</p>
+      <div class="actions">
+        <button class="secondary" @click=${() => (this._step = "switches_intro")}>${t("setupWizard.back")}</button>
+        <button class="primary" ?disabled=${this._busy} @click=${this._createSwitchPresets}>
+          ${toCreate
+            ? t(toCreate === 1 ? "setupWizard.create_presets_one" : "setupWizard.create_presets_other", { count: toCreate })
+            : t("setupWizard.next")}
+        </button>
+      </div>
+    `;
   }
 
   private _finish() {
@@ -473,14 +645,41 @@ export class HomexSetupWizard extends LitElement {
     return html`
       <div class="done">
         <span class="done-icon">${this._icon(mdiCheckCircle)}</span>
-        <p class="lead">
-          ${t(this._created === 1 ? "setupWizard.done_one" : "setupWizard.done_other", { count: this._created })}
-        </p>
+        <div>
+          <p class="lead">
+            ${t(this._created === 1 ? "setupWizard.done_one" : "setupWizard.done_other", { count: this._created })}
+          </p>
+          ${this._presetsCreated
+            ? html`<p class="lead">
+                ${t(this._presetsCreated === 1 ? "setupWizard.presets_done_one" : "setupWizard.presets_done_other", {
+                  count: this._presetsCreated,
+                })}
+              </p>`
+            : nothing}
+        </div>
       </div>
       <div class="actions">
         <button class="primary" @click=${this._finish}>${t("setupWizard.continue")}</button>
       </div>
     `;
+  }
+
+  /** 1 Rooms · 2 Switches, the current one highlighted. */
+  private _stepper() {
+    const second = ["switches_intro", "switches"].includes(this._step);
+    const finished = this._step === "done";
+    const steps = [
+      { n: 1, label: t("setupWizard.step_rooms"), state: second || finished ? "past" : "current" },
+      { n: 2, label: t("setupWizard.step_switches"), state: finished ? "past" : second ? "current" : "next" },
+    ];
+    return html`<div class="steps">
+      ${steps.map(
+        (st) => html`<span class="step ${st.state}">
+          <span class="step-num">${st.state === "past" ? "✓" : st.n}</span>
+          <span>${st.label}</span>
+        </span>`
+      )}
+    </div>`;
   }
 
   render() {
@@ -493,10 +692,7 @@ export class HomexSetupWizard extends LitElement {
             <div class="sub">${t("setupWizard.subtitle")}</div>
           </div>
         </header>
-        <div class="step">
-          <span class="step-num">1</span>
-          <span>${t("setupWizard.step_rooms")}</span>
-        </div>
+        ${this._stepper()}
         ${this._step === "choose"
           ? this._choose()
           : this._step === "import"
@@ -505,7 +701,11 @@ export class HomexSetupWizard extends LitElement {
               ? this._options()
               : this._step === "shutters"
                 ? this._shutters()
-                : this._done()}
+                : this._step === "switches_intro"
+                  ? this._switchesIntro()
+                  : this._step === "switches"
+                    ? this._switches()
+                    : this._done()}
       </div>
     `;
   }
@@ -536,6 +736,18 @@ export class HomexSetupWizard extends LitElement {
       color: var(--secondary-text-color);
       font-size: 14px;
       margin-top: 2px;
+    }
+    .steps {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 22px;
+      margin-bottom: 8px;
+    }
+    .step.next {
+      opacity: 0.5;
+    }
+    .step.past .step-num {
+      background: var(--success-color, #43a047);
     }
     .step {
       display: flex;
@@ -799,6 +1011,71 @@ export class HomexSetupWizard extends LitElement {
     }
     .switch input:checked + span::before {
       transform: translateX(18px);
+    }
+    .done.inline {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    .done.inline svg {
+      width: 22px;
+      height: 22px;
+    }
+    .concepts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+    }
+    .concept {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: rgba(127, 127, 127, 0.08);
+    }
+    .concept-title {
+      font-weight: 500;
+    }
+    .switch-model {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 16px;
+      border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+    .switch-model .option-text {
+      flex: 1;
+      min-width: 0;
+    }
+    .layout {
+      width: 76px;
+      height: 76px;
+      flex: none;
+    }
+    .layout .plate {
+      fill: rgba(127, 127, 127, 0.12);
+      stroke: var(--secondary-text-color);
+      stroke-width: 0.4;
+    }
+    .layout .zone {
+      fill: var(--card-background-color, #fff);
+      stroke: var(--primary-color);
+      stroke-width: 0.35;
+    }
+    .layout .zone-label {
+      font-size: 2.6px;
+      fill: var(--primary-text-color);
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+    .devices {
+      font-size: 12px;
+      color: var(--secondary-text-color);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .done {
       display: flex;

@@ -17,7 +17,7 @@ from homeassistant.components.device_automation import (
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry, ConfigSubentry
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from homeassistant.helpers import area_registry as ar, device_registry as dr, entity_registry as er
 from homeassistant.helpers.storage import Store
 from homeassistant.setup import async_setup_component
 from homeassistant.util.yaml import load_yaml, save_yaml
@@ -139,7 +139,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "210"
+PANEL_VERSION = "211"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -247,6 +247,7 @@ async def async_register_homex_panel(hass: HomeAssistant) -> None:
         ws_room_create,
         ws_rooms_import,
         ws_setup_shutter_plan,
+        ws_setup_switch_plan,
         ws_room_update,
         ws_room_delete,
         ws_room_sync_labels,
@@ -944,6 +945,79 @@ _COVER_MOTION = {
     "moving_down": {"source": "cover", "state": "closing"},
     "stopped": {"source": "cover", "state": "open|closed"},
 }
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "homex/setup/switch_plan",
+        # Only the switches located in these areas (all when omitted).
+        vol.Optional("area_ids"): [str],
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_setup_switch_plan(hass: HomeAssistant, connection, msg) -> None:
+    """Setup wizard: the switch / remote models of these areas, each with its
+    existing device preset, or a suggested layout + preset guessed from the
+    model's actions (see setup_switches)."""
+    from .setup_switches import analyze, build_layout, build_preset
+
+    dev_reg = dr.async_get(hass)
+    areas = set(msg["area_ids"]) if "area_ids" in msg else None
+    area_names = {a.id: a.name for a in ar.async_get(hass).async_list_areas()}
+    presets = await _get_presets(hass)
+    layout_ids = {l.get("id") for l in await _get_layouts(hass)}
+    preset_ids = {p.get("id") for p in presets}
+    models: dict[str, dict] = {}
+    for dev_id, triggers in (await _action_device_ids(hass)).items():
+        dev = dev_reg.async_get(dev_id)
+        if dev is None or (areas is not None and dev.area_id not in areas):
+            continue
+        key = f"{dev.manufacturer or ''}|{dev.model or ''}"
+        model = models.get(key)
+        if model is None:
+            label = " ".join(p for p in (dev.manufacturer, dev.model) if p) or tr(
+                hass, _STRINGS, "unknown_model"
+            )
+            existing = next((p for p in presets if p.get("model") == key), None)
+            model = models[key] = {
+                "model": key,
+                "label": label,
+                "devices": [],
+                "existing": {"id": existing["id"], "name": existing.get("name")} if existing else None,
+                "buttons": [],
+                "layout": None,
+                "preset": None,
+            }
+            actions = [t for t in triggers if t.get("type") == "action"]
+            buttons = analyze([str(t.get("subtype") or "") for t in actions])
+            model["buttons"] = [{"name": b["name"], "taps": b["taps"]} for b in buttons]
+            if existing is None and buttons:
+                base = _slugify(label) or "switch"
+
+                def free(taken: set, base: str = base) -> str:
+                    pid, i = base, 2
+                    while pid in taken:
+                        pid, i = f"{base}_{i}", i + 1
+                    taken.add(pid)
+                    return pid
+
+                lid = free(layout_ids)
+                model["layout"] = build_layout(lid, label, buttons)
+                model["preset"] = build_preset(
+                    free(preset_ids), label, key, dev_id, lid, buttons,
+                    {str(t.get("subtype")): _device_trigger_label(t) for t in actions},
+                )
+        model["devices"].append(
+            {
+                "device_id": dev_id,
+                "name": dev.name_by_user or dev.name or dev_id,
+                "area": area_names.get(dev.area_id or "", ""),
+            }
+        )
+    connection.send_result(
+        msg["id"], {"models": sorted(models.values(), key=lambda m: m["label"].lower())}
+    )
 
 
 @websocket_api.websocket_command(

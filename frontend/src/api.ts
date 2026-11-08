@@ -359,3 +359,20 @@ export const shutterPlan = (
   hass: HomeAssistant,
   covers: string[]
 ): Promise<{ models: ShutterPlanModel[] }> => hass.callWS({ type: "homex/setup/shutter_plan", covers });
+
+/** A switch / remote model of the setup wizard: its devices, its existing
+ * device preset, or a suggested layout + preset guessed from its actions. */
+export interface SwitchPlanModel {
+  model: string;
+  label: string;
+  devices: { device_id: string; name: string; area: string }[];
+  existing: { id: string; name: string } | null;
+  buttons: { name: string; taps: import("./types").TapMode[] }[];
+  layout: import("./types").SwitchLayout | null;
+  preset: import("./types").DevicePreset | null;
+}
+export const switchPlan = (
+  hass: HomeAssistant,
+  area_ids?: string[]
+): Promise<{ models: SwitchPlanModel[] }> =>
+  hass.callWS({ type: "homex/setup/switch_plan", ...(area_ids ? { area_ids } : {}) });
