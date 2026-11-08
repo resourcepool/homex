@@ -1,0 +1,112 @@
+{
+  "id": "ikea_icpshc24_30eu",
+  "name": "IKEA TRADFRI LED driver, 30 w",
+  "device": {
+    "vendor": "IKEA",
+    "model": "ICPSHC24-30EU-IL-1/ICPSHC24-10EU-IL-2",
+    "description": "TRADFRI LED driver, 30 w",
+    "type": "Light",
+    "image": "https://www.zigbee2mqtt.io/images/devices/ICPSHC24-30EU-IL-1-ICPSHC24-10EU-IL-2.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/ICPSHC24-30EU-IL-1_ICPSHC24-10EU-IL-2.html"
+      }
+    ]
+  },
+  "_sources": "Identification (modelId 'TRADFRI Driver 30W', manufacturerName 'IKEA of Sweden') from the wishlist export and the zigbee-herdsman-converters 26.128.0 definition. Same descriptor layout as the captured IKEA LED2109G6 entry (zigbee2mqtt#21755). IKEA bulbs lose configured reporting on power loss (zigbee-herdsman-converters lib/ikea.js bulbOnEvent). Basic version/date attributes are representative, not captured.",
+  "node": {
+    "logicalType": "router",
+    "rxOnWhenIdle": true,
+    "manufacturerCode": 4476,
+    "macCapabilities": 142,
+    "ieeePrefix": "000b57",
+    "volatileReporting": true
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 257,
+      "inClusters": [
+        "genBasic",
+        "genIdentify",
+        "genGroups",
+        "genScenes",
+        "genOnOff",
+        "genLevelCtrl",
+        "touchlink",
+        "manuSpecificIkeaUnknown"
+      ],
+      "outClusters": [
+        "genOta"
+      ],
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 8,
+          "appVersion": 1,
+          "stackVersion": 113,
+          "hwVersion": 1,
+          "dateCode": "20230913",
+          "swBuildId": "1.0.38",
+          "manufacturerName": "IKEA of Sweden",
+          "modelId": "TRADFRI Driver 30W",
+          "powerSource": 1
+        },
+        "genOnOff": {
+          "onOff": 1,
+          "startUpOnOff": 255
+        }
+      }
+    },
+    {
+      "id": 242,
+      "profileId": 41440,
+      "deviceId": 97,
+      "inClusters": [
+        "greenPower"
+      ],
+      "outClusters": [
+        "greenPower"
+      ]
+    }
+  ],
+  "routineTemplates": [
+    {
+      "name": "Wall switch off and on every 2 minutes",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "wait",
+          "ms": 120000
+        },
+        {
+          "kind": "gesture",
+          "control": "mains",
+          "gesture": "off"
+        },
+        {
+          "kind": "wait",
+          "ms": 5000
+        },
+        {
+          "kind": "gesture",
+          "control": "mains",
+          "gesture": "on"
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "light",
+      "use": "brightness",
+      "endpoint": 1
+    },
+    {
+      "id": "mains",
+      "use": "power",
+      "description": "Mains / wall switch. On power-up the light applies its power-on behaviour (startUpOnOff, startUpCurrentLevel) and re-announces. IKEA lights also forget their reporting configuration."
+    }
+  ]
+}

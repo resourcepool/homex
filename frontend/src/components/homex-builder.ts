@@ -8,6 +8,7 @@ import type {
   PlanOpening,
   PlanPoint,
   PlanRadiator,
+  RadiatorKind,
   PlanLight,
   LightMount,
   LightType,
@@ -17,9 +18,11 @@ import type {
   PlanStair,
   Room,
 } from "../types";
+import { RADIATOR_LENGTH } from "../types";
 import { errorMessage, fetchPlan, fetchRooms, savePlan } from "../api";
 import { sharedStyles } from "../lib/styles";
 import { t, locale } from "../lib/i18n";
+import { joinPath, navigate } from "../lib/router";
 import "./homex-builder-level-dialog";
 import {
   NEXT_DIR,
@@ -120,6 +123,9 @@ type OpeningOpts = { width: number; flip: boolean; out: boolean; style?: string;
 @customElement("homex-builder")
 export class HomexBuilder extends LitElement {
   @property({ attribute: false }) hass!: HomeAssistant;
+  /** Pages: <base>/structure, <base>/fixtures, <base>/render (the tabs). */
+  @property({ attribute: false }) base = "/homex/builder";
+  @property({ attribute: false }) subpath = "";
 
   @state() private _plan: Plan | null = null;
   @state() private _rooms: Room[] = [];
@@ -1034,6 +1040,19 @@ export class HomexBuilder extends LitElement {
 
   // -- Fixtures -------------------------------------------------------------------------
 
+  /** A tab is a page: switching tabs navigates; the page sets the mode. */
+  private _goMode(mode: "structure" | "fixtures" | "render") {
+    if (mode !== this._mode) navigate(joinPath(this.base, mode));
+  }
+
+  willUpdate(changed: Map<string, unknown>) {
+    if (changed.has("subpath")) {
+      const seg = this.subpath.split("/")[0];
+      const mode = seg === "fixtures" || seg === "render" ? seg : "structure";
+      if (mode !== this._mode) this._setMode(mode);
+    }
+  }
+
   private _setMode(mode: "structure" | "fixtures" | "render") {
     // three.js loads with the Rendering tab only.
     if (mode === "render") import("./homex-builder-render");
@@ -1783,12 +1802,14 @@ export class HomexBuilder extends LitElement {
     const sel = r.id === this._selected;
     const a = (r.angle * Math.PI) / 180;
     const u: PlanPoint = [Math.cos(a), Math.sin(a)];
+    const tall = r.kind === "tall";
+    const pitch = tall ? 5 : 10; // a tall one: tight vertical columns
     const fins = [];
-    for (let d = -r.length / 2 + 10; d < r.length / 2 - 4; d += 10) {
+    for (let d = -r.length / 2 + pitch; d < r.length / 2 - pitch / 2 + 1; d += pitch) {
       const c: PlanPoint = [r.x + u[0] * d, r.y + u[1] * d];
       fins.push(svg`<line class="fin" x1=${c[0] - u[1] * 4} y1=${c[1] + u[0] * 4} x2=${c[0] + u[1] * 4} y2=${c[1] - u[0] * 4}></line>`);
     }
-    return svg`<g class="radiator ${heating ? "heating" : ""} ${sel ? "selected" : ""}">
+    return svg`<g class="radiator ${tall ? "tall" : ""} ${heating ? "heating" : ""} ${sel ? "selected" : ""}">
       <polygon data-kind="radiator" data-id=${r.id} points=${pts.map((p) => p.join(",")).join(" ")}></polygon>
       ${fins}
       ${this._mode === "fixtures" || sel
@@ -2372,6 +2393,24 @@ export class HomexBuilder extends LitElement {
     const st = climate ? this.hass.states[climate] : undefined;
     return html`<div class="selection">
       ${this._panelHead(this._deviceName(r.device_id))}
+      <div class="field">
+        <span>${t("builder.radiator_type")}</span>
+        <div class="seg kinds">
+          ${(["panel", "tall"] as RadiatorKind[]).map(
+            (kind) => html`<button
+              class=${(r.kind ?? "panel") === kind ? "on" : ""}
+              @click=${() =>
+                (r.kind ?? "panel") !== kind &&
+                this._commit(() => {
+                  r.kind = kind;
+                  r.length = RADIATOR_LENGTH[kind];
+                })}
+            >
+              ${kind === "tall" ? "▮" : "▬"} ${t(`builder.radiator_${kind}`)}
+            </button>`
+          )}
+        </div>
+      </div>
       ${st
         ? html`<p class="stats">
             ${st.attributes.hvac_action === "heating" ? t("builder.fx_heating") : t("builder.fx_idle")}
@@ -2483,26 +2522,9 @@ export class HomexBuilder extends LitElement {
     }[this._saving];
     const level = this._level;
     return html`
-      <div class="head">
-        <button class="back" title=${t("builder.back")} @click=${this._close}>←</button>
-        <h2>3D Builder</h2>
-        ${level ? html`<span class="cur">${level.name} · ${t("builder.level_label", { level: level.level })}</span>` : nothing}
-        ${level
-          ? html`<div class="seg mode">
-              <button class=${this._mode === "structure" ? "on" : ""} @click=${() => this._setMode("structure")}>
-                🧱 ${t("builder.mode_structure")}
-              </button>
-              <button class=${this._mode === "fixtures" ? "on" : ""} @click=${() => this._setMode("fixtures")}>
-                🔌 ${t("builder.mode_fixtures")}
-              </button>
-              <button class=${this._mode === "render" ? "on" : ""} @click=${() => this._setMode("render")}>
-                🏠 ${t("builder.mode_render")}
-              </button>
-            </div>`
-          : nothing}
-        <span class="status ${this._saving}">${saving}</span>
-      </div>
       ${this._error ? html`<p class="err">${this._error}</p>` : nothing}
+      <div class="main">
+      ${this._nav(level, saving)}
       ${!this._plan
         ? html`<p class="hint">${t("common.loading")}</p>`
         : !level
@@ -2518,6 +2540,7 @@ export class HomexBuilder extends LitElement {
                 .plan=${this._plan}
                 .levelId=${this._levelId}
                 .names=${Object.fromEntries(this._rooms.map((r) => [r.room_id, r.name]))}
+                .rooms=${this._rooms}
               ></homex-builder-render>`
             : html`<div class="body">
               ${this._sidePanel()}
@@ -2535,8 +2558,48 @@ export class HomexBuilder extends LitElement {
                 ${this._floorSwitcher()}
               </div>
             </div>`}
+      </div>
       ${this._levelDialog()}
     `;
+  }
+
+  /** The builder's only bar, floating top right: back, the three tabs, the
+   * save status and — on the 3D view — Publish (the dashboard's 3D tab). */
+  private _nav(level: PlanLevel | undefined, saving: string) {
+    const published = !!this._plan?.published;
+    return html`<div class="nav">
+      <button class="back" title=${t("builder.back")} @click=${this._close}>←</button>
+      ${level
+        ? html`<div class="seg mode">
+            <button class=${this._mode === "structure" ? "on" : ""} @click=${() => this._goMode("structure")}>
+              🧱 ${t("builder.mode_structure")}
+            </button>
+            <button class=${this._mode === "fixtures" ? "on" : ""} @click=${() => this._goMode("fixtures")}>
+              🔌 ${t("builder.mode_fixtures")}
+            </button>
+            <button class=${this._mode === "render" ? "on" : ""} @click=${() => this._goMode("render")}>
+              🏠 ${t("builder.mode_render")}
+            </button>
+          </div>`
+        : nothing}
+      ${saving ? html`<span class="status ${this._saving}">${saving}</span>` : nothing}
+      ${level && this._mode === "render"
+        ? html`<button
+            class="publish ${published ? "on" : ""}"
+            title=${published ? t("builder.unpublish_hint") : t("builder.publish_hint")}
+            @click=${() => this._setPublished(!published)}
+          >
+            ${published ? html`✓ ${t("builder.published")}` : html`🚀 ${t("builder.publish")}`}
+          </button>`
+        : nothing}
+    </div>`;
+  }
+
+  /** Publish (or withdraw) the 3D house: the Homex dashboard shows it in its own tab. */
+  private _setPublished(on: boolean) {
+    if (!this._plan) return;
+    this._plan.published = on;
+    this._changed();
   }
 
   static styles = [
@@ -2547,26 +2610,50 @@ export class HomexBuilder extends LitElement {
         flex-direction: column;
         height: calc(100vh - 32px);
       }
-      .head {
+      .main {
+        position: relative;
+        flex: 1 1 auto;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+      }
+      .nav {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 6;
         display: flex;
         align-items: center;
-        gap: 12px;
-        margin-bottom: 10px;
-        flex: 0 0 auto;
+        gap: 6px;
+        padding: 4px;
+        background: color-mix(in srgb, var(--card-background-color, #1c1c1c) 92%, transparent);
+        border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
       }
-      .head h2 {
+      .nav .seg.mode {
         margin: 0;
-        font-size: 20px;
-        font-weight: 500;
       }
-      .cur {
-        color: var(--secondary-text-color);
-        font-size: 14px;
+      .nav .publish {
+        font-weight: 600;
+        white-space: nowrap;
+        background: var(--primary-color);
+        color: var(--text-primary-color, #fff);
+      }
+      .nav .publish.on {
+        background: color-mix(in srgb, #4caf7a 20%, transparent);
+        color: #4caf7a;
+        box-shadow: inset 0 0 0 1px #4caf7a;
       }
       .status {
-        margin-left: auto;
-        font-size: 12px;
+        /* under the bar: it never shifts the buttons */
+        position: absolute;
+        top: calc(100% + 4px);
+        right: 6px;
+        font-size: 11.5px;
+        white-space: nowrap;
         color: var(--secondary-text-color);
+        pointer-events: none;
       }
       .status.error {
         color: var(--error-color, #db4437);
@@ -2720,7 +2807,7 @@ export class HomexBuilder extends LitElement {
         align-items: center;
         gap: 4px;
         padding: 4px;
-        max-width: calc(100% - 20px);
+        max-width: calc(100% - 400px); /* the nav floats top right */
       }
       .tool.active {
         background: var(--primary-color);
@@ -3097,9 +3184,12 @@ export class HomexBuilder extends LitElement {
       }
       .seg.mode {
         margin: 0 0 0 8px;
+        flex: none;
       }
       .seg.mode button {
+        flex: none;
         padding: 6px 12px;
+        white-space: nowrap; /* icon and label on one line */
       }
       .fx-room {
         font-size: 12px;
@@ -3147,6 +3237,16 @@ export class HomexBuilder extends LitElement {
         stroke-width: 1;
         vector-effect: non-scaling-stroke;
         pointer-events: none;
+      }
+      .seg.kinds button {
+        flex: 1;
+        white-space: nowrap;
+        padding-left: 6px;
+        padding-right: 6px;
+      }
+      .radiator.tall polygon {
+        fill: rgba(158, 158, 158, 0.8);
+        stroke-width: 2;
       }
       .radiator.heating polygon {
         fill: rgba(255, 112, 67, 0.85);

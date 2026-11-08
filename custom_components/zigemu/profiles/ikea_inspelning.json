@@ -1,0 +1,318 @@
+{
+  "id": "ikea_inspelning",
+  "name": "IKEA INSPELNING smart plug",
+  "device": {
+    "vendor": "IKEA",
+    "model": "E22xx (E2206 EU)",
+    "description": "INSPELNING smart plug with energy monitoring",
+    "type": "Smart plug",
+    "image": "https://www.zigbee2mqtt.io/images/devices/E22xx.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/E22xx.html"
+      },
+      {
+        "label": "ZHA quirk",
+        "url": "https://github.com/zigpy/zha-device-handlers/blob/dev/zhaquirks/ikea/plug_g2.py"
+      },
+      {
+        "label": "Captured signature",
+        "url": "https://github.com/zigpy/zha-device-handlers/issues/3374"
+      }
+    ]
+  },
+  "_sources": "Node/simple descriptors from the device signature in zha-device-handlers#3374; Basic attributes and meter scaling from the Zigbee2MQTT database entry in zigbee2mqtt#23961 (fw 2.4.34). activePower switches acPowerDivisor from 10 to 1 above ~1000 W (zigbee2mqtt#23961), which is why hosts configure reporting on acPowerDivisor.",
+  "node": {
+    "logicalType": "router",
+    "rxOnWhenIdle": true,
+    "manufacturerCode": 4476,
+    "macCapabilities": 142,
+    "ieeePrefix": "000b57"
+  },
+  "inputs": {
+    "load_w": 0,
+    "mains_v": 220
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 266,
+      "inClusters": [
+        "genBasic",
+        "genIdentify",
+        "genGroups",
+        "genScenes",
+        "genOnOff",
+        "genLevelCtrl",
+        "seMetering",
+        "haElectricalMeasurement",
+        "touchlink",
+        "manuSpecificIkeaUnknown",
+        "manuSpecificIkeaSmartPlug"
+      ],
+      "outClusters": [
+        "genOta"
+      ],
+      "serverOptions": {
+        "electricityMeter": {
+          "voltageDivisor": 10,
+          "currentDivisor": 1000,
+          "energyDivisor": 1000,
+          "powerDivisor": {
+            "below": 10,
+            "above": 1,
+            "threshold": 1000
+          },
+          "voltageNoise": 0.6,
+          "tick": 1
+        }
+      },
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 8,
+          "appVersion": 2,
+          "stackVersion": 114,
+          "hwVersion": 1,
+          "manufacturerName": "IKEA of Sweden",
+          "modelId": "INSPELNING Smart plug",
+          "dateCode": "20240215",
+          "powerSource": 1,
+          "swBuildId": "2.4.34"
+        },
+        "genOnOff": {
+          "onOff": 1
+        },
+        "manuSpecificIkeaSmartPlug": {
+          "childLock": {
+            "value": 0,
+            "writable": true
+          },
+          "ledEnable": {
+            "value": 0,
+            "writable": true
+          }
+        }
+      }
+    },
+    {
+      "id": 242,
+      "profileId": 41440,
+      "deviceId": 97,
+      "inClusters": [
+        "greenPower"
+      ],
+      "outClusters": [
+        "greenPower"
+      ]
+    }
+  ],
+  "routineTemplates": [
+    {
+      "name": "Kettle: boil for 3 minutes, every 10 minutes",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "load",
+          "gesture": "select",
+          "params": {
+            "option": "high"
+          }
+        },
+        {
+          "kind": "wait",
+          "ms": 180000
+        },
+        {
+          "kind": "gesture",
+          "control": "load",
+          "gesture": "select",
+          "params": {
+            "option": "none"
+          }
+        },
+        {
+          "kind": "wait",
+          "ms": 420000
+        }
+      ]
+    },
+    {
+      "name": "Desk lamp: on/off with the button every 30 s",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "load",
+          "gesture": "select",
+          "params": {
+            "option": "mid"
+          }
+        },
+        {
+          "kind": "gesture",
+          "control": "button",
+          "gesture": "tap"
+        },
+        {
+          "kind": "wait",
+          "ms": 30000
+        }
+      ]
+    },
+    {
+      "name": "Washing machine cycle (heats past 1000 W)",
+      "loop": false,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "load",
+          "gesture": "select",
+          "params": {
+            "option": "mid"
+          }
+        },
+        {
+          "kind": "wait",
+          "ms": 60000
+        },
+        {
+          "kind": "gesture",
+          "control": "load",
+          "gesture": "select",
+          "params": {
+            "option": "high"
+          }
+        },
+        {
+          "kind": "wait",
+          "ms": 120000
+        },
+        {
+          "kind": "gesture",
+          "control": "load",
+          "gesture": "select",
+          "params": {
+            "option": "mid"
+          }
+        },
+        {
+          "kind": "wait",
+          "ms": 300000
+        },
+        {
+          "kind": "gesture",
+          "control": "load",
+          "gesture": "select",
+          "params": {
+            "option": "none"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Power outage every 5 minutes",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "wait",
+          "ms": 300000
+        },
+        {
+          "kind": "gesture",
+          "control": "mains",
+          "gesture": "off"
+        },
+        {
+          "kind": "wait",
+          "ms": 15000
+        },
+        {
+          "kind": "gesture",
+          "control": "mains",
+          "gesture": "on"
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "relay",
+      "type": "indicator",
+      "label": "Relay",
+      "icon": "push",
+      "value": "{{ 'no power' if not powered else ('ON' if attr('genOnOff', 'onOff') else 'OFF') }}",
+      "on": "{{ powered and attr('genOnOff', 'onOff') }}"
+    },
+    {
+      "id": "led",
+      "type": "indicator",
+      "label": "LED",
+      "icon": "sun",
+      "comment": "White LED: lit while the relay is on, unless disabled (fw >= 2.4.25: ledEnable = 1 means LED off); blinks while identifying.",
+      "value": "{{ 'off' if not powered else ('blinking' if attr('genIdentify', 'identifyTime') else ('on' if attr('genOnOff', 'onOff') and not attr('manuSpecificIkeaSmartPlug', 'ledEnable') else 'off')) }}",
+      "on": "{{ powered and (attr('genIdentify', 'identifyTime') or (attr('genOnOff', 'onOff') and not attr('manuSpecificIkeaSmartPlug', 'ledEnable'))) }}"
+    },
+    {
+      "id": "power",
+      "type": "indicator",
+      "label": "Power",
+      "icon": "plug",
+      "value": "{{ round(attr('haElectricalMeasurement', 'activePower') / attr('haElectricalMeasurement', 'acPowerDivisor'), 1) }} W (÷{{ attr('haElectricalMeasurement', 'acPowerDivisor') }})"
+    },
+    {
+      "id": "voltage",
+      "type": "indicator",
+      "label": "Mains",
+      "icon": "voltage",
+      "value": "{{ round(attr('haElectricalMeasurement', 'rmsVoltage') / 10, 1) }} V · {{ round(attr('haElectricalMeasurement', 'rmsCurrent') / 1000, 3) }} A"
+    },
+    {
+      "id": "energy",
+      "type": "indicator",
+      "label": "Energy",
+      "icon": "meter",
+      "value": "{{ round(attr('seMetering', 'currentSummDelivered') / 1000, 3) }} kWh"
+    },
+    {
+      "id": "lock",
+      "type": "indicator",
+      "label": "Lock",
+      "icon": "lock",
+      "value": "{{ 'locked' if attr('manuSpecificIkeaSmartPlug', 'childLock') else 'unlocked' }}",
+      "on": "{{ attr('manuSpecificIkeaSmartPlug', 'childLock') }}"
+    },
+    {
+      "id": "button",
+      "use": "relay_button",
+      "description": "The round button on the plug toggles the relay (ignored while child lock is on).",
+      "on": {
+        "press": [
+          {
+            "if": "{{ not attr('manuSpecificIkeaSmartPlug', 'childLock') }}",
+            "command": {
+              "endpoint": 1,
+              "cluster": "genOnOff",
+              "name": "toggle"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "load",
+      "use": "load",
+      "description": "None: 0 W. Mid: 150–180 W, fluctuating. High: 2000–2200 W, fluctuating (the plug switches its power divisor above 1000 W)."
+    },
+    {
+      "id": "mains_v",
+      "use": "mains_voltage"
+    },
+    {
+      "id": "mains",
+      "use": "power"
+    }
+  ]
+}

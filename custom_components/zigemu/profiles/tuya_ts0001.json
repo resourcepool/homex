@@ -1,0 +1,159 @@
+{
+  "id": "tuya_ts0001",
+  "name": "Tuya TS0001 1-gang switch module",
+  "device": {
+    "vendor": "Tuya",
+    "model": "TS0001",
+    "description": "1 gang switch",
+    "type": "Switch",
+    "image": "https://www.zigbee2mqtt.io/images/devices/TS0001.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/TS0001.html"
+      },
+      {
+        "label": "ZHA quirk",
+        "url": "https://github.com/zigpy/zha-device-handlers/blob/dev/zhaquirks/tuya/ts000x.py"
+      }
+    ]
+  },
+  "_sources": "Zigbee2MQTT: zigbeeModel TS0001 (tuyaOnOff; for _TZ3000_p26flek3 also power_on_behavior via genOnOff 0x8002, switch_type via 0xE001/0xD030, indicator mode via genOnOff 0x8001). Descriptor from the zha-quirks Switch_1G_GPP signature: ep1 device 0x0100 in [0,3,4,5,6,0xE000,0xE001] out [0x0A,0x19], ep242 GP proxy; Tuya router, manufacturer code 4098.",
+  "node": {
+    "logicalType": "router",
+    "rxOnWhenIdle": true,
+    "manufacturerCode": 4098,
+    "macCapabilities": 142,
+    "ieeePrefix": "a4c138"
+  },
+  "inputs": {
+    "wall_switch": false
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 256,
+      "inClusters": [
+        "genBasic",
+        "genIdentify",
+        "genGroups",
+        "genScenes",
+        "genOnOff",
+        "0xE000",
+        "0xE001"
+      ],
+      "outClusters": [
+        "genTime",
+        "genOta"
+      ],
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 3,
+          "appVersion": 70,
+          "stackVersion": 0,
+          "hwVersion": 1,
+          "manufacturerName": "_TZ3000_p26flek3",
+          "modelId": "TS0001",
+          "powerSource": 1
+        },
+        "genOnOff": {
+          "onOff": 0,
+          "0x8001": {
+            "type": "enum8",
+            "value": 1,
+            "writable": true,
+            "comment": "Tuya indicator / backlight mode"
+          },
+          "0x8002": {
+            "type": "enum8",
+            "value": 2,
+            "writable": true,
+            "comment": "Tuya power-on state (0 off, 1 on, 2 previous)"
+          }
+        },
+        "0xE001": {
+          "0xD030": {
+            "type": "enum8",
+            "value": 0,
+            "writable": true,
+            "comment": "external switch type: 0 toggle, 1 state, 2 momentary"
+          }
+        }
+      }
+    },
+    {
+      "id": 242,
+      "profileId": 41440,
+      "deviceId": 97,
+      "inClusters": [],
+      "outClusters": [
+        "greenPower"
+      ]
+    }
+  ],
+  "events": {
+    "attr:genOnOff:0x0000": [
+      {
+        "report": {
+          "endpoint": 1,
+          "cluster": "genOnOff",
+          "attributes": {
+            "onOff": "{{ value }}"
+          }
+        }
+      }
+    ]
+  },
+  "routineTemplates": [
+    {
+      "name": "Flip the wall switch every minute",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "wall",
+          "gesture": "up"
+        },
+        {
+          "kind": "wait",
+          "ms": 60000
+        },
+        {
+          "kind": "gesture",
+          "control": "wall",
+          "gesture": "down"
+        },
+        {
+          "kind": "wait",
+          "ms": 60000
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "relay",
+      "type": "indicator",
+      "label": "Relay",
+      "icon": "push",
+      "value": "{{ 'no power' if not powered else ('ON' if attr('genOnOff', 'onOff') else 'OFF') }}",
+      "on": "{{ powered and attr('genOnOff', 'onOff') }}"
+    },
+    {
+      "id": "wall",
+      "use": "wall_switch",
+      "description": "Wall switch wired to the module's S1/S2 input (toggle mode): every flip toggles the relay."
+    },
+    {
+      "id": "button",
+      "use": "relay_button",
+      "label": "Button",
+      "description": "The module's own button toggles the relay."
+    },
+    {
+      "id": "mains",
+      "use": "power"
+    }
+  ]
+}

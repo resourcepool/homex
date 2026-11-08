@@ -32,7 +32,11 @@
         "title": "Paramètres Homex",
         "description": "Langue de l'interface du panneau Homex, des cartes et des noms d'entités et de scènes. Automatique suit la langue de Home Assistant (anglais si elle n'est pas disponible).",
         "data": {
-          "language": "Langue"
+          "language": "Langue",
+          "builder_beta": "3D Builder (bêta)"
+        },
+        "data_description": {
+          "builder_beta": "Dessiner le plan de la maison (pièces, portes, fenêtres, escaliers), placer lumières, volets et radiateurs, et la voir en direct en 3D. Ajoute « 3D Builder » au menu Homex."
         }
       }
     }

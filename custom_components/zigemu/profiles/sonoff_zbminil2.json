@@ -1,0 +1,138 @@
+{
+  "id": "sonoff_zbminil2",
+  "name": "SONOFF ZBMINIL2 no-neutral switch module",
+  "device": {
+    "vendor": "SONOFF",
+    "model": "ZBMINIL2",
+    "description": "Zigbee smart switch module (no neutral)",
+    "type": "Switch",
+    "image": "https://www.zigbee2mqtt.io/images/devices/ZBMINIL2.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/ZBMINIL2.html"
+      },
+      {
+        "label": "Captured signature",
+        "url": "https://github.com/zigpy/zha-device-handlers/issues/2949"
+      }
+    ]
+  },
+  "_sources": "Node/simple descriptor from zha-device-handlers#2949: end device (mac 0x80: no neutral, so it cannot be a router), manufacturer 4742, ep1 device 0x0002 in [0,1,3,6,7,0x0B05,0xFC57] out [0x19]; genPowerCfg has no battery attributes; startUpOnOff 0. Firmware 1.0.14 per the hsolgaard/zigbee-capabilities capture (no 0xFC11, so Z2M's external trigger mode, gated on fw >= 1.0.19, is not exposed). Z2M unbinds genPollCtrl; this firmware has no Poll Control cluster.",
+  "node": {
+    "logicalType": "end_device",
+    "rxOnWhenIdle": false,
+    "manufacturerCode": 4742,
+    "macCapabilities": 128,
+    "ieeePrefix": "00124b"
+  },
+  "inputs": {
+    "wall_switch": false
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 2,
+      "inClusters": [
+        "genBasic",
+        "genPowerCfg",
+        "genIdentify",
+        "genOnOff",
+        "genOnOffSwitchCfg",
+        "haDiagnostic",
+        "manuSpecificAmazonWWAH"
+      ],
+      "outClusters": [
+        "genOta"
+      ],
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 8,
+          "manufacturerName": "SONOFF",
+          "modelId": "ZBMINIL2",
+          "powerSource": 1,
+          "swBuildId": "1.0.14"
+        },
+        "genOnOff": {
+          "onOff": 0,
+          "startUpOnOff": 0
+        },
+        "genOnOffSwitchCfg": {
+          "switchType": {
+            "value": 0,
+            "writable": false
+          },
+          "switchActions": {
+            "value": 2,
+            "writable": true
+          }
+        },
+        "haDiagnostic": {
+          "lastMessageLqi": 220,
+          "lastMessageRssi": -55
+        }
+      }
+    }
+  ],
+  "routineTemplates": [
+    {
+      "name": "Flip the wall switch every minute",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "wall",
+          "gesture": "up"
+        },
+        {
+          "kind": "wait",
+          "ms": 60000
+        },
+        {
+          "kind": "gesture",
+          "control": "wall",
+          "gesture": "down"
+        },
+        {
+          "kind": "wait",
+          "ms": 60000
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "relay",
+      "type": "indicator",
+      "label": "Relay",
+      "icon": "push",
+      "value": "{{ 'no power' if not powered else ('ON' if attr('genOnOff', 'onOff') else 'OFF') }}",
+      "on": "{{ powered and attr('genOnOff', 'onOff') }}"
+    },
+    {
+      "id": "wall",
+      "use": "wall_switch"
+    },
+    {
+      "id": "button",
+      "use": "relay_button",
+      "holdDelay": 5000,
+      "description": "The module's own button toggles the relay.",
+      "on": {
+        "press": [
+          {
+            "command": {
+              "cluster": "genOnOff",
+              "name": "toggle"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "mains",
+      "use": "power"
+    }
+  ]
+}

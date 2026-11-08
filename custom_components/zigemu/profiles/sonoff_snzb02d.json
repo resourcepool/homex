@@ -1,0 +1,180 @@
+{
+  "id": "sonoff_snzb02d",
+  "name": "SONOFF SNZB-02D temperature and humidity sensor",
+  "device": {
+    "vendor": "SONOFF",
+    "model": "SNZB-02D",
+    "description": "Temperature and humidity sensor with screen (CR2450)",
+    "type": "Temperature sensor",
+    "image": "https://www.zigbee2mqtt.io/images/devices/SNZB-02D.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/SNZB-02D.html"
+      },
+      {
+        "label": "ZHA quirk",
+        "url": "https://github.com/zigpy/zha-device-handlers/blob/dev/zhaquirks/sonoff/snzb02d.py"
+      }
+    ]
+  },
+  "_sources": "Z2M sonoff.js SNZB-02D (zigbeeModel SNZB-02D; customSonoffSnzb02d on 0xFC11: comfort temperature max/min 0x0003/0x0004 int16 x100, comfort humidity min/max 0x0005/0x0006 uint16 x100, temperature units 0x0007, calibrations 0x2003/0x2004; battery, temperature, humidity, genPollCtrl bind); zhaquirks sonoff/snzb02d.py (QuirkBuilder SONOFF / SNZB-02D). Descriptor follows the SONOFF -P/-D family (end device, manufacturer 4742, ep1 0x0302 temperature sensor with PollCtrl, 0xFC11, 0xFC57): inferred, not captured.",
+  "node": {
+    "logicalType": "end_device",
+    "rxOnWhenIdle": false,
+    "manufacturerCode": 4742,
+    "macCapabilities": 128,
+    "ieeePrefix": "00124b",
+    "reportManufacturerCode": {
+      "customClusterEwelink": null
+    }
+  },
+  "inputs": {
+    "temperature_c": 17,
+    "humidity_pct": 47
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 770,
+      "inClusters": [
+        "genBasic",
+        "genPowerCfg",
+        "genIdentify",
+        "genPollCtrl",
+        "msTemperatureMeasurement",
+        "msRelativeHumidity",
+        "customClusterEwelink",
+        "manuSpecificAmazonWWAH"
+      ],
+      "outClusters": [
+        "genOta"
+      ],
+      "serverOptions": {
+        "genPollCtrl": {
+          "checkinInterval": 14400
+        }
+      },
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 8,
+          "appVersion": 1,
+          "manufacturerName": "SONOFF",
+          "modelId": "SNZB-02D",
+          "powerSource": 3,
+          "swBuildId": "1.0.2"
+        },
+        "genPowerCfg": {
+          "batteryVoltage": 30,
+          "batteryPercentageRemaining": 200
+        },
+        "customClusterEwelink": {
+          "0x2003": {
+            "type": "int16",
+            "value": 0,
+            "writable": true
+          },
+          "0x2004": {
+            "type": "int16",
+            "value": 0,
+            "writable": true
+          },
+          "0x0003": {
+            "type": "int16",
+            "value": 2600,
+            "writable": true
+          },
+          "0x0004": {
+            "type": "int16",
+            "value": 1900,
+            "writable": true
+          },
+          "0x0005": {
+            "type": "uint16",
+            "value": 4000,
+            "writable": true
+          },
+          "0x0006": {
+            "type": "uint16",
+            "value": 6000,
+            "writable": true
+          },
+          "0x0007": {
+            "type": "uint16",
+            "value": 0,
+            "writable": true
+          }
+        }
+      }
+    }
+  ],
+  "routineTemplates": [
+    {
+      "name": "Shower every morning: humid for 15 minutes",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "humidity",
+          "gesture": "select",
+          "params": {
+            "option": "wet"
+          }
+        },
+        {
+          "kind": "wait",
+          "ms": 900000
+        },
+        {
+          "kind": "gesture",
+          "control": "humidity",
+          "gesture": "select",
+          "params": {
+            "option": "normal"
+          }
+        },
+        {
+          "kind": "wait",
+          "ms": 3600000
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "temp",
+      "type": "indicator",
+      "label": "Temp",
+      "icon": "thermometer",
+      "value": "{{ attr('msTemperatureMeasurement', 'measuredValue') / 100 }} °C"
+    },
+    {
+      "id": "hum",
+      "type": "indicator",
+      "label": "Humidity",
+      "icon": "droplet",
+      "value": "{{ attr('msRelativeHumidity', 'measuredValue') / 100 }} %"
+    },
+    {
+      "id": "battery_state",
+      "type": "indicator",
+      "label": "Battery",
+      "icon": "battery",
+      "value": "{{ attr('genPowerCfg', 'batteryPercentageRemaining') // 2 }} %"
+    },
+    {
+      "id": "room",
+      "use": "room_temperature",
+      "description": "Temperature around the sensor."
+    },
+    {
+      "id": "humidity",
+      "use": "humidity"
+    },
+    {
+      "id": "battery",
+      "use": "battery"
+    }
+  ]
+}

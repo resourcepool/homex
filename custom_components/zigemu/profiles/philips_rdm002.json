@@ -1,0 +1,575 @@
+{
+  "id": "philips_rdm002",
+  "name": "Philips Hue Tap dial switch",
+  "device": {
+    "vendor": "Philips",
+    "model": "8719514440937/8719514440999",
+    "description": "Hue Tap dial switch",
+    "type": "Remote",
+    "image": "https://www.zigbee2mqtt.io/images/devices/8719514440937-8719514440999.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/8719514440937_8719514440999.html"
+      },
+      {
+        "label": "ZHA quirk",
+        "url": "https://github.com/zigpy/zha-device-handlers/blob/dev/zhaquirks/philips/rdm002.py"
+      }
+    ]
+  },
+  "node": {
+    "logicalType": "end_device",
+    "manufacturerCode": 4107,
+    "macCapabilities": 128,
+    "ieeePrefix": "001788010",
+    "rxOnWhenIdle": false
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 2096,
+      "inClusters": [
+        "genBasic",
+        "genPowerCfg",
+        "genIdentify",
+        "manuSpecificPhilips",
+        "touchlink"
+      ],
+      "outClusters": [
+        "genOta",
+        "genBasic",
+        "genIdentify",
+        "genGroups",
+        "genOnOff",
+        "genLevelCtrl",
+        "genScenes",
+        "touchlink"
+      ],
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 8,
+          "appVersion": 2,
+          "stackVersion": 1,
+          "hwVersion": 1,
+          "manufacturerName": "Signify Netherlands B.V.",
+          "modelId": "RDM002",
+          "dateCode": "20220124",
+          "powerSource": 3,
+          "swBuildId": "2.59.25",
+          "0x0031": {
+            "type": "bitmap16",
+            "value": 0,
+            "writable": true
+          }
+        },
+        "genPowerCfg": {
+          "batteryVoltage": 30,
+          "batteryPercentageRemaining": 200,
+          "batterySize": 4,
+          "batteryQuantity": 1
+        },
+        "genIdentify": {
+          "identifyTime": 0
+        },
+        "manuSpecificPhilips": {
+          "config": {
+            "value": 0,
+            "writable": true
+          }
+        }
+      }
+    }
+  ],
+  "macros": {
+    "hue_button": {
+      "description": "manuSpecificPhilips hueNotification: button(u8) unknown1(u24) type(u8) unknown2(u8) time(u8) unknown3(u8). type: 0=press 1=hold 2=press_release 3=hold_release",
+      "send": {
+        "endpoint": 1,
+        "cluster": "manuSpecificPhilips",
+        "command": 0,
+        "clusterSpecific": true,
+        "direction": "server_to_client",
+        "manufacturerCode": 4107,
+        "disableDefaultResponse": true,
+        "payload": [
+          [
+            "uint8",
+            "{{ button }}"
+          ],
+          [
+            "uint24",
+            3145728
+          ],
+          [
+            "uint8",
+            "{{ type }}"
+          ],
+          [
+            "uint8",
+            "{{ 0x21 if type in (0, 2) else 0x29 }}"
+          ],
+          [
+            "uint8",
+            "{{ (held_ms // 125) & 0xFF }}"
+          ],
+          [
+            "uint8",
+            0
+          ]
+        ]
+      }
+    }
+  },
+  "routineTemplates": [
+    {
+      "name": "Tap then sweep the dial",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "button_1",
+          "gesture": "tap",
+          "repeat": {
+            "every": 5000,
+            "times": 3
+          }
+        },
+        {
+          "kind": "gesture",
+          "control": "dial",
+          "gesture": "rotate",
+          "params": {
+            "direction": "+",
+            "step": 2
+          },
+          "repeat": {
+            "every": 250,
+            "for": 10000
+          }
+        },
+        {
+          "kind": "gesture",
+          "control": "dial",
+          "gesture": "rotate",
+          "params": {
+            "direction": "-",
+            "step": 2
+          },
+          "repeat": {
+            "every": 250,
+            "for": 10000
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cycle through the 4 buttons",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "button_1",
+          "gesture": "tap"
+        },
+        {
+          "kind": "wait",
+          "ms": 2000
+        },
+        {
+          "kind": "gesture",
+          "control": "button_2",
+          "gesture": "tap"
+        },
+        {
+          "kind": "wait",
+          "ms": 2000
+        },
+        {
+          "kind": "gesture",
+          "control": "button_3",
+          "gesture": "tap"
+        },
+        {
+          "kind": "wait",
+          "ms": 2000
+        },
+        {
+          "kind": "gesture",
+          "control": "button_4",
+          "gesture": "tap"
+        },
+        {
+          "kind": "wait",
+          "ms": 2000
+        }
+      ]
+    },
+    {
+      "name": "Long press dimming",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "button_4",
+          "gesture": "hold",
+          "params": {
+            "holdMs": 3000
+          }
+        },
+        {
+          "kind": "wait",
+          "ms": 5000
+        }
+      ]
+    },
+    {
+      "name": "Battery slowly draining",
+      "loop": false,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "battery",
+          "gesture": "select",
+          "params": {
+            "option": "full"
+          }
+        },
+        {
+          "kind": "wait",
+          "ms": 1800000
+        },
+        {
+          "kind": "gesture",
+          "control": "battery",
+          "gesture": "select",
+          "params": {
+            "option": "middle"
+          }
+        },
+        {
+          "kind": "wait",
+          "ms": 1800000
+        },
+        {
+          "kind": "gesture",
+          "control": "battery",
+          "gesture": "select",
+          "params": {
+            "option": "low"
+          }
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "button_1",
+      "type": "button",
+      "label": "1",
+      "holdDelay": 800,
+      "holdInterval": 800,
+      "vars": {
+        "button": 1
+      },
+      "on": {
+        "press": [
+          {
+            "macro": "hue_button",
+            "vars": {
+              "type": 0
+            }
+          }
+        ],
+        "hold": [
+          {
+            "macro": "hue_button",
+            "vars": {
+              "type": 1
+            }
+          },
+          {
+            "if": "{{ hold_count == 1 }}",
+            "comment": "Real RDM002: the first long-press report of button 1 also sends LevelControl step_with_on_off(down, 255, transition 8) to its binding",
+            "send": {
+              "endpoint": 1,
+              "cluster": "genLevelCtrl",
+              "command": 6,
+              "clusterSpecific": true,
+              "direction": "client_to_server",
+              "disableDefaultResponse": true,
+              "payload": [
+                [
+                  "enum8",
+                  1
+                ],
+                [
+                  "uint8",
+                  255
+                ],
+                [
+                  "uint16",
+                  8
+                ]
+              ]
+            }
+          }
+        ],
+        "press_release": [
+          {
+            "macro": "hue_button",
+            "vars": {
+              "type": 2
+            }
+          }
+        ],
+        "hold_release": [
+          {
+            "macro": "hue_button",
+            "vars": {
+              "type": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "button_2",
+      "type": "button",
+      "label": "2",
+      "holdDelay": 800,
+      "holdInterval": 800,
+      "vars": {
+        "button": 2
+      },
+      "on": {
+        "press": [
+          {
+            "macro": "hue_button",
+            "vars": {
+              "type": 0
+            }
+          }
+        ],
+        "hold": [
+          {
+            "macro": "hue_button",
+            "vars": {
+              "type": 1
+            }
+          }
+        ],
+        "press_release": [
+          {
+            "macro": "hue_button",
+            "vars": {
+              "type": 2
+            }
+          }
+        ],
+        "hold_release": [
+          {
+            "macro": "hue_button",
+            "vars": {
+              "type": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "button_3",
+      "type": "button",
+      "label": "3",
+      "holdDelay": 800,
+      "holdInterval": 800,
+      "vars": {
+        "button": 3
+      },
+      "on": {
+        "press": [
+          {
+            "macro": "hue_button",
+            "vars": {
+              "type": 0
+            }
+          }
+        ],
+        "hold": [
+          {
+            "macro": "hue_button",
+            "vars": {
+              "type": 1
+            }
+          }
+        ],
+        "press_release": [
+          {
+            "macro": "hue_button",
+            "vars": {
+              "type": 2
+            }
+          }
+        ],
+        "hold_release": [
+          {
+            "macro": "hue_button",
+            "vars": {
+              "type": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "button_4",
+      "type": "button",
+      "label": "4",
+      "holdDelay": 800,
+      "holdInterval": 800,
+      "vars": {
+        "button": 4
+      },
+      "on": {
+        "press": [
+          {
+            "macro": "hue_button",
+            "vars": {
+              "type": 0
+            }
+          }
+        ],
+        "hold": [
+          {
+            "macro": "hue_button",
+            "vars": {
+              "type": 1
+            }
+          }
+        ],
+        "press_release": [
+          {
+            "macro": "hue_button",
+            "vars": {
+              "type": 2
+            }
+          }
+        ],
+        "hold_release": [
+          {
+            "macro": "hue_button",
+            "vars": {
+              "type": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "dial",
+      "type": "dial",
+      "label": "Dial",
+      "description": "Each turn report carries a signed step count (Hue notification, cluster 0xFC00) and a LevelControl step_with_on_off. The first report of a turn is typed 'step', later ones within the sequence timeout 'rotate'.",
+      "presets": [
+        {
+          "label": "step",
+          "steps": 10
+        },
+        {
+          "label": "slow",
+          "steps": 50
+        },
+        {
+          "label": "fast",
+          "steps": 100
+        }
+      ],
+      "sequenceTimeout": 1000,
+      "on": {
+        "rotate": [
+          {
+            "send": {
+              "endpoint": 1,
+              "cluster": "manuSpecificPhilips",
+              "command": 0,
+              "clusterSpecific": true,
+              "direction": "server_to_client",
+              "manufacturerCode": 4107,
+              "disableDefaultResponse": true,
+              "payload": [
+                [
+                  "uint8",
+                  20
+                ],
+                [
+                  "uint24",
+                  3145728
+                ],
+                [
+                  "uint8",
+                  "{{ 1 if first else 2 }}"
+                ],
+                [
+                  "uint8",
+                  1
+                ],
+                [
+                  "uint8",
+                  "{{ steps & 0xFF }}"
+                ],
+                [
+                  "uint8",
+                  "{{ 0 if steps >= 0 else 0xFF }}"
+                ]
+              ]
+            }
+          },
+          {
+            "send": {
+              "endpoint": 1,
+              "cluster": "genLevelCtrl",
+              "command": 6,
+              "clusterSpecific": true,
+              "direction": "client_to_server",
+              "disableDefaultResponse": true,
+              "payload": [
+                [
+                  "enum8",
+                  "{{ 0 if steps >= 0 else 1 }}"
+                ],
+                [
+                  "uint8",
+                  "{{ min(255, abs(steps)) }}"
+                ],
+                [
+                  "uint16",
+                  4
+                ]
+              ]
+            },
+            "comment": "Real RDM002: dial sends LevelControl step_with_on_off with transition time 4"
+          }
+        ]
+      }
+    },
+    {
+      "id": "battery",
+      "use": "battery",
+      "on": {
+        "change": [
+          {
+            "report": {
+              "endpoint": 1,
+              "cluster": "genPowerCfg",
+              "attributes": {
+                "batteryPercentageRemaining": "{{ value * 2 }}",
+                "batteryVoltage": "{{ 20 + value // 10 }}"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

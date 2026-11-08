@@ -1,0 +1,11 @@
+{
+  "domain": "zigemu",
+  "name": "ZigEmu - Zigbee coordinator emulator",
+  "codeowners": [],
+  "config_flow": true,
+  "dependencies": ["http", "frontend"],
+  "documentation": "https://github.com/loicortola/zigemu",
+  "iot_class": "local_push",
+  "requirements": [],
+  "version": "0.1.0"
+}

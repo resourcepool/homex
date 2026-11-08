@@ -1,12 +1,13 @@
-import { LitElement, css, html } from "lit";
+import { LitElement, css, html, nothing } from "lit";
 import { mdiBackupRestore, mdiCheck, mdiContentSave, mdiDownload, mdiMenu, mdiRefresh, mdiTranslate } from "@mdi/js";
 import { customElement, property, state } from "lit/decorators.js";
 import { keyed } from "lit/directives/keyed.js";
-import { LANGUAGES, language, languageSetting, loadLanguageSetting, onLanguageChange, setLanguageSetting, syncHass, t, type LangSetting } from "./lib/i18n";
+import { LANGUAGES, language, languageSetting, loadLanguageSetting, featureEnabled, featuresKnown, onLanguageChange, setLanguageSetting, syncHass, t, type LangSetting } from "./lib/i18n";
 import { logo, registerIconset } from "./lib/logo";
 import type { HomeAssistant, Room } from "./types";
 import { HOMEX_CHANGED } from "./types";
-import { errorMessage, fetchRooms } from "./api";
+import { errorMessage, fetchPlan, fetchRooms } from "./api";
+import type { Plan } from "./types";
 import { loadHaComponents } from "./lib/ha-elements";
 import { goBack, joinPath, navigate, segments, type PanelRoute } from "./lib/router";
 import "./components/homex-room-card";
@@ -23,9 +24,11 @@ import { downloadBackup } from "./components/homex-backup-dialog";
 
 // Bump together with PANEL_VERSION in panel.py. Shown in the header so you can
 // confirm a full page reload picked up the latest build.
-const BUILD = "228";
+const BUILD = "240";
 
 /** Homex sidebar panel: lists rooms and orchestrates loading / reloading. */
+
+type DashTab = "general" | "climate" | "house";
 @customElement("homex-panel")
 export class HomexPanel extends LitElement {
   @property({ attribute: false }) hass!: HomeAssistant;
@@ -40,8 +43,16 @@ export class HomexPanel extends LitElement {
   @state() private _restoreOpen = false;
   @state() private _menuOpen = false;
   // Dashboard tab (General: rooms; Climate: heating context), remembered.
-  @state() private _dashTab: "general" | "climate" =
-    localStorage.getItem("homex_dash_tab") === "climate" ? "climate" : "general";
+  @state() private _dashTab: DashTab = (() => {
+    try {
+      const v = localStorage.getItem("homex_dash_tab");
+      return v === "climate" || v === "house" ? v : "general";
+    } catch {
+      return "general";
+    }
+  })();
+  // The 3D house plan: the dashboard's 3D tab once published (beta builder).
+  @state() private _plan: Plan | null = null;
   // entry_id of the single expanded room (accordion), persisted in localStorage.
   @state() private _expanded: string | null =
     localStorage.getItem("homex_expanded") || null;
@@ -167,6 +178,17 @@ export class HomexPanel extends LitElement {
       display: flex;
       flex-direction: column;
     }
+    .menu .beta {
+      margin-left: 6px;
+      padding: 1px 6px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: var(--primary-color);
+      color: var(--text-primary-color, #fff);
+    }
     .menu button {
       text-align: left;
       background: transparent;
@@ -197,6 +219,11 @@ export class HomexPanel extends LitElement {
       font-weight: 500;
       color: var(--secondary-text-color);
       cursor: pointer;
+    }
+    .house {
+      display: flex;
+      height: calc(100vh - 150px);
+      min-height: 420px;
     }
     .dash-tab.active {
       color: var(--primary-color);
@@ -283,10 +310,15 @@ export class HomexPanel extends LitElement {
     if (changed.has("hass")) syncHass(this.hass);
     if (changed.has("hass") && this.hass && !this._loaded) {
       this._loaded = true;
-      loadLanguageSetting(this.hass);
+      loadLanguageSetting(this.hass).then(() => this.requestUpdate()); // language + beta features
       // Pull HA's native form elements into the registry, then load data.
       loadHaComponents().then(() => this.requestUpdate());
       this._reload();
+    }
+    // The 3D Builder is a beta feature, enabled in the integration settings.
+    if (this._segs[0] === "builder" && featuresKnown() && !featureEnabled("builder")) {
+      navigate(this._prefix, true);
+      return;
     }
     // Former Heating Manager URLs (/heating/...) now live under /climate.
     if (this._segs[0] === "heating") {
@@ -310,6 +342,10 @@ export class HomexPanel extends LitElement {
     try {
       this._rooms = await fetchRooms(this.hass);
       this._error = null;
+      // the 3D house tab: best effort, the dashboard works without it
+      fetchPlan(this.hass)
+        .then((plan) => (this._plan = plan))
+        .catch(() => (this._plan = null));
     } catch (err) {
       this._error = errorMessage(err);
     }
@@ -317,12 +353,15 @@ export class HomexPanel extends LitElement {
 
   private _backToRooms = () => goBack(this._prefix);
 
-  /** General (rooms) and, once a room has the Climate module, Climate tabs. */
+  /** General (rooms); Climate once a room has the Climate module; 3D House once
+   * the house is published from the 3D Builder (beta). */
   private _renderDashboard(general: unknown) {
     const climate = (this._rooms ?? []).some((r) => (r.modules ?? []).includes("heating"));
-    if (!climate) return general;
-    const tab = this._dashTab;
-    const pick = (t: "general" | "climate") => {
+    const house = featureEnabled("builder") && !!this._plan?.published && this._plan.levels.length > 0;
+    if (!climate && !house) return general;
+    if (house) import("./components/homex-builder-render");
+    const tab: DashTab = (this._dashTab === "climate" && !climate) || (this._dashTab === "house" && !house) ? "general" : this._dashTab;
+    const pick = (t: DashTab) => {
       this._dashTab = t;
       try {
         localStorage.setItem("homex_dash_tab", t);
@@ -335,16 +374,33 @@ export class HomexPanel extends LitElement {
         <span class="dash-tab ${tab === "general" ? "active" : ""}" @click=${() => pick("general")}
           >${t("panel.tab_general")}</span
         >
-        <span class="dash-tab ${tab === "climate" ? "active" : ""}" @click=${() => pick("climate")}
-          >${t("panel.tab_climate")}</span
-        >
+        ${climate
+          ? html`<span class="dash-tab ${tab === "climate" ? "active" : ""}" @click=${() => pick("climate")}
+              >${t("panel.tab_climate")}</span
+            >`
+          : nothing}
+        ${house
+          ? html`<span class="dash-tab ${tab === "house" ? "active" : ""}" @click=${() => pick("house")}
+              >${t("panel.tab_house")}</span
+            >`
+          : nothing}
       </div>
       ${tab === "climate"
         ? html`<homex-climate-dashboard
             .hass=${this.hass}
             .rooms=${this._rooms ?? []}
           ></homex-climate-dashboard>`
-        : general}
+        : tab === "house"
+          ? html`<div class="house">
+              <homex-builder-render
+                .hass=${this.hass}
+                .plan=${this._plan}
+                .levelId=${this._plan!.levels.find((l) => l.level === 0)?.id ?? null}
+                .names=${Object.fromEntries((this._rooms ?? []).map((r) => [r.room_id, r.name]))}
+                .rooms=${this._rooms ?? []}
+              ></homex-builder-render>
+            </div>`
+          : general}
     `;
   }
 
@@ -469,7 +525,14 @@ export class HomexPanel extends LitElement {
     if (this._view === "builder") {
       return html`
         <div class="wrap wide">
-          <homex-builder .hass=${this.hass} @close=${this._backToRooms}></homex-builder>
+          ${featureEnabled("builder")
+            ? html`<homex-builder
+                .hass=${this.hass}
+                .base=${joinPath(this._prefix, "builder")}
+                .subpath=${this._segs.slice(1).join("/")}
+                @close=${this._backToRooms}
+              ></homex-builder>`
+            : nothing}
         </div>
       `;
     }
@@ -585,14 +648,16 @@ export class HomexPanel extends LitElement {
                       >
                         🌡 ${t("panel.climate_manager")}
                       </button>
-                      <button
-                        @click=${() => {
-                          this._menuOpen = false;
-                          navigate(joinPath(this._prefix, "builder"));
-                        }}
-                      >
-                        🧊 3D Builder
-                      </button>
+                      ${featureEnabled("builder")
+                        ? html`<button
+                            @click=${() => {
+                              this._menuOpen = false;
+                              navigate(joinPath(this._prefix, "builder"));
+                            }}
+                          >
+                            🧊 3D Builder <span class="beta">beta</span>
+                          </button>`
+                        : nothing}
                       <div class="menu-sep"></div>
                       <div class="menu-label">
                         <svg class="ico" viewBox="0 0 24 24"><path d=${mdiTranslate}></path></svg>

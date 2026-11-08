@@ -4,6 +4,8 @@ DOMAIN = "homex"
 
 # Config / options keys
 CONF_HUB = "hub"  # marks the single anchor entry (install without a room)
+# Feature flags (hub options, integration settings): beta modules, off by default.
+CONF_BUILDER_BETA = "builder_beta"  # 3D Builder (plan, fixtures, 3D rendering)
 HUB_UNIQUE_ID = "homex_hub"
 CONF_ROOMS = "rooms"  # list of room config dicts stored in the hub's options
 HUB_DATA = "hub_live"  # hass.data[DOMAIN] key for the live HomexHub instance

@@ -32,7 +32,11 @@
         "title": "Homex settings",
         "description": "Interface language of the Homex panel, cards, entity and scene names. Automatic follows the Home Assistant language (English when unavailable).",
         "data": {
-          "language": "Language"
+          "language": "Language",
+          "builder_beta": "3D Builder (beta)"
+        },
+        "data_description": {
+          "builder_beta": "Draw the house plan (rooms, doors, windows, stairs), place lights, shutters and radiators, and see it live in 3D. Adds \"3D Builder\" to the Homex menu."
         }
       }
     }

@@ -1,0 +1,315 @@
+{
+  "id": "sonoff_trvzb",
+  "name": "SONOFF TRVZB thermostatic radiator valve",
+  "device": {
+    "vendor": "SONOFF",
+    "model": "TRVZB",
+    "description": "Zigbee thermostatic radiator valve",
+    "type": "Thermostat",
+    "image": "https://www.zigbee2mqtt.io/images/devices/TRVZB.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/TRVZB.html"
+      },
+      {
+        "label": "Captured signature",
+        "url": "https://github.com/zigpy/zha-device-handlers/issues/3812"
+      }
+    ]
+  },
+  "_sources": "Node/simple descriptor from zha-device-handlers#3812 (fw 0x00001101): end device (mac 0x80), manufacturer 4742, ep1 device 0x0301 (thermostat) in [0,1,3,6,0x20,0x201,0xFC11,0xFC57] out [0x0A,0x19]. Setpoint 4-35 C, calibration +/-12.7 C, system modes off/auto/heat, weekly schedule up to 6 transitions/day, 0xFC11 attributes from zigbee-herdsman-converters devices/sonoff.js. Basic versions and the check-in interval are inferred.",
+  "node": {
+    "logicalType": "end_device",
+    "rxOnWhenIdle": false,
+    "manufacturerCode": 4742,
+    "macCapabilities": 128,
+    "ieeePrefix": "00124b",
+    "reportManufacturerCode": {
+      "customClusterEwelink": null
+    }
+  },
+  "inputs": {
+    "temperature_c": 17,
+    "ambient_c": 12.5
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 769,
+      "inClusters": [
+        "genBasic",
+        "genPowerCfg",
+        "genIdentify",
+        "genOnOff",
+        "genPollCtrl",
+        "hvacThermostat",
+        "customClusterEwelink",
+        "manuSpecificAmazonWWAH"
+      ],
+      "outClusters": [
+        "genTime",
+        "genOta"
+      ],
+      "serverOptions": {
+        "hvacThermostat": {
+          "minSetpoint": 400,
+          "maxSetpoint": 3500,
+          "defaultSetpoint": 2000,
+          "heatRate": 0.6,
+          "lossRate": 0.02,
+          "timeScale": 6,
+          "tick": 10,
+          "valveOpeningLimit": [
+            "customClusterEwelink",
+            "valveOpeningDegree"
+          ],
+          "externalSensorSelect": [
+            "customClusterEwelink",
+            "temperatureSensorSelect"
+          ],
+          "externalSensorValue": [
+            "customClusterEwelink",
+            "externalTemperatureInput"
+          ],
+          "frostProtection": [
+            "customClusterEwelink",
+            "frostProtectionTemperature"
+          ]
+        },
+        "genPollCtrl": {
+          "checkinInterval": 14400
+        }
+      },
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 8,
+          "manufacturerName": "SONOFF",
+          "modelId": "TRVZB",
+          "powerSource": 3,
+          "swBuildId": "1.1.1"
+        },
+        "genPowerCfg": {
+          "batteryVoltage": 30,
+          "batteryPercentageRemaining": 200
+        },
+        "customClusterEwelink": {
+          "childLock": {
+            "value": 0,
+            "writable": true
+          },
+          "openWindow": {
+            "value": 1,
+            "writable": true
+          },
+          "frostProtectionTemperature": {
+            "value": 700,
+            "writable": true
+          },
+          "idleSteps": {
+            "value": 0,
+            "writable": true
+          },
+          "closingSteps": {
+            "value": 0,
+            "writable": true
+          },
+          "valveOpeningLimitVoltage": {
+            "value": 0,
+            "writable": true
+          },
+          "valveClosingLimitVoltage": {
+            "value": 0,
+            "writable": true
+          },
+          "valveMotorRunningVoltage": {
+            "value": 0,
+            "writable": true
+          },
+          "valveOpeningDegree": {
+            "value": 100,
+            "writable": true
+          },
+          "valveClosingDegree": {
+            "value": 100,
+            "writable": true
+          },
+          "externalTemperatureInput": {
+            "value": 0,
+            "writable": true
+          },
+          "temperatureSensorSelect": {
+            "value": 0,
+            "writable": true
+          },
+          "tempAccuracy": {
+            "value": -20,
+            "writable": true
+          },
+          "temporaryMode": {
+            "value": 0,
+            "writable": true
+          },
+          "temporaryModeTime": {
+            "value": 0,
+            "writable": true
+          },
+          "temporaryModeTemp": {
+            "value": 2000,
+            "writable": true
+          },
+          "smartTempControl": {
+            "value": 0,
+            "writable": true
+          }
+        }
+      }
+    }
+  ],
+  "routineTemplates": [
+    {
+      "name": "Cold morning: window opened, then turn the knob up",
+      "loop": false,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "room",
+          "gesture": "select",
+          "params": {
+            "option": "cold"
+          }
+        },
+        {
+          "kind": "wait",
+          "ms": 60000
+        },
+        {
+          "kind": "gesture",
+          "control": "knob",
+          "gesture": "up",
+          "repeat": {
+            "every": 800,
+            "times": 4
+          }
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "temp",
+      "type": "indicator",
+      "label": "Temp",
+      "icon": "thermometer",
+      "value": "{{ attr('hvacThermostat', 'localTemp') / 100 }} °C"
+    },
+    {
+      "id": "setpoint",
+      "type": "indicator",
+      "label": "Target",
+      "icon": "target",
+      "value": "{{ attr('hvacThermostat', 'occupiedHeatingSetpoint') / 100 }} °C · {{ 'off' if attr('hvacThermostat', 'systemMode') == 0 else ('auto' if attr('hvacThermostat', 'systemMode') == 1 else 'heat') }}"
+    },
+    {
+      "id": "valve",
+      "type": "indicator",
+      "label": "Valve",
+      "icon": "flame",
+      "value": "{{ attr('hvacThermostat', 'pIHeatingDemand') }} % · {{ 'heating' if attr('hvacThermostat', 'runningState') & 1 else 'idle' }}",
+      "on": "{{ attr('hvacThermostat', 'runningState') & 1 }}"
+    },
+    {
+      "id": "lock",
+      "type": "indicator",
+      "label": "Lock",
+      "icon": "lock",
+      "value": "{{ 'locked' if attr('customClusterEwelink', 'childLock') else 'unlocked' }}",
+      "on": "{{ attr('customClusterEwelink', 'childLock') }}"
+    },
+    {
+      "id": "knob",
+      "use": "knob",
+      "description": "Turning the knob: ±0.5 °C per click (ignored while child-locked).",
+      "on": {
+        "up": [
+          {
+            "if": "{{ not attr('customClusterEwelink', 'childLock') }}",
+            "command": {
+              "cluster": "hvacThermostat",
+              "name": "raise",
+              "args": {
+                "step": 50
+              }
+            }
+          }
+        ],
+        "down": [
+          {
+            "if": "{{ not attr('customClusterEwelink', 'childLock') }}",
+            "command": {
+              "cluster": "hvacThermostat",
+              "name": "lower",
+              "args": {
+                "step": 50
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "target",
+      "type": "preset",
+      "icon": "target",
+      "label": "Target T°",
+      "unit": "°C",
+      "options": [
+        {
+          "id": "eco",
+          "label": "Eco",
+          "value": 17
+        },
+        {
+          "id": "comfort",
+          "label": "Comfort",
+          "value": 20
+        },
+        {
+          "id": "warm",
+          "label": "Warm",
+          "value": 22
+        },
+        {
+          "id": "boost",
+          "label": "Boost",
+          "value": 25
+        }
+      ],
+      "description": "Set the target temperature on the valve itself (like turning the knob to it; ignored while child-locked). The host sees occupiedHeatingSetpoint change.",
+      "on": {
+        "change": [
+          {
+            "if": "{{ not attr('customClusterEwelink', 'childLock') }}",
+            "setAttribute": {
+              "cluster": "hvacThermostat",
+              "attributes": {
+                "occupiedHeatingSetpoint": "{{ round(value * 100) }}"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "room",
+      "use": "room_temperature",
+      "label": "Current T°",
+      "description": "The temperature the valve measures now (localTemp); the room heat model takes over from there, warming while the valve is open."
+    },
+    {
+      "id": "battery",
+      "use": "battery"
+    }
+  ]
+}

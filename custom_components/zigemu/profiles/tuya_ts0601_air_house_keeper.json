@@ -1,0 +1,200 @@
+{
+  "id": "tuya_ts0601_air_house_keeper",
+  "name": "Tuya smart air house keeper (TS0601 _TZE204_dwcarsat)",
+  "device": {
+    "vendor": "Tuya",
+    "model": "TS0601_smart_air_house_keeper",
+    "description": "Smart air house keeper",
+    "type": "Air quality sensor",
+    "image": "https://www.zigbee2mqtt.io/images/devices/TS0601_smart_air_house_keeper.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/TS0601_smart_air_house_keeper.html"
+      },
+      {
+        "label": "ZHA quirk",
+        "url": "https://github.com/zigpy/zha-device-handlers/blob/dev/zhaquirks/tuya/tuya_co.py"
+      }
+    ]
+  },
+  "_sources": "Z2M tuya.js TS0601_smart_air_house_keeper (fingerprint TS0601 / _TZE204_dwcarsat, legacy fz.tuya_air_quality: first DP of each message only; DP2 PM2.5 µg/m³ (>1000 ignored), DP18 temperature x10 (16-bit negative), DP19 humidity x10, DP20 formaldehyde µg/m³, DP21 VOC, DP22 CO2 ppm); zhaquirks tuya/tuya_co.py (same DPs). Descriptor: the usual Tuya TS0601 router (manufacturer 0x1002, ep1 device 0x0051 in [0,4,5,0xEF00] out [0x0019,0x000A]): inferred, not captured.",
+  "node": {
+    "logicalType": "router",
+    "rxOnWhenIdle": true,
+    "manufacturerCode": 4098,
+    "macCapabilities": 142,
+    "ieeePrefix": "a4c138"
+  },
+  "inputs": {
+    "temperature_c": 20,
+    "humidity_pct": 47,
+    "co2_ppm": 450,
+    "voc_ppb": 90,
+    "hcho_ugm3": 6,
+    "pm25_ugm3": 8
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 81,
+      "inClusters": [
+        "genBasic",
+        "genGroups",
+        "genScenes",
+        "manuSpecificTuya"
+      ],
+      "outClusters": [
+        "genOta",
+        "genTime"
+      ],
+      "serverOptions": {
+        "manuSpecificTuya": {
+          "reportInterval": 60,
+          "datapoints": [
+            {
+              "dp": 2,
+              "type": "value",
+              "input": "pm25_ugm3"
+            },
+            {
+              "dp": 18,
+              "type": "value",
+              "input": "temperature_c",
+              "scale": 10,
+              "int16": true
+            },
+            {
+              "dp": 19,
+              "type": "value",
+              "input": "humidity_pct",
+              "scale": 10
+            },
+            {
+              "dp": 20,
+              "type": "value",
+              "input": "hcho_ugm3"
+            },
+            {
+              "dp": 21,
+              "type": "value",
+              "input": "voc_ppb"
+            },
+            {
+              "dp": 22,
+              "type": "value",
+              "input": "co2_ppm"
+            }
+          ]
+        }
+      },
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 3,
+          "appVersion": 74,
+          "stackVersion": 0,
+          "hwVersion": 1,
+          "manufacturerName": "_TZE204_dwcarsat",
+          "modelId": "TS0601",
+          "powerSource": 1
+        }
+      }
+    }
+  ],
+  "routineTemplates": [
+    {
+      "name": "Meeting room: stuffy after 30 minutes, aired every hour",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "air",
+          "gesture": "select",
+          "params": {
+            "option": "fresh"
+          }
+        },
+        {
+          "kind": "wait",
+          "ms": 1800000
+        },
+        {
+          "kind": "gesture",
+          "control": "air",
+          "gesture": "select",
+          "params": {
+            "option": "stuffy"
+          }
+        },
+        {
+          "kind": "wait",
+          "ms": 1800000
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "co2",
+      "type": "indicator",
+      "label": "CO2",
+      "icon": "cloud",
+      "value": "{{ co2_ppm }} ppm",
+      "on": "{{ co2_ppm >= 1000 }}"
+    },
+    {
+      "id": "pm25",
+      "type": "indicator",
+      "label": "PM2.5",
+      "icon": "waves",
+      "value": "{{ pm25_ugm3 }} µg/m³"
+    },
+    {
+      "id": "voc",
+      "type": "indicator",
+      "label": "VOC",
+      "icon": "alert",
+      "value": "{{ voc_ppb }} ppb"
+    },
+    {
+      "id": "hcho",
+      "type": "indicator",
+      "label": "HCHO",
+      "icon": "flame",
+      "value": "{{ hcho_ugm3 }} µg/m³"
+    },
+    {
+      "id": "temp",
+      "type": "indicator",
+      "label": "Temp",
+      "icon": "thermometer",
+      "value": "{{ temperature_c }} °C"
+    },
+    {
+      "id": "hum",
+      "type": "indicator",
+      "label": "Humidity",
+      "icon": "droplet",
+      "value": "{{ humidity_pct }} %"
+    },
+    {
+      "id": "air",
+      "use": "air_quality"
+    },
+    {
+      "id": "room",
+      "use": "room_temperature",
+      "description": "Temperature around the sensor.",
+      "default": "comfort"
+    },
+    {
+      "id": "humidity",
+      "use": "humidity"
+    },
+    {
+      "id": "mains",
+      "use": "power"
+    }
+  ]
+}

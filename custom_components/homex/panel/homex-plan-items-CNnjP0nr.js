@@ -737,6 +737,37 @@ var Ne = {
 			mode_render: "Rendering",
 			render_all: "All floors",
 			render_reset: "Reset view",
+			render_room: "Room",
+			render_lights: "Lights",
+			render_shutters: "Shutters",
+			render_climate: "Climate",
+			render_heating: "Heating",
+			publish: "Publish",
+			published: "Published",
+			publish_hint: "Show this 3D house in a new tab of the Homex dashboard",
+			unpublish_hint: "Published in the Homex dashboard. Click to withdraw it",
+			radiator_type: "Type",
+			radiator_panel: "Normal",
+			radiator_tall: "Full height",
+			render_target: "Target",
+			render_current: "now",
+			render_scenes: "Scenes",
+			render_heating_off: "Not heated",
+			render_heating_active: "Heating up",
+			render_m_temperature: "Temperature",
+			render_m_humidity: "Humidity",
+			render_m_co2: "CO₂",
+			render_m_pm25: "PM2.5",
+			render_m_pm10: "PM10",
+			render_on: "On",
+			render_off: "Off",
+			render_none: "None",
+			render_room_lights: "Room lights",
+			render_all_shutters: "All shutters",
+			render_open: "Open",
+			render_stop: "Stop",
+			render_close: "Close",
+			render_nothing: "Nothing to control in this room yet.",
 			render_hint: "Drag to turn · right-drag or Shift to move · wheel to zoom",
 			fx_shutters: "Shutters",
 			fx_shutters_hint: "Drag a shutter onto a window, glass door or sliding door (dashed orange: none yet).",
@@ -920,9 +951,40 @@ var Ne = {
 			hint_fx_light: "Glissez ses points / lignes (ils s'aimantent), double-cliquez-en un pour le retirer, Suppr retire la lumière du plan.",
 			mode_structure: "Bâti",
 			mode_fixtures: "Équipements",
-			mode_render: "Rendering",
+			mode_render: "Rendu",
 			render_all: "Tous les étages",
 			render_reset: "Recentrer",
+			render_room: "Pièce",
+			render_lights: "Lumières",
+			render_shutters: "Volets",
+			render_climate: "Climat",
+			render_heating: "Chauffage",
+			publish: "Publier",
+			published: "Publiée",
+			publish_hint: "Afficher cette maison 3D dans un nouvel onglet du tableau de bord Homex",
+			unpublish_hint: "Publiée dans le tableau de bord Homex. Cliquer pour la retirer",
+			radiator_type: "Type",
+			radiator_panel: "Normal",
+			radiator_tall: "Pleine hauteur",
+			render_target: "Consigne",
+			render_current: "actuel",
+			render_scenes: "Scènes",
+			render_heating_off: "Non chauffée",
+			render_heating_active: "En chauffe",
+			render_m_temperature: "Température",
+			render_m_humidity: "Humidité",
+			render_m_co2: "CO₂",
+			render_m_pm25: "PM2.5",
+			render_m_pm10: "PM10",
+			render_on: "Allumé",
+			render_off: "Éteint",
+			render_none: "Aucune",
+			render_room_lights: "Lumières de la pièce",
+			render_all_shutters: "Tous les volets",
+			render_open: "Ouvrir",
+			render_stop: "Arrêter",
+			render_close: "Fermer",
+			render_nothing: "Rien à piloter dans cette pièce pour l'instant.",
 			render_hint: "Glisser pour tourner · clic droit ou Maj pour se déplacer · molette pour zoomer",
 			fx_shutters: "Volets",
 			fx_shutters_hint: "Glissez un volet sur une fenêtre, porte vitrée ou porte coulissante (pointillés orange : pas encore de volet).",
@@ -1040,6 +1102,7 @@ var Ne = {
 		en: {
 			tab_general: "General",
 			tab_climate: "Climate",
+			tab_house: "3D House",
 			error: "Error: {message}",
 			no_rooms: "No rooms yet. Click “＋ {button}” at the top right to create one.",
 			new_room: "New room",
@@ -1053,6 +1116,7 @@ var Ne = {
 		fr: {
 			tab_general: "Général",
 			tab_climate: "Climat",
+			tab_house: "Maison 3D",
 			error: "Erreur : {message}",
 			no_rooms: "Aucune pièce. Clique sur « ＋ {button} » en haut à droite pour en créer une.",
 			new_room: "Nouvelle pièce",
@@ -2996,19 +3060,21 @@ function Le(e) {
 function Re(e) {
 	U = e && (e === "auto" || Fe(e)) ? e : "auto", Ie();
 }
-var ze = () => U, Be = () => G, q;
-function Ve(e) {
-	return Le(e), q ??= e.connection.sendMessagePromise({ type: "homex/settings/get" }).then((e) => Re(e.language)).catch(() => {
+var ze = () => U, Be = () => G, Ve = {}, He = !1, Ue = (e) => !!Ve[e], We = () => He, q;
+function Ge(e) {
+	return Le(e), q ??= e.connection.sendMessagePromise({ type: "homex/settings/get" }).then((e) => {
+		Ve = e.features ?? {}, He = !0, Re(e.language);
+	}).catch(() => {
 		q = void 0;
 	}), q;
 }
-function He(e, t) {
+function Ke(e, t) {
 	let n = H[G][e] ?? H.en[e] ?? e;
 	return t && (n = n.replace(/\{(\w+)\}/g, (e, n) => n in t ? String(t[n]) : e)), n;
 }
-var Ue = () => G;
+var qe = () => G;
 // \0@oxc-project+runtime@0.156.0/helpers/esm/decorate.js
-function We(e, t, n, r) {
+function Je(e, t, n, r) {
 	var i = arguments.length, a = i < 3 ? t : r === null ? r = Object.getOwnPropertyDescriptor(t, n) : r, o;
 	if (typeof Reflect == "object" && typeof Reflect.decorate == "function") a = Reflect.decorate(e, t, n, r);
 	else for (var s = e.length - 1; s >= 0; s--) (o = e[s]) && (a = (i < 3 ? o(a) : i > 3 ? o(t, n, a) : o(t, n)) || a);
@@ -3021,7 +3087,7 @@ function X(e, t, n) {
 	let o = Math.max(0, Math.min(1, ((e[0] - t[0]) * r + (e[1] - t[1]) * i) / a));
 	return [t[0] + o * r, t[1] + o * i];
 }
-function Ge(e, t) {
+function Ye(e, t) {
 	let n = t.tolerance, r = t.grid ?? 50, i = null, a = n;
 	for (let n of t.vertices) {
 		let t = J(e, n);
@@ -3074,7 +3140,7 @@ function Ge(e, t) {
 		guideY: f
 	};
 }
-function Ke(e) {
+function Xe(e) {
 	let t = 0;
 	for (let n = 0; n < e.length; n++) {
 		let [r, i] = e[n], [a, o] = e[(n + 1) % e.length];
@@ -3082,7 +3148,7 @@ function Ke(e) {
 	}
 	return Math.abs(t) / 2 / 1e4;
 }
-function qe(e) {
+function Ze(e) {
 	let t = 0, n = 0, r = 0;
 	for (let i = 0; i < e.length; i++) {
 		let [a, o] = e[i], [s, c] = e[(i + 1) % e.length], l = a * c - s * o;
@@ -3094,7 +3160,7 @@ function qe(e) {
 	}
 	return [n / (3 * t), r / (3 * t)];
 }
-function Je(e, t) {
+function Qe(e, t) {
 	let n = !1;
 	for (let r = 0, i = t.length - 1; r < t.length; i = r++) {
 		let [a, o] = t[r], [s, c] = t[i];
@@ -3102,10 +3168,10 @@ function Je(e, t) {
 	}
 	return n;
 }
-function Ye(e) {
+function $e(e) {
 	return e.map((t, n) => [t, e[(n + 1) % e.length]]);
 }
-function Xe(e) {
+function et(e) {
 	return e.length ? {
 		minX: Math.min(...e.map((e) => e[0])),
 		minY: Math.min(...e.map((e) => e[1])),
@@ -3113,25 +3179,25 @@ function Xe(e) {
 		maxY: Math.max(...e.map((e) => e[1]))
 	} : null;
 }
-function Ze(e, t) {
+function tt(e, t) {
 	return `${(e / 100).toLocaleString(t, { maximumFractionDigits: 2 })} m`;
 }
-var Z = (e, t) => J(e, t), Qe = (e) => `${e}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`, $e = {
+var Z = (e, t) => J(e, t), nt = (e) => `${e}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`, rt = {
 	door: 90,
 	sliding_door: 90,
 	window: 120,
 	glass_door: 240
-}, et = (e, t, n) => {
+}, it = (e, t, n) => {
 	let r = e.rooms.find((e) => e.id === t);
 	return !r || n < 0 || n >= r.points.length ? null : [r.points[n], r.points[(n + 1) % r.points.length]];
 };
-function tt(e, t) {
-	let n = et(e, t.shape, t.edge);
+function at(e, t) {
+	let n = it(e, t.shape, t.edge);
 	if (!n) return null;
 	let [r, i] = n, a = Z(r, i);
 	if (!a) return null;
 	let o = [(i[0] - r[0]) / a, (i[1] - r[1]) / a], s = [r[0] + (i[0] - r[0]) * t.t, r[1] + (i[1] - r[1]) * t.t], c = Math.min(t.width, a) / 2, l = [s[0] - o[0] * c, s[1] - o[1] * c], u = [s[0] + o[0] * c, s[1] + o[1] * c], d = e.rooms.find((e) => e.id === t.shape), f = [-o[1], o[0]];
-	return nt([s[0] + f[0] * 5, s[1] + f[1] * 5], d.points) || (f = [o[1], -o[0]]), {
+	return ot([s[0] + f[0] * 5, s[1] + f[1] * 5], d.points) || (f = [o[1], -o[0]]), {
 		a: l,
 		b: u,
 		c: s,
@@ -3139,7 +3205,7 @@ function tt(e, t) {
 		n: f
 	};
 }
-function nt(e, t) {
+function ot(e, t) {
 	let n = !1;
 	for (let r = 0, i = t.length - 1; r < t.length; i = r++) {
 		let [a, o] = t[r], [s, c] = t[i];
@@ -3147,7 +3213,7 @@ function nt(e, t) {
 	}
 	return n;
 }
-function rt(e, t, n, r) {
+function st(e, t, n, r) {
 	let i = null;
 	for (let a of e.rooms) a.points.forEach((e, o) => {
 		let s = a.points[(o + 1) % a.points.length], c = X(t, e, s), l = Z(t, c), u = Z(e, s);
@@ -3163,14 +3229,14 @@ function rt(e, t, n, r) {
 	});
 	return i;
 }
-function it(e, t, n, r) {
+function ct(e, t, n, r) {
 	for (let i of e.openings ?? []) i.shape === t && (i.edge > n ? i.edge += 1 : i.edge === n && (i.t < r ? i.t /= r : (i.edge += 1, i.t = (i.t - r) / (1 - r))));
 }
-function at(e, t, n, r, i, a) {
+function lt(e, t, n, r, i, a) {
 	let o = (n + r - 1) % r, s = n === 0 ? r - 2 : n - 1;
 	for (let r of e.openings ?? []) r.shape === t && (r.edge === o ? (r.t = r.t * i / (i + a), r.edge = s) : r.edge === n ? (r.t = (i + r.t * a) / (i + a), r.edge = s) : (n === 0 || r.edge > n) && --r.edge);
 }
-function ot(e) {
+function ut(e) {
 	return [
 		[e.x, e.y],
 		[e.x + e.w, e.y],
@@ -3178,7 +3244,7 @@ function ot(e) {
 		[e.x, e.y + e.h]
 	];
 }
-function st(e) {
+function dt(e) {
 	let t = e.dir === "up" || e.dir === "down", n = t ? e.h : e.w, r = Math.max(2, Math.round(n / 25)), i = [];
 	for (let n = 1; n < r; n++) {
 		let a = n / r;
@@ -3186,7 +3252,7 @@ function st(e) {
 	}
 	return i;
 }
-function ct(e) {
+function ft(e) {
 	let t = e.x + e.w / 2, n = e.y + e.h / 2, r = .12;
 	switch (e.dir) {
 		case "up": return [[t, e.y + e.h * .88], [t, e.y + e.h * r]];
@@ -3195,28 +3261,28 @@ function ct(e) {
 		default: return [[e.x + e.w * r, n], [e.x + e.w * .88, n]];
 	}
 }
-var lt = {
+var pt = {
 	up: "right",
 	right: "down",
 	down: "left",
 	left: "up"
-}, ut = [
+}, mt = [
 	[!1, !1],
 	[!0, !1],
 	[!0, !0],
 	[!1, !0]
 ];
-function dt(e, t) {
-	let [n, r] = ut[(ut.findIndex(([t, n]) => t === !!e.flip && n === !!e.out) + t + 4) % 4];
+function ht(e, t) {
+	let [n, r] = mt[(mt.findIndex(([t, n]) => t === !!e.flip && n === !!e.out) + t + 4) % 4];
 	e.flip = n, e.out = r;
 }
-var ft = {
+var gt = {
 	up: "down",
 	down: "up",
 	left: "right",
 	right: "left"
 };
-function pt(e, t, n, r) {
+function _t(e, t, n, r) {
 	let i = null;
 	for (let a of e.rooms) a.points.forEach((e, o) => {
 		let s = a.points[(o + 1) % a.points.length], c = Z(e, s);
@@ -3224,7 +3290,7 @@ function pt(e, t, n, r) {
 		let l = X(t, e, s), u = Z(t, l);
 		if (u > n || i && u >= i.d) return;
 		let d = [(s[0] - e[0]) / c, (s[1] - e[1]) / c], f = Math.min(r, c) / 2, p = Math.max(f, Math.min(c - f, Y(Z(e, l), 10))), m = [e[0] + d[0] * p, e[1] + d[1] * p], h = [-d[1], d[0]];
-		nt([m[0] + h[0] * 5, m[1] + h[1] * 5], a.points) || (h = [d[1], -d[0]]), i = {
+		ot([m[0] + h[0] * 5, m[1] + h[1] * 5], a.points) || (h = [d[1], -d[0]]), i = {
 			x: m[0] + h[0] * 9,
 			y: m[1] + h[1] * 9,
 			angle: Math.atan2(d[1], d[0]) * 180 / Math.PI,
@@ -3239,7 +3305,7 @@ function pt(e, t, n, r) {
 		angle: s
 	};
 }
-function mt(e) {
+function vt(e) {
 	let t = e.angle * Math.PI / 180, n = [Math.cos(t), Math.sin(t)], r = [-n[1], n[0]], i = e.length / 2;
 	return [
 		[e.x - n[0] * i - r[0] * 5, e.y - n[1] * i - r[1] * 5],
@@ -3270,7 +3336,7 @@ var Q = {
 		"sliding",
 		"fixed"
 	]
-}, ht = (e) => e.style && Q[e.type].includes(e.style) ? e.style : Q[e.type][0], gt = [
+}, yt = (e) => e.style && Q[e.type].includes(e.style) ? e.style : Q[e.type][0], bt = [
 	"straight",
 	"l",
 	"u",
@@ -3288,13 +3354,13 @@ var Q = {
 		"table_lamp",
 		"led_strip"
 	]
-}, _t = [
+}, xt = [
 	"pendant",
 	"sconce",
 	"floor_lamp",
 	"table_lamp"
-], vt = (e) => e.type && $[e.mount]?.includes(e.type) ? e.type : e.kind === "linear" ? "led_strip" : $[e.mount]?.[0] ?? "ceiling_light", yt = (e) => e === "led_strip" ? "linear" : "point";
-function bt(e) {
+], St = (e) => e.type && $[e.mount]?.includes(e.type) ? e.type : e.kind === "linear" ? "led_strip" : $[e.mount]?.[0] ?? "ceiling_light", Ct = (e) => e === "led_strip" ? "linear" : "point";
+function wt(e) {
 	let { x: t, y: n, w: r, h: i } = e, { o: a, s: o, c: s, L: c, B: l } = {
 		up: {
 			o: [t, n + i],
@@ -3334,8 +3400,8 @@ function bt(e) {
 		B: l
 	};
 }
-function xt(e) {
-	let t = e.shape ?? "straight", { at: n, L: r, B: i } = bt(e), a = [], o = [], s = (e, t, r, i) => {
+function Tt(e) {
+	let t = e.shape ?? "straight", { at: n, L: r, B: i } = wt(e), a = [], o = [], s = (e, t, r, i) => {
 		let o = Math.max(2, Math.round(Math.abs(t - e) / 25));
 		for (let s = 1; s < o; s++) {
 			let c = e + (t - e) * s / o;
@@ -3416,10 +3482,10 @@ function xt(e) {
 		};
 	}
 	return {
-		outline: ot(e),
-		treads: st(e),
+		outline: ut(e),
+		treads: dt(e),
 		edges: o,
-		path: ct(e)
+		path: ft(e)
 	};
 }
-export { We as A, Me as B, Ze as C, Z as D, Y as E, Ue as F, M as G, Oe as H, Pe as I, he as J, me as K, Re as L, Be as M, ze as N, Ge as O, Ve as P, Le as R, Ye as S, X as T, B as U, je as V, N as W, o as Y, pt as _, ft as a, Xe as b, yt as c, tt as d, ht as f, dt as g, at as h, $e as i, V as j, Qe as k, vt as l, it as m, lt as n, _t as o, mt as p, we as q, Q as r, gt as s, $ as t, rt as u, xt as v, Je as w, qe as x, Ke as y, He as z };
+export { Je as A, Le as B, tt as C, Z as D, Y as E, ze as F, B as G, Me as H, Ge as I, me as J, N as K, qe as L, Ue as M, We as N, Ye as O, Be as P, Pe as R, $e as S, X as T, je as U, Ke as V, Oe as W, he as X, we as Y, o as Z, _t as _, gt as a, et as b, Ct as c, at as d, yt as f, ht as g, lt as h, rt as i, V as j, nt as k, St as l, ct as m, pt as n, xt as o, vt as p, M as q, Q as r, bt as s, $ as t, st as u, Tt as v, Qe as w, Ze as x, Xe as y, Re as z };

@@ -1,0 +1,138 @@
+{
+  "id": "ikea_led2109g6",
+  "name": "IKEA TRÅDFRI bulb E27 CWS globe 806 lm",
+  "device": {
+    "vendor": "IKEA",
+    "model": "LED2109G6",
+    "description": "TRADFRI bulb E26/E27, color/white spectrum, globe, opal, 800/806/810 lm",
+    "type": "Light",
+    "image": "https://www.zigbee2mqtt.io/images/devices/LED2109G6.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/LED2109G6.html"
+      },
+      {
+        "label": "Captured database entry",
+        "url": "https://github.com/Koenkk/zigbee2mqtt/issues/21755"
+      }
+    ]
+  },
+  "_sources": "Descriptors, Basic and color attributes from the Z2M database entry in zigbee2mqtt#21755 (fw 1.0.38): router, manufacturer 4476, ep1 device 0x010D (extended color light), colorCapabilities 31, colorTempPhysical 250-454, startUpOnOff 255; GP proxy ep242. IKEA bulbs lose configured reporting on power loss (zigbee-herdsman-converters lib/ikea.js bulbOnEvent).",
+  "node": {
+    "logicalType": "router",
+    "rxOnWhenIdle": true,
+    "manufacturerCode": 4476,
+    "macCapabilities": 142,
+    "ieeePrefix": "000b57",
+    "volatileReporting": true
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 269,
+      "inClusters": [
+        "genBasic",
+        "genIdentify",
+        "genGroups",
+        "genScenes",
+        "genOnOff",
+        "genLevelCtrl",
+        "lightingColorCtrl",
+        "touchlink",
+        "manuSpecificIkeaUnknown"
+      ],
+      "outClusters": [
+        "genOta"
+      ],
+      "serverOptions": {
+        "lightingColorCtrl": {
+          "capabilities": [
+            "hs",
+            "ehue",
+            "loop",
+            "xy",
+            "ct"
+          ],
+          "ctMin": 250,
+          "ctMax": 454
+        }
+      },
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 8,
+          "appVersion": 1,
+          "stackVersion": 113,
+          "hwVersion": 1,
+          "manufacturerName": "IKEA of Sweden",
+          "modelId": "TRADFRI bulb E27 CWS globe 806lm",
+          "dateCode": "20230913",
+          "powerSource": 1,
+          "swBuildId": "1.0.38"
+        },
+        "genOnOff": {
+          "onOff": 1,
+          "startUpOnOff": 255
+        },
+        "lightingColorCtrl": {
+          "colorTemperature": 370
+        }
+      }
+    },
+    {
+      "id": 242,
+      "profileId": 41440,
+      "deviceId": 97,
+      "inClusters": [
+        "greenPower"
+      ],
+      "outClusters": [
+        "greenPower"
+      ]
+    }
+  ],
+  "routineTemplates": [
+    {
+      "name": "Wall switch off and on every 2 minutes",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "wait",
+          "ms": 120000
+        },
+        {
+          "kind": "gesture",
+          "control": "mains",
+          "gesture": "off"
+        },
+        {
+          "kind": "wait",
+          "ms": 5000
+        },
+        {
+          "kind": "gesture",
+          "control": "mains",
+          "gesture": "on"
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "light",
+      "use": "brightness",
+      "endpoint": 1
+    },
+    {
+      "id": "color",
+      "use": "color",
+      "endpoint": 1
+    },
+    {
+      "id": "mains",
+      "use": "power",
+      "description": "Mains / wall switch. On power-up the bulb applies its power-on behaviour (startUpOnOff, startUpCurrentLevel, startUpColorTemperature) and re-announces — IKEA bulbs also forget their reporting configuration."
+    }
+  ]
+}

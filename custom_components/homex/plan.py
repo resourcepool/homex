@@ -13,7 +13,8 @@ Stored as one document in the ``homex_plan`` store::
          "stairs": [{"id", "x", "y", "w", "h", "dir": "up" | ..., "goes": "up" | "down",
                      "shape": "straight" | "l" | "u" | "spiral", "turn", "color"}],
          # Fixtures: shutters are the openings' "cover" (entity id).
-         "radiators": [{"id", "device_id", "x", "y", "angle", "length"}],
+         "radiators": [{"id", "device_id", "x", "y", "angle", "length",
+                         "kind": "panel" | "tall"}],
          "lights": [{"id", "entity_id", "kind": "point" | "linear",
                      "mount": "ceiling" | "floor" | "wall",
                      "points": [[x, y]], "lines": [[[x, y], [x, y]]],
@@ -86,6 +87,8 @@ _RADIATOR = vol.Schema(
         vol.Required("y"): vol.Coerce(float),
         vol.Optional("angle", default=0): vol.Coerce(float),
         vol.Optional("length", default=80): vol.All(vol.Coerce(float), vol.Range(min=10)),
+        # panel: a normal, low radiator (under a window); tall: full height
+        vol.Optional("kind", default="panel"): vol.In(["panel", "tall"]),
     },
     extra=vol.ALLOW_EXTRA,
 )
@@ -124,7 +127,14 @@ _LEVEL = vol.Schema(
     },
     extra=vol.ALLOW_EXTRA,
 )
-PLAN_SCHEMA = vol.Schema({vol.Required("levels"): [_LEVEL]}, extra=vol.ALLOW_EXTRA)
+PLAN_SCHEMA = vol.Schema(
+    {
+        vol.Required("levels"): [_LEVEL],
+        # published from the 3D view: the dashboard shows the house in its own tab
+        vol.Optional("published", default=False): bool,
+    },
+    extra=vol.ALLOW_EXTRA,
+)
 
 
 def _store(hass: HomeAssistant) -> Store:

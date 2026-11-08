@@ -1,0 +1,143 @@
+{
+  "id": "ikea_tretakt",
+  "name": "IKEA TRETAKT smart plug",
+  "device": {
+    "vendor": "IKEA",
+    "model": "E22x4",
+    "description": "TRETAKT smart plug",
+    "type": "Smart plug",
+    "image": "https://www.zigbee2mqtt.io/images/devices/E22x4.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/E22x4.html"
+      },
+      {
+        "label": "ZHA quirk",
+        "url": "https://github.com/zigpy/zha-device-handlers/blob/dev/zhaquirks/ikea/plug_g2.py"
+      }
+    ]
+  },
+  "_sources": "Zigbee2MQTT: zigbeeModel 'TRETAKT Smart plug' (onOff, child lock and LED via manuSpecificIkeaSmartPlug 0xFC85, identify). Same platform as INSPELNING without metering (zha-quirks plug_g2 applies to both): ep1 device 0x010A with the IKEA clusters, ep242 GP proxy.",
+  "node": {
+    "logicalType": "router",
+    "rxOnWhenIdle": true,
+    "manufacturerCode": 4476,
+    "macCapabilities": 142,
+    "ieeePrefix": "000b57"
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 266,
+      "inClusters": [
+        "genBasic",
+        "genIdentify",
+        "genGroups",
+        "genScenes",
+        "genOnOff",
+        "genLevelCtrl",
+        "touchlink",
+        "manuSpecificIkeaUnknown",
+        "manuSpecificIkeaSmartPlug"
+      ],
+      "outClusters": [
+        "genOta"
+      ],
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 8,
+          "appVersion": 2,
+          "stackVersion": 114,
+          "hwVersion": 1,
+          "manufacturerName": "IKEA of Sweden",
+          "modelId": "TRETAKT Smart plug",
+          "dateCode": "20231024",
+          "powerSource": 1,
+          "swBuildId": "2.3.089"
+        },
+        "genOnOff": {
+          "onOff": 0
+        },
+        "manuSpecificIkeaSmartPlug": {
+          "childLock": {
+            "value": 0,
+            "writable": true
+          },
+          "ledEnable": {
+            "value": 0,
+            "writable": true
+          }
+        }
+      }
+    },
+    {
+      "id": 242,
+      "profileId": 41440,
+      "deviceId": 97,
+      "inClusters": [
+        "greenPower"
+      ],
+      "outClusters": [
+        "greenPower"
+      ]
+    }
+  ],
+  "routineTemplates": [
+    {
+      "name": "Press the button every 30 s",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "button",
+          "gesture": "tap"
+        },
+        {
+          "kind": "wait",
+          "ms": 30000
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "relay",
+      "type": "indicator",
+      "label": "Relay",
+      "icon": "push",
+      "value": "{{ 'no power' if not powered else ('ON' if attr('genOnOff', 'onOff') else 'OFF') }}",
+      "on": "{{ powered and attr('genOnOff', 'onOff') }}"
+    },
+    {
+      "id": "lock",
+      "type": "indicator",
+      "label": "Lock",
+      "icon": "lock",
+      "value": "{{ 'locked' if attr('manuSpecificIkeaSmartPlug', 'childLock') else 'unlocked' }}",
+      "on": "{{ attr('manuSpecificIkeaSmartPlug', 'childLock') }}"
+    },
+    {
+      "id": "button",
+      "use": "relay_button",
+      "description": "The plug's button toggles the relay (ignored while child lock is on).",
+      "on": {
+        "press": [
+          {
+            "if": "{{ not attr('manuSpecificIkeaSmartPlug', 'childLock') }}",
+            "command": {
+              "endpoint": 1,
+              "cluster": "genOnOff",
+              "name": "toggle"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "mains",
+      "use": "power"
+    }
+  ]
+}

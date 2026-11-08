@@ -1,0 +1,203 @@
+{
+  "id": "sonoff_snzb04p",
+  "name": "SONOFF SNZB-04P contact sensor",
+  "device": {
+    "vendor": "SONOFF",
+    "model": "SNZB-04P",
+    "description": "Zigbee door/window contact sensor (CR2477)",
+    "type": "Contact sensor",
+    "image": "https://www.zigbee2mqtt.io/images/devices/SNZB-04P.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/SNZB-04P.html"
+      },
+      {
+        "label": "Captured signature",
+        "url": "https://github.com/zigpy/zha-device-handlers/issues/3308"
+      }
+    ]
+  },
+  "_sources": "Node/simple descriptor from zha-device-handlers#3308: end device (mac 0x80), manufacturer 4742, manufacturerName 'eWeLink', ep1 device 0x0402 (IAS zone) in [0,1,3,0x20,0x500,0xFC11,0xFC57] out [3,6,0x19], zoneType 21, OTA file version 0x2200. Tamper on 0xFC11/0x2000 (0 installed, 1 removed). Basic versions and the check-in interval are not captured (inferred).",
+  "node": {
+    "logicalType": "end_device",
+    "rxOnWhenIdle": false,
+    "manufacturerCode": 4742,
+    "macCapabilities": 128,
+    "ieeePrefix": "00124b",
+    "reportManufacturerCode": {
+      "customClusterEwelink": null
+    }
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 1026,
+      "inClusters": [
+        "genBasic",
+        "genPowerCfg",
+        "genIdentify",
+        "genPollCtrl",
+        "ssIasZone",
+        "customClusterEwelink",
+        "manuSpecificAmazonWWAH"
+      ],
+      "outClusters": [
+        "genIdentify",
+        "genOnOff",
+        "genOta"
+      ],
+      "serverOptions": {
+        "ssIasZone": {
+          "zoneType": 21
+        },
+        "genPollCtrl": {
+          "checkinInterval": 14400
+        }
+      },
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 8,
+          "appVersion": 34,
+          "manufacturerName": "eWeLink",
+          "modelId": "SNZB-04P",
+          "powerSource": 3,
+          "swBuildId": "2.2.0"
+        },
+        "genPowerCfg": {
+          "batteryVoltage": 30,
+          "batteryPercentageRemaining": 200
+        },
+        "customClusterEwelink": {
+          "tamper": 0
+        }
+      }
+    }
+  ],
+  "routineTemplates": [
+    {
+      "name": "Door opened for 20 s every 5 minutes",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "door",
+          "gesture": "open"
+        },
+        {
+          "kind": "wait",
+          "ms": 20000
+        },
+        {
+          "kind": "gesture",
+          "control": "door",
+          "gesture": "closed"
+        },
+        {
+          "kind": "wait",
+          "ms": 280000
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "contact",
+      "type": "indicator",
+      "label": "Contact",
+      "icon": "door",
+      "value": "{{ 'open' if attr('ssIasZone', 'zoneStatus') & 1 else 'closed' }}",
+      "on": "{{ not (attr('ssIasZone', 'zoneStatus') & 1) }}"
+    },
+    {
+      "id": "enrolled",
+      "type": "indicator",
+      "label": "IAS",
+      "icon": "link",
+      "value": "{{ ('zone ' + str(attr('ssIasZone', 'zoneId'))) if attr('ssIasZone', 'zoneState') else 'not enrolled' }}",
+      "on": "{{ attr('ssIasZone', 'zoneState') == 1 }}"
+    },
+    {
+      "id": "tamper_state",
+      "type": "indicator",
+      "label": "Tamper",
+      "icon": "shield",
+      "value": "{{ 'open' if attr('customClusterEwelink', 'tamper') else 'ok' }}"
+    },
+    {
+      "id": "battery_state",
+      "type": "indicator",
+      "label": "Battery",
+      "icon": "battery",
+      "value": "{{ attr('genPowerCfg', 'batteryPercentageRemaining') // 2 }} %"
+    },
+    {
+      "id": "door",
+      "use": "contact"
+    },
+    {
+      "id": "tamper",
+      "use": "tamper",
+      "also": {
+        "removed": [
+          {
+            "report": {
+              "cluster": "customClusterEwelink",
+              "attributes": {
+                "tamper": 1
+              }
+            }
+          }
+        ],
+        "closed": [
+          {
+            "report": {
+              "cluster": "customClusterEwelink",
+              "attributes": {
+                "tamper": 0
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "battery",
+      "use": "battery",
+      "on": {
+        "change": [
+          {
+            "setAttribute": {
+              "cluster": "genPowerCfg",
+              "attributes": {
+                "batteryPercentageRemaining": "{{ value * 2 }}",
+                "batteryVoltage": "{{ 22 + value * 8 // 100 }}"
+              }
+            }
+          },
+          {
+            "if": "{{ value < 10 }}",
+            "command": {
+              "cluster": "ssIasZone",
+              "name": "battery_low",
+              "args": {
+                "on": true
+              }
+            }
+          },
+          {
+            "if": "{{ value >= 10 }}",
+            "command": {
+              "cluster": "ssIasZone",
+              "name": "battery_low",
+              "args": {
+                "on": false
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

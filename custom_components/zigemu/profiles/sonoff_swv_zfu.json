@@ -1,0 +1,377 @@
+{
+  "id": "sonoff_swv_zfu",
+  "name": "SONOFF SWV-ZFU smart water valve",
+  "device": {
+    "vendor": "SONOFF",
+    "model": "SWV-ZFU",
+    "description": "Zigbee smart water valve (Hydro ONE, US thread) with flow meter",
+    "type": "Water valve",
+    "image": "https://www.zigbee2mqtt.io/images/devices/SWV-ZFU.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/SWV-ZFU.html"
+      },
+      {
+        "label": "Captured signature (SWV-ZFE)",
+        "url": "https://github.com/zigpy/zha-device-handlers/pull/4927"
+      }
+    ]
+  },
+  "_sources": "Z2M handles SWV-ZFU with the SWV-ZFE definition. Descriptors from the SWV-ZFE diagnostics in zha-device-handlers PR #4927 (fw 0x00001007; SWV-ZFU reported with the same fw): end device (mac 0x80), manufacturer 4742, server mask 0x2A00, ep1 device 0x0002 in [0,1,3,6,0x20,0xFC11,0xFC57] out [3,0x19]. realTimeIrrigationDuration/Volume are big-endian inside uint32 (Z2M bigEndianNumericFzConvert). manualDefaultSettings is a 12-element uint8 array: mode, total duration (BE u16, min), irrigation duration (BE u16), 2 bytes, unit, volume (BE u16), safety timeout (BE u16). The valve reads genTime from the coordinator (Z2M answers it). Basic versions inferred.",
+  "node": {
+    "logicalType": "end_device",
+    "rxOnWhenIdle": false,
+    "manufacturerCode": 4742,
+    "macCapabilities": 128,
+    "ieeePrefix": "00124b",
+    "reportManufacturerCode": {
+      "customClusterEwelink": null
+    }
+  },
+  "inputs": {
+    "flow_lpm": 20,
+    "supply_ok": true,
+    "duration_s": 0,
+    "volume_l": 0
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 2,
+      "inClusters": [
+        "genBasic",
+        "genPowerCfg",
+        "genIdentify",
+        "genOnOff",
+        "genPollCtrl",
+        "customClusterEwelink",
+        "manuSpecificAmazonWWAH"
+      ],
+      "outClusters": [
+        "genIdentify",
+        "genOta"
+      ],
+      "serverOptions": {
+        "genPollCtrl": {
+          "checkinInterval": 14400
+        }
+      },
+      "acceptCommands": {
+        "customClusterEwelink": [
+          6,
+          7,
+          8
+        ]
+      },
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 8,
+          "manufacturerName": "SONOFF",
+          "modelId": "SWV-ZFU",
+          "powerSource": 3,
+          "swBuildId": "1.0.7"
+        },
+        "genOnOff": {
+          "onOff": 0
+        },
+        "genPowerCfg": {
+          "batteryVoltage": 30,
+          "batteryPercentageRemaining": 200
+        },
+        "customClusterEwelink": {
+          "childLock": {
+            "value": 0,
+            "writable": true
+          },
+          "realTimeIrrigationDuration": 0,
+          "realTimeIrrigationVolume": 0,
+          "valveAbnormalState": 0,
+          "rainDelayEndDatetime": 0,
+          "hourIrrigationVolume": 0,
+          "hourIrrigationDuration": 0,
+          "manualDefaultSettings": {
+            "type": "array",
+            "value": "200c0000000a000a00000000000000",
+            "writable": true
+          },
+          "seasonalWateringAdjustment": {
+            "type": "array",
+            "value": "200000",
+            "writable": true
+          },
+          "irrigationScheduleStatus": {
+            "type": "array",
+            "value": "200000"
+          },
+          "valveAlarmSettings": {
+            "type": "array",
+            "value": "200000",
+            "writable": true
+          },
+          "unitOfWaterFlow": {
+            "value": 0,
+            "writable": true
+          }
+        }
+      }
+    }
+  ],
+  "events": {
+    "joined": [
+      {
+        "send": {
+          "endpoint": 1,
+          "cluster": "genTime",
+          "command": 0,
+          "clusterSpecific": false,
+          "direction": "client_to_server",
+          "disableDefaultResponse": true,
+          "payload": [
+            [
+              "uint16",
+              0
+            ],
+            [
+              "uint16",
+              1
+            ],
+            [
+              "uint16",
+              7
+            ]
+          ]
+        }
+      }
+    ],
+    "powerUp": [
+      {
+        "send": {
+          "endpoint": 1,
+          "cluster": "genTime",
+          "command": 0,
+          "clusterSpecific": false,
+          "direction": "client_to_server",
+          "disableDefaultResponse": true,
+          "payload": [
+            [
+              "uint16",
+              0
+            ],
+            [
+              "uint16",
+              1
+            ],
+            [
+              "uint16",
+              7
+            ]
+          ]
+        }
+      }
+    ],
+    "attr:genOnOff:0x0000": [
+      {
+        "if": "{{ value }}",
+        "setInput": {
+          "duration_s": 0,
+          "volume_l": 0
+        }
+      },
+      {
+        "if": "{{ value }}",
+        "schedule": {
+          "id": "irrigate",
+          "after": 10000,
+          "do": [
+            {
+              "macro": "irrigate_tick"
+            }
+          ]
+        }
+      },
+      {
+        "if": "{{ not value }}",
+        "cancel": "irrigate"
+      },
+      {
+        "if": "{{ not value }}",
+        "report": {
+          "cluster": "customClusterEwelink",
+          "attributes": {
+            "realTimeIrrigationDuration": "{{ bswap32(int(duration_s // 60)) }}",
+            "realTimeIrrigationVolume": "{{ bswap32(int(volume_l)) }}"
+          }
+        }
+      }
+    ]
+  },
+  "routineTemplates": [
+    {
+      "name": "Water the garden 2 minutes, every 10 minutes",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "button",
+          "gesture": "tap"
+        },
+        {
+          "kind": "wait",
+          "ms": 120000
+        },
+        {
+          "kind": "gesture",
+          "control": "button",
+          "gesture": "tap"
+        },
+        {
+          "kind": "wait",
+          "ms": 480000
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "valve",
+      "type": "indicator",
+      "label": "Valve",
+      "icon": "valve",
+      "value": "{{ 'open' if attr('genOnOff', 'onOff') else 'closed' }}",
+      "on": "{{ attr('genOnOff', 'onOff') }}"
+    },
+    {
+      "id": "irrigation",
+      "type": "indicator",
+      "label": "Run",
+      "icon": "droplet",
+      "value": "{{ round(duration_s / 60, 1) }} min · {{ round(volume_l, 1) }} L"
+    },
+    {
+      "id": "abnormal",
+      "type": "indicator",
+      "label": "State",
+      "icon": "alert",
+      "value": "{{ 'normal' if not attr('customClusterEwelink', 'valveAbnormalState') else ('water shortage' if attr('customClusterEwelink', 'valveAbnormalState') & 1 else ('leakage' if attr('customClusterEwelink', 'valveAbnormalState') & 2 else 'fail-safe')) }}"
+    },
+    {
+      "id": "lock",
+      "type": "indicator",
+      "label": "Lock",
+      "icon": "lock",
+      "value": "{{ 'locked' if attr('customClusterEwelink', 'childLock') else 'unlocked' }}",
+      "on": "{{ attr('customClusterEwelink', 'childLock') }}"
+    },
+    {
+      "id": "button",
+      "use": "valve_button",
+      "description": "The valve's button toggles watering (ignored while child-locked). Opening starts a run that auto-closes after the manual default duration.",
+      "on": {
+        "press": [
+          {
+            "if": "{{ not attr('customClusterEwelink', 'childLock') }}",
+            "command": {
+              "cluster": "genOnOff",
+              "name": "toggle"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "flow",
+      "use": "water_flow"
+    },
+    {
+      "id": "supply",
+      "use": "water_supply",
+      "description": "No water: the valve flags water shortage (valveAbnormalState bit 0) and closes.",
+      "on": {
+        "off": [
+          {
+            "setInput": {
+              "supply_ok": false
+            }
+          },
+          {
+            "report": {
+              "cluster": "customClusterEwelink",
+              "attributes": {
+                "valveAbnormalState": 1
+              }
+            }
+          },
+          {
+            "if": "{{ attr('genOnOff', 'onOff') }}",
+            "command": {
+              "cluster": "genOnOff",
+              "name": "off"
+            }
+          }
+        ],
+        "on": [
+          {
+            "setInput": {
+              "supply_ok": true
+            }
+          },
+          {
+            "report": {
+              "cluster": "customClusterEwelink",
+              "attributes": {
+                "valveAbnormalState": 0
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "battery",
+      "use": "battery"
+    }
+  ],
+  "macros": {
+    "irrigate_tick": {
+      "description": "Every 10 s while open: accumulate duration/volume from the flow, report them (big-endian in uint32, as the firmware does), auto-close after the manual default duration.",
+      "actions": [
+        {
+          "setInput": {
+            "duration_s": "{{ duration_s + 10 }}",
+            "volume_l": "{{ volume_l + (flow_lpm / 6 if supply_ok else 0) }}"
+          }
+        },
+        {
+          "report": {
+            "cluster": "customClusterEwelink",
+            "attributes": {
+              "realTimeIrrigationDuration": "{{ bswap32(int(duration_s // 60)) }}",
+              "realTimeIrrigationVolume": "{{ bswap32(int(volume_l)) }}"
+            }
+          }
+        },
+        {
+          "if": "{{ duration_s >= 60 * ((arr(attr('customClusterEwelink', 'manualDefaultSettings'), 3) * 256 + arr(attr('customClusterEwelink', 'manualDefaultSettings'), 4)) or (arr(attr('customClusterEwelink', 'manualDefaultSettings'), 1) * 256 + arr(attr('customClusterEwelink', 'manualDefaultSettings'), 2)) or 10) }}",
+          "command": {
+            "cluster": "genOnOff",
+            "name": "off"
+          }
+        },
+        {
+          "if": "{{ attr('genOnOff', 'onOff') }}",
+          "schedule": {
+            "id": "irrigate",
+            "after": 10000,
+            "do": [
+              {
+                "macro": "irrigate_tick"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

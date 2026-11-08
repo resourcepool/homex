@@ -1,0 +1,259 @@
+{
+  "id": "sonoff_snzb06p",
+  "name": "SONOFF SNZB-06P mmWave presence sensor",
+  "device": {
+    "vendor": "SONOFF",
+    "model": "SNZB-06P",
+    "description": "Zigbee human presence sensor (5.8 GHz mmWave, USB powered)",
+    "type": "Presence sensor",
+    "image": "https://www.zigbee2mqtt.io/images/devices/SNZB-06P.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/SNZB-06P.html"
+      },
+      {
+        "label": "Captured signature",
+        "url": "https://github.com/zigpy/zha-device-handlers/issues/2702"
+      }
+    ]
+  },
+  "_sources": "Node/simple descriptor from zha-device-handlers#2702: router (mac 0x8E, mains), manufacturer 4742, ep1 device 0x0107 (occupancy sensor) in [0,3,0x406,0x500,0xFC11,0xFC57] out [3,0x19]; IAS zoneType 13; ultrasonicOToUDelay 30, ultrasonicUToOThreshold 3. Illumination on 0xFC11/0x2001 (0 dim, 1 bright), updated only when occupancy is detected. Z2M configures no occupancy reporting: the device reports on its own. Basic versions not captured.",
+  "node": {
+    "logicalType": "router",
+    "rxOnWhenIdle": true,
+    "manufacturerCode": 4742,
+    "macCapabilities": 142,
+    "ieeePrefix": "00124b",
+    "reportManufacturerCode": {
+      "customClusterEwelink": null
+    }
+  },
+  "inputs": {
+    "occupied": false
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 263,
+      "inClusters": [
+        "genBasic",
+        "genIdentify",
+        "msOccupancySensing",
+        "ssIasZone",
+        "customClusterEwelink",
+        "manuSpecificAmazonWWAH"
+      ],
+      "outClusters": [
+        "genIdentify",
+        "genOta"
+      ],
+      "serverOptions": {
+        "ssIasZone": {
+          "zoneType": 13
+        },
+        "msOccupancySensing": {
+          "sensorType": 1
+        }
+      },
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 8,
+          "manufacturerName": "SONOFF",
+          "modelId": "SNZB-06P",
+          "powerSource": 1,
+          "swBuildId": "1.0.6"
+        },
+        "msOccupancySensing": {
+          "ultrasonicOToUDelay": {
+            "type": "uint16",
+            "value": 30,
+            "writable": true
+          },
+          "ultrasonicUToOThreshold": {
+            "type": "uint8",
+            "value": 3,
+            "writable": true
+          }
+        },
+        "customClusterEwelink": {
+          "illumination": 0
+        }
+      }
+    }
+  ],
+  "routineTemplates": [
+    {
+      "name": "Someone enters for 2 minutes every 10 minutes",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "person",
+          "gesture": "present"
+        },
+        {
+          "kind": "wait",
+          "ms": 120000
+        },
+        {
+          "kind": "gesture",
+          "control": "person",
+          "gesture": "away"
+        },
+        {
+          "kind": "wait",
+          "ms": 480000
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "occupancy",
+      "type": "indicator",
+      "label": "Occupancy",
+      "icon": "person",
+      "value": "{{ 'occupied' if attr('msOccupancySensing', 'occupancy') else 'clear' }}",
+      "on": "{{ attr('msOccupancySensing', 'occupancy') }}"
+    },
+    {
+      "id": "timeout",
+      "type": "indicator",
+      "label": "Delay",
+      "icon": "timer",
+      "value": "{{ attr('msOccupancySensing', 'ultrasonicOToUDelay') }} s · {{ ['', 'low', 'medium', 'high'][attr('msOccupancySensing', 'ultrasonicUToOThreshold')] if attr('msOccupancySensing', 'ultrasonicUToOThreshold') in (1, 2, 3) else '?' }}"
+    },
+    {
+      "id": "light",
+      "type": "indicator",
+      "label": "Light",
+      "icon": "sun",
+      "value": "{{ 'bright' if attr('customClusterEwelink', 'illumination') else 'dim' }}"
+    },
+    {
+      "id": "person",
+      "use": "presence",
+      "description": "Enter: occupancy reported at once (and the light level). Leave: occupancy clears after the occupied-to-unoccupied delay (ultrasonicOToUDelay, writable by the host).",
+      "also": {
+        "present": [
+          {
+            "cancel": "clear"
+          },
+          {
+            "setInput": {
+              "occupied": true
+            }
+          },
+          {
+            "report": {
+              "cluster": "msOccupancySensing",
+              "attributes": {
+                "occupancy": 1
+              }
+            }
+          },
+          {
+            "command": {
+              "cluster": "ssIasZone",
+              "name": "alarm1",
+              "args": {
+                "on": true
+              }
+            }
+          },
+          {
+            "report": {
+              "cluster": "customClusterEwelink",
+              "attributes": {
+                "illumination": "{{ attr('customClusterEwelink', 'illumination') }}"
+              }
+            }
+          }
+        ],
+        "away": [
+          {
+            "schedule": {
+              "id": "clear",
+              "after": "{{ attr('msOccupancySensing', 'ultrasonicOToUDelay') * 1000 }}",
+              "do": [
+                {
+                  "setInput": {
+                    "occupied": false
+                  }
+                },
+                {
+                  "report": {
+                    "cluster": "msOccupancySensing",
+                    "attributes": {
+                      "occupancy": 0
+                    }
+                  }
+                },
+                {
+                  "command": {
+                    "cluster": "ssIasZone",
+                    "name": "alarm1",
+                    "args": {
+                      "on": false
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ambient",
+      "use": "ambient_light",
+      "description": "The light level is only reported while someone is present.",
+      "also": {
+        "bright": [
+          {
+            "setAttribute": {
+              "cluster": "customClusterEwelink",
+              "attributes": {
+                "illumination": 1
+              }
+            }
+          },
+          {
+            "if": "{{ attr('msOccupancySensing', 'occupancy') }}",
+            "report": {
+              "cluster": "customClusterEwelink",
+              "attributes": {
+                "illumination": 1
+              }
+            }
+          }
+        ],
+        "dim": [
+          {
+            "setAttribute": {
+              "cluster": "customClusterEwelink",
+              "attributes": {
+                "illumination": 0
+              }
+            }
+          },
+          {
+            "if": "{{ attr('msOccupancySensing', 'occupancy') }}",
+            "report": {
+              "cluster": "customClusterEwelink",
+              "attributes": {
+                "illumination": 0
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "mains",
+      "use": "power"
+    }
+  ]
+}

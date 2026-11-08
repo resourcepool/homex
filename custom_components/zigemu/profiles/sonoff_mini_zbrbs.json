@@ -1,0 +1,152 @@
+{
+  "id": "sonoff_mini_zbrbs",
+  "name": "SONOFF MINI-ZBRBS roller shutter switch",
+  "device": {
+    "vendor": "SONOFF",
+    "model": "MINI-ZBRBS",
+    "description": "Zigbee smart roller shutter switch",
+    "type": "Cover",
+    "image": "https://www.zigbee2mqtt.io/images/devices/MINI-ZBRBS.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/MINI-ZBRBS.html"
+      },
+      {
+        "label": "ZHA quirk",
+        "url": "https://github.com/zigpy/zha-device-handlers/blob/dev/zhaquirks/sonoff/mini_zbrbs.py"
+      }
+    ]
+  },
+  "_sources": "Z2M sonoff.js MINI-ZBRBS: m.windowCovering (lift, not inverted: currentPositionLiftPercentage 0 = open), customClusterEwelink 0xFC11: externalTriggerMode 0x0016, motorTravelCalibrationAction 0x5001, motorTravelCalibrationStatus 0x5012, motorRunStatus 0x5013 (0 stop, 1 forward, 2 reverse), singleSwitchMode 0x6038, radioPower 0x0012 (read at configure); zhaquirks sonoff/mini_zbrbs.py (QuirkBuilder SONOFF / MINI-ZBRBS). Descriptor: SONOFF mains router layout (ep1 device 0x0202 with Identify, Groups, Scenes, 0x0102, 0xFC11, 0xFC57): inferred.",
+  "node": {
+    "logicalType": "router",
+    "rxOnWhenIdle": true,
+    "manufacturerCode": 4742,
+    "macCapabilities": 142,
+    "ieeePrefix": "00124b",
+    "reportManufacturerCode": {
+      "customClusterEwelink": null
+    }
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 514,
+      "inClusters": [
+        "genBasic",
+        "genIdentify",
+        "genGroups",
+        "genScenes",
+        "closuresWindowCovering",
+        "customClusterEwelink",
+        "manuSpecificAmazonWWAH"
+      ],
+      "outClusters": [
+        "genOta"
+      ],
+      "serverOptions": {
+        "closuresWindowCovering": {
+          "ewelinkMotorStatus": true,
+          "travelSeconds": 25
+        }
+      },
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 8,
+          "appVersion": 1,
+          "manufacturerName": "SONOFF",
+          "modelId": "MINI-ZBRBS",
+          "powerSource": 1,
+          "swBuildId": "1.0.4"
+        },
+        "customClusterEwelink": {
+          "0x0010": {
+            "type": "int32",
+            "value": 0
+          },
+          "0x0012": {
+            "type": "int16",
+            "value": 20,
+            "writable": true
+          },
+          "externalTriggerMode": {
+            "type": "uint8",
+            "value": 0,
+            "writable": true
+          },
+          "0x5001": {
+            "type": "uint8",
+            "value": 0,
+            "writable": true
+          },
+          "0x5012": {
+            "type": "uint8",
+            "value": 1
+          },
+          "0x5013": {
+            "type": "uint8",
+            "value": 0
+          },
+          "0x6038": {
+            "type": "bool",
+            "value": false,
+            "writable": true
+          }
+        }
+      }
+    }
+  ],
+  "routineTemplates": [
+    {
+      "name": "Shutter: open, then close 10 minutes later",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "cover",
+          "gesture": "open"
+        },
+        {
+          "kind": "wait",
+          "ms": 600000
+        },
+        {
+          "kind": "gesture",
+          "control": "cover",
+          "gesture": "close"
+        },
+        {
+          "kind": "wait",
+          "ms": 600000
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "cover_state",
+      "type": "indicator",
+      "label": "Cover",
+      "icon": "valve",
+      "value": "{{ cover_open_pct }} % open · {{ cover_motion }}",
+      "on": "{{ cover_motion != 'stopped' }}"
+    },
+    {
+      "id": "motor",
+      "type": "indicator",
+      "label": "Motor",
+      "icon": "dial",
+      "value": "{{ ('stop', 'forward', 'reverse')[attr('customClusterEwelink', 0x5013)] }}"
+    },
+    {
+      "id": "cover",
+      "use": "cover"
+    },
+    {
+      "id": "mains",
+      "use": "power"
+    }
+  ]
+}

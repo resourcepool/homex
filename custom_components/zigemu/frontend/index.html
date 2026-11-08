@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ZigEmu</title>
+  <link rel="stylesheet" href="style.css?v=0.1.0-2">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">⬡</span>
+      <div>
+        <h1>ZigEmu</h1>
+        <p class="sub">Emulated Ember Zigbee coordinators</p>
+      </div>
+    </div>
+    <div class="top-right">
+      <div class="coord" id="coord">
+        <span class="pill" id="host-pill">host: —</span>
+        <span class="pill" id="net-pill">network: —</span>
+        <span class="pill" id="join-pill">permit join: —</span>
+      </div>
+      <label class="coord-pick" title="Coordinator">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg>
+        <span class="sr-only">Coordinator</span>
+        <select id="coord-select" aria-label="Coordinator"></select>
+      </label>
+      <div class="menu-wrap">
+        <button type="button" class="icon-btn burger" id="menu-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="main-menu" title="Menu">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div class="menu" id="main-menu" role="menu" hidden>
+          <button type="button" role="menuitem" data-menu="coord-edit">Coordinator settings…</button>
+          <button type="button" role="menuitem" data-menu="coord-add">Add coordinator…</button>
+          <hr>
+          <button type="button" role="menuitem" data-menu="profiles">Supported profiles…</button>
+          <button type="button" role="menuitem" data-menu="tags">Tags &amp; views…</button>
+          <button type="button" role="menuitem" data-menu="wishlist">Wishlist…</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- first launch: no coordinator yet -->
+  <section class="onboarding" id="onboarding" hidden>
+    <div class="onboard-card">
+      <span class="logo big" aria-hidden="true">⬡</span>
+      <h2>Create your first coordinator</h2>
+      <p class="hint">A coordinator is an emulated Ember (EZSP) Zigbee stick listening on a TCP port. Point Zigbee2MQTT or ZHA at it, then add virtual devices and pair them. You can create as many coordinators as you like, one port each.</p>
+      <form class="coord-form" id="onboard-form" autocomplete="off">
+        <label>Name <input name="name" value="Coordinator 1" maxlength="40" required autocomplete="off" data-1p-ignore data-lpignore="true"></label>
+        <fieldset class="kind-pick">
+          <legend>Type</legend>
+          <label class="kind-opt"><input type="radio" name="kind" value="emulated" checked> <b>Emulated</b><small>A virtual Ember stick: add virtual devices from profiles.</small></label>
+          <label class="kind-opt"><input type="radio" name="kind" value="proxy"> <b>Proxy</b><small>Forward to a real network-attached stick (SLZB-06, ser2net…) and watch its devices.</small></label>
+        </fieldset>
+        <label class="upstream-field" hidden>Stick address <input name="upstream" placeholder="slzb-06.local:6638" maxlength="80" autocomplete="off" data-1p-ignore data-lpignore="true"></label>
+        <label>TCP port <input name="port" type="number" min="1024" max="65535" required autocomplete="off" data-1p-ignore data-lpignore="true"></label>
+        <label>Bind address <input name="host" maxlength="64" autocomplete="off" data-1p-ignore data-lpignore="true"></label>
+        <p class="form-error" hidden></p>
+        <button type="submit" class="btn primary">Create coordinator</button>
+      </form>
+    </div>
+  </section>
+
+  <div class="coord-banner" id="coord-banner" hidden></div>
+
+  <main class="layout" id="main-layout">
+    <section class="col devices">
+      <div class="section-head devices-head">
+        <h2>Devices <span class="count" id="dev-count"></span></h2>
+        <div class="head-tools">
+          <div class="seg view-toggle" role="radiogroup" aria-label="View">
+            <button type="button" class="seg-btn" data-view="cards" role="radio" title="Cards">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
+              <span>Cards</span>
+            </button>
+            <button type="button" class="seg-btn" data-view="list" role="radio" title="Compact list">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="4" cy="6" r="1.2"/><circle cx="4" cy="12" r="1.2"/><circle cx="4" cy="18" r="1.2"/></svg>
+              <span>List</span>
+            </button>
+          </div>
+          <button type="button" class="btn primary" id="add-open">+ Add device</button>
+        </div>
+      </div>
+      <div class="dev-toolbar" id="dev-toolbar">
+        <label class="view-pick">
+          <span class="sr-only">Saved view</span>
+          <select id="view-select" aria-label="Saved view"></select>
+        </label>
+        <input type="search" id="dev-search" class="add-search small" placeholder="Search name, model, brand…" aria-label="Search devices" autocomplete="off">
+        <details class="filter-dd" data-key="tags"><summary>Tags <b class="dd-count"></b></summary><div class="dd-menu"></div></details>
+        <details class="filter-dd" data-key="types"><summary>Type <b class="dd-count"></b></summary><div class="dd-menu"></div></details>
+        <details class="filter-dd" data-key="vendors"><summary>Brand <b class="dd-count"></b></summary><div class="dd-menu"></div></details>
+        <details class="filter-dd" data-key="status"><summary>Status <b class="dd-count"></b></summary><div class="dd-menu"></div></details>
+        <details class="filter-dd" data-key="modes"><summary>Mode <b class="dd-count"></b></summary><div class="dd-menu"></div></details>
+        <button type="button" class="btn tiny toggle-btn" id="group-toggle" aria-pressed="false" title="Group devices by their first tag">Group by tag</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn tiny ghost" id="filters-clear" hidden>Clear</button>
+        <button type="button" class="btn tiny" id="view-update" hidden>Update view</button>
+        <button type="button" class="btn tiny" id="view-save">Save view…</button>
+      </div>
+      <div class="active-filters" id="active-filters" hidden></div>
+      <div id="devices" class="device-grid"></div>
+      <p id="no-match" class="empty" hidden>No device matches these filters. <button type="button" class="btn tiny" id="no-match-clear">Clear filters</button></p>
+      <p id="empty" class="empty">No devices yet. Click <b>+ Add device</b>, then pair it while permit join is open in Zigbee2MQTT or ZHA.</p>
+    </section>
+
+    <aside class="col log" id="traffic">
+      <button type="button" class="log-rail" id="log-expand" aria-label="Show traffic" title="Show traffic">
+        <span class="rail-arrow" aria-hidden="true">‹</span>
+        <span class="rail-label">Traffic</span>
+        <span class="rail-badge" id="log-unseen" hidden></span>
+      </button>
+      <div class="section-head">
+        <h2>Traffic</h2>
+        <div class="log-tools">
+          <label><input type="checkbox" id="log-rx" checked> rx</label>
+          <label><input type="checkbox" id="log-tx" checked> tx</label>
+          <button class="btn ghost" id="log-clear" type="button">Clear</button>
+          <button class="icon-btn" id="log-collapse" type="button" aria-label="Hide traffic" title="Hide traffic">›</button>
+        </div>
+      </div>
+      <ol id="log" class="log-list"></ol>
+    </aside>
+  </main>
+
+  <template id="device-tpl">
+    <article class="card">
+      <header class="card-head">
+        <button type="button" class="icon-btn expand" aria-label="Show controls" aria-expanded="false" title="Show controls"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        <span class="dev-thumb" aria-hidden="true"></span>
+        <div class="title">
+          <h3 class="dev-name" tabindex="0" role="button" title="Rename"></h3>
+          <span class="dev-model"></span>
+        </div>
+        <div class="tag-chips" title="Tags: click to edit"></div>
+        <div class="row-summary"></div>
+        <span class="status"></span>
+        <button type="button" class="icon-btn info" aria-label="Device info" title="Device info, details and actions">ⓘ</button>
+      </header>
+      <div class="modebar">
+        <div class="seg" role="radiogroup" aria-label="Mode">
+          <button type="button" class="seg-btn" data-mode="manual" role="radio">Manual</button>
+          <button type="button" class="seg-btn" data-mode="auto" role="radio">Auto</button>
+        </div>
+        <button type="button" class="btn tiny record" title="Record what you do with the manual controls into a routine">● Rec</button>
+        <button type="button" class="btn tiny pair"></button>
+      </div>
+      <div class="pair-overlay">
+        <button type="button" class="btn primary pair-big">Pair</button>
+        <span class="pair-note"></span>
+      </div>
+      <div class="dev-body">
+        <div class="dev-main">
+          <div class="indicators"></div>
+          <div class="controls"></div>
+          <div class="routines" hidden>
+            <ul class="routine-list"></ul>
+            <p class="routine-empty">No routines yet.</p>
+            <div class="routine-actions">
+              <button type="button" class="btn tiny new-routine">+ New</button>
+              <select class="template-select" aria-label="Add from template"><option value="">From template…</option></select>
+            </div>
+          </div>
+        </div>
+        <section class="activity" aria-label="Device activity">
+          <header class="activity-head">
+            <h4>Activity <span class="count activity-count"></span></h4>
+            <button type="button" class="btn tiny ghost activity-clear">Clear</button>
+          </header>
+          <ol class="log-list activity-list"></ol>
+          <p class="activity-empty">No activity yet. Messages to and from this device appear here.</p>
+        </section>
+      </div>
+    </article>
+  </template>
+
+  <dialog id="add-dialog" class="add-dialog" aria-labelledby="add-title">
+    <form method="dialog" class="add-form-modal">
+      <header class="info-head">
+        <h3 id="add-title">Add a device</h3>
+        <button type="submit" class="icon-btn" aria-label="Close">✕</button>
+      </header>
+      <div class="add-identity">
+        <label class="field">Name <input id="name-input" placeholder="e.g. Kitchen plug" maxlength="60" autocomplete="off" data-1p-ignore data-lpignore="true"></label>
+        <div class="field">Tags <div class="tag-editor" id="add-tags"></div></div>
+      </div>
+      <input type="search" id="add-search" class="add-search" placeholder="Search brand, model or type… e.g. ikea plug, SNZB, valve" autocomplete="off" aria-label="Search device profiles">
+      <div class="add-filters">
+        <div class="chips" id="add-types" aria-label="Device type"></div>
+        <div class="chips" id="add-vendors" aria-label="Brand"></div>
+      </div>
+      <section class="add-recent-section" id="add-recent-section">
+        <h4>Recently used</h4>
+        <div class="add-recent" id="add-recent"></div>
+      </section>
+      <section>
+        <h4 id="add-results-title">All profiles</h4>
+        <div class="add-results" id="add-results" role="listbox" aria-label="Device profiles"></div>
+        <p class="add-none" id="add-none" hidden>No profile matches. Try a brand (IKEA, Philips, SONOFF), a model or a type.</p>
+      </section>
+      <footer class="add-footer">
+        <div class="add-picked" id="add-picked">Pick a profile</div>
+        <button type="button" class="btn primary" id="add-confirm" disabled>Add</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="settings-dialog" class="add-dialog settings-dialog" aria-labelledby="settings-title">
+    <form method="dialog" class="add-form-modal settings-form">
+      <header class="info-head">
+        <h3 id="settings-title">Settings</h3>
+        <button type="submit" class="icon-btn" aria-label="Close">✕</button>
+      </header>
+      <div class="seg tabs" role="tablist">
+        <button type="button" class="seg-btn on" role="tab" data-tab="profiles" aria-selected="true">Supported profiles <small id="tab-profiles-count"></small></button>
+        <button type="button" class="seg-btn" role="tab" data-tab="tags" aria-selected="false">Tags &amp; views <small id="tab-tags-count"></small></button>
+        <button type="button" class="seg-btn" role="tab" data-tab="wishlist" aria-selected="false">Wishlist <small id="tab-wishlist-count"></small></button>
+      </div>
+
+      <!-- supported profiles -->
+      <section class="tab-panel" data-panel="profiles">
+        <p class="hint">Profiles switched off are hidden from <b>Add device</b>. Devices already using them keep working.</p>
+        <div class="settings-tools">
+          <input type="search" class="add-search small" id="prof-search" placeholder="Filter profiles…" aria-label="Filter profiles">
+          <button type="button" class="btn tiny" id="prof-all">Enable all</button>
+          <button type="button" class="btn tiny ghost" id="prof-none">Disable all</button>
+        </div>
+        <div class="prof-list" id="prof-list"></div>
+      </section>
+
+      <!-- categories & views -->
+      <section class="tab-panel" data-panel="tags" hidden>
+        <p class="hint">Tags organise your devices (a room, a floor, a test bench…); a device can have several. Add them when you create a device or in its settings (ⓘ), where new ones are created on the fly. Rename a tag by editing its name (every device follows); deleting a tag removes it from its devices. Usage counts cover every coordinator.</p>
+        <div class="settings-tools">
+          <input class="add-search small" id="cat-new-name" placeholder="New tag name" maxlength="40" aria-label="New tag name" autocomplete="off">
+          <button type="button" class="btn tiny primary" id="cat-add">Add tag</button>
+          <span class="spacer"></span>
+          <button type="button" class="btn tiny ghost danger" id="tags-purge" hidden>Delete unused tags</button>
+        </div>
+        <p class="form-error" id="tags-error" hidden></p>
+        <div class="cat-list" id="cat-list"></div>
+        <h4 class="sub-title">Saved views</h4>
+        <p class="hint">A view saves the device list's search, filters (tags included) and grouping. Pick one from the list above the devices.</p>
+        <div class="cat-list" id="views-list"></div>
+      </section>
+
+      <!-- wishlist -->
+      <section class="tab-panel" data-panel="wishlist" hidden>
+        <div class="wish-import" id="wish-drop">
+          <div>
+            <b>Import from Zigbee2MQTT</b>
+            <p class="hint">Drop or pick a file exported from Zigbee2MQTT: <i>Settings → Tools → Download state</i> (JSON), the <code>bridge/devices</code> payload, or <code>database.db</code>. It is read in your browser; only the devices you select are saved.</p>
+          </div>
+          <label class="btn primary file-btn">Choose file…<input type="file" id="wish-file" accept=".json,.db,.txt,application/json" hidden></label>
+        </div>
+
+        <div class="wish-review" id="wish-review" hidden>
+          <div class="settings-tools">
+            <b class="wish-review-title" id="wish-review-title"></b>
+            <input type="search" class="add-search small" id="wish-search" placeholder="Filter brand or model…" aria-label="Filter devices">
+            <label class="check"><input type="checkbox" id="wish-hide-supported" checked> Hide supported</label>
+          </div>
+          <div class="wish-groups" id="wish-groups"></div>
+          <div class="settings-tools end">
+            <button type="button" class="btn ghost" id="wish-cancel">Cancel</button>
+            <button type="button" class="btn primary" id="wish-apply">Add to wishlist</button>
+          </div>
+        </div>
+
+        <div class="wish-current" id="wish-current">
+          <div class="settings-tools">
+            <b>Wishlist</b>
+            <span class="hint" id="wish-summary"></span>
+            <span class="spacer"></span>
+            <button type="button" class="btn tiny" id="wish-download">Download (.json)</button>
+            <button type="button" class="btn tiny ghost danger" id="wish-clear">Clear</button>
+          </div>
+          <div class="wish-groups" id="wish-list"></div>
+          <p class="add-none" id="wish-empty">Empty. Import a Zigbee2MQTT state to pick the devices you want ZigEmu to emulate.</p>
+        </div>
+      </section>
+    </form>
+  </dialog>
+
+  <dialog id="coord-dialog" class="info-dialog small-dialog" aria-labelledby="coord-dialog-title">
+    <form method="dialog" class="info-form coord-form" id="coord-form" autocomplete="off">
+      <header class="info-head">
+        <h3 id="coord-dialog-title">Add coordinator</h3>
+        <button type="button" class="icon-btn coord-close" aria-label="Close">✕</button>
+      </header>
+      <label>Name <input name="name" maxlength="40" required autocomplete="off" data-1p-ignore data-lpignore="true"></label>
+      <fieldset class="kind-pick">
+          <legend>Type</legend>
+          <label class="kind-opt"><input type="radio" name="kind" value="emulated" checked> <b>Emulated</b><small>A virtual Ember stick: add virtual devices from profiles.</small></label>
+          <label class="kind-opt"><input type="radio" name="kind" value="proxy"> <b>Proxy</b><small>Forward to a real network-attached stick (SLZB-06, ser2net…) and watch its devices.</small></label>
+        </fieldset>
+        <label class="upstream-field" hidden>Stick address <input name="upstream" placeholder="slzb-06.local:6638" maxlength="80" autocomplete="off" data-1p-ignore data-lpignore="true"></label>
+        <label>TCP port <input name="port" type="number" min="1024" max="65535" required autocomplete="off" data-1p-ignore data-lpignore="true"></label>
+      <label>Bind address <input name="host" maxlength="64" autocomplete="off" data-1p-ignore data-lpignore="true"></label>
+      <p class="hint coord-connect"></p>
+      <p class="form-error" hidden></p>
+      <footer class="settings-tools">
+        <button type="button" class="btn ghost danger coord-delete" hidden>Delete coordinator</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn ghost coord-close">Cancel</button>
+        <button type="submit" class="btn primary coord-submit">Create</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="view-dialog" class="info-dialog small-dialog" aria-labelledby="view-dialog-title">
+    <form method="dialog" class="info-form" id="view-form">
+      <header class="info-head">
+        <h3 id="view-dialog-title">Save view</h3>
+        <button type="submit" value="cancel" class="icon-btn" aria-label="Close" formnovalidate>✕</button>
+      </header>
+      <p class="hint" id="view-dialog-summary"></p>
+      <input class="add-search" id="view-name" placeholder="View name, e.g. Kitchen lights" maxlength="40" required aria-label="View name">
+      <footer class="settings-tools end">
+        <button type="submit" value="cancel" class="btn ghost" formnovalidate>Cancel</button>
+        <button type="submit" value="save" class="btn primary">Save view</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="device-info" class="info-dialog">
+    <form method="dialog" class="info-form">
+      <header class="info-head">
+        <div>
+          <h3 class="info-name"></h3>
+          <p class="info-model"></p>
+        </div>
+        <button type="submit" class="icon-btn" aria-label="Close">✕</button>
+      </header>
+      <section class="info-settings">
+        <h4>Settings</h4>
+        <label class="field">Name <input class="i-name" maxlength="60" autocomplete="off" data-1p-ignore data-lpignore="true"></label>
+        <div class="field">Tags <div class="tag-editor i-tags"></div></div>
+      </section>
+      <section>
+        <h4>Device</h4>
+        <dl class="info-facts"></dl>
+      </section>
+      <section class="info-controls-section">
+        <h4>Controls</h4>
+        <dl class="info-controls"></dl>
+      </section>
+      <section>
+        <h4>Actions</h4>
+        <div class="info-actions">
+          <div class="info-action emu-only"><button type="button" class="btn small i-pair"></button><span class="i-pair-help"></span></div>
+          <div class="info-action emu-only"><button type="button" class="btn small ghost i-leave">Leave</button><span>Leaves the network (the trust center reports the device as left).</span></div>
+          <div class="info-action emu-only"><button type="button" class="btn small ghost i-reset">Reset</button><span>Factory reset: leaves, forgets bindings and settings, goes back to Manual, then enters pairing mode. Routines are kept.</span></div>
+          <div class="info-action"><button type="button" class="btn small ghost danger i-remove">Remove</button><span class="i-remove-help">Deletes this virtual device (leaves first if joined).</span></div>
+        </div>
+      </section>
+      <section class="info-capture-section" hidden>
+        <h4>Captured from the device</h4>
+        <p class="hint i-capture-hint"></p>
+        <dl class="info-capture"></dl>
+        <div class="settings-tools">
+          <button type="button" class="btn small primary i-draft">Download profile draft</button>
+          <span class="hint">A ZigEmu profile with these descriptors and Basic attributes, to complete with controls (or give it to Claude with the wishlist).</span>
+        </div>
+      </section>
+      <section class="info-links-section">
+        <h4>Links</h4>
+        <p class="info-links"></p>
+      </section>
+    </form>
+  </dialog>
+
+  <dialog id="routine-editor" class="editor">
+    <form method="dialog" class="editor-form">
+      <header class="editor-head">
+        <input class="editor-name" name="name" placeholder="Routine name" aria-label="Routine name" required>
+        <label class="loop-toggle"><input type="checkbox" class="editor-loop"> Repeat forever</label>
+      </header>
+      <ol class="step-list"></ol>
+      <div class="add-step">
+        <span class="hint">Add step:</span>
+        <div class="add-step-btns"></div>
+      </div>
+      <div class="preview">
+        <div class="preview-text"></div>
+        <div class="preview-meta"></div>
+      </div>
+      <footer class="editor-foot">
+        <button type="button" class="btn ghost editor-cancel">Cancel</button>
+        <button type="button" class="btn primary editor-save">Save routine</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <script src="z2m-import.js?v=0.1.0-2"></script>
+<script src="routines.js?v=0.1.0-2"></script>
+  <script src="app.js?v=0.1.0-2"></script>
+</body>
+</html>

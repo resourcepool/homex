@@ -3,6 +3,7 @@ export default {
   en: {
     tab_general: "General",
     tab_climate: "Climate",
+    tab_house: "3D House",
     error: "Error: {message}",
     no_rooms: "No rooms yet. Click “＋ {button}” at the top right to create one.",
     new_room: "New room",
@@ -16,6 +17,7 @@ export default {
   fr: {
     tab_general: "Général",
     tab_climate: "Climat",
+    tab_house: "Maison 3D",
     error: "Erreur : {message}",
     no_rooms: "Aucune pièce. Clique sur « ＋ {button} » en haut à droite pour en créer une.",
     new_room: "Nouvelle pièce",

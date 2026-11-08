@@ -20,6 +20,7 @@ from homeassistant.config_entries import (
     SubentryFlowResult,
 )
 from homeassistant.helpers.selector import (
+    BooleanSelector,
     SelectSelector,
     SelectSelectorConfig,
     SelectSelectorMode,
@@ -28,6 +29,7 @@ from homeassistant.core import callback
 
 from .const import (
     CONF_AREA_ID,
+    CONF_BUILDER_BETA,
     CONF_DEVICES,
     CONF_GROUPS,
     CONF_HUB,
@@ -70,13 +72,18 @@ class HomexConfigFlow(ConfigFlow, domain=DOMAIN):
 
 
 class HomexOptionsFlow(OptionsFlow):
-    """Homex settings: the interface language ("auto" follows Home Assistant)."""
+    """Homex settings: the interface language ("auto" follows Home Assistant)
+    and the beta features (off by default)."""
 
     async def async_step_init(self, user_input=None) -> ConfigFlowResult:
         if user_input is not None:
             # Saving the options reloads Homex: entity and scene names follow.
             return self.async_create_entry(
-                data={**self.config_entry.options, CONF_LANGUAGE: user_input[CONF_LANGUAGE]}
+                data={
+                    **self.config_entry.options,
+                    CONF_LANGUAGE: user_input[CONF_LANGUAGE],
+                    CONF_BUILDER_BETA: bool(user_input.get(CONF_BUILDER_BETA, False)),
+                }
             )
         schema = vol.Schema(
             {
@@ -89,6 +96,10 @@ class HomexOptionsFlow(OptionsFlow):
                         mode=SelectSelectorMode.DROPDOWN,
                     )
                 ),
+                vol.Optional(
+                    CONF_BUILDER_BETA,
+                    default=bool(self.config_entry.options.get(CONF_BUILDER_BETA, False)),
+                ): BooleanSelector(),
             }
         )
         return self.async_show_form(step_id="init", data_schema=schema)

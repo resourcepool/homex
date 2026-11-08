@@ -67,13 +67,23 @@ export function setLanguageSetting(value: LangSetting | undefined) {
 export const languageSetting = () => setting;
 export const language = () => current;
 
+/** Beta features enabled in the integration settings (homex/settings/get). */
+let features: Record<string, boolean> = {};
+let featuresLoaded = false;
+export const featureEnabled = (name: string) => !!features[name];
+export const featuresKnown = () => featuresLoaded;
+
 /** Load the Homex language setting once per page (shared by panel and cards). */
 let settingsPromise: Promise<void> | undefined;
 export function loadLanguageSetting(hass: HomeAssistant): Promise<void> {
   syncHass(hass);
   settingsPromise ??= hass.connection
     .sendMessagePromise({ type: "homex/settings/get" })
-    .then((r: { language?: LangSetting }) => setLanguageSetting(r.language))
+    .then((r: { language?: LangSetting; features?: Record<string, boolean> }) => {
+      features = r.features ?? {};
+      featuresLoaded = true;
+      setLanguageSetting(r.language);
+    })
     .catch(() => {
       settingsPromise = undefined; // retry next time (e.g. Homex reloading)
     });

@@ -1,0 +1,197 @@
+{
+  "id": "tuya_ts011f_plug_1",
+  "name": "Tuya TS011F smart plug with power monitoring",
+  "device": {
+    "vendor": "Tuya",
+    "model": "TS011F_plug_1",
+    "description": "Smart plug (with power monitoring)",
+    "type": "Smart plug",
+    "image": "https://www.zigbee2mqtt.io/images/devices/TS011F_plug_1.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/TS011F_plug_1.html"
+      },
+      {
+        "label": "ZHA quirk",
+        "url": "https://github.com/zigpy/zha-device-handlers/blob/dev/zhaquirks/tuya/ts011f_plug.py"
+      }
+    ]
+  },
+  "_sources": "Zigbee2MQTT: zigbeeModel TS011F -> TS011F_plug_1 (appVersion 77 keeps it off the version-only TS011F_plug_3 fingerprints 64-69/100/160/192). Metering: rmsVoltage in V, rmsCurrent in mA, activePower in W (Z2M saves acCurrentDivisor 1000, reads the voltage/power divisors), currentSummDelivered in 0.01 kWh (seMetering divisor 100). Tuya genOnOff extras: 0x8000 child lock, 0x8001 indicator mode, 0x8002 power-on state. Descriptor from the zha-quirks Plug signature: ep1 device 0x010A (the signature value; its comment says 0x0051) in [0,3,4,5,6,0x0702,0x0B04,0xE000,0xE001] out [0x0A,0x19], ep242 GP proxy.",
+  "node": {
+    "logicalType": "router",
+    "rxOnWhenIdle": true,
+    "manufacturerCode": 4098,
+    "macCapabilities": 142,
+    "ieeePrefix": "a4c138"
+  },
+  "inputs": {
+    "load_w": 0,
+    "mains_v": 220
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 266,
+      "inClusters": [
+        "genBasic",
+        "genIdentify",
+        "genGroups",
+        "genScenes",
+        "genOnOff",
+        "seMetering",
+        "haElectricalMeasurement",
+        "0xE000",
+        "0xE001"
+      ],
+      "outClusters": [
+        "genTime",
+        "genOta"
+      ],
+      "serverOptions": {
+        "electricityMeter": {
+          "voltageDivisor": 1,
+          "currentDivisor": 1000,
+          "energyDivisor": 100,
+          "powerDivisor": 1,
+          "voltageNoise": 0.6,
+          "tick": 1
+        }
+      },
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 3,
+          "appVersion": 77,
+          "stackVersion": 0,
+          "hwVersion": 1,
+          "manufacturerName": "_TZ3000_w0qqde0g",
+          "modelId": "TS011F",
+          "powerSource": 1
+        },
+        "genOnOff": {
+          "onOff": 0,
+          "0x8001": {
+            "type": "enum8",
+            "value": 1,
+            "writable": true,
+            "comment": "Tuya indicator / backlight mode"
+          },
+          "0x8002": {
+            "type": "enum8",
+            "value": 2,
+            "writable": true,
+            "comment": "Tuya power-on state (0 off, 1 on, 2 previous)"
+          },
+          "0x8000": {
+            "type": "bool",
+            "value": 0,
+            "writable": true,
+            "comment": "child lock"
+          }
+        }
+      }
+    },
+    {
+      "id": 242,
+      "profileId": 41440,
+      "deviceId": 97,
+      "inClusters": [],
+      "outClusters": [
+        "greenPower"
+      ]
+    }
+  ],
+  "events": {
+    "attr:genOnOff:0x0000": [
+      {
+        "report": {
+          "endpoint": 1,
+          "cluster": "genOnOff",
+          "attributes": {
+            "onOff": "{{ value }}"
+          }
+        }
+      }
+    ]
+  },
+  "routineTemplates": [
+    {
+      "name": "Heater: 2 kW for 5 minutes, then off for 10",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "load",
+          "gesture": "select",
+          "params": {
+            "option": "high"
+          }
+        },
+        {
+          "kind": "wait",
+          "ms": 300000
+        },
+        {
+          "kind": "gesture",
+          "control": "load",
+          "gesture": "select",
+          "params": {
+            "option": "none"
+          }
+        },
+        {
+          "kind": "wait",
+          "ms": 600000
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "relay",
+      "type": "indicator",
+      "label": "Relay",
+      "icon": "push",
+      "value": "{{ 'no power' if not powered else ('ON' if attr('genOnOff', 'onOff') else 'OFF') }}",
+      "on": "{{ powered and attr('genOnOff', 'onOff') }}"
+    },
+    {
+      "id": "power_w",
+      "type": "indicator",
+      "label": "Power",
+      "icon": "plug",
+      "value": "{{ attr('haElectricalMeasurement', 'activePower') }} W · {{ round(attr('seMetering', 'currentSummDelivered') / 100, 2) }} kWh"
+    },
+    {
+      "id": "button",
+      "use": "relay_button",
+      "description": "The plug's button toggles the relay (ignored while child lock is on).",
+      "on": {
+        "press": [
+          {
+            "if": "{{ not attr('genOnOff', '0x8000') }}",
+            "command": {
+              "endpoint": 1,
+              "cluster": "genOnOff",
+              "name": "toggle"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "load",
+      "use": "load"
+    },
+    {
+      "id": "mains_v",
+      "use": "mains_voltage"
+    },
+    {
+      "id": "mains",
+      "use": "power"
+    }
+  ]
+}

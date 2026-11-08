@@ -1,0 +1,122 @@
+{
+  "id": "luumr_10010339",
+  "name": "LUUMR Smart LED G9 2,5W CCT Clear",
+  "device": {
+    "vendor": "LUUMR",
+    "model": "10010339",
+    "description": "Smart LED G9 2,5W CCT Clear",
+    "type": "Light",
+    "image": "https://www.zigbee2mqtt.io/images/devices/10010339.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/10010339.html"
+      }
+    ]
+  },
+  "_sources": "Identification (modelId 'TS0502B', manufacturerName '_TZ3210_tqwyiitv') from the wishlist export and the zigbee-herdsman-converters 26.128.0 definition; color temperature range 153-500 mired from that definition. Tuya TS0502B CCT light (whitelabelled LUUMR 10010339 via manufacturerName _TZ3210_tqwyiitv, zigbee-herdsman-converters tuya.js); Telink manufacturer code 4417. Basic version/date attributes are representative, not captured.",
+  "node": {
+    "logicalType": "router",
+    "rxOnWhenIdle": true,
+    "manufacturerCode": 4417,
+    "macCapabilities": 142,
+    "ieeePrefix": "a4c138"
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 268,
+      "inClusters": [
+        "genBasic",
+        "genIdentify",
+        "genGroups",
+        "genScenes",
+        "genOnOff",
+        "genLevelCtrl",
+        "lightingColorCtrl",
+        "touchlink"
+      ],
+      "outClusters": [
+        "genOta"
+      ],
+      "serverOptions": {
+        "lightingColorCtrl": {
+          "capabilities": [
+            "ct"
+          ],
+          "ctMin": 153,
+          "ctMax": 500
+        }
+      },
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 3,
+          "appVersion": 65,
+          "stackVersion": 0,
+          "hwVersion": 1,
+          "swBuildId": "0122052017",
+          "manufacturerName": "_TZ3210_tqwyiitv",
+          "modelId": "TS0502B",
+          "powerSource": 1
+        },
+        "genOnOff": {
+          "onOff": 1,
+          "startUpOnOff": 255
+        }
+      }
+    },
+    {
+      "id": 242,
+      "profileId": 41440,
+      "deviceId": 97,
+      "inClusters": [],
+      "outClusters": [
+        "greenPower"
+      ]
+    }
+  ],
+  "routineTemplates": [
+    {
+      "name": "Wall switch off and on every 2 minutes",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "wait",
+          "ms": 120000
+        },
+        {
+          "kind": "gesture",
+          "control": "mains",
+          "gesture": "off"
+        },
+        {
+          "kind": "wait",
+          "ms": 5000
+        },
+        {
+          "kind": "gesture",
+          "control": "mains",
+          "gesture": "on"
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "light",
+      "use": "brightness",
+      "endpoint": 1
+    },
+    {
+      "id": "color",
+      "use": "color",
+      "endpoint": 1
+    },
+    {
+      "id": "mains",
+      "use": "power",
+      "description": "Mains / wall switch. On power-up the light applies its power-on behaviour (startUpOnOff, startUpCurrentLevel, startUpColorTemperature) and re-announces."
+    }
+  ]
+}

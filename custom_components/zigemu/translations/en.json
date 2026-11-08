@@ -1,0 +1,16 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "ZigEmu",
+        "description": "Emulated EmberZNet (EZSP) Zigbee coordinators. After setup, open the ZigEmu panel to create coordinators: each one listens on its own TCP port, and a Zigbee host connects to it like to a network-attached Ember stick (ZHA: `socket://<host>:<port>`, Zigbee2MQTT: `adapter: ember`, `port: tcp://<host>:<port>`).",
+        "data": {
+          "host": "Default bind address for coordinators"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "ZigEmu is already configured."
+    }
+  }
+}

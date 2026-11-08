@@ -1,0 +1,113 @@
+{
+  "id": "philips_lwg004",
+  "name": "Philips Hue white GU10 bluetooth",
+  "device": {
+    "vendor": "Philips",
+    "model": "LWG004",
+    "description": "Hue white GU10 bluetooth",
+    "type": "Light",
+    "image": "https://www.zigbee2mqtt.io/images/devices/LWG004.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/LWG004.html"
+      }
+    ]
+  },
+  "_sources": "Identification (modelId 'LWG004', manufacturerName 'Signify Netherlands B.V.') from the wishlist export and the zigbee-herdsman-converters 26.128.0 definition. Hue Bluetooth-generation light: same descriptor layout as the captured LWF004 entry (zigbee2mqtt#22937): Zigbee 3.0 HA profile on ep 11 with Hue clusters 0xFC03/0xFC02 and a Green Power proxy on ep 242. Basic version/date attributes are representative, not captured.",
+  "node": {
+    "logicalType": "router",
+    "rxOnWhenIdle": true,
+    "manufacturerCode": 4107,
+    "macCapabilities": 142,
+    "ieeePrefix": "001788010"
+  },
+  "endpoints": [
+    {
+      "id": 11,
+      "profileId": 260,
+      "deviceId": 257,
+      "inClusters": [
+        "genBasic",
+        "genIdentify",
+        "genGroups",
+        "genScenes",
+        "genOnOff",
+        "genLevelCtrl",
+        "touchlink",
+        "manuSpecificPhilips2",
+        "manuSpecificPhilips3"
+      ],
+      "outClusters": [
+        "genOta"
+      ],
+      "acceptCommands": {
+        "manuSpecificPhilips2": "*"
+      },
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 8,
+          "appVersion": 2,
+          "stackVersion": 1,
+          "hwVersion": 1,
+          "dateCode": "20210101",
+          "swBuildId": "1.104.2",
+          "manufacturerName": "Signify Netherlands B.V.",
+          "modelId": "LWG004",
+          "powerSource": 1
+        },
+        "genOnOff": {
+          "onOff": 1,
+          "startUpOnOff": 1
+        }
+      }
+    },
+    {
+      "id": 242,
+      "profileId": 41440,
+      "deviceId": 97,
+      "inClusters": [],
+      "outClusters": [
+        "greenPower"
+      ]
+    }
+  ],
+  "routineTemplates": [
+    {
+      "name": "Wall switch off and on every 2 minutes",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "wait",
+          "ms": 120000
+        },
+        {
+          "kind": "gesture",
+          "control": "mains",
+          "gesture": "off"
+        },
+        {
+          "kind": "wait",
+          "ms": 5000
+        },
+        {
+          "kind": "gesture",
+          "control": "mains",
+          "gesture": "on"
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "light",
+      "use": "brightness",
+      "endpoint": 11
+    },
+    {
+      "id": "mains",
+      "use": "power",
+      "description": "Mains / wall switch. On power-up the light applies its power-on behaviour (startUpOnOff, startUpCurrentLevel) and re-announces."
+    }
+  ]
+}

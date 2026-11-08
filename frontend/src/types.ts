@@ -427,7 +427,12 @@ export interface PlanRadiator {
   y: number;
   angle: number;
   length: number;
+  /** panel (default): a normal, low radiator; tall: a full-height one. */
+  kind?: RadiatorKind;
 }
+export type RadiatorKind = "panel" | "tall";
+/** Default width (cm) of a newly placed radiator of each kind. */
+export const RADIATOR_LENGTH: Record<RadiatorKind, number> = { panel: 80, tall: 50 };
 
 /** Stairs: an axis-aligned rectangle (cm), climbing towards `dir`. */
 export interface PlanStair {
@@ -483,4 +488,6 @@ export interface PlanLevel {
 /** The house plan: levels sorted by level number. */
 export interface Plan {
   levels: PlanLevel[];
+  /** Shown in the Homex dashboard (its 3D tab) once published from the 3D view. */
+  published?: boolean;
 }

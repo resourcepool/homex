@@ -1,0 +1,130 @@
+{
+  "id": "philips_lom008",
+  "name": "Philips Hue smart plug EU (LOM008)",
+  "device": {
+    "vendor": "Philips",
+    "model": "9290030509",
+    "description": "Hue smart plug - EU",
+    "type": "Smart plug",
+    "image": "https://www.zigbee2mqtt.io/images/devices/9290030509.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/9290030509.html"
+      }
+    ]
+  },
+  "_sources": "Zigbee2MQTT: zigbeeModel LOM008 (philips.m.onOff, identify). Bluetooth-generation Hue router: ep11 device 0x010A with the Hue clusters 0xFC03/0xFC02 like the LWF004 bulb, ep242 GP proxy; manufacturer code 4107 (no captured descriptor found: approximated from that generation).",
+  "node": {
+    "logicalType": "router",
+    "rxOnWhenIdle": true,
+    "manufacturerCode": 4107,
+    "macCapabilities": 142,
+    "ieeePrefix": "001788010"
+  },
+  "endpoints": [
+    {
+      "id": 11,
+      "profileId": 260,
+      "deviceId": 266,
+      "inClusters": [
+        "genBasic",
+        "genIdentify",
+        "genGroups",
+        "genScenes",
+        "genOnOff",
+        "touchlink",
+        "manuSpecificPhilips2",
+        "manuSpecificPhilips3"
+      ],
+      "outClusters": [
+        "genOta"
+      ],
+      "acceptCommands": {
+        "manuSpecificPhilips2": "*"
+      },
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 8,
+          "appVersion": 2,
+          "stackVersion": 1,
+          "hwVersion": 1,
+          "manufacturerName": "Signify Netherlands B.V.",
+          "modelId": "LOM008",
+          "dateCode": "20210604",
+          "powerSource": 1,
+          "swBuildId": "1.93.6"
+        },
+        "genOnOff": {
+          "onOff": 0,
+          "startUpOnOff": 1
+        }
+      }
+    },
+    {
+      "id": 242,
+      "profileId": 41440,
+      "deviceId": 97,
+      "inClusters": [],
+      "outClusters": [
+        "greenPower"
+      ]
+    }
+  ],
+  "routineTemplates": [
+    {
+      "name": "Power outage every 5 minutes",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "wait",
+          "ms": 300000
+        },
+        {
+          "kind": "gesture",
+          "control": "mains",
+          "gesture": "off"
+        },
+        {
+          "kind": "wait",
+          "ms": 15000
+        },
+        {
+          "kind": "gesture",
+          "control": "mains",
+          "gesture": "on"
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "relay",
+      "type": "indicator",
+      "label": "Relay",
+      "icon": "push",
+      "value": "{{ 'no power' if not powered else ('ON' if attr('genOnOff', 'onOff') else 'OFF') }}",
+      "on": "{{ powered and attr('genOnOff', 'onOff') }}"
+    },
+    {
+      "id": "button",
+      "use": "relay_button",
+      "description": "The plug's button toggles the relay.",
+      "on": {
+        "press": [
+          {
+            "command": {
+              "endpoint": 11,
+              "cluster": "genOnOff",
+              "name": "toggle"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "mains",
+      "use": "power"
+    }
+  ]
+}

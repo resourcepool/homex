@@ -298,3 +298,15 @@ DEVICES = {
         ("Terrace Shutter", "legrand_shutter", {"position": 100}),
     ],
 }
+
+# Climate control: every heated room has two radiator valves (a second one where
+# it has one, two where it has none), for the Heating module and the 3D view.
+_TRV_MODELS = ["trvzb", "danfoss_ally", "aqara_trv"]
+_UNHEATED = ("Garage", "Boiler Room")
+for _i, (_area, _devices) in enumerate(DEVICES.items()):
+    if AREAS[_area][0] is None or _area in _UNHEATED:
+        continue
+    _trvs = [d for d in _devices if MODELS[d[1]]["kind"] == "trv"]
+    for _n in range(len(_trvs), 2):
+        _name = f"{_area} Radiator {_n + 1}" if _trvs or _n else f"{_area} Radiator 1"
+        _devices.append((_name, _TRV_MODELS[(_i + _n) % 3], {"local_temperature": round(18.6 + (_i % 5) * 0.4, 1)}))

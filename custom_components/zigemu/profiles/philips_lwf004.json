@@ -1,0 +1,120 @@
+{
+  "id": "philips_lwf004",
+  "name": "Philips Hue white A60 E27 (LWF004)",
+  "device": {
+    "vendor": "Philips",
+    "model": "8719514329843",
+    "description": "Hue white A60 bulb E27 1100 lm with Bluetooth",
+    "type": "Light",
+    "image": "https://www.zigbee2mqtt.io/images/devices/8719514329843.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/8719514329843.html"
+      },
+      {
+        "label": "Captured database entry",
+        "url": "https://github.com/Koenkk/zigbee2mqtt/issues/22937"
+      }
+    ]
+  },
+  "_sources": "Descriptors and Basic attributes from the Z2M database entry in zigbee2mqtt#22937 (modelId LWF004, fw 1.93.7): router, manufacturer 4107, ep11 device 0x0101 (dimmable light) with Hue clusters 0xFC03/0xFC02, ep242 GP. Dimmable white only (no color cluster). Hue effects are sent on 0xFC03.",
+  "node": {
+    "logicalType": "router",
+    "rxOnWhenIdle": true,
+    "manufacturerCode": 4107,
+    "macCapabilities": 142,
+    "ieeePrefix": "001788010"
+  },
+  "endpoints": [
+    {
+      "id": 11,
+      "profileId": 260,
+      "deviceId": 257,
+      "inClusters": [
+        "genBasic",
+        "genIdentify",
+        "genGroups",
+        "genScenes",
+        "genOnOff",
+        "genLevelCtrl",
+        "touchlink",
+        "manuSpecificPhilips2",
+        "manuSpecificPhilips3"
+      ],
+      "outClusters": [
+        "genOta"
+      ],
+      "acceptCommands": {
+        "manuSpecificPhilips2": "*"
+      },
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 2,
+          "appVersion": 2,
+          "stackVersion": 1,
+          "hwVersion": 1,
+          "manufacturerName": "Signify Netherlands B.V.",
+          "modelId": "LWF004",
+          "dateCode": "20211210",
+          "powerSource": 1,
+          "swBuildId": "1.93.7"
+        },
+        "genOnOff": {
+          "onOff": 0,
+          "startUpOnOff": 1
+        },
+        "genLevelCtrl": {
+          "startUpCurrentLevel": 254
+        }
+      }
+    },
+    {
+      "id": 242,
+      "profileId": 41440,
+      "deviceId": 97,
+      "inClusters": [],
+      "outClusters": [
+        "greenPower"
+      ]
+    }
+  ],
+  "routineTemplates": [
+    {
+      "name": "Wall switch off and on every 2 minutes",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "wait",
+          "ms": 120000
+        },
+        {
+          "kind": "gesture",
+          "control": "mains",
+          "gesture": "off"
+        },
+        {
+          "kind": "wait",
+          "ms": 5000
+        },
+        {
+          "kind": "gesture",
+          "control": "mains",
+          "gesture": "on"
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "light",
+      "use": "brightness",
+      "endpoint": 11
+    },
+    {
+      "id": "mains",
+      "use": "power",
+      "description": "Mains / wall switch. On power-up the bulb applies its power-on behaviour (startUpOnOff, startUpCurrentLevel) and re-announces."
+    }
+  ]
+}

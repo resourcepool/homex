@@ -1,0 +1,248 @@
+{
+  "id": "tuya_ts0601_cover_6",
+  "name": "Tuya cover motor (TS0601 _TZE200_libht6ua)",
+  "device": {
+    "vendor": "Tuya",
+    "model": "TS0601_cover_6",
+    "description": "Cover motor (battery)",
+    "type": "Cover",
+    "image": "https://www.zigbee2mqtt.io/images/devices/TS0601_cover_6.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/TS0601_cover_6.html"
+      }
+    ]
+  },
+  "_sources": "Z2M tuya.js TS0601_cover_6 (fingerprint TS0601 / _TZE200_libht6ua, tuyaBase dp): DP1 state enum OPEN 0 / STOP 1 / CLOSE 2, DP2 target and DP3 current position as closed % (coverPositionInverted), DP4 opening mode (tilt 0, lift 1), DP7 work state (standby 0), DP13 battery %, DP101 motor side, DP104 illuminance %. No ZHA quirk exists for this fingerprint. Descriptor: usual Tuya TS0601 (ep1 device 0x0051 in [0,4,5,0xEF00] out [0x0019,0x000A]); battery powered, receiver always on (wishlist: EndDevice): inferred, not captured.",
+  "node": {
+    "logicalType": "end_device",
+    "rxOnWhenIdle": true,
+    "manufacturerCode": 4098,
+    "macCapabilities": 136,
+    "ieeePrefix": "a4c138"
+  },
+  "inputs": {
+    "battery_pct": 100,
+    "light_pct": 40
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 81,
+      "inClusters": [
+        "genBasic",
+        "genGroups",
+        "genScenes",
+        "manuSpecificTuya"
+      ],
+      "outClusters": [
+        "genOta",
+        "genTime"
+      ],
+      "serverOptions": {
+        "manuSpecificTuya": {
+          "cover": {
+            "control": 1,
+            "target": 2,
+            "position": 3,
+            "workState": 7,
+            "travelSeconds": 25,
+            "closed": true
+          },
+          "datapoints": [
+            {
+              "dp": 1,
+              "type": "enum",
+              "value": 1
+            },
+            {
+              "dp": 2,
+              "type": "value"
+            },
+            {
+              "dp": 3,
+              "type": "value"
+            },
+            {
+              "dp": 4,
+              "type": "enum",
+              "value": 1,
+              "writable": true
+            },
+            {
+              "dp": 7,
+              "type": "enum"
+            },
+            {
+              "dp": 13,
+              "type": "value",
+              "input": "battery_pct"
+            },
+            {
+              "dp": 101,
+              "type": "enum",
+              "value": 0,
+              "writable": true
+            },
+            {
+              "dp": 104,
+              "type": "value",
+              "input": "light_pct"
+            }
+          ]
+        }
+      },
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 3,
+          "appVersion": 72,
+          "stackVersion": 0,
+          "hwVersion": 1,
+          "manufacturerName": "_TZE200_libht6ua",
+          "modelId": "TS0601",
+          "powerSource": 3
+        }
+      }
+    }
+  ],
+  "routineTemplates": [
+    {
+      "name": "Curtain: open, then close 10 minutes later",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "cover",
+          "gesture": "open"
+        },
+        {
+          "kind": "wait",
+          "ms": 600000
+        },
+        {
+          "kind": "gesture",
+          "control": "cover",
+          "gesture": "close"
+        },
+        {
+          "kind": "wait",
+          "ms": 600000
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "cover_state",
+      "type": "indicator",
+      "label": "Cover",
+      "icon": "valve",
+      "value": "{{ cover_open_pct }} % open · {{ cover_motion }}",
+      "on": "{{ cover_motion != 'stopped' }}"
+    },
+    {
+      "id": "battery_state",
+      "type": "indicator",
+      "label": "Battery",
+      "icon": "battery",
+      "value": "{{ battery_pct }} %"
+    },
+    {
+      "id": "cover",
+      "use": "cover",
+      "on": {
+        "open": [
+          {
+            "command": {
+              "cluster": "manuSpecificTuya",
+              "name": "open"
+            }
+          }
+        ],
+        "stop": [
+          {
+            "command": {
+              "cluster": "manuSpecificTuya",
+              "name": "stop"
+            }
+          }
+        ],
+        "close": [
+          {
+            "command": {
+              "cluster": "manuSpecificTuya",
+              "name": "close"
+            }
+          }
+        ],
+        "half": [
+          {
+            "command": {
+              "cluster": "manuSpecificTuya",
+              "name": "set",
+              "args": {
+                "position": 50
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "light",
+      "type": "preset",
+      "icon": "sun",
+      "label": "Daylight",
+      "unit": "%",
+      "options": [
+        {
+          "id": "night",
+          "label": "Night",
+          "value": 0
+        },
+        {
+          "id": "dim",
+          "label": "Dim",
+          "value": 25
+        },
+        {
+          "id": "day",
+          "label": "Day",
+          "value": 70
+        },
+        {
+          "id": "sun",
+          "label": "Sun",
+          "value": 100
+        }
+      ],
+      "default": "dim",
+      "offline": true,
+      "description": "Light on the motor's sensor (DP104, %).",
+      "on": {
+        "change": [
+          {
+            "setInput": {
+              "light_pct": "{{ value }}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "battery",
+      "use": "battery",
+      "on": {
+        "change": [
+          {
+            "setInput": {
+              "battery_pct": "{{ value }}"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

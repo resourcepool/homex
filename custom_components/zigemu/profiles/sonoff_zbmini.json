@@ -1,0 +1,110 @@
+{
+  "id": "sonoff_zbmini",
+  "name": "SONOFF ZBMINI two-way smart switch",
+  "device": {
+    "vendor": "SONOFF",
+    "model": "ZBMINI",
+    "description": "Zigbee two way smart switch",
+    "type": "Switch",
+    "image": "https://www.zigbee2mqtt.io/images/devices/ZBMINI.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/ZBMINI.html"
+      }
+    ]
+  },
+  "_sources": "Zigbee2MQTT: zigbeeModel 01MINIZB (onOff without power-on behaviour, power source forced to mains). First-generation ITead module (with neutral, so a router): ep1 device 0x0100 in [0,3,4,5,6] out [0]; manufacturer code 4742 (approximated: no captured node descriptor found).",
+  "node": {
+    "logicalType": "router",
+    "rxOnWhenIdle": true,
+    "manufacturerCode": 4742,
+    "macCapabilities": 142,
+    "ieeePrefix": "00124b"
+  },
+  "inputs": {
+    "wall_switch": false
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 256,
+      "inClusters": [
+        "genBasic",
+        "genIdentify",
+        "genGroups",
+        "genScenes",
+        "genOnOff"
+      ],
+      "outClusters": [
+        "genBasic"
+      ],
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 1,
+          "appVersion": 5,
+          "stackVersion": 2,
+          "hwVersion": 0,
+          "manufacturerName": "SONOFF",
+          "modelId": "01MINIZB",
+          "dateCode": "20200424",
+          "powerSource": 4
+        },
+        "genOnOff": {
+          "onOff": 0
+        }
+      }
+    }
+  ],
+  "routineTemplates": [
+    {
+      "name": "Flip the wall switch every minute",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "wall",
+          "gesture": "up"
+        },
+        {
+          "kind": "wait",
+          "ms": 60000
+        },
+        {
+          "kind": "gesture",
+          "control": "wall",
+          "gesture": "down"
+        },
+        {
+          "kind": "wait",
+          "ms": 60000
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "relay",
+      "type": "indicator",
+      "label": "Relay",
+      "icon": "push",
+      "value": "{{ 'no power' if not powered else ('ON' if attr('genOnOff', 'onOff') else 'OFF') }}",
+      "on": "{{ powered and attr('genOnOff', 'onOff') }}"
+    },
+    {
+      "id": "wall",
+      "use": "wall_switch",
+      "description": "Two-way wall switch wired to S1/S2: every flip toggles the relay."
+    },
+    {
+      "id": "button",
+      "use": "relay_button",
+      "description": "The module's own button toggles the relay."
+    },
+    {
+      "id": "mains",
+      "use": "power"
+    }
+  ]
+}

@@ -26,6 +26,7 @@ from .i18n import CONF_LANGUAGE, LANGUAGE_AUTO, LANGUAGES, language, language_se
 from .setup_switches import is_button_trigger
 from .plan import PLAN_WS_COMMANDS
 from .const import (
+    CONF_BUILDER_BETA,
     CONF_HEATING,
     CONF_METRICS,
     METRIC_RULES,
@@ -149,7 +150,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "228"
+PANEL_VERSION = "240"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -605,8 +606,15 @@ async def ws_backup_restore(hass: HomeAssistant, connection, msg) -> None:
 @callback
 def ws_settings_get(hass: HomeAssistant, connection, msg) -> None:
     """Homex settings the panel and cards need (any user: cards read it)."""
+    hub = _hub_entry(hass)
     connection.send_result(
-        msg["id"], {"language": language_setting(hass), "active_language": language(hass)}
+        msg["id"],
+        {
+            "language": language_setting(hass),
+            "active_language": language(hass),
+            # beta features enabled in the integration settings
+            "features": {"builder": bool(hub and hub.options.get(CONF_BUILDER_BETA, False))},
+        },
     )
 
 

@@ -1,0 +1,117 @@
+{
+  "id": "moes_zs_eub_1gang",
+  "name": "Moes ZS-EUB 1-gang wall light switch",
+  "device": {
+    "vendor": "Moes",
+    "model": "ZS-EUB_1gang",
+    "description": "Wall light switch (1 gang)",
+    "type": "Switch",
+    "image": "https://www.zigbee2mqtt.io/images/devices/ZS-EUB_1gang.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/ZS-EUB_1gang.html"
+      },
+      {
+        "label": "ZHA quirk",
+        "url": "https://github.com/zigpy/zha-device-handlers/blob/dev/zhaquirks/tuya/ts001x.py"
+      }
+    ]
+  },
+  "_sources": "Zigbee2MQTT: fingerprint TS0011/_TZ3000_hhiodade (tuyaOnOff with backlight mode on genOnOff 0x8001). Descriptor and node from the zha-quirks TuyaSingleNoNeutralSwitch_2 signature: no-neutral end device (mac 0x80, manufacturer code 4098), ep1 device 0x0100 in [0,3,4,5,6] out [0x0A,0x19].",
+  "node": {
+    "logicalType": "end_device",
+    "rxOnWhenIdle": false,
+    "manufacturerCode": 4098,
+    "macCapabilities": 128,
+    "ieeePrefix": "a4c138"
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 256,
+      "inClusters": [
+        "genBasic",
+        "genIdentify",
+        "genGroups",
+        "genScenes",
+        "genOnOff"
+      ],
+      "outClusters": [
+        "genTime",
+        "genOta"
+      ],
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 3,
+          "appVersion": 66,
+          "stackVersion": 0,
+          "hwVersion": 1,
+          "manufacturerName": "_TZ3000_hhiodade",
+          "modelId": "TS0011",
+          "powerSource": 1
+        },
+        "genOnOff": {
+          "onOff": 0,
+          "0x8001": {
+            "type": "enum8",
+            "value": 1,
+            "writable": true,
+            "comment": "backlight mode: 0 off, 1 normal, 2 inverted"
+          }
+        }
+      }
+    }
+  ],
+  "events": {
+    "attr:genOnOff:0x0000": [
+      {
+        "report": {
+          "endpoint": 1,
+          "cluster": "genOnOff",
+          "attributes": {
+            "onOff": "{{ value }}"
+          }
+        }
+      }
+    ]
+  },
+  "routineTemplates": [
+    {
+      "name": "Press the button every 30 s",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "button",
+          "gesture": "tap"
+        },
+        {
+          "kind": "wait",
+          "ms": 30000
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "relay",
+      "type": "indicator",
+      "label": "Relay",
+      "icon": "push",
+      "value": "{{ 'no power' if not powered else ('ON' if attr('genOnOff', 'onOff') else 'OFF') }}",
+      "on": "{{ powered and attr('genOnOff', 'onOff') }}"
+    },
+    {
+      "id": "button",
+      "use": "relay_button",
+      "label": "Touch",
+      "description": "Touching the panel toggles the light."
+    },
+    {
+      "id": "mains",
+      "use": "power"
+    }
+  ]
+}

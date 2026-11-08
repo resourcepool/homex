@@ -1,0 +1,124 @@
+{
+  "id": "gledopto_gl_c_008_1id",
+  "name": "Gledopto Zigbee LED Controller RGB+CCT (1 ID)",
+  "device": {
+    "vendor": "Gledopto",
+    "model": "GL-C-008-1ID",
+    "description": "Zigbee LED Controller RGB+CCT (1 ID)",
+    "type": "Light",
+    "image": "https://www.zigbee2mqtt.io/images/devices/GL-C-008-1ID.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/GL-C-008-1ID.html"
+      }
+    ]
+  },
+  "_sources": "Identification (modelId 'GL-C-008', manufacturerName 'GLEDOPTO') from the wishlist export and the zigbee-herdsman-converters 26.128.0 definition; color temperature range 153-500 mired from that definition. Gledopto ZLL controller layout from the GL-C-008 family fingerprint in zigbee-herdsman-converters gledopto.js: ep 11 ZLL (device 0x0210) with Basic/Identify/Groups/Scenes/OnOff/Level/Color, ep 13 ZLL commissioning. Basic version/date attributes are representative, not captured.",
+  "node": {
+    "logicalType": "router",
+    "rxOnWhenIdle": true,
+    "manufacturerCode": 4687,
+    "macCapabilities": 142,
+    "ieeePrefix": "00124b0"
+  },
+  "endpoints": [
+    {
+      "id": 11,
+      "profileId": 49246,
+      "deviceId": 528,
+      "inClusters": [
+        "genBasic",
+        "genIdentify",
+        "genGroups",
+        "genScenes",
+        "genOnOff",
+        "genLevelCtrl",
+        "lightingColorCtrl"
+      ],
+      "outClusters": [
+        "genOta"
+      ],
+      "serverOptions": {
+        "lightingColorCtrl": {
+          "capabilities": [
+            "hs",
+            "xy",
+            "ct"
+          ],
+          "ctMin": 153,
+          "ctMax": 500
+        }
+      },
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 1,
+          "appVersion": 2,
+          "stackVersion": 2,
+          "hwVersion": 1,
+          "manufacturerName": "GLEDOPTO",
+          "modelId": "GL-C-008",
+          "powerSource": 1
+        },
+        "genOnOff": {
+          "onOff": 1,
+          "startUpOnOff": 255
+        }
+      }
+    },
+    {
+      "id": 13,
+      "profileId": 49246,
+      "deviceId": 57694,
+      "inClusters": [
+        "touchlink"
+      ],
+      "outClusters": [
+        "touchlink"
+      ]
+    }
+  ],
+  "routineTemplates": [
+    {
+      "name": "Wall switch off and on every 2 minutes",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "wait",
+          "ms": 120000
+        },
+        {
+          "kind": "gesture",
+          "control": "mains",
+          "gesture": "off"
+        },
+        {
+          "kind": "wait",
+          "ms": 5000
+        },
+        {
+          "kind": "gesture",
+          "control": "mains",
+          "gesture": "on"
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "light",
+      "use": "brightness",
+      "endpoint": 11
+    },
+    {
+      "id": "color",
+      "use": "color",
+      "endpoint": 11
+    },
+    {
+      "id": "mains",
+      "use": "power",
+      "description": "Mains / wall switch. On power-up the light applies its power-on behaviour (startUpOnOff, startUpCurrentLevel, startUpColorTemperature) and re-announces."
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "domain": "homex",
   "name": "Homex",
-  "version": "2.16.0",
+  "version": "2.17.0",
   "config_flow": true,
   "single_config_entry": true,
   "documentation": "https://github.com/resourcepool/homex",

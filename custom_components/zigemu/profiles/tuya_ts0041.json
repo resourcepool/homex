@@ -1,0 +1,186 @@
+{
+  "id": "tuya_ts0041",
+  "name": "Tuya TS0041 wireless switch (1 button)",
+  "device": {
+    "vendor": "Tuya",
+    "model": "TS0041",
+    "description": "Wireless switch with 1 button",
+    "type": "Remote",
+    "image": "https://www.zigbee2mqtt.io/images/devices/TS0041.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/TS0041.html"
+      }
+    ]
+  },
+  "_sources": "Zigbee2MQTT definition: zigbeeModel TS0041 (tuya.fz.on_off_action: genOnOff command 0xFD 'tuyaAction', value 0/1/2 = single/double/hold, button from the endpoint id; configure = Tuya magic packet: genBasic read of manufacturerName/zclVersion/appVersion/modelId/powerSource/0xfffe). Descriptor from the zha-quirks Tuya TS0041 'TO' signature (ep1 in [0,1,6] out [10,25], further endpoints in [1,6]); Tuya _TZ3000 node: sleepy end device, manufacturer code 4098.",
+  "node": {
+    "logicalType": "end_device",
+    "rxOnWhenIdle": false,
+    "manufacturerCode": 4098,
+    "macCapabilities": 128,
+    "ieeePrefix": "a4c138"
+  },
+  "inputs": {
+    "click_1": false
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 0,
+      "inClusters": [
+        "genBasic",
+        "genPowerCfg",
+        "genOnOff"
+      ],
+      "outClusters": [
+        "genTime",
+        "genOta"
+      ],
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 3,
+          "appVersion": 67,
+          "stackVersion": 0,
+          "hwVersion": 1,
+          "manufacturerName": "_TZ3000_22ugzkme",
+          "modelId": "TS0041",
+          "powerSource": 3
+        },
+        "genPowerCfg": {
+          "batteryVoltage": 30,
+          "batteryPercentageRemaining": 200
+        }
+      }
+    }
+  ],
+  "routineTemplates": [
+    {
+      "name": "Press every button in turn, then double-click 1",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "button_1",
+          "gesture": "tap"
+        },
+        {
+          "kind": "wait",
+          "ms": 10000
+        },
+        {
+          "kind": "gesture",
+          "control": "button_1",
+          "gesture": "double_tap"
+        },
+        {
+          "kind": "wait",
+          "ms": 10000
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "button_1",
+      "type": "button",
+      "label": "Button",
+      "holdDelay": 1500,
+      "holdInterval": 60000,
+      "description": "Click = single, two clicks within 0.4 s = double, hold 1.5 s = hold. The remote sends genOnOff command 0xFD (0 single, 1 double, 2 hold) from this endpoint.",
+      "on": {
+        "press_release": [
+          {
+            "if": "{{ click_1 }}",
+            "cancel": "click_1"
+          },
+          {
+            "if": "{{ click_1 }}",
+            "send": {
+              "endpoint": 1,
+              "cluster": "genOnOff",
+              "command": 253,
+              "clusterSpecific": true,
+              "direction": "client_to_server",
+              "disableDefaultResponse": false,
+              "payload": [
+                [
+                  "uint8",
+                  1
+                ]
+              ]
+            }
+          },
+          {
+            "if": "{{ not click_1 }}",
+            "schedule": {
+              "id": "click_1",
+              "after": 400,
+              "do": [
+                {
+                  "send": {
+                    "endpoint": 1,
+                    "cluster": "genOnOff",
+                    "command": 253,
+                    "clusterSpecific": true,
+                    "direction": "client_to_server",
+                    "disableDefaultResponse": false,
+                    "payload": [
+                      [
+                        "uint8",
+                        0
+                      ]
+                    ]
+                  }
+                },
+                {
+                  "setInput": {
+                    "click_1": false
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "setInput": {
+              "click_1": "{{ not click_1 }}"
+            }
+          }
+        ],
+        "hold": [
+          {
+            "if": "{{ hold_count == 1 }}",
+            "send": {
+              "endpoint": 1,
+              "cluster": "genOnOff",
+              "command": 253,
+              "clusterSpecific": true,
+              "direction": "client_to_server",
+              "disableDefaultResponse": false,
+              "payload": [
+                [
+                  "uint8",
+                  2
+                ]
+              ]
+            }
+          },
+          {
+            "cancel": "click_1"
+          },
+          {
+            "setInput": {
+              "click_1": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "battery",
+      "use": "battery"
+    }
+  ]
+}

@@ -1,0 +1,192 @@
+{
+  "id": "sonoff_snzb01p",
+  "name": "SONOFF SNZB-01P wireless button",
+  "device": {
+    "vendor": "SONOFF",
+    "model": "SNZB-01P",
+    "description": "Wireless button",
+    "type": "Remote",
+    "image": "https://www.zigbee2mqtt.io/images/devices/SNZB-01P.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/SNZB-01P.html"
+      },
+      {
+        "label": "ZHA quirk",
+        "url": "https://github.com/zigpy/zha-device-handlers/blob/dev/zhaquirks/sonoff/button.py"
+      }
+    ]
+  },
+  "_sources": "Zigbee2MQTT: zigbeeModel SNZB-01P, ewelinkAction (genOnOff commands from the button: toggle = single, on = double, off = long). Descriptor from a device dump (Homey SONOFF app thread): ep1 in [0,1,3,0x20,0xFC57] out [3,6,0x19]; manufacturerName eWeLink, manufacturer code 4742; sleepy end device.",
+  "node": {
+    "logicalType": "end_device",
+    "rxOnWhenIdle": false,
+    "manufacturerCode": 4742,
+    "macCapabilities": 128,
+    "ieeePrefix": "00124b"
+  },
+  "inputs": {
+    "click_1": false
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 0,
+      "inClusters": [
+        "genBasic",
+        "genPowerCfg",
+        "genIdentify",
+        "genPollCtrl",
+        "manuSpecificAmazonWWAH"
+      ],
+      "outClusters": [
+        "genIdentify",
+        "genOnOff",
+        "genOta"
+      ],
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 8,
+          "appVersion": 1,
+          "stackVersion": 2,
+          "hwVersion": 0,
+          "manufacturerName": "eWeLink",
+          "modelId": "SNZB-01P",
+          "dateCode": "20221220",
+          "powerSource": 3,
+          "swBuildId": "2.1.0"
+        },
+        "genPowerCfg": {
+          "batteryVoltage": 30,
+          "batteryPercentageRemaining": 200
+        }
+      }
+    }
+  ],
+  "routineTemplates": [
+    {
+      "name": "Click, double-click, then long press, every 30 s",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "button",
+          "gesture": "tap"
+        },
+        {
+          "kind": "wait",
+          "ms": 10000
+        },
+        {
+          "kind": "gesture",
+          "control": "button",
+          "gesture": "double_tap"
+        },
+        {
+          "kind": "wait",
+          "ms": 10000
+        },
+        {
+          "kind": "gesture",
+          "control": "button",
+          "gesture": "hold",
+          "params": {
+            "holdMs": 2500
+          }
+        },
+        {
+          "kind": "wait",
+          "ms": 10000
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "button",
+      "type": "button",
+      "label": "Button",
+      "holdDelay": 1500,
+      "holdInterval": 60000,
+      "description": "Click = toggle (single), two clicks = on (double), hold = off (long), sent as genOnOff commands to the coordinator.",
+      "on": {
+        "press_release": [
+          {
+            "if": "{{ click_1 }}",
+            "cancel": "click_1"
+          },
+          {
+            "if": "{{ click_1 }}",
+            "send": {
+              "endpoint": 1,
+              "cluster": "genOnOff",
+              "command": 1,
+              "clusterSpecific": true,
+              "direction": "client_to_server",
+              "disableDefaultResponse": true,
+              "payload": []
+            }
+          },
+          {
+            "if": "{{ not click_1 }}",
+            "schedule": {
+              "id": "click_1",
+              "after": 400,
+              "do": [
+                {
+                  "send": {
+                    "endpoint": 1,
+                    "cluster": "genOnOff",
+                    "command": 2,
+                    "clusterSpecific": true,
+                    "direction": "client_to_server",
+                    "disableDefaultResponse": true,
+                    "payload": []
+                  }
+                },
+                {
+                  "setInput": {
+                    "click_1": false
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "setInput": {
+              "click_1": "{{ not click_1 }}"
+            }
+          }
+        ],
+        "hold": [
+          {
+            "if": "{{ hold_count == 1 }}",
+            "send": {
+              "endpoint": 1,
+              "cluster": "genOnOff",
+              "command": 0,
+              "clusterSpecific": true,
+              "direction": "client_to_server",
+              "disableDefaultResponse": true,
+              "payload": []
+            }
+          },
+          {
+            "cancel": "click_1"
+          },
+          {
+            "setInput": {
+              "click_1": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "battery",
+      "use": "battery"
+    }
+  ]
+}

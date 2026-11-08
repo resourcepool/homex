@@ -1,0 +1,112 @@
+{
+  "id": "moes_ms_108zr",
+  "name": "Moes Zigbee + RF curtain switch module (MS-108ZR)",
+  "device": {
+    "vendor": "Moes",
+    "model": "MS-108ZR",
+    "description": "Zigbee + RF curtain switch module",
+    "type": "Cover",
+    "image": "https://www.zigbee2mqtt.io/images/devices/MS-108ZR.png",
+    "links": [
+      {
+        "label": "Zigbee2MQTT",
+        "url": "https://www.zigbee2mqtt.io/devices/MS-108ZR.html"
+      }
+    ]
+  },
+  "_sources": "Z2M tuya.js MS-108ZR: fingerprint TS130F / _TZ3000_1dd0d5yi, meta coverInverted (currentPositionLiftPercentage is the open %), fz tuya cover_options (0xF000 moving 0 UP/1 STOP/2 DOWN, 0xF001 calibration, 0xF002 motor reversal, 0xF003 moesCalibrationTime 0.1 s) + cover_position_tilt, tz cover_state / goToLiftPercentage, switch type 0x8000. Descriptor: TS130F Zemismart layout (ep1 device 0x0202 in [0,4,5,6,0x0102] out [0x000A,0x0019]) matching zhaquirks tuya/ts130f.py TuyaZemismartTS130F, which also inverts the lift percentage: inferred, not captured for this fingerprint.",
+  "node": {
+    "logicalType": "router",
+    "rxOnWhenIdle": true,
+    "manufacturerCode": 4098,
+    "macCapabilities": 142,
+    "ieeePrefix": "a4c138"
+  },
+  "endpoints": [
+    {
+      "id": 1,
+      "profileId": 260,
+      "deviceId": 514,
+      "inClusters": [
+        "genBasic",
+        "genGroups",
+        "genScenes",
+        "genOnOff",
+        "closuresWindowCovering"
+      ],
+      "outClusters": [
+        "genTime",
+        "genOta"
+      ],
+      "serverOptions": {
+        "closuresWindowCovering": {
+          "invert": true,
+          "tuya": true,
+          "travelSeconds": 30
+        }
+      },
+      "attributes": {
+        "genBasic": {
+          "zclVersion": 3,
+          "appVersion": 66,
+          "stackVersion": 0,
+          "hwVersion": 1,
+          "manufacturerName": "_TZ3000_1dd0d5yi",
+          "modelId": "TS130F",
+          "powerSource": 1
+        }
+      }
+    }
+  ],
+  "routineTemplates": [
+    {
+      "name": "Open, then close 10 minutes later",
+      "loop": true,
+      "steps": [
+        {
+          "kind": "gesture",
+          "control": "cover",
+          "gesture": "open"
+        },
+        {
+          "kind": "wait",
+          "ms": 600000
+        },
+        {
+          "kind": "gesture",
+          "control": "cover",
+          "gesture": "close"
+        },
+        {
+          "kind": "wait",
+          "ms": 600000
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "cover_state",
+      "type": "indicator",
+      "label": "Cover",
+      "icon": "valve",
+      "value": "{{ cover_open_pct }} % open · {{ cover_motion }}",
+      "on": "{{ cover_motion != 'stopped' }}"
+    },
+    {
+      "id": "travel",
+      "type": "indicator",
+      "label": "Travel",
+      "icon": "timer",
+      "value": "{{ attr('closuresWindowCovering', 'moesCalibrationTime') / 10 }} s"
+    },
+    {
+      "id": "cover",
+      "use": "cover"
+    },
+    {
+      "id": "mains",
+      "use": "power"
+    }
+  ]
+}
