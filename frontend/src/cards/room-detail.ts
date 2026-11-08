@@ -215,7 +215,11 @@ export class HomexRoomDetail extends LitElement {
             </button>
           </div>`
         : nothing}
-      ${h && roomOn ? html`<div class="hmode muted">Mode ${h.mode_name}${h.enabled ? "" : " · chauffage global coupé"}</div>` : nothing}
+      ${h
+        ? html`<div class="hmode muted">
+            ${roomOn ? `Mode ${h.mode_name}${h.enabled ? "" : " · chauffage global coupé"}` : "—"}
+          </div>`
+        : nothing}
     </section>`;
   }
 

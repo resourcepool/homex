@@ -764,7 +764,9 @@ var nt, rt = [
               ${K(ze)}
             </button>
           </div>`}
-      ${t && i ? A`<div class="hmode muted">Mode ${t.mode_name}${t.enabled ? "" : " · chauffage global coupé"}</div>` : M}
+      ${t ? A`<div class="hmode muted">
+            ${i ? `Mode ${t.mode_name}${t.enabled ? "" : " · chauffage global coupé"}` : "—"}
+          </div>` : M}
     </section>`;
 	}
 	_shutters() {
