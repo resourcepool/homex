@@ -13958,7 +13958,7 @@ var Ya = (qa = class extends v {
   `, qa);
 k([b({ attribute: !1 })], Ya.prototype, "hass", void 0), k([b({ type: Boolean })], Ya.prototype, "open", void 0), k([x()], Ya.prototype, "_backup", void 0), k([x()], Ya.prototype, "_summary", void 0), k([x()], Ya.prototype, "_fileName", void 0), k([x()], Ya.prototype, "_error", void 0), k([x()], Ya.prototype, "_busy", void 0), k([x()], Ya.prototype, "_done", void 0), Ya = k([y("homex-backup-dialog")], Ya);
 // src/homex-panel.ts
-var Xa, Za = "214", $ = (Xa = class extends v {
+var Xa, Za = "215", $ = (Xa = class extends v {
 	constructor(...e) {
 		super(...e), this.narrow = !1, this._rooms = null, this._error = null, this._createOpen = !1, this._exportOpen = !1, this._restoreOpen = !1, this._menuOpen = !1, this._dashTab = localStorage.getItem("homex_dash_tab") === "climate" ? "climate" : "general", this._expanded = localStorage.getItem("homex_expanded") || null, this._loaded = !1, this._onToggleExpand = (e) => {
 			let t = e.detail.entry_id;

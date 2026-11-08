@@ -12,12 +12,16 @@ motion — moving up, moving down, stopped — each as one condition:
 
 Values are compared case-insensitively; ``a|b`` matches either. With smart toggle enabled, "toggle"
 becomes: moving → stop; stopped → move the opposite way of the last motion
-(an end position wins: fully open → close, fully closed → open).
+(an end position wins: fully open → close, fully closed → open — except
+right after a motion: motors report their position late, so a shutter
+stopped on its way up from closed can still read "closed" for a while; the
+last motion's reverse wins then).
 """
 
 from __future__ import annotations
 
 import logging
+import time
 from collections.abc import Callable
 
 from homeassistant.core import Context, Event, HomeAssistant, callback
@@ -30,6 +34,9 @@ _LOGGER = logging.getLogger(__name__)
 
 UP, DOWN, STOPPED = "up", "down", "stopped"
 MOTIONS = ((UP, "moving_up"), (DOWN, "moving_down"), (STOPPED, "stopped"))
+# How long after a motion (or a stop) the last direction beats the reported
+# position, which motors update late.
+RECENT_MOTION = 120.0
 
 
 def model_key(hass: HomeAssistant, device_id: str | None) -> str:
@@ -110,6 +117,7 @@ class ShutterMotion:
         self.hass = hass
         self.bridge = bridge
         self._last_dir: dict[str, str] = {}  # cover entity_id -> UP / DOWN
+        self._last_at: dict[str, float] = {}  # cover -> monotonic time of it
         self._unsubs: list[Callable[[], None]] = []
 
     # -- Presets ------------------------------------------------------------
@@ -200,9 +208,13 @@ class ShutterMotion:
         def handler(_payload) -> None:
             motion = self.motion(device_id, preset)
             if motion in (UP, DOWN):
-                self._last_dir[cover] = motion
+                self._set_dir(cover, motion)
 
         return handler
+
+    def _set_dir(self, cover: str, motion: str) -> None:
+        self._last_dir[cover] = motion
+        self._last_at[cover] = time.monotonic()
 
     @callback
     def async_stop(self) -> None:
@@ -214,9 +226,12 @@ class ShutterMotion:
     def remember(self, covers: list[str], service: str) -> None:
         """Record the direction of an explicit open / close."""
         motion = {"open_cover": UP, "close_cover": DOWN}.get(service)
-        if motion:
-            for cover in covers:
-                self._last_dir[cover] = motion
+        for cover in covers:
+            if motion:
+                self._set_dir(cover, motion)
+            elif service == "stop_cover" and cover in self._last_dir:
+                # Stopped mid-way: the position read next may still be stale.
+                self._last_at[cover] = time.monotonic()
 
     async def async_toggle(self, covers: list[str], context: Context) -> None:
         """Toggle covers, smartly for those whose preset enables it."""
@@ -250,15 +265,14 @@ class ShutterMotion:
         motion = self.motion(device_id, preset)
         if motion in (UP, DOWN):
             return "stop_cover"
+        reverse = {UP: "close_cover", DOWN: "open_cover"}.get(self._last_dir.get(cover))
+        recent = time.monotonic() - self._last_at.get(cover, float("-inf")) < RECENT_MOTION
+        if reverse and recent:
+            return reverse
         state = self.hass.states.get(cover)
         position = state.attributes.get("current_position") if state else None
         if position == 100:
             return "close_cover"
         if position == 0 or (state and state.state == "closed"):
             return "open_cover"
-        last = self._last_dir.get(cover)
-        if last == UP:
-            return "close_cover"
-        if last == DOWN:
-            return "open_cover"
-        return "toggle"  # direction unknown: let the cover decide
+        return reverse or "toggle"  # direction unknown: let the cover decide
