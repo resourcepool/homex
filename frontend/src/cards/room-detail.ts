@@ -183,6 +183,7 @@ export class HomexRoomDetail extends LitElement {
             </label>`
           : nothing}
       </div>
+      <div class="hbody">
       <div class="hstatus">
         <span class="status big-icon ${status.cls}">${icon(status.path)}</span>
         <span class="htext">
@@ -220,6 +221,7 @@ export class HomexRoomDetail extends LitElement {
             ${roomOn ? `Mode ${h.mode_name}${h.enabled ? "" : " · chauffage global coupé"}` : "—"}
           </div>`
         : nothing}
+      </div>
     </section>`;
   }
 
@@ -326,6 +328,25 @@ export class HomexRoomDetail extends LitElement {
       border-left: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
       padding-left: 20px;
       margin-left: 20px;
+    }
+    /* Both columns: title on top, content vertically centred below. */
+    .cols.two > section {
+      display: flex;
+      flex-direction: column;
+    }
+    .cols.two .covers,
+    .cols.two .hbody {
+      flex: 1;
+    }
+    .cols.two .covers {
+      align-content: center;
+      align-items: center;
+    }
+    .hbody {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: 10px;
     }
     .heating .head {
       display: flex;

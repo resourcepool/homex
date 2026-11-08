@@ -734,6 +734,7 @@ var nt, rt = [
               <span></span>
             </label>` : M}
       </div>
+      <div class="hbody">
       <div class="hstatus">
         <span class="status big-icon ${u.cls}">${K(u.path)}</span>
         <span class="htext">
@@ -767,6 +768,7 @@ var nt, rt = [
       ${t ? A`<div class="hmode muted">
             ${i ? `Mode ${t.mode_name}${t.enabled ? "" : " · chauffage global coupé"}` : "—"}
           </div>` : M}
+      </div>
     </section>`;
 	}
 	_shutters() {
@@ -863,6 +865,25 @@ nt = X, nt.styles = o`
       border-left: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
       padding-left: 20px;
       margin-left: 20px;
+    }
+    /* Both columns: title on top, content vertically centred below. */
+    .cols.two > section {
+      display: flex;
+      flex-direction: column;
+    }
+    .cols.two .covers,
+    .cols.two .hbody {
+      flex: 1;
+    }
+    .cols.two .covers {
+      align-content: center;
+      align-items: center;
+    }
+    .hbody {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: 10px;
     }
     .heating .head {
       display: flex;
