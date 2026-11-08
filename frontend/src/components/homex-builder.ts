@@ -18,6 +18,9 @@ import "./homex-builder-level-dialog";
 import {
   NEXT_DIR,
   OPENING_WIDTH,
+  OPPOSITE_DIR,
+  PREV_DIR,
+  rotateDoor,
   nearestWall,
   openingGeometry,
   remapInsert,
@@ -44,6 +47,8 @@ import {
   type SnapResult,
 } from "../lib/plan-geometry";
 
+type Orient = "left" | "right" | "up" | "down" | "wider" | "narrower" | "rotate" | "mirror";
+
 type Tool = "select" | "draw" | "rect" | OpeningType | "stairs";
 const OPENING_TOOLS: Tool[] = ["door", "window", "glass_door"];
 const isOpeningTool = (tool: Tool): tool is OpeningType => OPENING_TOOLS.includes(tool);
@@ -63,6 +68,7 @@ type Drag =
   | { mode: "stair"; st: PlanStair; start: PlanPoint; ox: number; oy: number };
 
 const SNAP_PX = 12;
+const ARROW: Record<PlanStair["dir"], string> = { up: "↑", down: "↓", left: "←", right: "→" };
 const OPENING_SNAP_PX = 24;
 const MIN_K = 0.05;
 const MAX_K = 4;
@@ -94,6 +100,13 @@ export class HomexBuilder extends LitElement {
   @state() private _dragOver = false;
   /** Opening tools: where the opening would go. */
   @state() private _wallHover: WallSpot | null = null;
+  /** Settings of the next door / window / glass door / stairs placed. */
+  @state() private _openingOpts: Record<OpeningType, { width: number; flip: boolean; out: boolean }> = {
+    door: { width: OPENING_WIDTH.door, flip: false, out: false },
+    window: { width: OPENING_WIDTH.window, flip: false, out: false },
+    glass_door: { width: OPENING_WIDTH.glass_door, flip: false, out: false },
+  };
+  @state() private _stairDir: PlanStair["dir"] = "up";
 
   private _undo: string[] = [];
   private _redo: string[] = [];
@@ -432,12 +445,20 @@ export class HomexBuilder extends LitElement {
     }
     if (isOpeningTool(this._tool)) {
       const type = this._tool;
-      const spot = nearestWall(this._level, raw, OPENING_SNAP_PX / this._view.k, OPENING_WIDTH[type]);
+      const opts = this._openingOpts[type];
+      const spot = nearestWall(this._level, raw, OPENING_SNAP_PX / this._view.k, opts.width);
       if (!spot) return;
-      const o: PlanOpening = { id: uid("o"), type, shape: spot.shape, edge: spot.edge, t: spot.t, width: OPENING_WIDTH[type] };
+      const o: PlanOpening = {
+        id: uid("o"),
+        type,
+        shape: spot.shape,
+        edge: spot.edge,
+        t: spot.t,
+        width: opts.width,
+        ...(type === "door" ? { flip: opts.flip, out: opts.out } : {}),
+      };
       const level = this._level;
       this._commit(() => (level.openings = [...(level.openings ?? []), o]));
-      this._selected = o.id;
       return;
     }
     if (this._tool === "rect" || this._tool === "stairs") {
@@ -509,7 +530,7 @@ export class HomexBuilder extends LitElement {
     if (!d) {
       if (isOpeningTool(this._tool)) {
         this._hover = null;
-        this._wallHover = nearestWall(this._level, raw, OPENING_SNAP_PX / this._view.k, OPENING_WIDTH[this._tool]);
+        this._wallHover = nearestWall(this._level, raw, OPENING_SNAP_PX / this._view.k, this._openingOpts[this._tool].width);
         return;
       }
       this._hover = this._tool === "select" ? null : this._snap(raw);
@@ -691,9 +712,8 @@ export class HomexBuilder extends LitElement {
 
   private _addStair(r: { x: number; y: number; w: number; h: number }) {
     const level = this._level!;
-    const st: PlanStair = { id: uid("st"), ...r, dir: r.h >= r.w ? "up" : "right" };
+    const st: PlanStair = { id: uid("st"), ...r, dir: this._stairDir };
     this._commit(() => (level.stairs = [...(level.stairs ?? []), st]));
-    this._selected = st.id;
   }
 
   /** The selected room outline, opening or stairs. */
@@ -792,6 +812,20 @@ export class HomexBuilder extends LitElement {
       return;
     }
     if (mod) return;
+    const orient: Record<string, Orient> = {
+      ArrowLeft: "left",
+      ArrowRight: "right",
+      ArrowUp: "up",
+      ArrowDown: "down",
+      "+": "wider",
+      "=": "wider",
+      "-": "narrower",
+    };
+    if (orient[e.key] && this._orientTarget()) {
+      e.preventDefault();
+      this._orient(orient[e.key]);
+      return;
+    }
     switch (e.key) {
       case " ":
         this._space = true;
@@ -966,7 +1000,7 @@ export class HomexBuilder extends LitElement {
                   shape: this._wallHover.shape,
                   edge: this._wallHover.edge,
                   t: this._wallHover.t,
-                  width: OPENING_WIDTH[this._tool],
+                  ...this._openingOpts[this._tool],
                 },
                 true
               )
@@ -991,6 +1025,16 @@ export class HomexBuilder extends LitElement {
               ${this._edgeLabels(hover ? [...this._draft, hover.p] : this._draft, false)}
               ${this._draft.map((p, i) => svg`<circle class=${i === 0 ? "first" : ""} cx=${p[0]} cy=${p[1]} r=${(i === 0 ? 6 : 4) / k}></circle>`)}
             </g>`
+          : nothing}
+        ${this._rect && this._tool === "stairs"
+          ? this._stair({
+              id: "preview",
+              x: Math.min(this._rect[0][0], this._rect[1][0]),
+              y: Math.min(this._rect[0][1], this._rect[1][1]),
+              w: Math.abs(this._rect[1][0] - this._rect[0][0]),
+              h: Math.abs(this._rect[1][1] - this._rect[0][1]),
+              dir: this._stairDir,
+            })
           : nothing}
         ${this._rect
           ? svg`<g class="draft">
@@ -1245,26 +1289,122 @@ export class HomexBuilder extends LitElement {
     </label>`;
   }
 
+  /** What the orientation controls act on: the active tool's next item,
+   * else the selected door / window / stairs. */
+  private _orientTarget():
+    | { kind: "tool-opening"; type: OpeningType }
+    | { kind: "tool-stairs" }
+    | { kind: "opening"; item: PlanOpening }
+    | { kind: "stair"; item: PlanStair }
+    | null {
+    if (isOpeningTool(this._tool)) return { kind: "tool-opening", type: this._tool };
+    if (this._tool === "stairs") return { kind: "tool-stairs" };
+    const sel = this._selItem();
+    if (sel?.kind === "opening") return { kind: "opening", item: sel.item };
+    if (sel?.kind === "stair") return { kind: "stair", item: sel.item };
+    return null;
+  }
+
+  /** Rotate / mirror / resize the next item or the selected one. Arrows:
+   * ← → rotate, ↑ ↓ mirror (doors); stairs climb towards the arrow. */
+  private _orient(action: Orient) {
+    const target = this._orientTarget();
+    if (!target) return;
+    const step = action === "wider" ? 10 : action === "narrower" ? -10 : 0;
+    const door = (o: { flip?: boolean; out?: boolean }) => {
+      if (action === "right" || action === "rotate") rotateDoor(o, 1);
+      else if (action === "left") rotateDoor(o, -1);
+      else if (action === "up" || action === "down" || action === "mirror") o.flip = !o.flip;
+    };
+    const dir = (d: PlanStair["dir"]): PlanStair["dir"] => {
+      if (action === "rotate") return NEXT_DIR[d];
+      if (action === "mirror") return OPPOSITE_DIR[d];
+      if (action === "left" || action === "right" || action === "up" || action === "down") return action;
+      return d;
+    };
+    switch (target.kind) {
+      case "tool-opening": {
+        const opts = { ...this._openingOpts[target.type] };
+        if (step) opts.width = Math.max(30, opts.width + step);
+        else if (target.type === "door") door(opts);
+        this._openingOpts = { ...this._openingOpts, [target.type]: opts };
+        break;
+      }
+      case "tool-stairs":
+        this._stairDir = dir(this._stairDir);
+        break;
+      case "opening": {
+        const o = target.item;
+        if (step) this._commit(() => (o.width = Math.max(30, o.width + step)));
+        else if (o.type === "door") this._commit(() => door(o));
+        break;
+      }
+      case "stair": {
+        const st = target.item;
+        if (!step) this._commit(() => (st.dir = dir(st.dir)));
+        break;
+      }
+    }
+  }
+
+  private _widthControl(width: number, set: (v: number) => void) {
+    return html`<div class="field">
+      <span>${t("builder.width_cm")}</span>
+      <div class="stepper">
+        <button title="−10 cm (−)" @click=${() => this._orient("narrower")}>−</button>
+        <input
+          type="number"
+          min="30"
+          step="10"
+          .value=${String(Math.round(width))}
+          @change=${(e: Event) => {
+            const v = Math.round(Number((e.target as HTMLInputElement).value));
+            if (v >= 30) set(v);
+          }}
+        />
+        <button title="+10 cm (+)" @click=${() => this._orient("wider")}>＋</button>
+      </div>
+    </div>`;
+  }
+
+  private _orientButtons(stairs: boolean) {
+    return html`<div class="row">
+      <button title=${stairs ? "← ↑ → ↓" : "← →"} @click=${() => this._orient("rotate")}>↻ ${t("builder.rotate")}</button>
+      <button title=${stairs ? "" : "↑ ↓"} @click=${() => this._orient("mirror")}>⇋ ${t("builder.mirror")}</button>
+    </div>`;
+  }
+
+  /** Settings of the next item, shown while its tool is active. */
+  private _toolPanel() {
+    const target = this._orientTarget();
+    if (target?.kind === "tool-opening") {
+      const opts = this._openingOpts[target.type];
+      return html`<div class="selection">
+        <div class="sel-head"><strong>${t(`builder.tool_${target.type}`)}</strong></div>
+        ${this._widthControl(opts.width, (v) =>
+          (this._openingOpts = { ...this._openingOpts, [target.type]: { ...opts, width: v } })
+        )}
+        ${target.type === "door" ? this._orientButtons(false) : nothing}
+        <p class="keys">${target.type === "door" ? t("builder.keys_door") : t("builder.keys_width")}</p>
+      </div>`;
+    }
+    if (target?.kind === "tool-stairs") {
+      return html`<div class="selection">
+        <div class="sel-head"><strong>${t("builder.tool_stairs")}</strong></div>
+        <p class="stats">${t("builder.stairs_climb")} <strong class="dir">${ARROW[this._stairDir]}</strong></p>
+        ${this._orientButtons(true)}
+        <p class="keys">${t("builder.keys_stairs")}</p>
+      </div>`;
+    }
+    return nothing;
+  }
+
   private _openingPanel(o: PlanOpening) {
-    const types: OpeningType[] = ["door", "window", "glass_door"];
     return html`<div class="selection">
       ${this._panelHead(t(`builder.tool_${o.type}`))}
-      <label class="field">
-        <span>${t("builder.opening_type")}</span>
-        <select
-          @change=${(e: Event) =>
-            this._commit(() => (o.type = (e.target as HTMLSelectElement).value as OpeningType))}
-        >
-          ${types.map((ty) => html`<option value=${ty} ?selected=${ty === o.type}>${t(`builder.tool_${ty}`)}</option>`)}
-        </select>
-      </label>
-      ${this._cmInput(t("builder.width_cm"), o.width, (v) => (o.width = v))}
-      ${o.type === "door"
-        ? html`<div class="row">
-            <button @click=${() => this._commit(() => (o.flip = !o.flip))}>⇆ ${t("builder.door_flip")}</button>
-            <button @click=${() => this._commit(() => (o.out = !o.out))}>⇅ ${t("builder.door_side")}</button>
-          </div>`
-        : nothing}
+      ${this._widthControl(o.width, (v) => this._commit(() => (o.width = v)))}
+      ${o.type === "door" ? this._orientButtons(false) : nothing}
+      <p class="keys">${o.type === "door" ? t("builder.keys_door") : t("builder.keys_width")}</p>
       <button class="danger-link" @click=${() => this._deleteSelected()}>${t("builder.item_delete")}</button>
     </div>`;
   }
@@ -1277,9 +1417,9 @@ export class HomexBuilder extends LitElement {
       ${this._panelHead(t("builder.tool_stairs"))}
       ${this._cmInput(t("builder.width_cm"), st.w, (v) => (st.w = v), 40)}
       ${this._cmInput(t("builder.length_cm"), st.h, (v) => (st.h = v), 40)}
-      <div class="row">
-        <button @click=${() => this._commit(() => (st.dir = NEXT_DIR[st.dir]))}>↻ ${t("builder.stairs_turn")}</button>
-      </div>
+      <p class="stats">${t("builder.stairs_climb")} <strong class="dir">${ARROW[st.dir]}</strong></p>
+      ${this._orientButtons(true)}
+      <p class="keys">${t("builder.keys_stairs")}</p>
       <p class="stats">${above ? t("builder.stairs_to", { name: above.name }) : t("builder.stairs_no_above")}</p>
       <button class="danger-link" @click=${() => this._deleteSelected()}>${t("builder.item_delete")}</button>
     </div>`;
@@ -1334,7 +1474,7 @@ export class HomexBuilder extends LitElement {
                 @dragleave=${this._onDragLeave}
                 @drop=${this._onDrop}
               >
-                ${this._canvas()} ${this._toolbar()} ${this._selectionPanel()}
+                ${this._canvas()} ${this._toolbar()} ${this._toolPanel()} ${this._selectionPanel()}
                 ${this._ghost
                   ? html`<div class="ghost-tag">${this._ghostIsAbove ? "↑" : "↓"} ${this._ghost.name}</div>`
                   : nothing}
@@ -1766,6 +1906,23 @@ export class HomexBuilder extends LitElement {
       }
       .snap .snap-align {
         stroke: #e040fb;
+      }
+      .stepper {
+        display: flex;
+        gap: 4px;
+      }
+      .stepper input {
+        flex: 1;
+        min-width: 0;
+        text-align: center;
+      }
+      .keys {
+        font-size: 11px;
+        color: var(--secondary-text-color);
+        margin: 8px 0 0;
+      }
+      strong.dir {
+        font-size: 16px;
       }
       .row {
         display: flex;

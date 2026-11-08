@@ -645,6 +645,12 @@ var Fe = "M19.92,12.08L12,20L4.08,12.08L5.5,10.67L11,16.17V2H13V16.17L18.5,10.66
 	},
 	builder: {
 		en: {
+			rotate: "Rotate",
+			mirror: "Mirror",
+			stairs_climb: "Climbs towards",
+			keys_door: "Keys: ← → rotate · ↑ ↓ mirror · + − width",
+			keys_width: "Keys: + − width",
+			keys_stairs: "Keys: arrows set the climb",
 			tool_door: "Door",
 			tool_window: "Window",
 			tool_glass_door: "Glass door",
@@ -658,7 +664,7 @@ var Fe = "M19.92,12.08L12,20L4.08,12.08L5.5,10.67L11,16.17V2H13V16.17L18.5,10.66
 			stairs_to: "Leads up to: {name}",
 			stairs_no_above: "No floor above yet.",
 			item_delete: "Delete",
-			hint_opening: "Hover a wall and click to place it (centred on a 10 cm step). Then drag it along the walls.",
+			hint_opening: "Hover a wall and click to place it (centred on a 10 cm step). Set width, rotation and mirror beforehand in the panel or with the keys.",
 			hint_opening_no_wall: "Draw rooms first: doors and windows go in their walls.",
 			hint_opening_selected: "Drag it along the walls, set its width and side in the panel. Delete removes it.",
 			hint_stairs: "Drag to draw the stairs (snapped). The arrow shows the way up; turn it in the panel.",
@@ -725,6 +731,12 @@ var Fe = "M19.92,12.08L12,20L4.08,12.08L5.5,10.67L11,16.17V2H13V16.17L18.5,10.66
 			hint_rect: "Drag to draw a rectangular room (snapped to the grid and walls)."
 		},
 		fr: {
+			rotate: "Rotation",
+			mirror: "Miroir",
+			stairs_climb: "Monte vers",
+			keys_door: "Clavier : ← → rotation · ↑ ↓ miroir · + − largeur",
+			keys_width: "Clavier : + − largeur",
+			keys_stairs: "Clavier : les flèches donnent le sens de montée",
 			tool_door: "Porte",
 			tool_window: "Fenêtre",
 			tool_glass_door: "Porte vitrée",
@@ -738,7 +750,7 @@ var Fe = "M19.92,12.08L12,20L4.08,12.08L5.5,10.67L11,16.17V2H13V16.17L18.5,10.66
 			stairs_to: "Monte vers : {name}",
 			stairs_no_above: "Pas encore d'étage au-dessus.",
 			item_delete: "Supprimer",
-			hint_opening: "Survolez un mur et cliquez pour la placer (centrée au pas de 10 cm). Glissez-la ensuite le long des murs.",
+			hint_opening: "Survolez un mur et cliquez pour la placer (centrée au pas de 10 cm). Réglez avant la largeur, la rotation et le miroir dans le panneau ou au clavier.",
 			hint_opening_no_wall: "Tracez d'abord les pièces : portes et fenêtres se placent dans leurs murs.",
 			hint_opening_selected: "Glissez-la le long des murs, réglez sa largeur et son sens dans le panneau. Suppr la retire.",
 			hint_stairs: "Glissez pour tracer l'escalier (aimanté). La flèche indique la montée ; tournez-la dans le panneau.",

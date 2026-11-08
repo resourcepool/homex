@@ -169,3 +169,32 @@ export const NEXT_DIR: Record<PlanStair["dir"], PlanStair["dir"]> = {
   down: "left",
   left: "up",
 };
+
+/** Door orientations in rotation order: hinge side × opening side. */
+const DOOR_TURNS: [boolean, boolean][] = [
+  [false, false],
+  [true, false],
+  [true, true],
+  [false, true],
+];
+
+export function rotateDoor(o: { flip?: boolean; out?: boolean }, step: 1 | -1) {
+  const i = DOOR_TURNS.findIndex(([f, out]) => f === !!o.flip && out === !!o.out);
+  const [flip, out] = DOOR_TURNS[(i + step + 4) % 4];
+  o.flip = flip;
+  o.out = out;
+}
+
+export const PREV_DIR: Record<PlanStair["dir"], PlanStair["dir"]> = {
+  up: "left",
+  left: "down",
+  down: "right",
+  right: "up",
+};
+
+export const OPPOSITE_DIR: Record<PlanStair["dir"], PlanStair["dir"]> = {
+  up: "down",
+  down: "up",
+  left: "right",
+  right: "left",
+};

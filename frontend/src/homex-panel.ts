@@ -23,7 +23,7 @@ import { downloadBackup } from "./components/homex-backup-dialog";
 
 // Bump together with PANEL_VERSION in panel.py. Shown in the header so you can
 // confirm a full page reload picked up the latest build.
-const BUILD = "220";
+const BUILD = "221";
 
 /** Homex sidebar panel: lists rooms and orchestrates loading / reloading. */
 @customElement("homex-panel")
