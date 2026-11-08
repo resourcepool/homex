@@ -4,7 +4,16 @@ import { LitElement, css, html, nothing } from "lit";
 import { property, state } from "lit/decorators.js";
 import type { HomeAssistant, Room } from "../types";
 import { homexRooms } from "./shared";
-import type { RoomTileConfig } from "./room-tile";
+import { tileColor, type RoomTileConfig } from "./room-tile";
+
+/** HA theme colours offered in the editor (var(--<name>-color)). */
+const COLORS: [string, string][] = [
+  ["red", "Rouge"], ["pink", "Rose"], ["purple", "Violet"], ["deep-purple", "Violet foncé"],
+  ["indigo", "Indigo"], ["blue", "Bleu"], ["light-blue", "Bleu clair"], ["cyan", "Cyan"],
+  ["teal", "Sarcelle"], ["green", "Vert"], ["light-green", "Vert clair"], ["lime", "Citron vert"],
+  ["yellow", "Jaune"], ["amber", "Ambre"], ["orange", "Orange"], ["deep-orange", "Orange foncé"],
+  ["brown", "Marron"], ["grey", "Gris"], ["blue-grey", "Gris bleu"],
+];
 
 export class HomexRoomTileEditor extends LitElement {
   @property({ attribute: false }) hass!: HomeAssistant;
@@ -58,6 +67,8 @@ export class HomexRoomTileEditor extends LitElement {
     const scenes = (room?.scenes ?? []).filter((s) => s.key !== "turn_off");
     const shown = this._config.scenes;
     const climate = this._config.mode === "climate";
+    const color = this._config.color;
+    const named = !!color && COLORS.some(([v]) => v === color);
     return html`
       <label>
         Pièce Homex
@@ -104,6 +115,28 @@ export class HomexRoomTileEditor extends LitElement {
           @change=${(e: Event) => this._set({ name: (e.target as HTMLInputElement).value })}
         />
       </label>
+      <div class="color-row">
+        <label>
+          Couleur active
+          <select
+            @change=${(e: Event) => {
+              const v = (e.target as HTMLSelectElement).value;
+              this._set({ color: v === "custom" ? (this._config!.color?.startsWith("#") ? this._config!.color : "#ff8100") : v || undefined });
+            }}
+          >
+            <option value="" ?selected=${!color}>Défaut (${climate ? "orange chauffage" : "ambre lumières"})</option>
+            ${COLORS.map(([v, l]) => html`<option value=${v} ?selected=${color === v}>${l}</option>`)}
+            <option value="custom" ?selected=${!!color && !named}>Personnalisée…</option>
+          </select>
+        </label>
+        ${color && !named
+          ? html`<input
+              type="color"
+              .value=${/^#[0-9a-f]{6}$/i.test(color) ? color : "#ff8100"}
+              @change=${(e: Event) => this._set({ color: (e.target as HTMLInputElement).value })}
+            />`
+          : html`<span class="swatch" style="background: ${color ? tileColor(color) : climate ? "var(--state-climate-heat-color, #ff8100)" : "var(--state-light-active-color, var(--amber-color, #ffc107))"}"></span>`}
+      </div>
       <div class="toggle-row">
         <span>${climate ? "Activer / désactiver le chauffage au clic" : "Allumer / éteindre au clic"}</span>
         <label class="switch">
@@ -181,6 +214,25 @@ export class HomexRoomTileEditor extends LitElement {
       border: 1px solid var(--divider-color, #888);
       background: var(--card-background-color, transparent);
       color: var(--primary-text-color);
+    }
+    .color-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+    }
+    .color-row label {
+      flex: 1;
+    }
+    .color-row input[type="color"],
+    .swatch {
+      width: 38px;
+      height: 38px;
+      flex: none;
+      box-sizing: border-box;
+      border-radius: 6px;
+      border: 1px solid var(--divider-color, #888);
+      padding: 2px;
+      background: none;
     }
     .toggle-row {
       display: flex;

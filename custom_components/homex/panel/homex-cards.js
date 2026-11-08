@@ -1058,7 +1058,7 @@ nt = X, nt.styles = o`
     }
   `, Y([B({ attribute: !1 })], X.prototype, "hass", void 0), Y([B({ attribute: !1 })], X.prototype, "room", void 0), Y([B()], X.prototype, "heading", void 0), Y([V()], X.prototype, "_heating", void 0), Y([V()], X.prototype, "_busy", void 0), customElements.get("homex-room-detail") || customElements.define("homex-room-detail", X);
 // src/cards/room-tile.ts
-var it, at = "M3 4H21V6H20V20H18V6H6V20H4V6H3V4M7 7H17V9H7V7M7 10H17V12H7V10M7 13H17V14H7V13Z", Z = class extends z {
+var it, at = (e) => /^[a-z][a-z-]*$/.test(e) ? `var(--${e}-color, ${e})` : e, ot = "M3 4H21V6H20V20H18V6H6V20H4V6H3V4M7 7H17V9H7V7M7 10H17V12H7V10M7 13H17V14H7V13Z", Z = class extends z {
 	static getStubConfig() {
 		return { room: "" };
 	}
@@ -1168,7 +1168,7 @@ var it, at = "M3 4H21V6H20V20H18V6H6V20H4V6H3V4M7 7H17V9H7V7M7 10H17V12H7V10M7 1
 		let e = et(this._room).map((e) => this.hass.states[e]).filter((e) => e && e.state !== "unavailable" && e.state !== "unknown");
 		if (!e.length) return M;
 		let t = e.map(tt), n = Math.round(t.reduce((e, t) => e + t, 0) / t.length);
-		return t.every((e) => e === 0) ? this._status(Je, "", "Volets fermés") : t.every((e) => e === 100) ? this._status(Ye, "", "Volets ouverts") : this._status(at, "", `Volets ouverts à ${n} %`);
+		return t.every((e) => e === 0) ? this._status(Je, "", "Volets fermés") : t.every((e) => e === 100) ? this._status(Ye, "", "Volets ouverts") : this._status(ot, "", `Volets ouverts à ${n} %`);
 	}
 	_status(e, t, n) {
 		return A`<span class="status ${t}" title=${n}>${K(e)}</span>`;
@@ -1178,8 +1178,8 @@ var it, at = "M3 4H21V6H20V20H18V6H6V20H4V6H3V4M7 7H17V9H7V7M7 10H17V12H7V10M7 1
 		if (!this._config.room) return A`<ha-card class="empty">Choisir une pièce Homex</ha-card>`;
 		let e = this.hass.states[this._entity], t = e?.state === "on", n = this._entity.endsWith("_heating"), r = this._isLights ? this._lightState() : void 0, i = this._climate ? t ? He : Ue : r === "lit" ? Le : r === "stray" ? Ie : r === "off" ? Re : void 0, a = e ? e.state === "unavailable" ? "Indisponible" : this._climate ? t ? "Pièce chauffée — ne plus chauffer" : "Pièce non chauffée — chauffer" : r === "lit" ? "Allumée — éteindre" : r === "stray" ? "Éteinte, mais au moins une lumière est allumée — allumer" : r === "off" ? "Éteinte — allumer" : this.hass.formatEntityState?.(e) ?? e.state : "Introuvable", o = this._noAction, s = !o && this._config.toggle === !1, c = !o && (!e || e.state === "unavailable"), l = q(this.hass, this._config.room, "temperature"), u = q(this.hass, this._config.room, "humidity"), d = this._air(), f = this._scenes(), p = this._climate && t && !c ? this._setpoint() : void 0, ee = this._lightState() === "lit" ? this.hass.states[`switch.homex_${this._config.room}_lights_toggle`]?.attributes.active_scene : void 0, m = this._heatingStatus(), h = this._shutterStatus(), te = l || u || m !== M || h !== M;
 		return A`<ha-card
-      class="${t && !o ? "on" : ""} ${o || s ? "static" : ""}"
-      style=${n ? "--tile-color: var(--state-climate-heat-color, #ff8100)" : ""}
+      class="${t && !o && !s ? "on" : ""} ${o || s ? "static" : ""}"
+      style=${this._config.color ? `--tile-color: ${at(this._config.color)}` : n ? "--tile-color: var(--state-climate-heat-color, #ff8100)" : ""}
       title=${o ? this._name() : s ? a.split(" — ")[0] : a}
       @click=${this._toggle}
     >
@@ -1453,7 +1453,27 @@ it = Z, it.styles = o`
     }
   `, Y([B({ attribute: !1 })], Z.prototype, "hass", void 0), Y([V()], Z.prototype, "_config", void 0), Y([V()], Z.prototype, "_room", void 0), customElements.get("homex-room-tile") || customElements.define("homex-room-tile", Z);
 // src/cards/room-tile-editor.ts
-var ot, Q = class extends z {
+var st, ct = [
+	["red", "Rouge"],
+	["pink", "Rose"],
+	["purple", "Violet"],
+	["deep-purple", "Violet foncé"],
+	["indigo", "Indigo"],
+	["blue", "Bleu"],
+	["light-blue", "Bleu clair"],
+	["cyan", "Cyan"],
+	["teal", "Sarcelle"],
+	["green", "Vert"],
+	["light-green", "Vert clair"],
+	["lime", "Citron vert"],
+	["yellow", "Jaune"],
+	["amber", "Ambre"],
+	["orange", "Orange"],
+	["deep-orange", "Orange foncé"],
+	["brown", "Marron"],
+	["grey", "Gris"],
+	["blue-grey", "Gris bleu"]
+], Q = class extends z {
 	constructor(...e) {
 		super(...e), this._rooms = [];
 	}
@@ -1485,7 +1505,7 @@ var ot, Q = class extends z {
 	}
 	render() {
 		if (!this._config) return M;
-		let e = this._rooms.find((e) => e.room_id === this._config.room), t = this._config.room, n = t ? [[`switch.homex_${t}_lights_toggle`, "Lumières"], [`switch.homex_${t}_heating`, "Chauffage"]].filter(([e]) => this.hass.states[e]) : [], r = this._config.entity || `switch.homex_${t}_lights_toggle`, i = (e?.scenes ?? []).filter((e) => e.key !== "turn_off"), a = this._config.scenes, o = this._config.mode === "climate";
+		let e = this._rooms.find((e) => e.room_id === this._config.room), t = this._config.room, n = t ? [[`switch.homex_${t}_lights_toggle`, "Lumières"], [`switch.homex_${t}_heating`, "Chauffage"]].filter(([e]) => this.hass.states[e]) : [], r = this._config.entity || `switch.homex_${t}_lights_toggle`, i = (e?.scenes ?? []).filter((e) => e.key !== "turn_off"), a = this._config.scenes, o = this._config.mode === "climate", s = this._config.color, c = !!s && ct.some(([e]) => e === s);
 		return A`
       <label>
         Pièce Homex
@@ -1538,6 +1558,26 @@ var ot, Q = class extends z {
           @change=${(e) => this._set({ name: e.target.value })}
         />
       </label>
+      <div class="color-row">
+        <label>
+          Couleur active
+          <select
+            @change=${(e) => {
+			let t = e.target.value;
+			this._set({ color: t === "custom" ? this._config.color?.startsWith("#") ? this._config.color : "#ff8100" : t || void 0 });
+		}}
+          >
+            <option value="" ?selected=${!s}>Défaut (${o ? "orange chauffage" : "ambre lumières"})</option>
+            ${ct.map(([e, t]) => A`<option value=${e} ?selected=${s === e}>${t}</option>`)}
+            <option value="custom" ?selected=${!!s && !c}>Personnalisée…</option>
+          </select>
+        </label>
+        ${s && !c ? A`<input
+              type="color"
+              .value=${/^#[0-9a-f]{6}$/i.test(s) ? s : "#ff8100"}
+              @change=${(e) => this._set({ color: e.target.value })}
+            />` : A`<span class="swatch" style="background: ${s ? at(s) : o ? "var(--state-climate-heat-color, #ff8100)" : "var(--state-light-active-color, var(--amber-color, #ffc107))"}"></span>`}
+      </div>
       <div class="toggle-row">
         <span>${o ? "Activer / désactiver le chauffage au clic" : "Allumer / éteindre au clic"}</span>
         <label class="switch">
@@ -1584,7 +1624,7 @@ var ot, Q = class extends z {
     `;
 	}
 };
-ot = Q, ot.styles = o`
+st = Q, st.styles = o`
     :host {
       display: flex;
       flex-direction: column;
@@ -1610,6 +1650,25 @@ ot = Q, ot.styles = o`
       border: 1px solid var(--divider-color, #888);
       background: var(--card-background-color, transparent);
       color: var(--primary-text-color);
+    }
+    .color-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+    }
+    .color-row label {
+      flex: 1;
+    }
+    .color-row input[type="color"],
+    .swatch {
+      width: 38px;
+      height: 38px;
+      flex: none;
+      box-sizing: border-box;
+      border-radius: 6px;
+      border: 1px solid var(--divider-color, #888);
+      padding: 2px;
+      background: none;
     }
     .toggle-row {
       display: flex;

@@ -21,7 +21,8 @@
  *   scenes: [turn_on, film]              # optional: scene keys shown
  *   scene_names: { turn_on: Normal }     # optional: scene labels
  *   mode: climate                        # optional variant (default: default)
- *   toggle: false                        # optional: no tap action
+ *   toggle: false                        # optional: no tap action (icon greyed)
+ *   color: teal                          # optional active colour (HA name or CSS)
  *
  * The "climate" variant toggles the room's heating (switch.homex_<room>_
  * heating) instead of its lights, shows the radiators' setpoint, and leaves
@@ -76,7 +77,12 @@ export interface RoomTileConfig {
   /** false: no tap action (e.g. rooms whose heating must not be turned off
    * from the dashboard). */
   toggle?: boolean;
+  /** Active colour: a HA colour name (red, teal…) or any CSS colour. */
+  color?: string;
 }
+
+/** CSS value of a tile colour: HA theme names map to var(--<name>-color). */
+export const tileColor = (c: string) => (/^[a-z][a-z-]*$/.test(c) ? `var(--${c}-color, ${c})` : c);
 
 // A shutter half-way: frame + slats on the top half only.
 const SHUTTER_HALF =
@@ -325,8 +331,12 @@ export class HomexRoomTile extends LitElement {
     const shutterS = this._shutterStatus();
     const hasRight = t || h || heatingS !== nothing || shutterS !== nothing;
     return html`<ha-card
-      class="${on && !noAction ? "on" : ""} ${noAction || locked ? "static" : ""}"
-      style=${heating ? "--tile-color: var(--state-climate-heat-color, #ff8100)" : ""}
+      class="${on && !noAction && !locked ? "on" : ""} ${noAction || locked ? "static" : ""}"
+      style=${this._config.color
+        ? `--tile-color: ${tileColor(this._config.color)}`
+        : heating
+          ? "--tile-color: var(--state-climate-heat-color, #ff8100)"
+          : ""}
       title=${noAction ? this._name() : locked ? title.split(" — ")[0] : title}
       @click=${this._toggle}
     >
