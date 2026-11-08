@@ -1,10 +1,32 @@
 import { LitElement, css, html, nothing, svg } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import type { HomeAssistant, Plan, PlanLevel, PlanPoint, PlanShape, Room } from "../types";
+import type {
+  HomeAssistant,
+  OpeningType,
+  Plan,
+  PlanLevel,
+  PlanOpening,
+  PlanPoint,
+  PlanShape,
+  PlanStair,
+  Room,
+} from "../types";
 import { errorMessage, fetchPlan, fetchRooms, savePlan } from "../api";
 import { sharedStyles } from "../lib/styles";
 import { t, locale } from "../lib/i18n";
 import "./homex-builder-level-dialog";
+import {
+  NEXT_DIR,
+  OPENING_WIDTH,
+  nearestWall,
+  openingGeometry,
+  remapInsert,
+  remapRemove,
+  stairArrow,
+  stairPoints,
+  stairTreads,
+  type WallSpot,
+} from "../lib/plan-items";
 import type { HaFloor } from "./homex-builder-level-dialog";
 import {
   GRID,
@@ -22,7 +44,9 @@ import {
   type SnapResult,
 } from "../lib/plan-geometry";
 
-type Tool = "select" | "draw" | "rect";
+type Tool = "select" | "draw" | "rect" | OpeningType | "stairs";
+const OPENING_TOOLS: Tool[] = ["door", "window", "glass_door"];
+const isOpeningTool = (tool: Tool): tool is OpeningType => OPENING_TOOLS.includes(tool);
 
 interface View {
   tx: number; // screen offset of the world origin, px
@@ -34,9 +58,12 @@ type Drag =
   | { mode: "pan"; sx: number; sy: number; tx: number; ty: number }
   | { mode: "vertex"; shape: PlanShape; index: number }
   | { mode: "move"; shape: PlanShape; start: PlanPoint; orig: PlanPoint[] }
-  | { mode: "rect"; start: PlanPoint };
+  | { mode: "rect"; start: PlanPoint }
+  | { mode: "opening"; o: PlanOpening }
+  | { mode: "stair"; st: PlanStair; start: PlanPoint; ox: number; oy: number };
 
 const SNAP_PX = 12;
+const OPENING_SNAP_PX = 24;
 const MIN_K = 0.05;
 const MAX_K = 4;
 const UNDO_MAX = 60;
@@ -65,6 +92,8 @@ export class HomexBuilder extends LitElement {
   @state() private _saving: "idle" | "saving" | "saved" | "error" = "idle";
   @state() private _dropTarget: string | null = null;
   @state() private _dragOver = false;
+  /** Opening tools: where the opening would go. */
+  @state() private _wallHover: WallSpot | null = null;
 
   private _undo: string[] = [];
   private _redo: string[] = [];
@@ -200,7 +229,7 @@ export class HomexBuilder extends LitElement {
 
   private _afterHistory() {
     if (!this._level) this._levelId = this._defaultLevel()?.id ?? null;
-    if (this._selected && !this._level?.rooms.some((s) => s.id === this._selected)) this._selected = null;
+    if (this._selected && !this._selItem()) this._selected = null;
     this._scheduleSave();
   }
 
@@ -401,7 +430,17 @@ export class HomexBuilder extends LitElement {
       if (!last || last[0] !== s.p[0] || last[1] !== s.p[1]) this._draft = [...this._draft, s.p];
       return;
     }
-    if (this._tool === "rect") {
+    if (isOpeningTool(this._tool)) {
+      const type = this._tool;
+      const spot = nearestWall(this._level, raw, OPENING_SNAP_PX / this._view.k, OPENING_WIDTH[type]);
+      if (!spot) return;
+      const o: PlanOpening = { id: uid("o"), type, shape: spot.shape, edge: spot.edge, t: spot.t, width: OPENING_WIDTH[type] };
+      const level = this._level;
+      this._commit(() => (level.openings = [...(level.openings ?? []), o]));
+      this._selected = o.id;
+      return;
+    }
+    if (this._tool === "rect" || this._tool === "stairs") {
       const s = this._snap(raw);
       this._drag = { mode: "rect", start: s.p };
       this._rect = [s.p, s.p];
@@ -412,6 +451,26 @@ export class HomexBuilder extends LitElement {
     // Select tool.
     const el = target.closest("[data-kind]") as SVGElement | null;
     const kind = el?.dataset.kind;
+    if (kind === "opening") {
+      const o = this._level.openings?.find((x) => x.id === el!.dataset.id);
+      if (o) {
+        this._selected = o.id;
+        this._snapshot();
+        this._drag = { mode: "opening", o };
+        svgEl.setPointerCapture(e.pointerId);
+        return;
+      }
+    }
+    if (kind === "stair") {
+      const st = this._level.stairs?.find((x) => x.id === el!.dataset.id);
+      if (st) {
+        this._selected = st.id;
+        this._snapshot();
+        this._drag = { mode: "stair", st, start: raw, ox: st.x, oy: st.y };
+        svgEl.setPointerCapture(e.pointerId);
+        return;
+      }
+    }
     const shape = this._level.rooms.find((s) => s.id === el?.dataset.shape);
     if (kind === "vertex" && shape) {
       this._snapshot();
@@ -425,6 +484,7 @@ export class HomexBuilder extends LitElement {
       const a = shape.points[index - 1];
       const b = shape.points[index % shape.points.length];
       shape.points.splice(index, 0, [roundTo((a[0] + b[0]) / 2, 1), roundTo((a[1] + b[1]) / 2, 1)]);
+      remapInsert(this._level, shape.id, index - 1, 0.5);
       this._drag = { mode: "vertex", shape, index };
       svgEl.setPointerCapture(e.pointerId);
       this.requestUpdate();
@@ -447,7 +507,27 @@ export class HomexBuilder extends LitElement {
     const raw = this._toWorld(e);
     const d = this._drag;
     if (!d) {
+      if (isOpeningTool(this._tool)) {
+        this._hover = null;
+        this._wallHover = nearestWall(this._level, raw, OPENING_SNAP_PX / this._view.k, OPENING_WIDTH[this._tool]);
+        return;
+      }
       this._hover = this._tool === "select" ? null : this._snap(raw);
+      return;
+    }
+    if (d.mode === "opening") {
+      const spot = nearestWall(this._level, raw, (OPENING_SNAP_PX * 3) / this._view.k, d.o.width);
+      if (spot) Object.assign(d.o, { shape: spot.shape, edge: spot.edge, t: spot.t });
+      this.requestUpdate();
+      return;
+    }
+    if (d.mode === "stair") {
+      const corner: PlanPoint = [d.ox + raw[0] - d.start[0], d.oy + raw[1] - d.start[1]];
+      const s = this._snap(corner);
+      this._hover = s;
+      d.st.x = s.p[0];
+      d.st.y = s.p[1];
+      this.requestUpdate();
       return;
     }
     if (d.mode === "pan") {
@@ -505,6 +585,12 @@ export class HomexBuilder extends LitElement {
     if (d.mode === "rect" && this._rect) {
       const [[x1, y1], [x2, y2]] = this._rect;
       this._rect = null;
+      if (this._tool === "stairs") {
+        const w = Math.abs(x2 - x1);
+        const h = Math.abs(y2 - y1);
+        if (w >= 40 && h >= 40) this._addStair({ x: Math.min(x1, x2), y: Math.min(y1, y2), w, h });
+        return;
+      }
       if (Math.abs(x2 - x1) >= GRID / 2 && Math.abs(y2 - y1) >= GRID / 2) {
         this._addShape([
           [x1, y1],
@@ -515,7 +601,7 @@ export class HomexBuilder extends LitElement {
       }
       return;
     }
-    if (d.mode === "vertex" || d.mode === "move") {
+    if (d.mode === "vertex" || d.mode === "move" || d.mode === "opening" || d.mode === "stair") {
       this._hover = null;
       if (d.mode === "vertex") this._dedupe(d.shape);
       this._changed();
@@ -534,7 +620,14 @@ export class HomexBuilder extends LitElement {
     const el = (e.target as Element).closest("[data-kind='vertex']") as SVGElement | null;
     const shape = this._level?.rooms.find((s) => s.id === el?.dataset.shape);
     if (el && shape && shape.points.length > 3) {
-      this._commit(() => shape.points.splice(Number(el.dataset.index), 1));
+      const v = Number(el.dataset.index);
+      const n = shape.points.length;
+      const l1 = segLength(shape.points[(v + n - 1) % n], shape.points[v]);
+      const l2 = segLength(shape.points[v], shape.points[(v + 1) % n]);
+      this._commit(() => {
+        remapRemove(this._level!, shape.id, v, n, l1, l2);
+        shape.points.splice(v, 1);
+      });
     }
   };
 
@@ -591,8 +684,46 @@ export class HomexBuilder extends LitElement {
     if (!level) return;
     this._commit(() => {
       level.rooms = level.rooms.filter((s) => s.id !== id);
+      level.openings = (level.openings ?? []).filter((o) => o.shape !== id);
     });
     if (this._selected === id) this._selected = null;
+  }
+
+  private _addStair(r: { x: number; y: number; w: number; h: number }) {
+    const level = this._level!;
+    const st: PlanStair = { id: uid("st"), ...r, dir: r.h >= r.w ? "up" : "right" };
+    this._commit(() => (level.stairs = [...(level.stairs ?? []), st]));
+    this._selected = st.id;
+  }
+
+  /** The selected room outline, opening or stairs. */
+  private _selItem():
+    | { kind: "shape"; item: PlanShape }
+    | { kind: "opening"; item: PlanOpening }
+    | { kind: "stair"; item: PlanStair }
+    | null {
+    const id = this._selected;
+    const level = this._level;
+    if (!id || !level) return null;
+    const shape = level.rooms.find((s) => s.id === id);
+    if (shape) return { kind: "shape", item: shape };
+    const o = level.openings?.find((x) => x.id === id);
+    if (o) return { kind: "opening", item: o };
+    const st = level.stairs?.find((x) => x.id === id);
+    if (st) return { kind: "stair", item: st };
+    return null;
+  }
+
+  private _deleteSelected() {
+    const sel = this._selItem();
+    const level = this._level;
+    if (!sel || !level) return;
+    if (sel.kind === "shape") return this._deleteShape(sel.item.id);
+    this._commit(() => {
+      if (sel.kind === "opening") level.openings = (level.openings ?? []).filter((o) => o.id !== sel.item.id);
+      else level.stairs = (level.stairs ?? []).filter((x) => x.id !== sel.item.id);
+    });
+    this._selected = null;
   }
 
   // -- Drag & drop of Homex rooms --------------------------------------------------------
@@ -677,7 +808,7 @@ export class HomexBuilder extends LitElement {
       case "Backspace":
       case "Delete":
         if (this._draft.length) this._draft = this._draft.slice(0, -1);
-        else if (this._selected) this._deleteShape(this._selected);
+        else if (this._selected) this._deleteSelected();
         e.preventDefault();
         break;
       case "v":
@@ -689,6 +820,18 @@ export class HomexBuilder extends LitElement {
         break;
       case "r":
         this._setTool("rect");
+        break;
+      case "o":
+        this._setTool("door");
+        break;
+      case "w":
+        this._setTool("window");
+        break;
+      case "g":
+        this._setTool("glass_door");
+        break;
+      case "s":
+        this._setTool("stairs");
         break;
     }
   };
@@ -703,6 +846,7 @@ export class HomexBuilder extends LitElement {
     this._draft = [];
     this._rect = null;
     this._hover = null;
+    this._wallHover = null;
     if (tool !== "select") this._selected = null;
   }
 
@@ -796,6 +940,7 @@ export class HomexBuilder extends LitElement {
               ${ghost.rooms.map(
                 (s) => svg`<polygon points=${pts(s.points)}></polygon>${this._label(s, "ghost-label")}`
               )}
+              ${(ghost.stairs ?? []).map((st) => this._stair(st, true))}
             </g>`
           : nothing}
         <g class="shapes">
@@ -808,6 +953,24 @@ export class HomexBuilder extends LitElement {
             ></polygon>`
           )}
           ${level.rooms.map((s) => this._label(s, "label"))}
+        </g>
+        <g class="stairs">${(level.stairs ?? []).map((st) => this._stair(st))}</g>
+        <g class="openings">
+          ${(level.openings ?? []).map((o) => this._opening(level, o))}
+          ${this._wallHover && isOpeningTool(this._tool)
+            ? this._opening(
+                level,
+                {
+                  id: "preview",
+                  type: this._tool,
+                  shape: this._wallHover.shape,
+                  edge: this._wallHover.edge,
+                  t: this._wallHover.t,
+                  width: OPENING_WIDTH[this._tool],
+                },
+                true
+              )
+            : nothing}
         </g>
         ${sel && this._tool === "select"
           ? svg`<g class="handles">
@@ -863,6 +1026,60 @@ export class HomexBuilder extends LitElement {
     </svg>`;
   }
 
+  /** A door (leaf + swing arc), window or glass door drawn in its wall. */
+  private _opening(level: PlanLevel, o: PlanOpening, preview = false) {
+    const g = openingGeometry(level, o);
+    if (!g) return nothing;
+    const { a, b, c, n } = g;
+    const sel = o.id === this._selected;
+    const cls = `op ${o.type} ${sel ? "selected" : ""} ${preview ? "preview" : ""}`;
+    const off = (p: PlanPoint, d: number): PlanPoint => [p[0] + n[0] * d, p[1] + n[1] * d];
+    const line = (p: PlanPoint, q: PlanPoint, c2 = "") =>
+      svg`<line class=${c2} x1=${p[0]} y1=${p[1]} x2=${q[0]} y2=${q[1]}></line>`;
+    let body;
+    if (o.type === "door") {
+      const hinge = o.flip ? b : a;
+      const other = o.flip ? a : b;
+      const side = o.out ? -1 : 1;
+      const w = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      const leaf: PlanPoint = [hinge[0] + n[0] * side * w, hinge[1] + n[1] * side * w];
+      const cross = (other[0] - hinge[0]) * (leaf[1] - hinge[1]) - (other[1] - hinge[1]) * (leaf[0] - hinge[0]);
+      body = svg`${line(hinge, leaf, "leaf")}
+        <path class="swing" d="M ${other[0]} ${other[1]} A ${w} ${w} 0 0 ${cross > 0 ? 1 : 0} ${leaf[0]} ${leaf[1]}"></path>`;
+    } else {
+      const t = 6;
+      body = svg`<polygon class="frame" points=${[off(a, t), off(b, t), off(b, -t), off(a, -t)].map((p) => p.join(",")).join(" ")}></polygon>
+        ${line(a, b, "pane")}
+        ${o.type === "glass_door" ? line(off(c, -t), off(c, t), "pane") : nothing}`;
+    }
+    return svg`<g class=${cls}>
+      ${line(a, b, "gap")}
+      ${body}
+      ${preview ? nothing : svg`<line data-kind="opening" data-id=${o.id} class="hit" x1=${a[0]} y1=${a[1]} x2=${b[0]} y2=${b[1]}></line>`}
+    </g>`;
+  }
+
+  private _stair(st: PlanStair, ghost = false) {
+    const pts = stairPoints(st).map((p) => p.join(",")).join(" ");
+    const [from, to] = stairArrow(st);
+    const k = this._view.k;
+    const ang = Math.atan2(to[1] - from[1], to[0] - from[0]);
+    const hs = 9 / k;
+    const head = [
+      to,
+      [to[0] - hs * Math.cos(ang - 0.45), to[1] - hs * Math.sin(ang - 0.45)],
+      [to[0] - hs * Math.cos(ang + 0.45), to[1] - hs * Math.sin(ang + 0.45)],
+    ]
+      .map((p) => p.join(","))
+      .join(" ");
+    return svg`<g class="stair ${ghost ? "ghost-stair" : ""} ${st.id === this._selected ? "selected" : ""}">
+      <polygon class="stair-bg" data-kind=${ghost ? "" : "stair"} data-id=${st.id} points=${pts}></polygon>
+      ${stairTreads(st).map(([p, q]) => svg`<line class="tread" x1=${p[0]} y1=${p[1]} x2=${q[0]} y2=${q[1]}></line>`)}
+      <line class="arrow" x1=${from[0]} y1=${from[1]} x2=${to[0]} y2=${to[1]}></line>
+      <polygon class="arrow-head" points=${head}></polygon>
+    </g>`;
+  }
+
   private _toolbar() {
     const tool = (id: Tool, icon: string, key: string) => html`<button
       class="tool ${this._tool === id ? "active" : ""}"
@@ -873,6 +1090,9 @@ export class HomexBuilder extends LitElement {
     </button>`;
     return html`<div class="toolbar">
       ${tool("select", "🖐", "V")} ${tool("draw", "✏️", "D")} ${tool("rect", "▭", "R")}
+      <span class="sep"></span>
+      ${tool("door", "🚪", "O")} ${tool("window", "🪟", "W")} ${tool("glass_door", "◫", "G")}
+      ${tool("stairs", "🪜", "S")}
       <span class="sep"></span>
       <button title=${t("builder.undo")} ?disabled=${!this._undo.length} @click=${() => this._undoAction()}>↶</button>
       <button title=${t("builder.redo")} ?disabled=${!this._redo.length} @click=${() => this._redoAction()}>↷</button>
@@ -887,7 +1107,13 @@ export class HomexBuilder extends LitElement {
     if (this._tool === "draw")
       return this._draft.length >= 3 ? t("builder.hint_draw_close") : t("builder.hint_draw");
     if (this._tool === "rect") return t("builder.hint_rect");
-    if (this._selected) return t("builder.hint_selected");
+    if (this._tool === "stairs") return t("builder.hint_stairs");
+    if (isOpeningTool(this._tool))
+      return this._level?.rooms.length ? t("builder.hint_opening") : t("builder.hint_opening_no_wall");
+    const sel = this._selItem();
+    if (sel?.kind === "opening") return t("builder.hint_opening_selected");
+    if (sel?.kind === "stair") return t("builder.hint_stair_selected");
+    if (sel) return t("builder.hint_selected");
     return this._level?.rooms.length ? t("builder.hint_select") : t("builder.hint_empty");
   }
 
@@ -957,8 +1183,11 @@ export class HomexBuilder extends LitElement {
   }
 
   private _selectionPanel() {
-    const shape = this._level?.rooms.find((s) => s.id === this._selected);
-    if (!shape) return nothing;
+    const sel = this._selItem();
+    if (!sel) return nothing;
+    if (sel.kind === "opening") return this._openingPanel(sel.item);
+    if (sel.kind === "stair") return this._stairPanel(sel.item);
+    const shape = sel.item;
     const perimeter = edgesOf(shape.points).reduce((s, [a, b]) => s + segLength(a, b), 0);
     const current = shape.room_id ? this._rooms.find((r) => r.room_id === shape.room_id) : undefined;
     const options = [...(current ? [current] : []), ...this._assignable()];
@@ -990,6 +1219,69 @@ export class HomexBuilder extends LitElement {
         <strong>${this._len(perimeter)}</strong>
       </p>
       <button class="danger-link" @click=${() => this._deleteShape(shape.id)}>${t("builder.shape_delete")}</button>
+    </div>`;
+  }
+
+  private _panelHead(title: string) {
+    return html`<div class="sel-head">
+      <strong>${title}</strong>
+      <button class="icon" title=${t("common.close")} @click=${() => (this._selected = null)}>✕</button>
+    </div>`;
+  }
+
+  private _cmInput(label: string, value: number, set: (v: number) => void, min = 20) {
+    return html`<label class="field">
+      <span>${label}</span>
+      <input
+        type="number"
+        min=${min}
+        step="10"
+        .value=${String(Math.round(value))}
+        @change=${(e: Event) => {
+          const v = Math.round(Number((e.target as HTMLInputElement).value));
+          if (v >= min) this._commit(() => set(v));
+        }}
+      />
+    </label>`;
+  }
+
+  private _openingPanel(o: PlanOpening) {
+    const types: OpeningType[] = ["door", "window", "glass_door"];
+    return html`<div class="selection">
+      ${this._panelHead(t(`builder.tool_${o.type}`))}
+      <label class="field">
+        <span>${t("builder.opening_type")}</span>
+        <select
+          @change=${(e: Event) =>
+            this._commit(() => (o.type = (e.target as HTMLSelectElement).value as OpeningType))}
+        >
+          ${types.map((ty) => html`<option value=${ty} ?selected=${ty === o.type}>${t(`builder.tool_${ty}`)}</option>`)}
+        </select>
+      </label>
+      ${this._cmInput(t("builder.width_cm"), o.width, (v) => (o.width = v))}
+      ${o.type === "door"
+        ? html`<div class="row">
+            <button @click=${() => this._commit(() => (o.flip = !o.flip))}>⇆ ${t("builder.door_flip")}</button>
+            <button @click=${() => this._commit(() => (o.out = !o.out))}>⇅ ${t("builder.door_side")}</button>
+          </div>`
+        : nothing}
+      <button class="danger-link" @click=${() => this._deleteSelected()}>${t("builder.item_delete")}</button>
+    </div>`;
+  }
+
+  private _stairPanel(st: PlanStair) {
+    const levels = this._levels;
+    const i = levels.findIndex((l) => l.id === this._levelId);
+    const above = levels[i + 1];
+    return html`<div class="selection">
+      ${this._panelHead(t("builder.tool_stairs"))}
+      ${this._cmInput(t("builder.width_cm"), st.w, (v) => (st.w = v), 40)}
+      ${this._cmInput(t("builder.length_cm"), st.h, (v) => (st.h = v), 40)}
+      <div class="row">
+        <button @click=${() => this._commit(() => (st.dir = NEXT_DIR[st.dir]))}>↻ ${t("builder.stairs_turn")}</button>
+      </div>
+      <p class="stats">${above ? t("builder.stairs_to", { name: above.name }) : t("builder.stairs_no_above")}</p>
+      <button class="danger-link" @click=${() => this._deleteSelected()}>${t("builder.item_delete")}</button>
     </div>`;
   }
 
@@ -1474,6 +1766,97 @@ export class HomexBuilder extends LitElement {
       }
       .snap .snap-align {
         stroke: #e040fb;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+      }
+      .op line,
+      .op path,
+      .op polygon {
+        vector-effect: non-scaling-stroke;
+        fill: none;
+      }
+      .op .gap {
+        stroke: var(--card-background-color, #1c1c1c);
+        stroke-width: 5;
+      }
+      .op .leaf {
+        stroke: var(--primary-text-color);
+        stroke-width: 2;
+      }
+      .op .swing {
+        stroke: var(--secondary-text-color);
+        stroke-width: 1;
+        stroke-dasharray: 4 3;
+      }
+      .op .frame {
+        stroke: #4fc3f7;
+        stroke-width: 1.5;
+      }
+      .op.glass_door .frame {
+        fill: rgba(79, 195, 247, 0.18);
+      }
+      .op .pane {
+        stroke: #4fc3f7;
+        stroke-width: 1.5;
+      }
+      .op .hit {
+        stroke: transparent;
+        stroke-width: 16;
+        cursor: pointer;
+      }
+      .op.selected .leaf,
+      .op.selected .frame,
+      .op.selected .pane {
+        stroke: var(--accent-color, #ff9800);
+      }
+      .op.preview {
+        opacity: 0.6;
+        pointer-events: none;
+      }
+      .stair-bg {
+        fill: rgba(127, 127, 127, 0.22);
+        stroke: var(--primary-text-color);
+        stroke-width: 1.5;
+        vector-effect: non-scaling-stroke;
+        cursor: move;
+      }
+      .stair .tread {
+        stroke: var(--primary-text-color);
+        stroke-opacity: 0.55;
+        stroke-width: 1;
+        vector-effect: non-scaling-stroke;
+        pointer-events: none;
+      }
+      .stair .arrow {
+        stroke: var(--primary-text-color);
+        stroke-width: 1.5;
+        vector-effect: non-scaling-stroke;
+        pointer-events: none;
+      }
+      .stair .arrow-head {
+        fill: var(--primary-text-color);
+        pointer-events: none;
+      }
+      .stair.selected .stair-bg {
+        stroke: var(--accent-color, #ff9800);
+        stroke-width: 3;
+      }
+      .ghost-stair {
+        opacity: 0.4;
+        pointer-events: none;
+      }
+      .ghost-stair .stair-bg {
+        stroke-dasharray: 6 4;
+      }
+      svg.tool-door,
+      svg.tool-window,
+      svg.tool-glass_door,
+      svg.tool-stairs {
+        cursor: crosshair;
       }
       @media (max-width: 800px) {
         :host {

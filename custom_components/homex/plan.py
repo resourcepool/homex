@@ -6,7 +6,10 @@ Stored as one document in the ``homex_plan`` store::
         {"id": "l_...", "name": "Ground floor", "level": 0,
          "floor_id": "ground_floor" | None,
          "rooms": [{"id": "s_...", "room_id": "<homex room id>" | None,
-                    "name": "...", "points": [[x, y], ...]}]},  # cm
+                    "name": "...", "points": [[x, y], ...]}],  # cm
+         "openings": [{"id", "type": "door" | "window" | "glass_door",
+                       "shape", "edge", "t", "width", "flip", "out"}],
+         "stairs": [{"id", "x", "y", "w", "h", "dir": "up" | ...}]},
     ]}
 """
 
@@ -33,6 +36,30 @@ _SHAPE = vol.Schema(
     },
     extra=vol.ALLOW_EXTRA,
 )
+_OPENING = vol.Schema(
+    {
+        vol.Required("id"): str,
+        vol.Required("type"): vol.In(["door", "window", "glass_door"]),
+        vol.Required("shape"): str,
+        vol.Required("edge"): vol.All(vol.Coerce(int), vol.Range(min=0)),
+        vol.Required("t"): vol.All(vol.Coerce(float), vol.Range(min=0, max=1)),
+        vol.Required("width"): vol.All(vol.Coerce(float), vol.Range(min=1)),
+        vol.Optional("flip"): bool,
+        vol.Optional("out"): bool,
+    },
+    extra=vol.ALLOW_EXTRA,
+)
+_STAIR = vol.Schema(
+    {
+        vol.Required("id"): str,
+        vol.Required("x"): vol.Coerce(float),
+        vol.Required("y"): vol.Coerce(float),
+        vol.Required("w"): vol.All(vol.Coerce(float), vol.Range(min=1)),
+        vol.Required("h"): vol.All(vol.Coerce(float), vol.Range(min=1)),
+        vol.Required("dir"): vol.In(["up", "down", "left", "right"]),
+    },
+    extra=vol.ALLOW_EXTRA,
+)
 _LEVEL = vol.Schema(
     {
         vol.Required("id"): str,
@@ -40,6 +67,8 @@ _LEVEL = vol.Schema(
         vol.Optional("level", default=0): vol.Coerce(int),
         vol.Optional("floor_id"): vol.Any(None, str),
         vol.Optional("rooms", default=list): [_SHAPE],
+        vol.Optional("openings", default=list): [_OPENING],
+        vol.Optional("stairs", default=list): [_STAIR],
     },
     extra=vol.ALLOW_EXTRA,
 )

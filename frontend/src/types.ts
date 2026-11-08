@@ -388,6 +388,33 @@ export interface PlanShape {
   points: PlanPoint[];
 }
 
+export type OpeningType = "door" | "window" | "glass_door";
+
+/** A door / window / glass door set in a room's wall (edge `edge` of room
+ * outline `shape`), centred at ratio `t` along it, `width` cm wide. */
+export interface PlanOpening {
+  id: string;
+  type: OpeningType;
+  shape: string;
+  edge: number;
+  t: number;
+  width: number;
+  /** Door: hinge on the other end. */
+  flip?: boolean;
+  /** Door: opens to the other side of the wall. */
+  out?: boolean;
+}
+
+/** Stairs: an axis-aligned rectangle (cm), climbing towards `dir`. */
+export interface PlanStair {
+  id: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  dir: "up" | "down" | "left" | "right";
+}
+
 export interface PlanLevel {
   id: string;
   name: string;
@@ -395,6 +422,8 @@ export interface PlanLevel {
   level: number;
   floor_id: string | null;
   rooms: PlanShape[];
+  openings?: PlanOpening[];
+  stairs?: PlanStair[];
 }
 
 /** The house plan: levels sorted by level number. */
