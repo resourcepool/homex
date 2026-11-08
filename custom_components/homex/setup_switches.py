@@ -1,8 +1,9 @@
 """Setup wizard: suggest a switch layout and device preset for a model.
 
-From a device's "action" triggers (Zigbee2MQTT button events such as
-``single_left``, ``on_press``, ``brightness_move_up``, ``arrow_left_click``),
-guess its physical buttons and their press types, then build:
+From a device's button triggers — Zigbee2MQTT "action" events such as
+``single_left``, ``on_press``, ``brightness_move_up``, ``arrow_left_click``, or
+ZHA / deCONZ style ``remote_button_short_press`` + ``button_1`` — guess its
+physical buttons and their press types, then build:
 
 - a layout (the switch's shape: buttons placed on a grid), in the format the
   layout editor saves (center-origin coordinates, cells, zones);
@@ -40,6 +41,39 @@ _SQUARE = {"x": -5.0, "y": -5.0, "w": 10.0, "h": 10.0}
 _VRECT = {"x": -2.5, "y": -10.0, "w": 5.0, "h": 20.0}
 
 
+# ZHA / deCONZ trigger types: the button is the subtype.
+_REMOTE_TYPES = {
+    "remote_button_short_press": "single",
+    "remote_button_double_press": "double",
+    "remote_button_long_press": "long",
+}
+# Trigger types that are a button event (ZHA, deCONZ, Hue...), besides the
+# Zigbee2MQTT "action" type.
+_BUTTON_TYPE = re.compile(r"(remote_button|press|click|release)", re.I)
+
+
+def is_button_trigger(trigger: dict) -> bool:
+    """Whether a device trigger is a button event (the device is a switch)."""
+    ttype = str(trigger.get("type") or "")
+    if ttype == "action":
+        return True
+    return bool(_BUTTON_TYPE.search(ttype)) and bool(trigger.get("subtype"))
+
+
+def trigger_key(trigger: dict) -> str:
+    return f"{trigger.get('type') or ''}|{trigger.get('subtype') or ''}"
+
+
+def parse_trigger(trigger: dict) -> tuple[str, str] | None:
+    """(button, press type) of a device trigger, None when not a press."""
+    ttype = str(trigger.get("type") or "")
+    if ttype == "action":
+        return parse_action(str(trigger.get("subtype") or ""))
+    tap = _REMOTE_TYPES.get(ttype)
+    button = str(trigger.get("subtype") or "").strip().lower()
+    return (button, tap) if tap and button else None
+
+
 def parse_action(subtype: str) -> tuple[str, str] | None:
     """(button, press type) of an action name, None when not a press."""
     name = str(subtype or "").strip().lower()
@@ -66,17 +100,18 @@ def _rank(button: str) -> tuple:
     return (len(_ORDER), button)
 
 
-def analyze(subtypes: list[str]) -> list[dict]:
-    """Physical buttons, in reading order: [{name, taps, actions{tap: subtype}}]."""
+def analyze(triggers: list[dict]) -> list[dict]:
+    """Physical buttons, in reading order:
+    [{name, taps, actions{tap: trigger_key}}]."""
     buttons: dict[str, dict] = {}
-    for subtype in subtypes:
-        parsed = parse_action(subtype)
+    for trigger in triggers:
+        parsed = parse_trigger(trigger)
         if parsed is None:
             continue
         name, tap = parsed
         btn = buttons.setdefault(name, {"name": name, "taps": [], "actions": {}})
         if tap not in btn["actions"]:
-            btn["actions"][tap] = subtype
+            btn["actions"][tap] = trigger_key(trigger)
             btn["taps"].append(tap)
     out = sorted(buttons.values(), key=lambda b: _rank(b["name"]))
     for btn in out:
@@ -151,8 +186,8 @@ def build_preset(
     bindings: dict[str, dict[str, list[str]]] = {}
     for i, btn in enumerate(buttons, start=1):
         taps[str(i)] = list(btn["taps"])
-        for tap, subtype in btn["actions"].items():
-            label = label_of.get(subtype)
+        for tap, key in btn["actions"].items():
+            label = label_of.get(key)
             if label:
                 bindings.setdefault(tap, {})[str(i)] = [label]
     return {

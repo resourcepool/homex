@@ -23,6 +23,7 @@ from homeassistant.setup import async_setup_component
 from homeassistant.util.yaml import load_yaml, save_yaml
 
 from .i18n import CONF_LANGUAGE, LANGUAGE_AUTO, LANGUAGES, language, language_setting, tr
+from .setup_switches import is_button_trigger
 from .const import (
     CONF_HEATING,
     CONF_METRICS,
@@ -147,7 +148,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "216"
+PANEL_VERSION = "217"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -1029,7 +1030,7 @@ async def ws_setup_switch_plan(hass: HomeAssistant, connection, msg) -> None:
     """Setup wizard: the switch / remote models of these areas, each with its
     existing device preset, or a suggested layout + preset guessed from the
     model's actions (see setup_switches)."""
-    from .setup_switches import analyze, build_layout, build_preset
+    from .setup_switches import analyze, build_layout, build_preset, trigger_key
 
     dev_reg = dr.async_get(hass)
     areas = set(msg["area_ids"]) if "area_ids" in msg else None
@@ -1058,8 +1059,8 @@ async def ws_setup_switch_plan(hass: HomeAssistant, connection, msg) -> None:
                 "layout": None,
                 "preset": None,
             }
-            actions = [t for t in triggers if t.get("type") == "action"]
-            buttons = analyze([str(t.get("subtype") or "") for t in actions])
+            actions = [t for t in triggers if is_button_trigger(t)]
+            buttons = analyze(actions)
             model["buttons"] = [{"name": b["name"], "taps": b["taps"]} for b in buttons]
             if existing is None and buttons:
                 base = _slugify(label) or "switch"
@@ -1075,7 +1076,7 @@ async def ws_setup_switch_plan(hass: HomeAssistant, connection, msg) -> None:
                 model["layout"] = build_layout(lid, label, buttons)
                 model["preset"] = build_preset(
                     free(preset_ids), label, key, dev_id, lid, buttons,
-                    {str(t.get("subtype")): _device_trigger_label(t) for t in actions},
+                    {trigger_key(t): _device_trigger_label(t) for t in actions},
                 )
         model["devices"].append(
             {
@@ -1763,14 +1764,15 @@ async def ws_layout_delete(hass: HomeAssistant, connection, msg) -> None:
 
 
 async def _action_device_ids(hass: HomeAssistant) -> dict[str, list]:
-    """Device triggers for every device that exposes an "action" trigger."""
+    """Device triggers for every device that exposes a button trigger
+    (Zigbee2MQTT "action", ZHA / deCONZ "remote_button_*"...)."""
     dev_reg = dr.async_get(hass)
 
     def with_action(autos: dict) -> dict[str, list]:
         return {
             dev_id: triggers
             for dev_id, triggers in autos.items()
-            if any(t.get("type") == "action" for t in triggers)
+            if any(is_button_trigger(t) for t in triggers)
         }
 
     # device_ids=None: HA lists every device itself. Passing list(dev_reg.devices)
@@ -1832,8 +1834,8 @@ async def ws_switch_devices(hass: HomeAssistant, connection, msg) -> None:
 async def ws_switch_models(hass: HomeAssistant, connection, msg) -> None:
     """List unique models of switch-like devices (interrupteurs).
 
-    A device is treated as a switch/remote when it exposes at least one device
-    trigger of type "action" (Zigbee2MQTT button events). Grouped by model so
+    A device is treated as a switch/remote when it exposes at least one button
+    device trigger (Zigbee2MQTT "action", ZHA / deCONZ "remote_button_*"...). Grouped by model so
     a Device Preset targets a model, not an individual device.
     """
     dev_reg = dr.async_get(hass)

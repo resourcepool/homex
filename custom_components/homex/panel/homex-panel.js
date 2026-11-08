@@ -1968,6 +1968,7 @@ var Ut = {
 			btn_left: "left",
 			btn_right: "right",
 			btn_on: "on",
+			btn_n: "button {n}",
 			btn_off: "off",
 			btn_up: "up",
 			btn_down: "down",
@@ -2048,6 +2049,7 @@ var Ut = {
 			btn_left: "gauche",
 			btn_right: "droite",
 			btn_on: "on",
+			btn_n: "bouton {n}",
 			btn_off: "off",
 			btn_up: "haut",
 			btn_down: "bas",
@@ -13137,8 +13139,8 @@ var qa = class extends v {
 		}[e] ?? (e.length > 3 ? e.slice(0, 3) : e);
 	}
 	_buttonName(e) {
-		let t = `setupWizard.btn_${e}`, n = S(t);
-		return n === t ? e.replace(/_/g, " ") : n;
+		let t = `setupWizard.btn_${e}`, n = S(t), r = /^button_(\d+)$/.exec(e);
+		return r ? S("setupWizard.btn_n", { n: r[1] }) : n === t ? e.replace(/_/g, " ") : n;
 	}
 	_tapNames(e) {
 		return e.map((e) => S(`setupWizard.tap_${e}`)).join(", ");
@@ -14006,7 +14008,7 @@ var Za = (Ya = class extends v {
   `, Ya);
 k([b({ attribute: !1 })], Za.prototype, "hass", void 0), k([b({ type: Boolean })], Za.prototype, "open", void 0), k([x()], Za.prototype, "_backup", void 0), k([x()], Za.prototype, "_summary", void 0), k([x()], Za.prototype, "_fileName", void 0), k([x()], Za.prototype, "_error", void 0), k([x()], Za.prototype, "_busy", void 0), k([x()], Za.prototype, "_done", void 0), Za = k([y("homex-backup-dialog")], Za);
 // src/homex-panel.ts
-var Qa, $a = "216", $ = (Qa = class extends v {
+var Qa, $a = "217", $ = (Qa = class extends v {
 	constructor(...e) {
 		super(...e), this.narrow = !1, this._rooms = null, this._error = null, this._createOpen = !1, this._exportOpen = !1, this._restoreOpen = !1, this._menuOpen = !1, this._dashTab = localStorage.getItem("homex_dash_tab") === "climate" ? "climate" : "general", this._expanded = localStorage.getItem("homex_expanded") || null, this._loaded = !1, this._onToggleExpand = (e) => {
 			let t = e.detail.entry_id;

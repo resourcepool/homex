@@ -288,6 +288,8 @@ export class HomexSetupWizard extends LitElement {
   private _buttonName(name: string) {
     const key = `setupWizard.btn_${name}`;
     const label = t(key);
+    const n = /^button_(\d+)$/.exec(name);
+    if (n) return t("setupWizard.btn_n", { n: n[1] });
     return label === key ? name.replace(/_/g, " ") : label;
   }
 
