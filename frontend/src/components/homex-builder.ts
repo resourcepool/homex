@@ -47,7 +47,17 @@ import {
   type SnapResult,
 } from "../lib/plan-geometry";
 
-type Orient = "left" | "right" | "up" | "down" | "wider" | "narrower" | "rotate" | "mirror";
+type Orient =
+  | "left"
+  | "right"
+  | "up"
+  | "down"
+  | "wider"
+  | "narrower"
+  | "rotate"
+  | "mirror"
+  | "goes-up"
+  | "goes-down";
 
 type Tool = "select" | "draw" | "rect" | OpeningType | "stairs";
 const OPENING_TOOLS: Tool[] = ["door", "sliding_door", "window", "glass_door"];
@@ -110,6 +120,8 @@ export class HomexBuilder extends LitElement {
     sliding_door: { width: OPENING_WIDTH.sliding_door, flip: false, out: false },
   };
   @state() private _stairDir: PlanStair["dir"] = "up";
+  /** Next stairs go up to the floor above, or down to the one below. */
+  @state() private _stairGoes: "up" | "down" = "up";
 
   private _undo: string[] = [];
   private _redo: string[] = [];
@@ -715,7 +727,7 @@ export class HomexBuilder extends LitElement {
 
   private _addStair(r: { x: number; y: number; w: number; h: number }) {
     const level = this._level!;
-    const st: PlanStair = { id: uid("st"), ...r, dir: this._stairDir };
+    const st: PlanStair = { id: uid("st"), ...r, dir: this._stairDir, goes: this._stairGoes };
     this._commit(() => (level.stairs = [...(level.stairs ?? []), st]));
   }
 
@@ -823,6 +835,8 @@ export class HomexBuilder extends LitElement {
       "+": "wider",
       "=": "wider",
       "-": "narrower",
+      PageUp: "goes-up",
+      PageDown: "goes-down",
     };
     if (orient[e.key] && this._orientTarget()) {
       e.preventDefault();
@@ -980,7 +994,7 @@ export class HomexBuilder extends LitElement {
               ${ghost.rooms.map(
                 (s) => svg`<polygon points=${pts(s.points)}></polygon>${this._label(s, "ghost-label")}`
               )}
-              ${(ghost.stairs ?? []).map((st) => this._stair(st, true))}
+              ${(ghost.stairs ?? []).filter((st) => !this._arrivals().some((a) => a.st === st)).map((st) => this._stair(st, "ghost"))}
             </g>`
           : nothing}
         <g class="shapes">
@@ -994,7 +1008,10 @@ export class HomexBuilder extends LitElement {
           )}
           ${level.rooms.map((s) => this._label(s, "label"))}
         </g>
-        <g class="stairs">${(level.stairs ?? []).map((st) => this._stair(st))}</g>
+        <g class="stairs">
+          ${this._arrivals().map((a) => this._stair(a.st, "arrival", a.from))}
+          ${(level.stairs ?? []).map((st) => this._stair(st))}
+        </g>
         <g class="openings">
           ${(level.openings ?? []).map((o) => this._opening(level, o))}
           ${this._wallHover && isOpeningTool(this._tool)
@@ -1040,6 +1057,7 @@ export class HomexBuilder extends LitElement {
               w: Math.abs(this._rect[1][0] - this._rect[0][0]),
               h: Math.abs(this._rect[1][1] - this._rect[0][1]),
               dir: this._stairDir,
+              goes: this._stairGoes,
             })
           : nothing}
         ${this._rect
@@ -1129,11 +1147,36 @@ export class HomexBuilder extends LitElement {
     </g>`;
   }
 
-  private _stair(st: PlanStair, ghost = false) {
+  /** Stairs of the neighbouring floors that arrive on this one: going up
+   * from the floor below, or down from the floor above. */
+  private _arrivals(): { st: PlanStair; from: PlanLevel }[] {
+    const levels = this._levels;
+    const i = levels.findIndex((l) => l.id === this._levelId);
+    if (i < 0) return [];
+    const below = levels[i - 1];
+    const above = levels[i + 1];
+    return [
+      ...(below?.stairs ?? []).filter((st) => (st.goes ?? "up") === "up").map((st) => ({ st, from: below! })),
+      ...(above?.stairs ?? []).filter((st) => st.goes === "down").map((st) => ({ st, from: above! })),
+    ];
+  }
+
+  /** Where stairs of the current floor lead. */
+  private _stairTarget(st: { goes?: "up" | "down" }): PlanLevel | undefined {
+    const levels = this._levels;
+    const i = levels.findIndex((l) => l.id === this._levelId);
+    return (st.goes ?? "up") === "up" ? levels[i + 1] : levels[i - 1];
+  }
+
+  /** Stairs: own (editable), ghost (neighbour floor) or arrival (stairs of
+   * the neighbouring floor that lead here, in their own colour). */
+  private _stair(st: PlanStair, mode: "own" | "ghost" | "arrival" = "own", from?: PlanLevel) {
     const pts = stairPoints(st).map((p) => p.join(",")).join(" ");
-    const [from, to] = stairArrow(st);
+    // The arrow is the way of travel (dir), up or down alike.
+    const [from0, to] = stairArrow(st);
+    const down = (st.goes ?? "up") === "down";
     const k = this._view.k;
-    const ang = Math.atan2(to[1] - from[1], to[0] - from[0]);
+    const ang = Math.atan2(to[1] - from0[1], to[0] - from0[0]);
     const hs = 9 / k;
     const head = [
       to,
@@ -1142,11 +1185,22 @@ export class HomexBuilder extends LitElement {
     ]
       .map((p) => p.join(","))
       .join(" ");
-    return svg`<g class="stair ${ghost ? "ghost-stair" : ""} ${st.id === this._selected ? "selected" : ""}">
-      <polygon class="stair-bg" data-kind=${ghost ? "" : "stair"} data-id=${st.id} points=${pts}></polygon>
+    const label =
+      mode === "arrival"
+        ? t(down ? "builder.stairs_arrival_down" : "builder.stairs_arrival_up", { name: from?.name ?? "" })
+        : mode === "own"
+          ? t(down ? "builder.stairs_tag_down" : "builder.stairs_tag_up")
+          : "";
+    const cx = st.x + st.w / 2;
+    const cy = st.y + st.h / 2;
+    return svg`<g class="stair ${mode === "ghost" ? "ghost-stair" : ""} ${mode === "arrival" ? "arrival" : ""} ${down ? "down" : ""} ${st.id === this._selected && mode === "own" ? "selected" : ""}">
+      <polygon class="stair-bg" data-kind=${mode === "own" ? "stair" : ""} data-id=${st.id} points=${pts}></polygon>
       ${stairTreads(st).map(([p, q]) => svg`<line class="tread" x1=${p[0]} y1=${p[1]} x2=${q[0]} y2=${q[1]}></line>`)}
-      <line class="arrow" x1=${from[0]} y1=${from[1]} x2=${to[0]} y2=${to[1]}></line>
+      <line class="arrow" x1=${from0[0]} y1=${from0[1]} x2=${to[0]} y2=${to[1]}></line>
       <polygon class="arrow-head" points=${head}></polygon>
+      ${label
+        ? svg`<text class="stair-tag" x=${cx} y=${cy} font-size=${10 / k} text-anchor="middle" dominant-baseline="middle">${label}</text>`
+        : nothing}
     </g>`;
   }
 
@@ -1357,7 +1411,8 @@ export class HomexBuilder extends LitElement {
         break;
       }
       case "tool-stairs":
-        this._stairDir = dir(this._stairDir);
+        if (action === "goes-up" || action === "goes-down") this._stairGoes = action === "goes-up" ? "up" : "down";
+        else this._stairDir = dir(this._stairDir);
         break;
       case "opening": {
         const o = target.item;
@@ -1367,7 +1422,8 @@ export class HomexBuilder extends LitElement {
       }
       case "stair": {
         const st = target.item;
-        if (!step) this._commit(() => (st.dir = dir(st.dir)));
+        if (action === "goes-up" || action === "goes-down") this._commit(() => (st.goes = action === "goes-up" ? "up" : "down"));
+        else if (!step) this._commit(() => (st.dir = dir(st.dir)));
         break;
       }
     }
@@ -1417,12 +1473,31 @@ export class HomexBuilder extends LitElement {
     if (target?.kind === "tool-stairs") {
       return html`<div class="selection">
         <div class="sel-head"><strong>${t("builder.tool_stairs")}</strong></div>
+        ${this._goesControl(this._stairGoes)}
         <p class="stats">${t("builder.stairs_climb")} <strong class="dir">${ARROW[this._stairDir]}</strong></p>
         ${this._orientButtons(true)}
         <p class="keys">${t("builder.keys_stairs")}</p>
       </div>`;
     }
     return nothing;
+  }
+
+  /** Up / down toggle, with the floor the stairs lead to. */
+  private _goesControl(goes: "up" | "down") {
+    const target = this._stairTarget({ goes });
+    return html`<div class="seg">
+        <button class=${goes === "up" ? "on" : ""} title="PgUp" @click=${() => this._orient("goes-up")}>
+          ↑ ${t("builder.stairs_go_up")}
+        </button>
+        <button class=${goes === "down" ? "on" : ""} title="PgDn" @click=${() => this._orient("goes-down")}>
+          ↓ ${t("builder.stairs_go_down")}
+        </button>
+      </div>
+      <p class="stats">
+        ${target
+          ? t(goes === "up" ? "builder.stairs_to" : "builder.stairs_to_down", { name: target.name })
+          : t(goes === "up" ? "builder.stairs_no_above" : "builder.stairs_no_below")}
+      </p>`;
   }
 
   private _openingPanel(o: PlanOpening) {
@@ -1436,17 +1511,14 @@ export class HomexBuilder extends LitElement {
   }
 
   private _stairPanel(st: PlanStair) {
-    const levels = this._levels;
-    const i = levels.findIndex((l) => l.id === this._levelId);
-    const above = levels[i + 1];
     return html`<div class="selection">
       ${this._panelHead(t("builder.tool_stairs"))}
+      ${this._goesControl(st.goes ?? "up")}
       ${this._cmInput(t("builder.width_cm"), st.w, (v) => (st.w = v), 40)}
       ${this._cmInput(t("builder.length_cm"), st.h, (v) => (st.h = v), 40)}
       <p class="stats">${t("builder.stairs_climb")} <strong class="dir">${ARROW[st.dir]}</strong></p>
       ${this._orientButtons(true)}
       <p class="keys">${t("builder.keys_stairs")}</p>
-      <p class="stats">${above ? t("builder.stairs_to", { name: above.name }) : t("builder.stairs_no_above")}</p>
       <button class="danger-link" @click=${() => this._deleteSelected()}>${t("builder.item_delete")}</button>
     </div>`;
   }
@@ -2048,6 +2120,50 @@ export class HomexBuilder extends LitElement {
       .stair.selected .stair-bg {
         stroke: var(--accent-color, #ff9800);
         stroke-width: 3;
+      }
+      .seg {
+        display: flex;
+        margin-top: 8px;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.4));
+      }
+      .seg button {
+        flex: 1;
+        border-radius: 0;
+        background: transparent;
+      }
+      .seg button.on {
+        background: var(--primary-color);
+        color: var(--text-primary-color, #fff);
+      }
+      .stair-tag {
+        fill: var(--primary-text-color);
+        font-weight: 700;
+        paint-order: stroke;
+        stroke: var(--card-background-color, #1c1c1c);
+        stroke-width: 3px;
+        pointer-events: none;
+      }
+      /* Stairs arriving from the neighbouring floor. */
+      .arrival {
+        pointer-events: none;
+      }
+      .arrival .stair-bg {
+        fill: rgba(171, 71, 188, 0.22);
+        stroke: #ab47bc;
+        stroke-width: 2;
+        cursor: default;
+      }
+      .arrival .tread,
+      .arrival .arrow {
+        stroke: #ab47bc;
+      }
+      .arrival .arrow-head {
+        fill: #ab47bc;
+      }
+      .arrival .stair-tag {
+        fill: #ce93d8;
       }
       .ghost-stair {
         opacity: 0.4;

@@ -718,12 +718,20 @@ var Ht = {
 	},
 	builder: {
 		en: {
+			stairs_go_up: "Goes up",
+			stairs_go_down: "Goes down",
+			stairs_to_down: "Leads down to: {name}",
+			stairs_no_below: "No floor below yet.",
+			stairs_tag_up: "UP",
+			stairs_tag_down: "DOWN",
+			stairs_arrival_up: "↑ from {name}",
+			stairs_arrival_down: "↓ from {name}",
 			rotate: "Rotate",
 			mirror: "Mirror",
-			stairs_climb: "Climbs towards",
+			stairs_climb: "Direction",
 			keys_door: "Keys: ← → rotate · ↑ ↓ mirror · + − width",
 			keys_width: "Keys: + − width",
-			keys_stairs: "Keys: arrows set the climb",
+			keys_stairs: "Keys: arrows set the direction · PgUp / PgDn up / down",
 			tool_door: "Door",
 			tool_sliding_door: "Sliding door",
 			tool_window: "Window",
@@ -805,12 +813,20 @@ var Ht = {
 			hint_rect: "Drag to draw a rectangular room (snapped to the grid and walls)."
 		},
 		fr: {
+			stairs_go_up: "Monte",
+			stairs_go_down: "Descend",
+			stairs_to_down: "Descend vers : {name}",
+			stairs_no_below: "Pas encore d'étage en dessous.",
+			stairs_tag_up: "MONTE",
+			stairs_tag_down: "DESCEND",
+			stairs_arrival_up: "↑ depuis {name}",
+			stairs_arrival_down: "↓ depuis {name}",
 			rotate: "Rotation",
 			mirror: "Miroir",
-			stairs_climb: "Monte vers",
+			stairs_climb: "Direction",
 			keys_door: "Clavier : ← → rotation · ↑ ↓ miroir · + − largeur",
 			keys_width: "Clavier : + − largeur",
-			keys_stairs: "Clavier : les flèches donnent le sens de montée",
+			keys_stairs: "Clavier : flèches pour la direction · PgUp / PgDn monte / descend",
 			tool_door: "Porte",
 			tool_sliding_door: "Porte coulissante",
 			tool_window: "Fenêtre",
@@ -10304,7 +10320,7 @@ var ja = {
 				flip: !1,
 				out: !1
 			}
-		}, this._stairDir = "up", this._undo = [], this._redo = [], this._drag = null, this._fitted = !1, this._space = !1, this._alt = !1, this._onWheel = (e) => {
+		}, this._stairDir = "up", this._stairGoes = "up", this._undo = [], this._redo = [], this._drag = null, this._fitted = !1, this._space = !1, this._alt = !1, this._onWheel = (e) => {
 			e.preventDefault();
 			let t = this._svgRect();
 			e.ctrlKey || Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? this._zoom(Math.exp(-e.deltaY * (e.ctrlKey ? .01 : .0015)), e.clientX - t.left, e.clientY - t.top) : this._view = {
@@ -10538,7 +10554,9 @@ var ja = {
 				ArrowDown: "down",
 				"+": "wider",
 				"=": "wider",
-				"-": "narrower"
+				"-": "narrower",
+				PageUp: "goes-up",
+				PageDown: "goes-down"
 			};
 			if (r[e.key] && this._orientTarget()) e.preventDefault(), this._orient(r[e.key]);
 			else switch (e.key) {
@@ -10811,7 +10829,8 @@ var ja = {
 		let t = this._level, n = {
 			id: _a("st"),
 			...e,
-			dir: this._stairDir
+			dir: this._stairDir,
+			goes: this._stairGoes
 		};
 		this._commit(() => t.stairs = [...t.stairs ?? [], n]);
 	}
@@ -10896,7 +10915,7 @@ var ja = {
         <g class="grid">${this._grid()}</g>
         ${t ? _`<g class="ghost">
               ${t.rooms.map((e) => _`<polygon points=${o(e.points)}></polygon>${this._label(e, "ghost-label")}`)}
-              ${(t.stairs ?? []).map((e) => this._stair(e, !0))}
+              ${(t.stairs ?? []).filter((e) => !this._arrivals().some((t) => t.st === e)).map((e) => this._stair(e, "ghost"))}
             </g>` : v}
         <g class="shapes">
           ${e.rooms.map((e) => _`<polygon
@@ -10907,7 +10926,10 @@ var ja = {
             ></polygon>`)}
           ${e.rooms.map((e) => this._label(e, "label"))}
         </g>
-        <g class="stairs">${(e.stairs ?? []).map((e) => this._stair(e))}</g>
+        <g class="stairs">
+          ${this._arrivals().map((e) => this._stair(e.st, "arrival", e.from))}
+          ${(e.stairs ?? []).map((e) => this._stair(e))}
+        </g>
         <g class="openings">
           ${(e.openings ?? []).map((t) => this._opening(e, t))}
           ${this._wallHover && Fa(this._tool) ? this._opening(e, {
@@ -10937,7 +10959,8 @@ var ja = {
 			y: Math.min(this._rect[0][1], this._rect[1][1]),
 			w: Math.abs(this._rect[1][0] - this._rect[0][0]),
 			h: Math.abs(this._rect[1][1] - this._rect[0][1]),
-			dir: this._stairDir
+			dir: this._stairDir,
+			goes: this._stairGoes
 		}) : v}
         ${this._rect ? _`<g class="draft">
               <polygon points=${o([
@@ -10998,17 +11021,34 @@ var ja = {
       ${n ? v : _`<line data-kind="opening" data-id=${t.id} class="hit" x1=${i[0]} y1=${i[1]} x2=${a[0]} y2=${a[1]}></line>`}
     </g>`;
 	}
-	_stair(e, t = !1) {
-		let n = Ta(e).map((e) => e.join(",")).join(" "), [r, i] = Da(e), a = this._view.k, o = Math.atan2(i[1] - r[1], i[0] - r[0]), s = 9 / a, c = [
-			i,
-			[i[0] - s * Math.cos(o - .45), i[1] - s * Math.sin(o - .45)],
-			[i[0] - s * Math.cos(o + .45), i[1] - s * Math.sin(o + .45)]
-		].map((e) => e.join(",")).join(" ");
-		return _`<g class="stair ${t ? "ghost-stair" : ""} ${e.id === this._selected ? "selected" : ""}">
-      <polygon class="stair-bg" data-kind=${t ? "" : "stair"} data-id=${e.id} points=${n}></polygon>
+	_arrivals() {
+		let e = this._levels, t = e.findIndex((e) => e.id === this._levelId);
+		if (t < 0) return [];
+		let n = e[t - 1], r = e[t + 1];
+		return [...(n?.stairs ?? []).filter((e) => (e.goes ?? "up") === "up").map((e) => ({
+			st: e,
+			from: n
+		})), ...(r?.stairs ?? []).filter((e) => e.goes === "down").map((e) => ({
+			st: e,
+			from: r
+		}))];
+	}
+	_stairTarget(e) {
+		let t = this._levels, n = t.findIndex((e) => e.id === this._levelId);
+		return (e.goes ?? "up") === "up" ? t[n + 1] : t[n - 1];
+	}
+	_stair(e, t = "own", n) {
+		let r = Ta(e).map((e) => e.join(",")).join(" "), [i, a] = Da(e), o = (e.goes ?? "up") === "down", s = this._view.k, c = Math.atan2(a[1] - i[1], a[0] - i[0]), l = 9 / s, u = [
+			a,
+			[a[0] - l * Math.cos(c - .45), a[1] - l * Math.sin(c - .45)],
+			[a[0] - l * Math.cos(c + .45), a[1] - l * Math.sin(c + .45)]
+		].map((e) => e.join(",")).join(" "), d = t === "arrival" ? C(o ? "builder.stairs_arrival_down" : "builder.stairs_arrival_up", { name: n?.name ?? "" }) : t === "own" ? C(o ? "builder.stairs_tag_down" : "builder.stairs_tag_up") : "", f = e.x + e.w / 2, p = e.y + e.h / 2;
+		return _`<g class="stair ${t === "ghost" ? "ghost-stair" : ""} ${t === "arrival" ? "arrival" : ""} ${o ? "down" : ""} ${e.id === this._selected && t === "own" ? "selected" : ""}">
+      <polygon class="stair-bg" data-kind=${t === "own" ? "stair" : ""} data-id=${e.id} points=${r}></polygon>
       ${Ea(e).map(([e, t]) => _`<line class="tread" x1=${e[0]} y1=${e[1]} x2=${t[0]} y2=${t[1]}></line>`)}
-      <line class="arrow" x1=${r[0]} y1=${r[1]} x2=${i[0]} y2=${i[1]}></line>
-      <polygon class="arrow-head" points=${c}></polygon>
+      <line class="arrow" x1=${i[0]} y1=${i[1]} x2=${a[0]} y2=${a[1]}></line>
+      <polygon class="arrow-head" points=${u}></polygon>
+      ${d ? _`<text class="stair-tag" x=${f} y=${p} font-size=${10 / s} text-anchor="middle" dominant-baseline="middle">${d}</text>` : v}
     </g>`;
 	}
 	_toolbar() {
@@ -11174,7 +11214,7 @@ var ja = {
 				break;
 			}
 			case "tool-stairs":
-				this._stairDir = i(this._stairDir);
+				e === "goes-up" || e === "goes-down" ? this._stairGoes = e === "goes-up" ? "up" : "down" : this._stairDir = i(this._stairDir);
 				break;
 			case "opening": {
 				let e = t.item;
@@ -11182,8 +11222,8 @@ var ja = {
 				break;
 			}
 			case "stair": {
-				let e = t.item;
-				n || this._commit(() => e.dir = i(e.dir));
+				let r = t.item;
+				e === "goes-up" || e === "goes-down" ? this._commit(() => r.goes = e === "goes-up" ? "up" : "down") : n || this._commit(() => r.dir = i(r.dir));
 				break;
 			}
 		}
@@ -11232,10 +11272,25 @@ var ja = {
 		}
 		return e?.kind === "tool-stairs" ? g`<div class="selection">
         <div class="sel-head"><strong>${C("builder.tool_stairs")}</strong></div>
+        ${this._goesControl(this._stairGoes)}
         <p class="stats">${C("builder.stairs_climb")} <strong class="dir">${La[this._stairDir]}</strong></p>
         ${this._orientButtons(!0)}
         <p class="keys">${C("builder.keys_stairs")}</p>
       </div>` : v;
+	}
+	_goesControl(e) {
+		let t = this._stairTarget({ goes: e });
+		return g`<div class="seg">
+        <button class=${e === "up" ? "on" : ""} title="PgUp" @click=${() => this._orient("goes-up")}>
+          ↑ ${C("builder.stairs_go_up")}
+        </button>
+        <button class=${e === "down" ? "on" : ""} title="PgDn" @click=${() => this._orient("goes-down")}>
+          ↓ ${C("builder.stairs_go_down")}
+        </button>
+      </div>
+      <p class="stats">
+        ${t ? C(e === "up" ? "builder.stairs_to" : "builder.stairs_to_down", { name: t.name }) : C(e === "up" ? "builder.stairs_no_above" : "builder.stairs_no_below")}
+      </p>`;
 	}
 	_openingPanel(e) {
 		return g`<div class="selection">
@@ -11247,15 +11302,14 @@ var ja = {
     </div>`;
 	}
 	_stairPanel(e) {
-		let t = this._levels, n = t[t.findIndex((e) => e.id === this._levelId) + 1];
 		return g`<div class="selection">
       ${this._panelHead(C("builder.tool_stairs"))}
+      ${this._goesControl(e.goes ?? "up")}
       ${this._cmInput(C("builder.width_cm"), e.w, (t) => e.w = t, 40)}
       ${this._cmInput(C("builder.length_cm"), e.h, (t) => e.h = t, 40)}
       <p class="stats">${C("builder.stairs_climb")} <strong class="dir">${La[e.dir]}</strong></p>
       ${this._orientButtons(!0)}
       <p class="keys">${C("builder.keys_stairs")}</p>
-      <p class="stats">${n ? C("builder.stairs_to", { name: n.name }) : C("builder.stairs_no_above")}</p>
       <button class="danger-link" @click=${() => this._deleteSelected()}>${C("builder.item_delete")}</button>
     </div>`;
 	}
@@ -11845,6 +11899,50 @@ var ja = {
         stroke: var(--accent-color, #ff9800);
         stroke-width: 3;
       }
+      .seg {
+        display: flex;
+        margin-top: 8px;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.4));
+      }
+      .seg button {
+        flex: 1;
+        border-radius: 0;
+        background: transparent;
+      }
+      .seg button.on {
+        background: var(--primary-color);
+        color: var(--text-primary-color, #fff);
+      }
+      .stair-tag {
+        fill: var(--primary-text-color);
+        font-weight: 700;
+        paint-order: stroke;
+        stroke: var(--card-background-color, #1c1c1c);
+        stroke-width: 3px;
+        pointer-events: none;
+      }
+      /* Stairs arriving from the neighbouring floor. */
+      .arrival {
+        pointer-events: none;
+      }
+      .arrival .stair-bg {
+        fill: rgba(171, 71, 188, 0.22);
+        stroke: #ab47bc;
+        stroke-width: 2;
+        cursor: default;
+      }
+      .arrival .tread,
+      .arrival .arrow {
+        stroke: #ab47bc;
+      }
+      .arrival .arrow-head {
+        fill: #ab47bc;
+      }
+      .arrival .stair-tag {
+        fill: #ce93d8;
+      }
       .ghost-stair {
         opacity: 0.4;
         pointer-events: none;
@@ -11884,7 +11982,7 @@ var ja = {
         }
       }
     `], Ma);
-k([x({ attribute: !1 })], K.prototype, "hass", void 0), k([S()], K.prototype, "_plan", void 0), k([S()], K.prototype, "_rooms", void 0), k([S()], K.prototype, "_error", void 0), k([S()], K.prototype, "_levelId", void 0), k([S()], K.prototype, "_dialog", void 0), k([S()], K.prototype, "_tool", void 0), k([S()], K.prototype, "_selected", void 0), k([S()], K.prototype, "_draft", void 0), k([S()], K.prototype, "_hover", void 0), k([S()], K.prototype, "_rect", void 0), k([S()], K.prototype, "_view", void 0), k([S()], K.prototype, "_size", void 0), k([S()], K.prototype, "_saving", void 0), k([S()], K.prototype, "_dropTarget", void 0), k([S()], K.prototype, "_dragOver", void 0), k([S()], K.prototype, "_wallHover", void 0), k([S()], K.prototype, "_openingOpts", void 0), k([S()], K.prototype, "_stairDir", void 0), K = k([b("homex-builder")], K);
+k([x({ attribute: !1 })], K.prototype, "hass", void 0), k([S()], K.prototype, "_plan", void 0), k([S()], K.prototype, "_rooms", void 0), k([S()], K.prototype, "_error", void 0), k([S()], K.prototype, "_levelId", void 0), k([S()], K.prototype, "_dialog", void 0), k([S()], K.prototype, "_tool", void 0), k([S()], K.prototype, "_selected", void 0), k([S()], K.prototype, "_draft", void 0), k([S()], K.prototype, "_hover", void 0), k([S()], K.prototype, "_rect", void 0), k([S()], K.prototype, "_view", void 0), k([S()], K.prototype, "_size", void 0), k([S()], K.prototype, "_saving", void 0), k([S()], K.prototype, "_dropTarget", void 0), k([S()], K.prototype, "_dragOver", void 0), k([S()], K.prototype, "_wallHover", void 0), k([S()], K.prototype, "_openingOpts", void 0), k([S()], K.prototype, "_stairDir", void 0), k([S()], K.prototype, "_stairGoes", void 0), K = k([b("homex-builder")], K);
 // src/components/homex-heating-group-editor.ts
 var Ha, Ua = "default", Wa = 5, Ga = 30, Ka = .5, qa = 12, Ja = (e) => Math.min(Ga, Math.max(Wa, Math.round(e / Ka) * Ka)), q = (Ha = class extends y {
 	constructor(...e) {
@@ -16121,7 +16219,7 @@ var zo = (Lo = class extends y {
   `, Lo);
 k([x({ attribute: !1 })], zo.prototype, "hass", void 0), k([x({ type: Boolean })], zo.prototype, "open", void 0), k([S()], zo.prototype, "_backup", void 0), k([S()], zo.prototype, "_summary", void 0), k([S()], zo.prototype, "_fileName", void 0), k([S()], zo.prototype, "_error", void 0), k([S()], zo.prototype, "_busy", void 0), k([S()], zo.prototype, "_done", void 0), zo = k([b("homex-backup-dialog")], zo);
 // src/homex-panel.ts
-var Bo, Vo = "222", $ = (Bo = class extends y {
+var Bo, Vo = "223", $ = (Bo = class extends y {
 	constructor(...e) {
 		super(...e), this.narrow = !1, this._rooms = null, this._error = null, this._createOpen = !1, this._exportOpen = !1, this._restoreOpen = !1, this._menuOpen = !1, this._dashTab = localStorage.getItem("homex_dash_tab") === "climate" ? "climate" : "general", this._expanded = localStorage.getItem("homex_expanded") || null, this._loaded = !1, this._onToggleExpand = (e) => {
 			let t = e.detail.entry_id;

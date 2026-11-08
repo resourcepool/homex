@@ -9,7 +9,7 @@ Stored as one document in the ``homex_plan`` store::
                     "name": "...", "points": [[x, y], ...]}],  # cm
          "openings": [{"id", "type": "door" | "sliding_door" | "window" | "glass_door",
                        "shape", "edge", "t", "width", "flip", "out"}],
-         "stairs": [{"id", "x", "y", "w", "h", "dir": "up" | ...}]},
+         "stairs": [{"id", "x", "y", "w", "h", "dir": "up" | ..., "goes": "up" | "down"}]},
     ]}
 """
 
@@ -57,6 +57,7 @@ _STAIR = vol.Schema(
         vol.Required("w"): vol.All(vol.Coerce(float), vol.Range(min=1)),
         vol.Required("h"): vol.All(vol.Coerce(float), vol.Range(min=1)),
         vol.Required("dir"): vol.In(["up", "down", "left", "right"]),
+        vol.Optional("goes", default="up"): vol.In(["up", "down"]),
     },
     extra=vol.ALLOW_EXTRA,
 )

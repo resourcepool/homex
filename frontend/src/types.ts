@@ -413,6 +413,8 @@ export interface PlanStair {
   w: number;
   h: number;
   dir: "up" | "down" | "left" | "right";
+  /** Leads up to the floor above (default) or down to the floor below. */
+  goes?: "up" | "down";
 }
 
 export interface PlanLevel {
