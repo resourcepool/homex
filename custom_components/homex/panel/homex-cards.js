@@ -738,8 +738,7 @@ var nt, rt = [
         <span class="status big-icon ${u.cls}">${K(u.path)}</span>
         <span class="htext">
           <span class="hstate">${i ? "Pièce chauffée" : "Pièce non chauffée"}</span>
-          <span>${u.text}</span>
-          ${t && i ? A`<span class="muted">Mode ${t.mode_name}${t.enabled ? "" : " · chauffage global coupé"}</span>` : M}
+          <span class="secondary">${u.text}</span>
         </span>
       </div>
       ${i && o !== void 0 ? A`<div class="setpoint" title="Gardée jusqu'au prochain changement de mode">
@@ -762,6 +761,7 @@ var nt, rt = [
               ${K(ze)}
             </button>
           </div>` : M}
+      ${t && i ? A`<div class="hmode muted">Mode ${t.mode_name}${t.enabled ? "" : " · chauffage global coupé"}</div>` : M}
     </section>`;
 	}
 	_shutters() {
@@ -890,6 +890,13 @@ nt = X, nt.styles = o`
       flex-direction: column;
       gap: 2px;
       min-width: 0;
+    }
+    .secondary {
+      color: var(--secondary-text-color);
+    }
+    .hmode {
+      margin-top: 12px;
+      text-align: center;
     }
     .hstate {
       font-weight: 500;
