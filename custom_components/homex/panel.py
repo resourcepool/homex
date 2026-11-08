@@ -50,7 +50,10 @@ from .const import (
     DOMAIN,
     HOLD_RELOAD,
     HUB_DATA,
+    MODULE_HEATING,
     MODULE_LIGHTS,
+    MODULE_SHUTTERS,
+    MODULE_SWITCHES,
     SCENES_FILE,
     SCENES_LOCK,
     STRATEGY_RECALL_FIRST,
@@ -135,7 +138,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "208"
+PANEL_VERSION = "209"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -880,16 +883,23 @@ async def ws_room_create(hass: HomeAssistant, connection, msg) -> None:
     connection.send_result(msg["id"], {"ok": True})
 
 
-def _new_room_data(room_id: str, name: str, area_id: str | None) -> dict:
-    """Stored data of a new room with the default modules and nothing wired."""
+def _new_room_data(
+    room_id: str,
+    name: str,
+    area_id: str | None,
+    modules: list[str] | None = None,
+    devices: list[str] | None = None,
+) -> dict:
+    """Stored data of a new room: the given modules (none by default) and
+    lights, nothing else wired."""
     return {
         CONF_ROOM_ID: room_id,
         CONF_ROOM_NAME: name,
         CONF_AREA_ID: area_id or None,
-        CONF_MODULES: list(DEFAULT_MODULES),
+        CONF_MODULES: list(modules or []),
         CONF_HEATING: _clean_heating(None),
         CONF_METRICS: _clean_metrics(None),
-        CONF_DEVICES: [],
+        CONF_DEVICES: list(devices or []),
         CONF_TRIGGERS: [],
         CONF_SCENE_TRIGGERS: [],
         CONF_SCENE_STRATEGY: STRATEGY_RECALL_FIRST,
@@ -906,6 +916,12 @@ def _new_room_data(room_id: str, name: str, area_id: str | None) -> dict:
                 vol.Required("name"): str,
                 vol.Required("room_id"): str,
                 vol.Optional("area_id"): vol.Any(str, None),
+                # Modules to enable (none by default) and the lights module's
+                # devices (light entity ids).
+                vol.Optional("modules"): [
+                    vol.In([MODULE_LIGHTS, MODULE_SWITCHES, MODULE_SHUTTERS, MODULE_HEATING])
+                ],
+                vol.Optional("devices"): [str],
             }
         ],
     }
@@ -932,18 +948,26 @@ async def ws_rooms_import(hass: HomeAssistant, connection, msg) -> None:
             connection.send_error(msg["id"], "id_exists", tr(hass, _STRINGS, "room_exists"))
             return
         seen.add(room_id)
-        rooms.append((room_id, room["name"].strip() or room_id, room.get("area_id")))
+        rooms.append(
+            (
+                room_id,
+                room["name"].strip() or room_id,
+                room.get("area_id"),
+                room.get("modules", []),
+                room.get("devices", []),
+            )
+        )
     if not rooms:
         connection.send_result(msg["id"], {"created": []})
         return
     domain_data = hass.data.setdefault(DOMAIN, {})
     domain_data[HOLD_RELOAD] = True
     try:
-        for room_id, name, area_id in rooms:
+        for room_id, name, area_id, modules, devices in rooms:
             hass.config_entries.async_add_subentry(
                 hub,
                 ConfigSubentry(
-                    data=_new_room_data(room_id, name, area_id),
+                    data=_new_room_data(room_id, name, area_id, modules, devices),
                     subentry_type="room",
                     title=name,
                     unique_id=room_id,
@@ -1066,8 +1090,9 @@ async def ws_room_update(hass: HomeAssistant, connection, msg) -> None:
     # Modules: when the lights module is turned off, tear down its entities and
     # scenes (they are recreated if it is turned back on).
     if "modules" in msg:
+        old_modules = sub.data.get(CONF_MODULES)
         old_lights = MODULE_LIGHTS in (
-            sub.data.get(CONF_MODULES) or list(DEFAULT_MODULES)
+            list(DEFAULT_MODULES) if old_modules is None else old_modules
         )
         new_lights = MODULE_LIGHTS in msg["modules"]
         room[CONF_MODULES] = msg["modules"]

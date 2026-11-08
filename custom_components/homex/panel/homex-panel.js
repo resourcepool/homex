@@ -1882,7 +1882,15 @@ var Vt = {
 			importing: "Importing…",
 			done_one: "1 room imported.",
 			done_other: "{count} rooms imported.",
-			continue: "Continue"
+			continue: "Continue",
+			next: "Next",
+			options_intro: "What should Homex bring along with these {count} room(s)?",
+			lights_title: "Import the lights",
+			lights_desc: "Turns on the Lights module and adds the {lights} light(s) of {rooms} room(s).",
+			lights_none: "No light found in these rooms.",
+			shutters_title: "Import the shutters",
+			shutters_soon: "Coming soon.",
+			options_hint: "Rooms are created without any module; each import turns on the matching module. Everything stays editable afterwards."
 		},
 		fr: {
 			title: "Assistant de configuration Homex",
@@ -1907,7 +1915,15 @@ var Vt = {
 			importing: "Import en cours…",
 			done_one: "1 pièce importée.",
 			done_other: "{count} pièces importées.",
-			continue: "Continuer"
+			continue: "Continuer",
+			next: "Suivant",
+			options_intro: "Que doit importer Homex avec ces {count} pièce(s) ?",
+			lights_title: "Importer les lumières",
+			lights_desc: "Active le module Lumières et ajoute les {lights} lumière(s) de {rooms} pièce(s).",
+			lights_none: "Aucune lumière trouvée dans ces pièces.",
+			shutters_title: "Importer les volets",
+			shutters_soon: "Bientôt disponible.",
+			options_hint: "Les pièces sont créées sans aucun module ; chaque import active le module correspondant. Tout reste modifiable ensuite."
 		}
 	},
 	shutterControlDialog: {
@@ -12690,7 +12706,7 @@ k([b({ attribute: !1 })], za.prototype, "hass", void 0), k([b({ attribute: !1 })
 // src/components/homex-setup-wizard.ts
 var Ba = class extends v {
 	constructor(...e) {
-		super(...e), this.rooms = [], this._step = "choose", this._selected = /* @__PURE__ */ new Set(), this._busy = !1, this._created = 0;
+		super(...e), this.rooms = [], this._step = "choose", this._withLights = !0, this._selected = /* @__PURE__ */ new Set(), this._busy = !1, this._created = 0;
 	}
 	_areas() {
 		let e = new Set(this.rooms.map((e) => e.area_id).filter(Boolean)), t = /* @__PURE__ */ new Map();
@@ -12731,20 +12747,37 @@ var Ba = class extends v {
 		for (let r of e) t ? n.add(r) : n.delete(r);
 		this._selected = n;
 	}
+	_lightsByArea() {
+		let e = this.hass.devices ?? {}, t = /* @__PURE__ */ new Map();
+		for (let n of Object.values(this.hass.entities ?? {})) {
+			if (!n.entity_id.startsWith("light.") || n.entity_id.startsWith("light.homex_") || n.hidden || n.entity_category) continue;
+			let r = n.area_id || n.device_id && e[n.device_id]?.area_id;
+			r && (t.get(r) ?? t.set(r, []).get(r)).push(n.entity_id);
+		}
+		for (let e of t.values()) e.sort();
+		return t;
+	}
+	_selectedAreas() {
+		return this._areas().filter((e) => this._selected.has(e.area_id) && !e.imported);
+	}
 	_roomIds(e) {
-		let t = new Set(this.rooms.map((e) => e.room_id));
+		let t = new Set(this.rooms.map((e) => e.room_id)), n = this._lightsByArea();
 		return e.map((e) => {
-			let n = /^[a-z0-9_]+$/.test(e.area_id) ? e.area_id : N(e.name) || "room", r = n;
-			for (let e = 2; t.has(r); e++) r = `${n}_${e}`;
-			return t.add(r), {
+			let r = /^[a-z0-9_]+$/.test(e.area_id) ? e.area_id : N(e.name) || "room", i = r;
+			for (let e = 2; t.has(i); e++) i = `${r}_${e}`;
+			t.add(i);
+			let a = this._withLights ? n.get(e.area_id) ?? [] : [];
+			return {
 				name: e.name,
-				room_id: r,
-				area_id: e.area_id
+				room_id: i,
+				area_id: e.area_id,
+				modules: a.length ? ["lights"] : [],
+				devices: a
 			};
 		});
 	}
 	async _import() {
-		let e = this._areas().filter((e) => this._selected.has(e.area_id) && !e.imported);
+		let e = this._selectedAreas();
 		if (e.length) {
 			this._busy = !0;
 			try {
@@ -12834,8 +12867,51 @@ var Ba = class extends v {
 		})}
       <div class="actions">
         <button class="secondary" @click=${() => this._step = "choose"}>${S("setupWizard.back")}</button>
-        <button class="primary" ?disabled=${!r || this._busy} @click=${this._import}>
-          ${this._busy ? S("setupWizard.importing") : S(r === 1 ? "setupWizard.import_button_one" : "setupWizard.import_button_other", { count: r })}
+        <button class="primary" ?disabled=${!r} @click=${() => this._step = "options"}>
+          ${S("setupWizard.next")}
+        </button>
+      </div>
+    `;
+	}
+	_options() {
+		let e = this._selectedAreas(), t = this._lightsByArea(), n = e.reduce((e, n) => e + (t.get(n.area_id)?.length ?? 0), 0), r = e.filter((e) => t.get(e.area_id)?.length).length, i = e.length;
+		return h`
+      <p class="lead">${S("setupWizard.options_intro", { count: i })}</p>
+      <label class="option">
+        <span class="option-text">
+          <span class="option-title">${S("setupWizard.lights_title")}</span>
+          <span class="option-desc">
+            ${n ? S("setupWizard.lights_desc", {
+			lights: n,
+			rooms: r
+		}) : S("setupWizard.lights_none")}
+          </span>
+        </span>
+        <span class="switch">
+          <input
+            type="checkbox"
+            .checked=${this._withLights && n > 0}
+            ?disabled=${!n}
+            @change=${(e) => this._withLights = e.target.checked}
+          />
+          <span></span>
+        </span>
+      </label>
+      <label class="option disabled">
+        <span class="option-text">
+          <span class="option-title">${S("setupWizard.shutters_title")}</span>
+          <span class="option-desc">${S("setupWizard.shutters_soon")}</span>
+        </span>
+        <span class="switch">
+          <input type="checkbox" disabled />
+          <span></span>
+        </span>
+      </label>
+      <p class="hint">${S("setupWizard.options_hint")}</p>
+      <div class="actions">
+        <button class="secondary" @click=${() => this._step = "import"}>${S("setupWizard.back")}</button>
+        <button class="primary" ?disabled=${!i || this._busy} @click=${this._import}>
+          ${this._busy ? S("setupWizard.importing") : S(i === 1 ? "setupWizard.import_button_one" : "setupWizard.import_button_other", { count: i })}
         </button>
       </div>
     `;
@@ -12867,7 +12943,7 @@ var Ba = class extends v {
           <span class="step-num">1</span>
           <span>${S("setupWizard.step_rooms")}</span>
         </div>
-        ${this._step === "choose" ? this._choose() : this._step === "import" ? this._importList() : this._done()}
+        ${this._step === "choose" ? this._choose() : this._step === "import" ? this._importList() : this._step === "options" ? this._options() : this._done()}
       </div>
     `;
 	}
@@ -13056,6 +13132,67 @@ var Ba = class extends v {
       background: transparent;
       border-color: var(--divider-color, rgba(127, 127, 127, 0.4));
     }
+    .option {
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 16px;
+      border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+    .option.disabled {
+      cursor: default;
+      opacity: 0.55;
+    }
+    .option-text {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .option-title {
+      font-weight: 500;
+    }
+    .option-desc,
+    .hint {
+      color: var(--secondary-text-color);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .switch {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      flex: none;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .switch span {
+      position: absolute;
+      inset: 0;
+      border-radius: 11px;
+      background: rgba(127, 127, 127, 0.4);
+      transition: background 0.2s;
+    }
+    .switch span::before {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 2px;
+      top: 2px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.2s;
+    }
+    .switch input:checked + span {
+      background: var(--primary-color);
+    }
+    .switch input:checked + span::before {
+      transform: translateX(18px);
+    }
     .done {
       display: flex;
       align-items: center;
@@ -13069,9 +13206,9 @@ var Ba = class extends v {
       height: 36px;
     }
   `, Ba);
-k([b({ attribute: !1 })], Va.prototype, "hass", void 0), k([b({ attribute: !1 })], Va.prototype, "rooms", void 0), k([x()], Va.prototype, "_step", void 0), k([x()], Va.prototype, "_selected", void 0), k([x()], Va.prototype, "_busy", void 0), k([x()], Va.prototype, "_created", void 0), Va = k([y("homex-setup-wizard")], Va);
+k([b({ attribute: !1 })], Va.prototype, "hass", void 0), k([b({ attribute: !1 })], Va.prototype, "rooms", void 0), k([x()], Va.prototype, "_step", void 0), k([x()], Va.prototype, "_withLights", void 0), k([x()], Va.prototype, "_selected", void 0), k([x()], Va.prototype, "_busy", void 0), k([x()], Va.prototype, "_created", void 0), Va = k([y("homex-setup-wizard")], Va);
 // src/homex-panel.ts
-var Ha, Ua = "208", $ = (Ha = class extends v {
+var Ha, Ua = "209", $ = (Ha = class extends v {
 	constructor(...e) {
 		super(...e), this.narrow = !1, this._rooms = null, this._error = null, this._createOpen = !1, this._exportOpen = !1, this._menuOpen = !1, this._dashTab = localStorage.getItem("homex_dash_tab") === "climate" ? "climate" : "general", this._expanded = localStorage.getItem("homex_expanded") || null, this._loaded = !1, this._onToggleExpand = (e) => {
 			let t = e.detail.entry_id;

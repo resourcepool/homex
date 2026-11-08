@@ -1809,7 +1809,15 @@ var Fe = "M19.92,12.08L12,20L4.08,12.08L5.5,10.67L11,16.17V2H13V16.17L18.5,10.66
 			importing: "Importing…",
 			done_one: "1 room imported.",
 			done_other: "{count} rooms imported.",
-			continue: "Continue"
+			continue: "Continue",
+			next: "Next",
+			options_intro: "What should Homex bring along with these {count} room(s)?",
+			lights_title: "Import the lights",
+			lights_desc: "Turns on the Lights module and adds the {lights} light(s) of {rooms} room(s).",
+			lights_none: "No light found in these rooms.",
+			shutters_title: "Import the shutters",
+			shutters_soon: "Coming soon.",
+			options_hint: "Rooms are created without any module; each import turns on the matching module. Everything stays editable afterwards."
 		},
 		fr: {
 			title: "Assistant de configuration Homex",
@@ -1834,7 +1842,15 @@ var Fe = "M19.92,12.08L12,20L4.08,12.08L5.5,10.67L11,16.17V2H13V16.17L18.5,10.66
 			importing: "Import en cours…",
 			done_one: "1 pièce importée.",
 			done_other: "{count} pièces importées.",
-			continue: "Continuer"
+			continue: "Continuer",
+			next: "Suivant",
+			options_intro: "Que doit importer Homex avec ces {count} pièce(s) ?",
+			lights_title: "Importer les lumières",
+			lights_desc: "Active le module Lumières et ajoute les {lights} lumière(s) de {rooms} pièce(s).",
+			lights_none: "Aucune lumière trouvée dans ces pièces.",
+			shutters_title: "Importer les volets",
+			shutters_soon: "Bientôt disponible.",
+			options_hint: "Les pièces sont créées sans aucun module ; chaque import active le module correspondant. Tout reste modifiable ensuite."
 		}
 	},
 	shutterControlDialog: {

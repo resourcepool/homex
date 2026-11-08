@@ -27,8 +27,11 @@ export class HomexSetupWizard extends LitElement {
   @property({ attribute: false }) hass!: HomeAssistant;
   @property({ attribute: false }) rooms: Room[] = [];
 
-  /** choose: import or create; import: pick the areas; done: summary. */
-  @state() private _step: "choose" | "import" | "done" = "choose";
+  /** choose: import or create; import: pick the areas; options: what to
+   * import with them (lights, shutters); done: summary. */
+  @state() private _step: "choose" | "import" | "options" | "done" = "choose";
+  /** What to bring along with the rooms (step "options"). */
+  @state() private _withLights = true;
   @state() private _selected = new Set<string>();
   @state() private _busy = false;
   @state() private _created = 0;
@@ -91,20 +94,49 @@ export class HomexSetupWizard extends LitElement {
     this._selected = next;
   }
 
-  /** A free room id from the area (its id when valid, else its slugified name). */
+  /** Light entities by area (the entity's area, else its device's), minus
+   * Homex's own, hidden and configuration / diagnostic ones. */
+  private _lightsByArea(): Map<string, string[]> {
+    const devices = (this.hass.devices ?? {}) as Record<string, any>;
+    const out = new Map<string, string[]>();
+    for (const e of Object.values((this.hass.entities ?? {}) as Record<string, any>)) {
+      if (!e.entity_id.startsWith("light.") || e.entity_id.startsWith("light.homex_")) continue;
+      if (e.hidden || e.entity_category) continue;
+      const area = e.area_id || (e.device_id && devices[e.device_id]?.area_id);
+      if (!area) continue;
+      (out.get(area) ?? out.set(area, []).get(area)!).push(e.entity_id);
+    }
+    for (const list of out.values()) list.sort();
+    return out;
+  }
+
+  private _selectedAreas() {
+    return this._areas().filter((a) => this._selected.has(a.area_id) && !a.imported);
+  }
+
+  /** The rooms to create: a free id from the area (its id when valid, else
+   * its slugified name), and the lights when importing them. */
   private _roomIds(areas: AreaRow[]) {
     const taken = new Set(this.rooms.map((r) => r.room_id));
+    const lights = this._lightsByArea();
     return areas.map((a) => {
       const base = /^[a-z0-9_]+$/.test(a.area_id) ? a.area_id : slugify(a.name) || "room";
       let id = base;
       for (let n = 2; taken.has(id); n++) id = `${base}_${n}`;
       taken.add(id);
-      return { name: a.name, room_id: id, area_id: a.area_id };
+      const devices = this._withLights ? lights.get(a.area_id) ?? [] : [];
+      return {
+        name: a.name,
+        room_id: id,
+        area_id: a.area_id,
+        modules: devices.length ? ["lights"] : [],
+        devices,
+      };
     });
   }
 
   private async _import() {
-    const areas = this._areas().filter((a) => this._selected.has(a.area_id) && !a.imported);
+    const areas = this._selectedAreas();
     if (!areas.length) return;
     this._busy = true;
     try {
@@ -205,6 +237,54 @@ export class HomexSetupWizard extends LitElement {
       })}
       <div class="actions">
         <button class="secondary" @click=${() => (this._step = "choose")}>${t("setupWizard.back")}</button>
+        <button class="primary" ?disabled=${!count} @click=${() => (this._step = "options")}>
+          ${t("setupWizard.next")}
+        </button>
+      </div>
+    `;
+  }
+
+  /** What to import with the rooms: their lights, their shutters. */
+  private _options() {
+    const areas = this._selectedAreas();
+    const lights = this._lightsByArea();
+    const nLights = areas.reduce((n, a) => n + (lights.get(a.area_id)?.length ?? 0), 0);
+    const roomsWithLights = areas.filter((a) => lights.get(a.area_id)?.length).length;
+    const count = areas.length;
+    return html`
+      <p class="lead">${t("setupWizard.options_intro", { count })}</p>
+      <label class="option">
+        <span class="option-text">
+          <span class="option-title">${t("setupWizard.lights_title")}</span>
+          <span class="option-desc">
+            ${nLights
+              ? t("setupWizard.lights_desc", { lights: nLights, rooms: roomsWithLights })
+              : t("setupWizard.lights_none")}
+          </span>
+        </span>
+        <span class="switch">
+          <input
+            type="checkbox"
+            .checked=${this._withLights && nLights > 0}
+            ?disabled=${!nLights}
+            @change=${(e: Event) => (this._withLights = (e.target as HTMLInputElement).checked)}
+          />
+          <span></span>
+        </span>
+      </label>
+      <label class="option disabled">
+        <span class="option-text">
+          <span class="option-title">${t("setupWizard.shutters_title")}</span>
+          <span class="option-desc">${t("setupWizard.shutters_soon")}</span>
+        </span>
+        <span class="switch">
+          <input type="checkbox" disabled />
+          <span></span>
+        </span>
+      </label>
+      <p class="hint">${t("setupWizard.options_hint")}</p>
+      <div class="actions">
+        <button class="secondary" @click=${() => (this._step = "import")}>${t("setupWizard.back")}</button>
         <button class="primary" ?disabled=${!count || this._busy} @click=${this._import}>
           ${this._busy
             ? t("setupWizard.importing")
@@ -242,7 +322,13 @@ export class HomexSetupWizard extends LitElement {
           <span class="step-num">1</span>
           <span>${t("setupWizard.step_rooms")}</span>
         </div>
-        ${this._step === "choose" ? this._choose() : this._step === "import" ? this._importList() : this._done()}
+        ${this._step === "choose"
+          ? this._choose()
+          : this._step === "import"
+            ? this._importList()
+            : this._step === "options"
+              ? this._options()
+              : this._done()}
       </div>
     `;
   }
@@ -431,6 +517,67 @@ export class HomexSetupWizard extends LitElement {
     .secondary {
       background: transparent;
       border-color: var(--divider-color, rgba(127, 127, 127, 0.4));
+    }
+    .option {
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 16px;
+      border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+    .option.disabled {
+      cursor: default;
+      opacity: 0.55;
+    }
+    .option-text {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .option-title {
+      font-weight: 500;
+    }
+    .option-desc,
+    .hint {
+      color: var(--secondary-text-color);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .switch {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      flex: none;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .switch span {
+      position: absolute;
+      inset: 0;
+      border-radius: 11px;
+      background: rgba(127, 127, 127, 0.4);
+      transition: background 0.2s;
+    }
+    .switch span::before {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 2px;
+      top: 2px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.2s;
+    }
+    .switch input:checked + span {
+      background: var(--primary-color);
+    }
+    .switch input:checked + span::before {
+      transform: translateX(18px);
     }
     .done {
       display: flex;

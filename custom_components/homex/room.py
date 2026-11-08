@@ -979,7 +979,13 @@ class RoomController:
         for entity_id in self.managed_entity_ids():
             if ent_reg.async_get(entity_id) is None:
                 continue
-            ent_reg.async_update_entity(entity_id, area_id=area_id, labels=labels)
+            try:
+                ent_reg.async_update_entity(entity_id, area_id=area_id, labels=labels)
+            except ValueError:
+                # An entity named after its device (no name of its own, e.g. a
+                # Zigbee2MQTT light) can't have an area of its own: it takes
+                # its device's. Labels only.
+                ent_reg.async_update_entity(entity_id, labels=labels)
             updated += 1
         _LOGGER.debug(
             "[%s] synced %d entities to area=%s with %d label(s)",
