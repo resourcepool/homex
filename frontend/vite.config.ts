@@ -12,5 +12,9 @@ export default defineConfig({
     emptyOutDir: false,
     target: "es2021",
     minify: true,
+    rollupOptions: {
+      // three.js (Rendering tab) is loaded on demand, from a fixed file name.
+      output: { chunkFileNames: "homex-[name]-[hash].js" },
+    },
   },
 });

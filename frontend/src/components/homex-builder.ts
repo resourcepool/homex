@@ -154,7 +154,7 @@ export class HomexBuilder extends LitElement {
     turn: "right",
   };
   /** Structure (rooms, openings, stairs) or fixtures (shutters, radiators). */
-  @state() private _mode: "structure" | "fixtures" = "structure";
+  @state() private _mode: "structure" | "fixtures" | "render" = "structure";
   /** Light being drawn: clicks add its spots / strips. */
   @state() private _placing: string | null = null;
   /** Linear light: the first end of the strip being drawn. */
@@ -1034,7 +1034,9 @@ export class HomexBuilder extends LitElement {
 
   // -- Fixtures -------------------------------------------------------------------------
 
-  private _setMode(mode: "structure" | "fixtures") {
+  private _setMode(mode: "structure" | "fixtures" | "render") {
+    // three.js loads with the Rendering tab only.
+    if (mode === "render") import("./homex-builder-render");
     if (this._placing) this._stopPlacing();
     this._setTool("select");
     this._mode = mode;
@@ -1250,6 +1252,7 @@ export class HomexBuilder extends LitElement {
   private _onKey = (e: KeyboardEvent) => {
     const tag = (e.composedPath()[0] as HTMLElement)?.tagName;
     if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+    if (this._mode === "render") return;
     if (!this._level && !(e.key === "z" && (e.metaKey || e.ctrlKey))) return;
     this._alt = e.altKey;
     const mod = e.metaKey || e.ctrlKey;
@@ -2492,6 +2495,9 @@ export class HomexBuilder extends LitElement {
               <button class=${this._mode === "fixtures" ? "on" : ""} @click=${() => this._setMode("fixtures")}>
                 🔌 ${t("builder.mode_fixtures")}
               </button>
+              <button class=${this._mode === "render" ? "on" : ""} @click=${() => this._setMode("render")}>
+                🏠 ${t("builder.mode_render")}
+              </button>
             </div>`
           : nothing}
         <span class="status ${this._saving}">${saving}</span>
@@ -2506,7 +2512,14 @@ export class HomexBuilder extends LitElement {
               <p>${t("builder.empty_text")}</p>
               <button class="primary" @click=${() => this._openLevelDialog("new", 0)}>${t("builder.create_first")}</button>
             </div>`
-          : html`<div class="body">
+          : this._mode === "render"
+            ? html`<homex-builder-render
+                .hass=${this.hass}
+                .plan=${this._plan}
+                .levelId=${this._levelId}
+                .names=${Object.fromEntries(this._rooms.map((r) => [r.room_id, r.name]))}
+              ></homex-builder-render>`
+            : html`<div class="body">
               ${this._sidePanel()}
               <div
                 class="stage ${this._dragOver ? "dragover" : ""}"

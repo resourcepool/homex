@@ -4,14 +4,16 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "build": "vite build && vite build -c vite.cards.config.ts",
+    "build": "rm -f ../custom_components/homex/panel/homex-*-*.js && vite build && vite build -c vite.cards.config.ts",
     "watch": "vite build --watch"
   },
   "dependencies": {
     "@mdi/js": "^7.4.47",
-    "lit": "^3.3.3"
+    "lit": "^3.3.3",
+    "three": "0.187.0"
   },
   "devDependencies": {
+    "@types/three": "0.187.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.6"
   }
