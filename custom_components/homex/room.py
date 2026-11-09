@@ -22,6 +22,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+import time
 from collections import deque
 
 from homeassistant.components.device_automation import (
@@ -104,6 +105,9 @@ from .const import (
 
 from .i18n import LANGUAGES, language, tr
 
+# Seconds a scene takes to settle: a room whose lights are all off meanwhile
+# (one turning off before another turns on) is not turned off.
+SCENE_SETTLE_S = 3.0
 _LOGGER = logging.getLogger(__name__)
 
 ROOM_KEY = "room"
@@ -806,6 +810,10 @@ class RoomController:
     def last_scene_key(self) -> str | None:
         return self._last_scene_key
 
+    def scene_settling(self) -> float:
+        """Seconds left while a scene just applied settles (0: none)."""
+        return max(0.0, getattr(self, "_scene_settle_until", 0.0) - time.monotonic())
+
     def restore_scene_memory(
         self, last_key: str | None, active_key: str | None
     ) -> None:
@@ -823,6 +831,11 @@ class RoomController:
         """Record the active scene and expose it on the room switch (on: also
         reflect the room on, in the same state write — no "on without a
         scene" step)."""
+        if key is not None:
+            # A scene is being applied: its lights change one by one and may
+            # all be off for an instant (e.g. Reading → Night) — the room
+            # switch must not read that as the room turned off.
+            self._scene_settle_until = time.monotonic() + SCENE_SETTLE_S
         self._active_scene_key = key
         if self._room_switch is not None:
             if on:

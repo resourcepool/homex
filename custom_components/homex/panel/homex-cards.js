@@ -1385,7 +1385,7 @@ var oe = async (e) => (await e.callWS({ type: "homex/rooms" })).rooms || [], se 
 		};
 	}
 	connectedCallback() {
-		super.connectedCallback(), this._unlisten = i(() => this.requestUpdate()), import("./homex-cards-homex-builder-render-DzedCmih.js").then(() => this._ready = !0);
+		super.connectedCallback(), this._unlisten = i(() => this.requestUpdate()), import("./homex-cards-homex-builder-render-8GmneECR.js").then(() => this._ready = !0);
 	}
 	disconnectedCallback() {
 		super.disconnectedCallback(), this._unlisten?.();

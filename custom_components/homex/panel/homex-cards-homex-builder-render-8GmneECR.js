@@ -14438,27 +14438,26 @@ var rf, af = 2.8, of = 2.5, sf = .1, cf = .12, lf = 40, uf = "#ffcf87", df = .12
         </div>
         ${n ? f`<div class="strip">
               <button title=${a("builder.render_reset")} @click=${() => this._frame()}>⤢</button>
-              ${e.map((e) => f`<button class=${this._upTo === e.level ? "on" : ""} title=${e.name} @click=${() => this._show(e.level)}>${e.level}</button>`)}
-              <button class=${this._upTo === null ? "on" : ""} title=${a("builder.render_all")} @click=${() => this._show(null)}>☰</button>
             </div>` : f`<div class="p-body">
               <section>
                 <div class="c-title">${a("builder.render_view")}</div>
                 <button class="cmd" @click=${() => this._frame()}>⤢ ${a("builder.render_reset")}</button>
                 <small class="hint">${a("builder.render_hint")}</small>
               </section>
-              <section>
-                <div class="c-title">${a("builder.render_floors")}</div>
-                <div class="floors">
-                  <button class=${this._upTo === null ? "on" : ""} @click=${() => this._show(null)}>${a("builder.render_all")}</button>
-                  ${e.map((e) => f`<button class=${this._upTo === e.level ? "on" : ""} @click=${() => this._show(e.level)}>
-                      <strong>${e.level}</strong> ${e.name}
-                    </button>`)}
-                </div>
-              </section>
               ${t ?? f`<p class="none pick">${a("builder.render_pick_room")}</p>`}
             </div>`}
       </aside>
-      <div class="stage"><div class="view"></div></div>
+      <div class="stage">
+        <div class="view"></div>
+        <div class="floors" role="group" aria-label=${a("builder.render_floors")}>
+          ${e.map((e) => f`<button class=${this._upTo === e.level ? "on" : ""} title=${e.name} aria-label=${e.name} @click=${() => this._show(e.level)}>
+              ${e.level}
+            </button>`)}
+          <button class="all ${this._upTo === null ? "on" : ""}" title=${a("builder.render_all")} aria-label=${a("builder.render_all")} @click=${() => this._show(null)}>
+            <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+          </button>
+        </div>
+      </div>
     </div>`;
 	}
 };
@@ -14580,17 +14579,25 @@ rf = wf, rf.styles = d`
       display: block;
     }
     .floors {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      background: color-mix(in srgb, var(--card-background-color, #1c1c1c) 90%, transparent);
       border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
       border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
     .floors button {
+      width: 40px;
+      height: 36px;
+      display: grid;
+      place-items: center;
       font: inherit;
-      font-size: 13px;
-      text-align: left;
-      padding: 8px 12px;
+      font-size: 14px;
+      font-weight: 600;
       border: 0;
       background: transparent;
       color: var(--primary-text-color);
@@ -14603,9 +14610,13 @@ rf = wf, rf.styles = d`
       background: var(--primary-color);
       color: var(--text-primary-color, #fff);
     }
-    .floors strong {
-      display: inline-block;
-      min-width: 22px;
+    .floors button svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
     }
     .ctl {
       box-sizing: border-box;

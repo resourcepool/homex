@@ -8063,7 +8063,7 @@ var yi, bi = [
 		}
 	}
 	_setMode(e) {
-		e === "render" && import("./homex-homex-builder-render-5qPReQVU.js"), this._placing && this._stopPlacing(), this._armed = null, this._pub = null, this._setTool("select"), this._mode = e, this._selected = null;
+		e === "render" && import("./homex-homex-builder-render-BArX09ak.js"), this._placing && this._stopPlacing(), this._armed = null, this._pub = null, this._setTool("select"), this._mode = e, this._selected = null;
 	}
 	_levelRooms() {
 		let e = new Set((this._level?.rooms ?? []).map((e) => e.room_id).filter(Boolean));
@@ -14535,7 +14535,7 @@ var Ma = (Aa = class extends b {
   `, Aa);
 e([v({ attribute: !1 })], Ma.prototype, "hass", void 0), e([v({ type: Boolean })], Ma.prototype, "open", void 0), e([s()], Ma.prototype, "_backup", void 0), e([s()], Ma.prototype, "_summary", void 0), e([s()], Ma.prototype, "_fileName", void 0), e([s()], Ma.prototype, "_error", void 0), e([s()], Ma.prototype, "_busy", void 0), e([s()], Ma.prototype, "_done", void 0), Ma = e([w("homex-backup-dialog")], Ma);
 // src/homex-panel.ts
-var Na, Pa = "242", $ = (Na = class extends b {
+var Na, Pa = "243", $ = (Na = class extends b {
 	constructor(...e) {
 		super(...e), this.narrow = !1, this._rooms = null, this._error = null, this._createOpen = !1, this._exportOpen = !1, this._restoreOpen = !1, this._menuOpen = !1, this._dashTab = (() => {
 			try {
@@ -14589,7 +14589,7 @@ var Na, Pa = "242", $ = (Na = class extends b {
 	_renderDashboard(e) {
 		let t = (this._rooms ?? []).some((e) => (e.modules ?? []).includes("heating")), n = f("builder") && !!this._plan?.published && this._plan.levels.length > 0;
 		if (!t && !n) return e;
-		n && import("./homex-homex-builder-render-5qPReQVU.js");
+		n && import("./homex-homex-builder-render-BArX09ak.js");
 		let r = this._dashTab === "climate" && !t || this._dashTab === "house" && !n ? "general" : this._dashTab, i = (e) => {
 			this._dashTab = e;
 			try {

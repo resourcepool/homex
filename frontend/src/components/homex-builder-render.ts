@@ -1212,10 +1212,6 @@ export class HomexBuilderRender extends LitElement {
         ${collapsed
           ? html`<div class="strip">
               <button title=${t("builder.render_reset")} @click=${() => this._frame()}>⤢</button>
-              ${levels.map(
-                (l) => html`<button class=${this._upTo === l.level ? "on" : ""} title=${l.name} @click=${() => this._show(l.level)}>${l.level}</button>`
-              )}
-              <button class=${this._upTo === null ? "on" : ""} title=${t("builder.render_all")} @click=${() => this._show(null)}>☰</button>
             </div>`
           : html`<div class="p-body">
               <section>
@@ -1223,21 +1219,22 @@ export class HomexBuilderRender extends LitElement {
                 <button class="cmd" @click=${() => this._frame()}>⤢ ${t("builder.render_reset")}</button>
                 <small class="hint">${t("builder.render_hint")}</small>
               </section>
-              <section>
-                <div class="c-title">${t("builder.render_floors")}</div>
-                <div class="floors">
-                  <button class=${this._upTo === null ? "on" : ""} @click=${() => this._show(null)}>${t("builder.render_all")}</button>
-                  ${levels.map(
-                    (l) => html`<button class=${this._upTo === l.level ? "on" : ""} @click=${() => this._show(l.level)}>
-                      <strong>${l.level}</strong> ${l.name}
-                    </button>`
-                  )}
-                </div>
-              </section>
               ${room ?? html`<p class="none pick">${t("builder.render_pick_room")}</p>`}
             </div>`}
       </aside>
-      <div class="stage"><div class="view"></div></div>
+      <div class="stage">
+        <div class="view"></div>
+        <div class="floors" role="group" aria-label=${t("builder.render_floors")}>
+          ${levels.map(
+            (l) => html`<button class=${this._upTo === l.level ? "on" : ""} title=${l.name} aria-label=${l.name} @click=${() => this._show(l.level)}>
+              ${l.level}
+            </button>`
+          )}
+          <button class="all ${this._upTo === null ? "on" : ""}" title=${t("builder.render_all")} aria-label=${t("builder.render_all")} @click=${() => this._show(null)}>
+            <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+          </button>
+        </div>
+      </div>
     </div>`;
   }
 
@@ -1359,17 +1356,25 @@ export class HomexBuilderRender extends LitElement {
       display: block;
     }
     .floors {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      background: color-mix(in srgb, var(--card-background-color, #1c1c1c) 90%, transparent);
       border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
       border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
     .floors button {
+      width: 40px;
+      height: 36px;
+      display: grid;
+      place-items: center;
       font: inherit;
-      font-size: 13px;
-      text-align: left;
-      padding: 8px 12px;
+      font-size: 14px;
+      font-weight: 600;
       border: 0;
       background: transparent;
       color: var(--primary-text-color);
@@ -1382,9 +1387,13 @@ export class HomexBuilderRender extends LitElement {
       background: var(--primary-color);
       color: var(--text-primary-color, #fff);
     }
-    .floors strong {
-      display: inline-block;
-      min-width: 22px;
+    .floors button svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
     }
     .ctl {
       box-sizing: border-box;

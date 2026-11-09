@@ -10,7 +10,7 @@ from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import Event, HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.event import async_track_state_change_event
+from homeassistant.helpers.event import async_call_later, async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from homeassistant.helpers import entity_registry as er
@@ -183,6 +183,7 @@ class RoomSwitch(SwitchEntity, RestoreEntity):
         self.entity_id = unit.switch_entity_id
         self._attr_is_on = False
         self._active_scene: str | None = None
+        self._recheck = None  # pending look after a scene settles
 
     @property
     def extra_state_attributes(self) -> dict:
@@ -239,15 +240,34 @@ class RoomSwitch(SwitchEntity, RestoreEntity):
         self._recompute_room_on()
 
     @callback
-    def _recompute_room_on(self) -> None:
+    def _recompute_room_on(self, _now=None) -> None:
         """Derive on/off from the room's parts (no scene side effect)."""
         on = self._any_part_on()
         if on == self._attr_is_on:
             return
+        if not on and self._unit.is_room:
+            # While a scene settles its lights may all be off for an instant:
+            # look again once it has settled instead of dropping the scene.
+            wait = self._unit._controller.scene_settling()
+            if wait > 0:
+                if self._recheck is None:
+                    self._recheck = async_call_later(self.hass, wait + 0.1, self._settled)
+                return
         self._attr_is_on = on
         if not on:
             self._active_scene = None  # nothing on → no active scene
         self.async_write_ha_state()
+
+    @callback
+    def _settled(self, _now=None) -> None:
+        self._recheck = None
+        self._recompute_room_on()
+
+    async def async_will_remove_from_hass(self) -> None:
+        if self._recheck is not None:
+            self._recheck()
+            self._recheck = None
+        await super().async_will_remove_from_hass()
 
     @callback
     def set_is_on(self, value: bool) -> None:
