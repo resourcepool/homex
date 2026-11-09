@@ -13,5 +13,9 @@ export default defineConfig({
     emptyOutDir: false,
     target: "es2021",
     minify: true,
+    rollupOptions: {
+      // the 3D house card loads three.js on demand
+      output: { chunkFileNames: "homex-cards-[name]-[hash].js" },
+    },
   },
 });

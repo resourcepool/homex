@@ -81,6 +81,17 @@ const OPENING_TOOLS: Tool[] = ["door", "sliding_door", "window", "glass_door", "
 /** Openings with a direction (rotate / mirror). */
 const directed = (type: OpeningType) => type === "door" || type === "sliding_door";
 const isOpeningTool = (tool: Tool): tool is OpeningType => OPENING_TOOLS.includes(tool);
+/** URL of the Home Assistant dashboard showing the published house. */
+const HOUSE_DASHBOARD = "homex-house";
+/** Objects set in the structure, listed on the left in Structure mode: tool, icon, key. */
+const OBJECTS: [Tool, string, string][] = [
+  ["door", "🚪", "O"],
+  ["sliding_door", "⇿", "C"],
+  ["window", "🪟", "W"],
+  ["glass_door", "◫", "G"],
+  ["opening", "⬚", "X"],
+  ["stairs", "🪜", "S"],
+];
 
 interface View {
   tx: number; // screen offset of the world origin, px
@@ -141,6 +152,12 @@ export class HomexBuilder extends LitElement {
   @state() private _size = { w: 800, h: 600 };
   @state() private _saving: "idle" | "saving" | "saved" | "error" = "idle";
   @state() private _dropTarget: string | null = null;
+  /** Fixtures: a radiator or shutter picked in the list, placed by the next click on the plan. */
+  @state() private _armed: { kind: "radiator" | "cover"; id: string } | null = null;
+  /** The Publish popover (3D view): its dashboard form. */
+  @state() private _pub: { busy: boolean; exists: boolean; error: string | null; title: string; done?: boolean } | null = null;
+  /** Where the armed radiator would go (under the pointer). */
+  @state() private _radGhost: PlanRadiator | null = null;
   @state() private _dragOver = false;
   /** Opening tools: where the opening would go. */
   @state() private _wallHover: WallSpot | null = null;
@@ -541,6 +558,22 @@ export class HomexBuilder extends LitElement {
     const el = target.closest("[data-kind]") as SVGElement | null;
     const kind = el?.dataset.kind;
     if (this._mode === "fixtures") {
+      // A radiator / shutter picked in the list: this click places it.
+      const armed = this._armed;
+      if (armed) {
+        if (armed.kind === "radiator") {
+          this._placeRadiator(armed.id, raw);
+          this._disarm();
+        } else {
+          const o = this._glazedNear(raw, (OPENING_SNAP_PX * 2) / this._view.k);
+          if (o) {
+            this._fitCover(o, armed.id);
+            this._armed = null;
+            this._dropTarget = null;
+          }
+        }
+        return;
+      }
       // Drawing a light: each click adds a spot, or a strip end.
       const placing = this._placingLight();
       if (placing) {
@@ -548,6 +581,8 @@ export class HomexBuilder extends LitElement {
         if (!s) return;
         if (placing.kind === "point") {
           this._commit(() => placing.points.push(s.p));
+          // a projector is one spot: done once placed
+          if (lightType(placing) === "projector") this._stopPlacing();
         } else if (!this._lineStart) {
           this._lineStart = s.p;
         } else {
@@ -648,6 +683,12 @@ export class HomexBuilder extends LitElement {
     this._alt = e.altKey;
     const raw = this._toWorld(e);
     const d = this._drag;
+    if (!d && this._armed) {
+      this._dropTarget =
+        this._armed.kind === "cover" ? (this._glazedNear(raw, (OPENING_SNAP_PX * 2) / this._view.k)?.id ?? null) : null;
+      this._radGhost = this._armed.kind === "radiator" ? this._radiatorSpot(raw) : null;
+      return;
+    }
     if (!d && this._placingLight()) {
       this._hover = this._snapLight(raw, this._placingLight()!.mount, this._lineStart ?? undefined);
       return;
@@ -1058,6 +1099,8 @@ export class HomexBuilder extends LitElement {
     // three.js loads with the Rendering tab only.
     if (mode === "render") import("./homex-builder-render");
     if (this._placing) this._stopPlacing();
+    this._armed = null;
+    this._pub = null;
     this._setTool("select");
     this._mode = mode;
     this._selected = null;
@@ -1109,6 +1152,33 @@ export class HomexBuilder extends LitElement {
     this._selected = o.id;
   }
 
+  /** Pick a radiator / shutter in the list: the next click on the plan places it
+   * (picking it again cancels). */
+  private _arm(kind: "radiator" | "cover", id: string) {
+    if (this._placing) this._stopPlacing();
+    const same = this._armed?.kind === kind && this._armed.id === id;
+    this._armed = same ? null : { kind, id };
+    this._selected = null;
+    this._dropTarget = null;
+  }
+
+  private _disarm() {
+    this._armed = null;
+    this._dropTarget = null;
+    this._radGhost = null;
+  }
+
+  /** A new radiator at p: along the nearest wall when close to one. */
+  private _radiatorSpot(p: PlanPoint): PlanRadiator {
+    const length = 80;
+    const spot = snapRadiator(this._level!, p, (RADIATOR_SNAP_PX * 2) / this._view.k, length) ?? {
+      x: roundTo(p[0], 5),
+      y: roundTo(p[1], 5),
+      angle: 0,
+    };
+    return { id: "ghost", device_id: this._armed?.id ?? "", length, ...spot };
+  }
+
   private _placeRadiator(deviceId: string, p: PlanPoint) {
     const level = this._level!;
     const length = 80;
@@ -1158,6 +1228,7 @@ export class HomexBuilder extends LitElement {
       if (s) {
         const nl = l;
         this._commit(() => nl.points.push(s.p));
+        if (lightType(nl) === "projector") this._stopPlacing();
       }
     } else if (at) {
       this._lineStart = this._snapLight(at, l.mount)?.p ?? null;
@@ -1252,6 +1323,7 @@ export class HomexBuilder extends LitElement {
       }
       l.mount = mount;
       l.type = type;
+      if (type === "projector") l.points = l.points.slice(0, 1);
       if (!SHADED.includes(type)) delete l.shade;
     });
     this._lineStart = null;
@@ -1310,7 +1382,8 @@ export class HomexBuilder extends LitElement {
         e.preventDefault();
         break;
       case "Escape":
-        if (this._placing) this._stopPlacing();
+        if (this._armed) this._disarm();
+        else if (this._placing) this._stopPlacing();
         else if (this._draft.length) this._draft = [];
         else if (this._tool !== "select") this._setTool("select");
         else this._selected = null;
@@ -1449,7 +1522,7 @@ export class HomexBuilder extends LitElement {
     const { w, h } = this._size;
     const draftLast = this._draft[this._draft.length - 1];
     return html`<svg
-      class="canvas tool-${this._tool} ${this._drag?.mode === "pan" ? "panning" : ""}"
+      class="canvas tool-${this._tool} ${this._armed ? "armed" : ""} ${this._drag?.mode === "pan" ? "panning" : ""}"
       @pointerdown=${this._onPointerDown}
       @pointermove=${this._onPointerMove}
       @pointerup=${this._onPointerUp}
@@ -1486,6 +1559,9 @@ export class HomexBuilder extends LitElement {
         </g>
         <g class="radiators ${this._mode === "fixtures" ? "" : "locked"}">
           ${(level.radiators ?? []).map((r) => this._radiator(r))}
+          ${this._radGhost
+            ? svg`<polygon class="rad-ghost" points=${radiatorPoints(this._radGhost).map((p) => p.join(",")).join(" ")}></polygon>`
+            : nothing}
         </g>
         <g class="lights ${this._mode === "fixtures" && !this._placing ? "" : "locked"}">
           ${(level.lights ?? []).map((l) => this._light(l))}
@@ -1758,6 +1834,10 @@ export class HomexBuilder extends LitElement {
         case "spot":
           mark = svg`${body(p, r * 0.6)}${dot(p, r * 0.25)}`;
           break;
+        case "projector": // a head on its base, a beam cone
+          mark = svg`<path class="lp-beam" d="M ${p[0]} ${p[1]} L ${p[0] + r * 2.2} ${p[1] - r * 1.1} L ${p[0] + r * 2.2} ${p[1] + r * 1.1} Z"></path>
+            ${body(p, r * 0.7)}${dot(p, r * 0.3)}`;
+          break;
         case "sconce":
           mark = svg`${body(p, r)}${dot(p, r * 0.35)}`;
           break;
@@ -1890,9 +1970,6 @@ export class HomexBuilder extends LitElement {
     return html`<div class="toolbar">
       ${structure
         ? html`${tool("select", "🖐", "V")} ${tool("draw", "✏️", "D")} ${tool("rect", "▭", "R")}
-            <span class="sep"></span>
-            ${tool("door", "🚪", "O")} ${tool("sliding_door", "⇿", "C")} ${tool("window", "🪟", "W")}
-            ${tool("glass_door", "◫", "G")} ${tool("opening", "⬚", "X")} ${tool("stairs", "🪜", "S")}
             <span class="sep"></span>`
         : nothing}
       <button title=${t("builder.undo")} ?disabled=${!this._undo.length} @click=${() => this._undoAction()}>↶</button>
@@ -1907,6 +1984,7 @@ export class HomexBuilder extends LitElement {
   private _hint() {
     if (this._mode === "fixtures") {
       const sel = this._selItem();
+      if (this._armed) return t(this._armed.kind === "radiator" ? "builder.hint_fx_place_radiator" : "builder.hint_fx_place_shutter");
       if (this._placing) return t("builder.hint_fx_light_placing");
       if (sel?.kind === "light") return t("builder.hint_fx_light");
       if (sel?.kind === "radiator") return t("builder.hint_fx_radiator");
@@ -1969,7 +2047,18 @@ export class HomexBuilder extends LitElement {
     const rooms = this._assignable();
     const sel = this._level?.rooms.find((s) => s.id === this._selected);
     return html`<aside>
-      <h3>${t("builder.rooms")}</h3>
+      <h3>${t("builder.objects")}</h3>
+      <p class="hint">${t("builder.objects_hint")}</p>
+      <div class="objects">
+        ${OBJECTS.map(
+          ([id, icon, key]) => html`<button class="obj ${this._tool === id ? "active" : ""}" title="${t(`builder.tool_${id}`)} (${key})" @click=${() => this._setTool(id)}>
+            <span class="obj-icon">${icon}</span>
+            <span class="obj-name">${t(`builder.tool_${id}`)}</span>
+            <kbd>${key}</kbd>
+          </button>`
+        )}
+      </div>
+      <h3 class="fx-h">${t("builder.rooms")}</h3>
       <p class="hint">${sel ? t("builder.rooms_hint_selected") : t("builder.rooms_hint")}</p>
       <div class="chips">
         ${rooms.map(
@@ -2285,13 +2374,13 @@ export class HomexBuilder extends LitElement {
           <div class="chips">
             ${g.items.map(
               (c) => html`<div
-                class="chip ${opening ? "clickable" : ""}"
+                class="chip clickable ${this._armed?.id === c ? "armed" : ""}"
                 draggable="true"
                 @dragstart=${(e: DragEvent) => {
                   e.dataTransfer?.setData("text/homex-cover", c);
                   e.dataTransfer!.effectAllowed = "link";
                 }}
-                @click=${() => opening && this._fitCover(opening, c)}
+                @click=${() => (opening ? this._fitCover(opening, c) : this._arm("cover", c))}
               >
                 <span>${this._coverName(c)}</span>
               </div>`
@@ -2306,12 +2395,13 @@ export class HomexBuilder extends LitElement {
           <div class="chips">
             ${g.items.map(
               (d) => html`<div
-                class="chip"
+                class="chip clickable ${this._armed?.id === d ? "armed" : ""}"
                 draggable="true"
                 @dragstart=${(e: DragEvent) => {
                   e.dataTransfer?.setData("text/homex-radiator", d);
                   e.dataTransfer!.effectAllowed = "link";
                 }}
+                @click=${() => this._arm("radiator", d)}
               >
                 <span>${this._deviceName(d)}</span>
               </div>`
@@ -2334,6 +2424,7 @@ export class HomexBuilder extends LitElement {
                 }}
                 @click=${() => {
                   if (this._placing) this._stopPlacing();
+                  this._disarm();
                   this._startLight(en);
                 }}
               >
@@ -2621,10 +2712,109 @@ export class HomexBuilder extends LitElement {
         ? html`<button
             class="publish ${published ? "on" : ""}"
             title=${published ? t("builder.unpublish_hint") : t("builder.publish_hint")}
-            @click=${() => this._setPublished(!published)}
+            @click=${() => this._openPublish()}
           >
             ${published ? html`✓ ${t("builder.published")}` : html`🚀 ${t("builder.publish")}`}
           </button>`
+        : nothing}
+      ${this._pub ? this._publishPop(published) : nothing}
+    </div>`;
+  }
+
+  /** Publish: the dashboard's 3D tab, and a Home Assistant dashboard showing the
+   * house full size (a panel view holding the house card). */
+  private async _openPublish() {
+    if (this._pub) {
+      this._pub = null;
+      return;
+    }
+    if (!this._plan?.published) this._setPublished(true);
+    this._pub = { busy: true, exists: false, error: null, title: this._pubTitle() };
+    try {
+      const list = (await this.hass.callWS({ type: "lovelace/dashboards/list" })) as { url_path: string; title: string }[];
+      const found = list.find((d) => d.url_path === HOUSE_DASHBOARD);
+      this._pub = { busy: false, exists: !!found, error: null, title: found?.title ?? this._pubTitle() };
+    } catch (err) {
+      this._pub = { busy: false, exists: false, error: errorMessage(err), title: this._pubTitle() };
+    }
+  }
+
+  private _pubTitle() {
+    return t("builder.house_dashboard_title");
+  }
+
+  /** Create (or refresh) the house dashboard: one panel view, the house card. */
+  private async _createDashboard() {
+    const pub = this._pub;
+    if (!pub) return;
+    const title = pub.title.trim() || this._pubTitle();
+    this._pub = { ...pub, busy: true, error: null };
+    try {
+      if (!pub.exists)
+        await this.hass.callWS({
+          type: "lovelace/dashboards/create",
+          url_path: HOUSE_DASHBOARD,
+          title,
+          icon: "mdi:home-modern",
+          show_in_sidebar: true,
+          require_admin: false,
+          mode: "storage",
+        });
+      else await this._renameDashboard(title);
+      await this.hass.callWS({
+        type: "lovelace/config/save",
+        url_path: HOUSE_DASHBOARD,
+        config: {
+          title,
+          views: [{ title, path: "house", icon: "mdi:home-modern", panel: true, cards: [{ type: "custom:homex-house-card", title }] }],
+        },
+      });
+      this._pub = { ...pub, title, busy: false, exists: true, done: true };
+    } catch (err) {
+      this._pub = { ...pub, busy: false, error: errorMessage(err) };
+    }
+  }
+
+  private async _renameDashboard(title: string) {
+    const list = (await this.hass.callWS({ type: "lovelace/dashboards/list" })) as { id: string; url_path: string }[];
+    const d = list.find((x) => x.url_path === HOUSE_DASHBOARD);
+    if (d) await this.hass.callWS({ type: "lovelace/dashboards/update", dashboard_id: d.id, title });
+  }
+
+  private _publishPop(published: boolean) {
+    const pub = this._pub!;
+    return html`<div class="pub-pop" role="dialog" aria-label=${t("builder.publish")}>
+      <div class="pub-head">
+        <strong>${published ? `✓ ${t("builder.pub_done")}` : t("builder.publish")}</strong>
+        <button class="icon" title=${t("common.close")} @click=${() => (this._pub = null)}>✕</button>
+      </div>
+      <p class="hint">${t("builder.pub_tab")}</p>
+      <div class="pub-dash">
+        <strong>${t("builder.pub_dashboard")}</strong>
+        <p class="hint">${t("builder.pub_dashboard_hint")}</p>
+        <label class="field">
+          <span>${t("builder.pub_dashboard_name")}</span>
+          <input
+            .value=${pub.title}
+            @input=${(e: Event) => (this._pub = { ...pub, title: (e.target as HTMLInputElement).value })}
+          />
+        </label>
+        <div class="row">
+          <button class="primary" ?disabled=${pub.busy} @click=${() => this._createDashboard()}>
+            ${pub.exists ? t("builder.pub_dashboard_update") : t("builder.pub_dashboard_create")}
+          </button>
+          ${pub.exists
+            ? html`<button @click=${() => navigate(`/${HOUSE_DASHBOARD}/house`)}>↗ ${t("builder.pub_dashboard_open")}</button>`
+            : nothing}
+        </div>
+        ${pub.done ? html`<p class="ok">✓ ${t("builder.pub_dashboard_done")}</p>` : nothing}
+        ${pub.error ? html`<p class="err">${pub.error}</p>` : nothing}
+      </div>
+      ${published
+        ? html`<button class="danger-link" @click=${() => {
+            this._setPublished(false);
+            this._pub = null;
+          }}>${t("builder.pub_withdraw")}</button>`
         : nothing}
     </div>`;
   }
@@ -2673,6 +2863,48 @@ export class HomexBuilder extends LitElement {
         white-space: nowrap;
         background: var(--primary-color);
         color: var(--text-primary-color, #fff);
+      }
+      .pub-pop {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        width: 320px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 14px;
+        background: var(--card-background-color, #1c1c1c);
+        border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      }
+      .pub-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .pub-pop .hint {
+        margin: 0;
+      }
+      .pub-dash {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-top: 10px;
+        border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
+      }
+      .pub-dash .row {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .pub-pop .ok {
+        margin: 0;
+        color: #4caf7a;
+        font-size: 13px;
+      }
+      .pub-pop .err {
+        margin: 0;
       }
       .nav .publish.on {
         background: color-mix(in srgb, #4caf7a 20%, transparent);
@@ -2842,6 +3074,62 @@ export class HomexBuilder extends LitElement {
         gap: 4px;
         padding: 4px;
         max-width: calc(100% - 400px); /* the nav floats top right */
+      }
+      .objects {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        margin: 8px 0 14px;
+      }
+      .objects .obj {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+        position: relative;
+        padding: 8px 4px 6px;
+        border-radius: 8px;
+        border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.35));
+        background: var(--card-background-color);
+        color: var(--primary-text-color);
+        font: inherit;
+        font-size: 12px;
+        cursor: pointer;
+      }
+      .objects .obj:hover {
+        border-color: var(--primary-color);
+      }
+      .objects .obj.active {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: var(--text-primary-color, #fff);
+      }
+      .objects .obj-icon {
+        font-size: 20px;
+        line-height: 1.2;
+      }
+      .objects kbd {
+        position: absolute;
+        top: 3px;
+        right: 5px;
+        font: inherit;
+        font-size: 10px;
+        opacity: 0.55;
+      }
+      .chip.armed {
+        border-color: var(--primary-color);
+        background: color-mix(in srgb, var(--primary-color) 18%, var(--card-background-color));
+        box-shadow: inset 0 0 0 1px var(--primary-color);
+      }
+      .rad-ghost {
+        fill: color-mix(in srgb, var(--primary-color) 35%, transparent);
+        stroke: var(--primary-color);
+        stroke-dasharray: 4 3;
+        vector-effect: non-scaling-stroke;
+        pointer-events: none;
+      }
+      svg.armed {
+        cursor: crosshair;
       }
       .tool.active {
         background: var(--primary-color);
@@ -3333,6 +3621,12 @@ export class HomexBuilder extends LitElement {
       }
       .light.on .lp-in {
         stroke: var(--card-background-color, #1c1c1c);
+      }
+      .light .lp-beam {
+        fill: color-mix(in srgb, var(--lc) 25%, transparent);
+        stroke: var(--lc);
+        stroke-width: 1;
+        vector-effect: non-scaling-stroke;
       }
       .light .lp-shade {
         fill: none;

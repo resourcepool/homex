@@ -454,7 +454,8 @@ export interface PlanStair {
 
 export type LightKind = "point" | "linear";
 export type LightMount = "ceiling" | "floor" | "wall";
-export type LightType = "ceiling_light" | "pendant" | "spot" | "sconce" | "floor_lamp" | "table_lamp" | "led_strip";
+/** projector: a single adjustable spot head (one point only). */
+export type LightType = "ceiling_light" | "pendant" | "spot" | "projector" | "sconce" | "floor_lamp" | "table_lamp" | "led_strip";
 
 /** A light on the plan: one HA light made of spots (`points`) or of strips
  * (`lines`), mounted on the ceiling, on the floor or on a wall. */

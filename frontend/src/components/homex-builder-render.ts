@@ -12,13 +12,25 @@
  * Loaded on demand (three.js is a separate chunk).
  */
 import { LitElement, css, html, svg } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { property, state } from "lit/decorators.js";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import type { HomeAssistant, Plan, PlanLevel, PlanLight, PlanOpening, PlanPoint, PlanShape, PlanStair, Room } from "../types";
 import { centroid, pointInPolygon, projectOnSegment } from "../lib/plan-geometry";
 import { lightType, openingGeometry, openingStyle, stairDrawing } from "../lib/plan-items";
 import { t } from "../lib/i18n";
+import {
+  doorCasing,
+  doorHandles,
+  fixtureModel,
+  gradientWall,
+  gradientWallMaterial,
+  radiatorModel,
+  stairModel,
+  stripModel,
+  windowModel,
+  type StairStep,
+} from "../lib/render-models";
 import { airLevel, coverPosition, levelName, roomMetric, roomValves, type AirKey } from "../cards/shared";
 
 const FLOOR_H = 2.8; // m, level to level
@@ -45,7 +57,9 @@ interface Fadeable {
 interface LightRig {
   entity: string;
   glow: THREE.MeshBasicMaterial;
-  lights: { pl: THREE.PointLight; base: number }[];
+  /** Lampshades: lit from inside while on. */
+  shade: THREE.MeshStandardMaterial;
+  lights: { pl: THREE.PointLight | THREE.SpotLight; base: number }[];
 }
 
 /** A shutter bound to its cover entity: a roller (slides) or two hinged leaves (swing). */
@@ -89,7 +103,6 @@ const heights = (o: PlanOpening): [number, number] => {
 
 const m = (cm: number) => cm / 100;
 
-@customElement("homex-builder-render")
 export class HomexBuilderRender extends LitElement {
   @property({ attribute: false }) hass!: HomeAssistant;
   @property({ attribute: false }) plan: Plan | null = null;
@@ -123,6 +136,16 @@ export class HomexBuilderRender extends LitElement {
 
   /** Highest level shown, null: all. */
   @state() private _upTo: number | null = null;
+  /** Left pane folded to a thin strip (the 3D view takes the room). */
+  @state() private _collapsed = (() => {
+    try {
+      return localStorage.getItem("homex_render_pane") === "collapsed";
+    } catch {
+      return false;
+    }
+  })();
+  /** Title of the left pane (the house). */
+  @property() heading = "";
 
   private _renderer?: THREE.WebGLRenderer;
   private _scene?: THREE.Scene;
@@ -299,6 +322,8 @@ export class HomexBuilderRender extends LitElement {
 
   private _buildLevel(g: THREE.Group, level: PlanLevel, holes: PlanPoint[][]) {
     const wallMat = new THREE.MeshStandardMaterial({ color: "#ecebe6", roughness: 0.9 });
+    // interior partitions: opaque at the floor, fading out toward the ceiling
+    const partitionMat = gradientWallMaterial("#ecebe6");
     const floorMat = new THREE.MeshStandardMaterial({ color: "#c9b79c", roughness: 0.8 });
     const slabMat = new THREE.MeshStandardMaterial({ color: "#8d8a84", roughness: 1 });
     const walls = new Set<string>();
@@ -328,6 +353,10 @@ export class HomexBuilderRender extends LitElement {
           const key = wallKey(a, b, y0, y1);
           if (walls.has(key)) continue;
           walls.add(key);
+          if (isInterior(level, a, b)) {
+            g.add(gradientWall(a, b, y0, y1, WALL_T, partitionMat, WALL_H));
+            continue;
+          }
           const wall = box(a, b, y0, y1, WALL_T, wallMat);
           g.add(wall);
           this._fadeable(wall, level, a, b);
@@ -345,21 +374,22 @@ export class HomexBuilderRender extends LitElement {
       const [cx, cy] = inward(level, [r.x, r.y], 0.06); // against the wall, not in it
       const p: PlanPoint = [cx - (u[0] * r.length) / 2, cy - (u[1] * r.length) / 2];
       const q: PlanPoint = [cx + (u[0] * r.length) / 2, cy + (u[1] * r.length) / 2];
-      const mat = new THREE.MeshStandardMaterial({ color: "#f2f2f2", roughness: 0.5 });
+      const mat = new THREE.MeshStandardMaterial({ color: "#f2f2f2", roughness: 0.45, metalness: 0.1 });
       const tall = r.kind === "tall";
-      const top = tall ? 1.9 : 0.75;
-      if (tall) {
-        // full height: vertical columns between two collectors
-        const n = Math.max(3, Math.round(r.length / 5));
-        for (let i = 0; i < n; i++) {
-          const t0 = i / n + 0.12 / n;
-          const t1 = (i + 1) / n - 0.12 / n;
-          const at = (t: number): PlanPoint => [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t];
-          g.add(box(at(t0), at(t1), 0.14, top, 0.07, mat));
-        }
-        g.add(box(p, q, 0.1, 0.16, 0.05, mat));
-        g.add(box(p, q, top - 0.04, top + 0.02, 0.05, mat));
-      } else g.add(box(p, q, 0.15, top, 0.08, mat));
+      // into the room: from the wall line to the radiator's centre
+      const dn = Math.hypot(cx - r.x, cy - r.y);
+      const nIn: PlanPoint = dn > 0.5 ? [(cx - r.x) / dn, (cy - r.y) / dn] : [-u[1], u[0]];
+      const model = radiatorModel(
+        p,
+        q,
+        nIn,
+        tall,
+        mat,
+        new THREE.MeshStandardMaterial({ color: "#c9ccd0", roughness: 0.3, metalness: 0.85 }),
+        new THREE.MeshStandardMaterial({ color: "#fafafa", roughness: 0.35 })
+      );
+      g.add(model.group);
+      const top = model.top;
       // heat rising above it, shown while the valve heats
       const smoke = new THREE.Group();
       smoke.position.set(m(cx), top + 0.05, m(cy));
@@ -429,36 +459,64 @@ export class HomexBuilderRender extends LitElement {
       color: "#a9d8f2",
       transparent: true,
       opacity: 0.28,
-      roughness: 0.1,
-      metalness: 0.1,
+      roughness: 0.05,
+      metalness: 0.2,
       depthWrite: false,
     });
+    const metal = new THREE.MeshStandardMaterial({ color: "#b9bcc0", roughness: 0.3, metalness: 0.8 });
+    const addAll = (x: THREE.Object3D) => [...x.children].forEach((ch) => g.add(ch));
     if (o.type === "door") {
-      // Leaf open at 90°, as on the plan.
+      // Leaf open at 90°, as on the plan: panels, glazing, handles; casing around.
       const hinge = o.flip ? b : a;
       const side = o.out ? -1 : 1;
       const end = off(hinge, side * w);
+      const leaf = (t: number) => off(hinge, side * t);
       g.add(box(hinge, end, 0, 2.05, 0.04, style === "glazed" ? glass : woodMat));
       if (style === "glazed") {
-        g.add(box(hinge, end, 0, 0.06, 0.045, woodMat));
-        g.add(box(hinge, end, 1.99, 2.05, 0.045, woodMat));
+        g.add(box(hinge, end, 0, 0.12, 0.045, woodMat));
+        g.add(box(hinge, end, 1.97, 2.05, 0.045, woodMat));
+        g.add(box(hinge, leaf(8), 0, 2.05, 0.045, woodMat));
+        g.add(box(leaf(w - 8), end, 0, 2.05, 0.045, woodMat));
+      } else if (style === "panel") {
+        for (const [y0, y1] of [[0.18, 0.95], [1.1, 1.88]] as const) g.add(box(leaf(12), leaf(w - 12), y0, y1, 0.052, woodMat));
       }
+      addAll(doorHandles(hinge, end, metal));
+      addAll(doorCasing(a, b, u, 2.05, WALL_T, frameMat));
       g.add(box(a, b, 2.05, top, WALL_T + 0.02, frameMat));
     } else if (o.type === "sliding_door") {
-      // Leaf half open, along the wall.
+      // Leaf half open, along the wall, hung from its rail; a recessed pull.
       const side = o.out ? -1 : 1;
       const dir = o.flip ? -1 : 1;
       const d = style === "pocket" ? 0 : side * 6;
-      g.add(box(off(shift(a, dir * w * 0.5), d), off(shift(b, dir * w * 0.5), d), 0, 2.05, 0.04, style === "glazed" ? glass : woodMat));
+      const la = off(shift(a, dir * w * 0.5), d);
+      const lb = off(shift(b, dir * w * 0.5), d);
+      g.add(box(la, lb, 0.01, 2.05, 0.04, style === "glazed" ? glass : woodMat));
+      if (style === "glazed") {
+        g.add(box(la, lb, 0.01, 0.1, 0.045, woodMat));
+        g.add(box(la, lb, 1.97, 2.05, 0.045, woodMat));
+      }
+      if (style !== "pocket") g.add(box(off(shift(a, dir * -2), d), off(shift(b, dir * w), d), 2.08, 2.12, 0.03, metal));
+      const pull = dir > 0 ? la : lb;
+      g.add(box(shift(pull, dir * 4), shift(pull, dir * 7), 0.95, 1.15, 0.05, metal));
+      addAll(doorCasing(a, b, u, 2.05, WALL_T, frameMat));
     } else {
-      // Glass, frame, mullion.
-      g.add(box(a, b, sill, top, 0.02, glass));
-      g.add(box(a, b, sill, sill + 0.05, 0.08, frameMat));
-      g.add(box(a, b, top - 0.05, top, 0.08, frameMat));
-      g.add(box(a, shift(a, 5), sill, top, 0.08, frameMat));
-      g.add(box(shift(b, -5), b, sill, top, 0.08, frameMat));
-      if (style !== "fixed" && style !== "sliding" && (o.type === "glass_door" || w > 70))
-        g.add(box(shift(c, -2.5), shift(c, 2.5), sill, top, 0.08, frameMat));
+      // A real window / glass door: frame, sashes, handles, sills.
+      addAll(
+        windowModel({
+          a,
+          b,
+          u,
+          n,
+          sill,
+          top,
+          style,
+          door: o.type === "glass_door",
+          frame: frameMat,
+          glass,
+          metal,
+          stone: new THREE.MeshStandardMaterial({ color: "#d8d2c4", roughness: 0.95 }),
+        })
+      );
     }
     if (o.cover && o.type !== "door") {
       // Shutters on the outside (-n), moved to their cover's position (_applyStates).
@@ -530,89 +588,92 @@ export class HomexBuilderRender extends LitElement {
       return { p: path[0], u: [1, 0] };
     };
     const depth = total / steps;
+    const list: StairStep[] = [];
     for (let i = 0; i < steps; i++) {
       const { p, u } = at(depth * (i + 0.5));
-      const n: PlanPoint = [-u[1], u[0]];
       const h = down ? -rise * (i + 1) : rise * (i + 1);
-      const y = down ? h + rise : h;
-      const a: PlanPoint = [p[0] - (n[0] * lane) / 2, p[1] - (n[1] * lane) / 2];
-      const b: PlanPoint = [p[0] + (n[0] * lane) / 2, p[1] + (n[1] * lane) / 2];
-      g.add(box(a, b, y - 0.05, y, m(depth) * 1.05, mat));
+      list.push({ p, u, y: down ? h + rise : h });
     }
+    // the handrail runs on the open side: away from the stairs' centre (a turn's
+    // outside), on the right of the climb for straight stairs
+    const centre: PlanPoint = [st.x + st.w / 2, st.y + st.h / 2];
+    const dist = (p: PlanPoint) => Math.hypot(p[0] - centre[0], p[1] - centre[1]);
+    const railSide = (a: PlanPoint, b: PlanPoint) => (Math.abs(dist(a) - dist(b)) < 2 ? b : dist(a) > dist(b) ? a : b);
+    const riser = mat.clone();
+    riser.color.multiplyScalar(0.82);
+    const rail = new THREE.MeshStandardMaterial({ color: "#2f3236", roughness: 0.4, metalness: 0.7 });
+    g.add(
+      stairModel(list, lane, depth, rise, down, mat, riser, rail, railSide,
+        shape === "spiral" ? { at: centre, from: down ? -FLOOR_H : 0, to: down ? 0.9 : FLOOR_H + 0.9 } : undefined)
+    );
   }
 
-  /** Lights, all on: a glowing fixture and a point light per spot / strip. */
+  /** Lights, all on: a detailed fixture and a light per spot / strip (a
+   * spotlight aimed at the room for a projector). */
   private _buildLights(g: THREE.Group, level: PlanLevel, count: number): number {
+    const metal = new THREE.MeshStandardMaterial({ color: "#c7c9cc", roughness: 0.35, metalness: 0.8 });
+    const wood = new THREE.MeshStandardMaterial({ color: "#7b5a3c", roughness: 0.75 });
     for (const l of level.lights ?? []) {
       const color = this._lightColor(l);
       const glow = new THREE.MeshBasicMaterial({ color });
-      const rig: LightRig = { entity: l.entity_id, glow, lights: [] };
+      const shadeMat = new THREE.MeshStandardMaterial({
+        color: l.color ?? "#efe6d4",
+        roughness: 0.9,
+        side: THREE.DoubleSide,
+        emissive: new THREE.Color(color),
+        emissiveIntensity: 0.55,
+      });
+      const rig: LightRig = { entity: l.entity_id, glow, shade: shadeMat, lights: [] };
       this._lightRigs.push(rig);
-      const body = new THREE.MeshStandardMaterial({ color: l.color ?? "#e8e8e8", roughness: 0.5, side: THREE.DoubleSide });
+      const body = new THREE.MeshStandardMaterial({ color: l.color ?? "#e8e8e8", roughness: 0.45, metalness: 0.25, side: THREE.DoubleSide });
       const type = lightType(l);
-      const addLight = (x: number, y: number, z: number, intensity: number) => {
+      const addLight = (at: THREE.Vector3, intensity: number, aim?: THREE.Vector3) => {
         if (count >= MAX_LIGHTS) return;
-        const pl = new THREE.PointLight(color, intensity, 7, 2);
-        pl.position.set(x, y, z);
+        let pl: THREE.PointLight | THREE.SpotLight;
+        if (aim) {
+          const sp = new THREE.SpotLight(color, intensity * 3, 9, Math.PI / 7, 0.45, 2);
+          sp.position.copy(at);
+          sp.target.position.copy(aim);
+          g.add(sp.target);
+          pl = sp;
+        } else {
+          pl = new THREE.PointLight(color, intensity, 7, 2);
+          pl.position.copy(at);
+        }
         g.add(pl);
-        rig.lights.push({ pl, base: intensity });
+        rig.lights.push({ pl, base: pl.intensity });
         count++;
       };
       // Wall and floor fixtures stand in the room, clear of the wall they are drawn on.
-      const depth = type === "sconce" ? 0.13 : type === "floor_lamp" ? 0.21 : type === "table_lamp" ? 0.24 : 0;
+      const depth = type === "sconce" ? 0.13 : type === "floor_lamp" ? 0.21 : type === "table_lamp" ? 0.24 : type === "projector" && l.mount === "wall" ? 0.1 : 0;
       for (const point of l.points) {
-        const [px, py] = depth ? inward(level, point, depth) : point;
-        const x = m(px);
-        const z = m(py);
-        const mesh = (geo: THREE.BufferGeometry, mat: THREE.Material, y: number) => {
-          const me = new THREE.Mesh(geo, mat);
-          me.position.set(x, y, z);
-          g.add(me);
-        };
-        const square = l.shape === "square";
-        switch (type) {
-          case "pendant":
-            mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.6), body, WALL_H - 0.3);
-            mesh(new THREE.SphereGeometry(0.09, 16, 12), glow, WALL_H - 0.66);
-            if (l.shade) mesh(new THREE.CylinderGeometry(0.08, square ? 0.22 : 0.2, 0.22, square ? 4 : 24, 1, true), body, WALL_H - 0.62);
-            addLight(x, WALL_H - 0.75, z, 3);
-            break;
-          case "spot":
-            mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.02, 16), glow, WALL_H - 0.01);
-            addLight(x, WALL_H - 0.15, z, 1.5);
-            break;
-          case "sconce":
-            mesh(square ? new THREE.BoxGeometry(0.14, 0.14, 0.14) : new THREE.SphereGeometry(0.08, 16, 12), glow, 1.8);
-            if (l.shade) mesh(new THREE.CylinderGeometry(0.07, 0.12, 0.16, 24, 1, true), body, 1.8);
-            addLight(x, 1.8, z, 1.5);
-            break;
-          case "floor_lamp":
-            mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.02, 24), body, 0.01);
-            mesh(new THREE.CylinderGeometry(0.012, 0.012, 1.5), body, 0.75);
-            mesh(new THREE.SphereGeometry(0.06, 16, 12), glow, 1.52);
-            if (l.shade) mesh(new THREE.CylinderGeometry(0.13, 0.2, 0.3, square ? 4 : 24, 1, true), body, 1.55);
-            addLight(x, 1.5, z, 2.5);
-            break;
-          case "table_lamp":
-            // On a small side table.
-            mesh(new THREE.BoxGeometry(0.45, 0.55, 0.45), new THREE.MeshStandardMaterial({ color: "#7b5a3c", roughness: 0.8 }), 0.275);
-            mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.3), body, 0.7);
-            mesh(new THREE.SphereGeometry(0.05, 16, 12), glow, 0.86);
-            if (l.shade) mesh(new THREE.CylinderGeometry(0.09, 0.14, 0.2, square ? 4 : 24, 1, true), body, 0.88);
-            addLight(x, 0.9, z, 1.5);
-            break;
-          default: // ceiling light
-            mesh(square ? new THREE.BoxGeometry(0.36, 0.05, 0.36) : new THREE.CylinderGeometry(0.18, 0.18, 0.05, 32), glow, WALL_H - 0.03);
-            addLight(x, WALL_H - 0.2, z, 3);
-        }
+        const at = depth ? inward(level, point, depth) : point;
+        const room = level.rooms.find((r) => pointInPolygon(at, r.points));
+        const parts = fixtureModel({
+          type,
+          at,
+          wallN: l.mount === "wall" ? wallNormal(level, point) : [0, 0],
+          roomCentre: room ? centroid(room.points) : at,
+          ceiling: WALL_H,
+          square: l.shape === "square",
+          shade: !!l.shade,
+          body,
+          metal,
+          glow,
+          shadeMat,
+          wood,
+        });
+        g.add(parts.group);
+        const power = type === "spot" ? 1.5 : type === "projector" ? 2 : type === "sconce" || type === "table_lamp" ? 1.6 : type === "floor_lamp" ? 2.5 : 3;
+        addLight(parts.source, power, parts.aim);
       }
-      // LED strips: a glowing bar, lit from its middle.
+      // LED strips: a glowing strip in its profile, lit from its middle.
       const y = l.mount === "ceiling" ? WALL_H - 0.03 : l.mount === "wall" ? 1.2 : 0.06;
       for (const [p0, q0] of l.lines) {
         const p = l.mount === "wall" ? inward(level, p0, 0.02) : p0;
         const q = l.mount === "wall" ? inward(level, q0, 0.02) : q0;
-        g.add(box(p, q, y - 0.015, y + 0.015, 0.03, glow));
-        addLight(m((p[0] + q[0]) / 2), y + (l.mount === "ceiling" ? -0.1 : 0.1), m((p[1] + q[1]) / 2), 1.5);
+        g.add(stripModel(p, q, y, l.mount === "ceiling", metal, glow));
+        addLight(new THREE.Vector3(m((p[0] + q[0]) / 2), y + (l.mount === "ceiling" ? -0.1 : 0.1), m((p[1] + q[1]) / 2)), 1.5);
       }
     }
     return count;
@@ -653,6 +714,8 @@ export class HomexBuilderRender extends LitElement {
       const bri = st?.state === "on" && st.attributes.brightness != null ? st.attributes.brightness / 255 : 1;
       const color = rgb ? `rgb(${rgb.join(",")})` : WARM;
       rig.glow.color.set(on ? color : LIGHT_OFF);
+      rig.shade.emissive.set(on ? color : "#000000");
+      rig.shade.emissiveIntensity = on ? 0.3 + 0.4 * bri : 0;
       for (const { pl, base } of rig.lights) {
         pl.color.set(color);
         pl.intensity = on ? base * (0.25 + 0.75 * bri) : 0;
@@ -764,7 +827,18 @@ export class HomexBuilderRender extends LitElement {
   private _select(mesh: THREE.Mesh | null) {
     this._selMesh = mesh;
     this._selected = mesh ? (mesh.userData.room as { shape: PlanShape; level: PlanLevel }) : null;
+    // a room picked: the left pane opens on it
+    if (mesh) this._collapsed = false;
     this._glow();
+  }
+
+  private _toggle() {
+    this._collapsed = !this._collapsed;
+    try {
+      localStorage.setItem("homex_render_pane", this._collapsed ? "collapsed" : "open");
+    } catch {
+      /* not remembered */
+    }
   }
 
   /** Floors glow: a little when hovered, more when selected. */
@@ -888,17 +962,8 @@ export class HomexBuilderRender extends LitElement {
       this._call("climate", "set_temperature", { entity_id: valves.map((v) => v.entity_id), temperature });
     };
 
-    // the window: sized to fit the view
-    const host = this.renderRoot.querySelector(".view") as HTMLElement | null;
-    const twoCols = shutterRows.length > 0; // shutters in their own (left) column
-    const W = twoCols ? 590 : 360;
-    const vw = host?.clientWidth ?? 800;
-    const vh = host?.clientHeight ?? 600;
-    // always docked on the left of the view, under its toolbar
-    const left = 10;
-    const top = 56;
-
-    return html`<div class="ctl ${twoCols ? "two" : ""}" style="left:${left}px; top:${top}px; width:${Math.min(W, vw - 20)}px; max-height:${vh - top - 10}px" role="dialog" aria-label=${title}>
+    // in the left pane, under the view commands
+    return html`<div class="ctl" role="region" aria-label=${title}>
       <div class="c-head">
         <div>
           <strong>${title}</strong>
@@ -908,7 +973,6 @@ export class HomexBuilderRender extends LitElement {
       </div>
 
       <div class="c-body">
-      ${twoCols ? this._shutterColumn(shutterRows, st, shutter) : null}
       <div class="c-main">
       ${roomSwitch || lightIds.length
         ? html`<section>
@@ -942,6 +1006,8 @@ export class HomexBuilderRender extends LitElement {
               : null}
           </section>`
         : null}
+
+      ${shutterRows.length ? this._shutterColumn(shutterRows, st, shutter) : null}
 
       ${metrics.length || heating || targets.length
         ? html`<section>
@@ -1124,22 +1190,55 @@ export class HomexBuilderRender extends LitElement {
     }
   }
 
+  /** Two parts: the commands pane on the left (view, floors, the picked
+   * room), folding to a strip, and the 3D view on the right. */
   render() {
     const levels = [...(this.plan?.levels ?? [])].sort((a, b) => b.level - a.level);
-    return html`<div class="view"></div>
-      <div class="floors">
-        <button class=${this._upTo === null ? "on" : ""} @click=${() => this._show(null)}>${t("builder.render_all")}</button>
-        ${levels.map(
-          (l) => html`<button class=${this._upTo === l.level ? "on" : ""} @click=${() => this._show(l.level)}>
-            <strong>${l.level}</strong> ${l.name}
-          </button>`
-        )}
-      </div>
-      ${this._roomControls()}
-      <div class="bar">
-        <button @click=${() => this._frame()}>⤢ ${t("builder.render_reset")}</button>
-        <span>${t("builder.render_hint")}</span>
-      </div>`;
+    const room = this._roomControls();
+    const collapsed = this._collapsed;
+    return html`<div class="layout ${collapsed ? "collapsed" : ""}">
+      <aside class="pane" aria-label=${t("builder.render_pane")}>
+        <div class="p-head">
+          ${collapsed ? null : html`<strong>🏠 ${this.heading || t("builder.render_house")}</strong>`}
+          <button
+            class="fold"
+            title=${collapsed ? t("builder.render_expand") : t("builder.render_collapse")}
+            aria-expanded=${collapsed ? "false" : "true"}
+            @click=${() => this._toggle()}
+          >
+            ${collapsed ? "»" : "«"}
+          </button>
+        </div>
+        ${collapsed
+          ? html`<div class="strip">
+              <button title=${t("builder.render_reset")} @click=${() => this._frame()}>⤢</button>
+              ${levels.map(
+                (l) => html`<button class=${this._upTo === l.level ? "on" : ""} title=${l.name} @click=${() => this._show(l.level)}>${l.level}</button>`
+              )}
+              <button class=${this._upTo === null ? "on" : ""} title=${t("builder.render_all")} @click=${() => this._show(null)}>☰</button>
+            </div>`
+          : html`<div class="p-body">
+              <section>
+                <div class="c-title">${t("builder.render_view")}</div>
+                <button class="cmd" @click=${() => this._frame()}>⤢ ${t("builder.render_reset")}</button>
+                <small class="hint">${t("builder.render_hint")}</small>
+              </section>
+              <section>
+                <div class="c-title">${t("builder.render_floors")}</div>
+                <div class="floors">
+                  <button class=${this._upTo === null ? "on" : ""} @click=${() => this._show(null)}>${t("builder.render_all")}</button>
+                  ${levels.map(
+                    (l) => html`<button class=${this._upTo === l.level ? "on" : ""} @click=${() => this._show(l.level)}>
+                      <strong>${l.level}</strong> ${l.name}
+                    </button>`
+                  )}
+                </div>
+              </section>
+              ${room ?? html`<p class="none pick">${t("builder.render_pick_room")}</p>`}
+            </div>`}
+      </aside>
+      <div class="stage"><div class="view"></div></div>
+    </div>`;
   }
 
   static styles = css`
@@ -1152,6 +1251,106 @@ export class HomexBuilderRender extends LitElement {
       overflow: hidden;
       border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
     }
+    .layout {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+      transition: grid-template-columns 0.2s ease;
+    }
+    .layout.collapsed {
+      grid-template-columns: 48px minmax(0, 1fr);
+    }
+    .pane {
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--card-background-color, #1c1c1c);
+      border-right: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
+      color: var(--primary-text-color);
+    }
+    .p-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 10px 10px 16px;
+      border-bottom: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
+    }
+    .collapsed .p-head {
+      padding: 10px 0;
+      justify-content: center;
+    }
+    .p-head strong {
+      font-size: 15px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .fold,
+    .strip button,
+    .cmd {
+      font: inherit;
+      font-size: 13px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--secondary-background-color, rgba(127, 127, 127, 0.2));
+      color: var(--primary-text-color);
+      cursor: pointer;
+    }
+    .fold {
+      width: 30px;
+      height: 30px;
+      flex: none;
+      font-size: 16px;
+    }
+    .strip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 0;
+      overflow: auto;
+    }
+    .strip button {
+      width: 34px;
+      height: 34px;
+      font-weight: 600;
+    }
+    .strip button.on {
+      background: var(--primary-color);
+      color: var(--text-primary-color, #fff);
+    }
+    .p-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+      padding: 14px 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .cmd {
+      align-self: flex-start;
+      padding: 7px 12px;
+    }
+    .hint {
+      color: var(--secondary-text-color);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .pick {
+      padding: 14px;
+      border: 1px dashed var(--divider-color, rgba(127, 127, 127, 0.4));
+      border-radius: 10px;
+      text-align: center;
+    }
+    .stage {
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+    }
     .view {
       position: absolute;
       inset: 0;
@@ -1159,21 +1358,12 @@ export class HomexBuilderRender extends LitElement {
     .view canvas {
       display: block;
     }
-    .floors,
-    .bar {
-      position: absolute;
-      background: color-mix(in srgb, var(--card-background-color, #1c1c1c) 90%, transparent);
-      border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    }
     .floors {
-      right: 10px;
-      bottom: 10px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      min-width: 150px;
+      border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
+      border-radius: 10px;
     }
     .floors button {
       font: inherit;
@@ -1196,41 +1386,17 @@ export class HomexBuilderRender extends LitElement {
       display: inline-block;
       min-width: 22px;
     }
-    .bar {
-      left: 10px;
-      top: 10px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 4px 10px 4px 4px;
-      font-size: 12px;
-      color: var(--secondary-text-color);
-    }
-    .bar button {
-      font: inherit;
-      font-size: 13px;
-      padding: 6px 10px;
-      border-radius: 8px;
-      border: 0;
-      background: var(--secondary-background-color, rgba(127, 127, 127, 0.2));
-      color: var(--primary-text-color);
-      cursor: pointer;
-    }
     .ctl {
-      position: absolute;
       box-sizing: border-box;
-      overflow: auto;
-      padding: 14px 16px 16px;
+      padding: 14px 14px 16px;
       display: flex;
       flex-direction: column;
       gap: 18px;
       font-size: 14px;
       color: var(--primary-text-color);
-      background: color-mix(in srgb, var(--card-background-color, #1c1c1c) 95%, transparent);
       border: 1px solid color-mix(in srgb, #ffcf87 55%, transparent);
       border-radius: 14px;
-      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45), 0 0 22px rgba(255, 207, 135, 0.15);
-      z-index: 2;
+      box-shadow: 0 0 18px rgba(255, 207, 135, 0.12);
     }
     .c-head {
       display: flex;
@@ -1357,12 +1523,6 @@ export class HomexBuilderRender extends LitElement {
       gap: 18px;
       min-height: 0;
     }
-    .ctl.two .c-body {
-      display: grid;
-      grid-template-columns: 150px minmax(0, 1fr);
-      gap: 20px;
-      align-items: start;
-    }
     .c-main {
       display: flex;
       flex-direction: column;
@@ -1370,8 +1530,6 @@ export class HomexBuilderRender extends LitElement {
       min-width: 0;
     }
     .c-shutters {
-      padding-right: 18px;
-      border-right: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
       gap: 12px;
     }
     .sh-group {
@@ -1447,12 +1605,19 @@ export class HomexBuilderRender extends LitElement {
       height: 24px;
     }
     @media (max-width: 700px) {
-      .ctl.two .c-body {
+      .layout,
+      .layout.collapsed {
         grid-template-columns: 1fr;
+        grid-template-rows: auto minmax(0, 1fr);
       }
-      .c-shutters {
-        padding-right: 0;
+      .pane {
+        max-height: 45%;
         border-right: 0;
+        border-bottom: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
+      }
+      .strip {
+        flex-direction: row;
+        padding: 0 10px 10px;
       }
     }
     .power-row {
@@ -1735,12 +1900,7 @@ export class HomexBuilderRender extends LitElement {
       background: var(--divider-color, rgba(127, 127, 127, 0.4));
       vertical-align: 1px;
     }
-    @media (max-width: 800px) {
-      .bar span {
-        display: none;
-      }
 
-    }
   `;
 }
 
@@ -1966,6 +2126,37 @@ function clip(subject: PlanPoint[], by: PlanPoint[]): PlanPoint[] {
   return out;
 }
 
+/** A wall piece with rooms on both sides (a partition), not part of the outline. */
+function isInterior(level: PlanLevel, a: PlanPoint, b: PlanPoint): boolean {
+  const len = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+  const n: PlanPoint = [-(b[1] - a[1]) / len, (b[0] - a[0]) / len];
+  const mid: PlanPoint = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+  const inRoom = (s: number) => level.rooms.some((r) => pointInPolygon([mid[0] + n[0] * s * 20, mid[1] + n[1] * s * 20], r.points));
+  return inRoom(1) && inRoom(-1);
+}
+
+/** Unit normal from the wall nearest to p into the room ([0, 0]: no wall within `tol` cm). */
+function wallNormal(level: PlanLevel, p: PlanPoint, tol = 60): PlanPoint {
+  let best: { d: number; on: PlanPoint; a: PlanPoint; b: PlanPoint } | null = null;
+  for (const room of level.rooms) {
+    room.points.forEach((a, i) => {
+      const b = room.points[(i + 1) % room.points.length];
+      const on = projectOnSegment(p, a, b);
+      const d = Math.hypot(p[0] - on[0], p[1] - on[1]);
+      if (!best || d < best.d) best = { d, on, a, b };
+    });
+  }
+  if (!best) return [0, 0];
+  const { d, on, a, b } = best as { d: number; on: PlanPoint; a: PlanPoint; b: PlanPoint };
+  if (d > tol) return [0, 0];
+  const len = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+  let n: PlanPoint = [-(b[1] - a[1]) / len, (b[0] - a[0]) / len];
+  const own = (p[0] - on[0]) * n[0] + (p[1] - on[1]) * n[1];
+  if (own < -0.5) n = [-n[0], -n[1]];
+  else if (Math.abs(own) <= 0.5 && !level.rooms.some((r) => pointInPolygon([on[0] + n[0] * 20, on[1] + n[1] * 20], r.points))) n = [-n[0], -n[1]];
+  return n;
+}
+
 /** A point drawn on (or near) a wall, moved into the room so that an object of
  * half-depth `depth` (m) stands against the wall instead of through it. */
 function inward(level: PlanLevel, p: PlanPoint, depth: number): PlanPoint {
@@ -2009,3 +2200,6 @@ function puffTexture(): THREE.CanvasTexture {
   puff = new THREE.CanvasTexture(c);
   return puff;
 }
+
+// The panel and the dashboard cards are separate bundles: define once.
+if (!customElements.get("homex-builder-render")) customElements.define("homex-builder-render", HomexBuilderRender);

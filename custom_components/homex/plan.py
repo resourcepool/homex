@@ -105,7 +105,7 @@ _LIGHT = vol.Schema(
         vol.Optional("points", default=list): [_POINT],
         vol.Optional("lines", default=list): [vol.All([_POINT], vol.Length(min=2, max=2))],
         vol.Optional("type"): vol.In(
-            ["ceiling_light", "pendant", "spot", "sconce", "floor_lamp", "table_lamp", "led_strip"]
+            ["ceiling_light", "pendant", "spot", "projector", "sconce", "floor_lamp", "table_lamp", "led_strip"]
         ),
         vol.Optional("shape"): vol.In(["round", "square"]),
         vol.Optional("shade"): bool,

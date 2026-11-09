@@ -284,8 +284,8 @@ export const STAIR_SHAPES: StairShape[] = ["straight", "l", "u", "spiral"];
 
 /** Light fixtures by mount; the first is the default. */
 export const LIGHT_TYPES: Record<LightMount, LightType[]> = {
-  ceiling: ["ceiling_light", "pendant", "spot", "led_strip"],
-  wall: ["sconce", "led_strip"],
+  ceiling: ["ceiling_light", "pendant", "spot", "projector", "led_strip"],
+  wall: ["sconce", "projector", "led_strip"],
   floor: ["floor_lamp", "table_lamp", "led_strip"],
 };
 
