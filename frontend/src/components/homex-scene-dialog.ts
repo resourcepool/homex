@@ -18,23 +18,13 @@ import { slugify } from "../lib/slug";
 import "./homex-dialog";
 import "./homex-trigger-selector";
 import "./homex-managed-triggers";
+import "./homex-light-start-picker";
+import { DEFAULT_LIGHT_COLOR } from "./homex-light-start-picker";
 
 type Mode = "new" | "attach";
 
-const DEFAULT_ANIMATION: SceneAnimation = {
-  mode: "fade_out",
-  lights: [],
-  color: [255, 180, 107],
-  brightness: 100,
-  duration: 600,
-};
-
-const toHex = (c: number[]) =>
-  "#" + c.map((v) => Math.round(v).toString(16).padStart(2, "0")).join("");
-const fromHex = (hex: string): [number, number, number] => {
-  const n = parseInt(hex.replace("#", ""), 16);
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-};
+const DEFAULT_DURATION = 600; // 10 min
+const DURATION_PRESETS = [5, 10, 15, 30, 60]; // minutes
 
 interface SceneOption {
   config_id: string;
@@ -55,7 +45,7 @@ export class HomexSceneDialog extends LitElement {
   @state() private _attachId = "";
   @state() private _triggers: TriggerSpec[] = [];
   @state() private _kind: SceneKind = "normal";
-  @state() private _anim: SceneAnimation = { ...DEFAULT_ANIMATION };
+  @state() private _anim: SceneAnimation = { mode: "fade_out", lights: [], duration: DEFAULT_DURATION };
   @state() private _busy = false;
 
   static styles = [
@@ -73,66 +63,34 @@ export class HomexSceneDialog extends LitElement {
         background: var(--primary-color);
         color: var(--text-primary-color, #fff);
       }
-      .lights {
+      .chips {
         display: flex;
-        flex-direction: column;
-        gap: 4px;
-        max-height: 220px;
-        overflow: auto;
-        border: 1px solid var(--divider-color, #e0e0e0);
-        border-radius: 8px;
-        padding: 6px 10px;
-      }
-      .lights label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 14px;
-        padding: 3px 0;
-        cursor: pointer;
-      }
-      .lights .eid {
-        color: var(--secondary-text-color);
-        font-size: 11px;
-        margin-left: auto;
-      }
-      .row {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin: 10px 0;
         flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+        margin: 6px 0 4px;
       }
-      .row > span {
+      .chips button {
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+      }
+      .chips button.active {
+        background: var(--primary-color);
+        color: var(--text-primary-color, #fff);
+      }
+      .chips .custom {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         font-size: 13px;
         color: var(--secondary-text-color);
-        min-width: 130px;
+        margin-left: 4px;
       }
-      .row input[type="range"] {
-        flex: 1;
-        min-width: 120px;
-      }
-      .row input[type="color"] {
-        width: 52px;
-        height: 34px;
-        padding: 0;
-        border: 1px solid var(--divider-color, #ccc);
-        border-radius: 6px;
-        background: none;
-        cursor: pointer;
-      }
-      .row input[type="number"] {
-        width: 80px;
-        padding: 8px;
-        font-size: 15px;
-        border: 1px solid var(--divider-color, #ccc);
-        border-radius: 8px;
-        background: var(--card-background-color, #fff);
-        color: var(--primary-text-color);
-      }
-      .row select {
-        padding: 8px;
-        font-size: 15px;
+      .chips input[type="number"] {
+        width: 70px;
+        padding: 6px 8px;
+        font-size: 14px;
         border: 1px solid var(--divider-color, #ccc);
         border-radius: 8px;
         background: var(--card-background-color, #fff);
@@ -160,8 +118,27 @@ export class HomexSceneDialog extends LitElement {
       this._kind = this.scene?.kind ?? "normal";
       const anim = this.scene?.animation;
       this._anim = anim
-        ? { ...anim, lights: [...anim.lights], color: [...anim.color] as [number, number, number] }
-        : { ...DEFAULT_ANIMATION, lights: this._roomLights() };
+        ? {
+            ...anim,
+            lights: anim.lights.map((l) => ({ ...l, color: [...l.color] as [number, number, number] })),
+          }
+        : {
+            mode: "fade_out",
+            duration: DEFAULT_DURATION,
+            // Warm white at full brightness (a white temperature where the
+            // light has one; brightness-only lights just dim).
+            lights: this._roomLights().map((entity_id) => {
+              const modes: string[] =
+                this.hass.states[entity_id]?.attributes?.supported_color_modes ?? [];
+              const dimOnly = modes.every((m) => m === "brightness" || m === "onoff");
+              return {
+                entity_id,
+                color: [...DEFAULT_LIGHT_COLOR] as [number, number, number],
+                brightness: 100,
+                ...(dimOnly ? {} : { kelvin: 2700 }),
+              };
+            }),
+          };
       this._busy = false;
     }
   }
@@ -194,12 +171,6 @@ export class HomexSceneDialog extends LitElement {
 
   private _setAnim(patch: Partial<SceneAnimation>) {
     this._anim = { ...this._anim, ...patch };
-  }
-
-  private _toggleLight(entityId: string, on: boolean) {
-    const lights = this._anim.lights.filter((e) => e !== entityId);
-    if (on) lights.push(entityId);
-    this._setAnim({ lights });
   }
 
   // The proposed name must not collide with another scene of the room.
@@ -328,78 +299,59 @@ export class HomexSceneDialog extends LitElement {
 
   private _renderAnimation() {
     const a = this._anim;
-    const lights = this._roomLights();
-    // Keep lights already chosen even if no longer in the room (to untick).
-    const all = [...lights, ...a.lights.filter((e) => !lights.includes(e))];
     const minutes = Math.round((a.duration / 60) * 10) / 10;
+    const preset = DURATION_PRESETS.includes(minutes);
     return html`
       <div class="hint">${t("sceneDialog.dynamic_hint")}</div>
-      <div class="row">
-        <span>${t("sceneDialog.animation")}</span>
-        <select
-          .value=${a.mode}
-          @change=${(e: Event) =>
-            this._setAnim({ mode: (e.target as HTMLSelectElement).value as SceneAnimation["mode"] })}
-        >
-          <option value="fade_out">${t("sceneDialog.mode_fade_out")}</option>
-        </select>
-      </div>
-      <div class="hint">${t("sceneDialog.fade_out_hint")}</div>
+      <homex-select
+        label=${t("sceneDialog.animation")}
+        .value=${a.mode}
+        .options=${[
+          {
+            value: "fade_out",
+            label: t("sceneDialog.mode_fade_out"),
+            secondary: t("sceneDialog.fade_out_hint"),
+          },
+        ]}
+        @value-changed=${(e: CustomEvent) => this._setAnim({ mode: e.detail.value })}
+      ></homex-select>
       <div class="section">${t("sceneDialog.lights")}</div>
-      ${all.length
-        ? html`<div class="lights">
-            ${all.map(
-              (id) => html`<label>
-                <input
-                  type="checkbox"
-                  .checked=${a.lights.includes(id)}
-                  @change=${(e: Event) =>
-                    this._toggleLight(id, (e.target as HTMLInputElement).checked)}
-                />
-                ${this.hass.states[id]?.attributes?.friendly_name ?? id}
-                <span class="eid">${id}</span>
-              </label>`
-            )}
-          </div>`
-        : html`<div class="err">${t("sceneDialog.no_lights")}</div>`}
-      ${all.length && !a.lights.length
+      <homex-light-start-picker
+        .hass=${this.hass}
+        .lights=${this._roomLights()}
+        .value=${a.lights}
+        @value-changed=${(e: CustomEvent) => this._setAnim({ lights: e.detail.value })}
+      ></homex-light-start-picker>
+      ${this._roomLights().length && !a.lights.length
         ? html`<div class="err">${t("sceneDialog.pick_lights")}</div>`
         : ""}
-      <div class="row">
-        <span>${t("sceneDialog.start_color")}</span>
-        <input
-          type="color"
-          .value=${toHex(a.color)}
-          @input=${(e: Event) =>
-            this._setAnim({ color: fromHex((e.target as HTMLInputElement).value) })}
-        />
-      </div>
-      <div class="row">
-        <span>${t("sceneDialog.start_brightness")}</span>
-        <input
-          type="range"
-          min="1"
-          max="100"
-          .value=${String(a.brightness)}
-          @input=${(e: Event) =>
-            this._setAnim({ brightness: Number((e.target as HTMLInputElement).value) })}
-        />
-        <b>${a.brightness} %</b>
-      </div>
-      <div class="row">
-        <span>${t("sceneDialog.duration")}</span>
-        <input
-          type="number"
-          min="0.5"
-          max="360"
-          step="0.5"
-          .value=${String(minutes)}
-          @change=${(e: Event) => {
-            const v = Number((e.target as HTMLInputElement).value);
-            if (v > 0) this._setAnim({ duration: Math.round(Math.min(360, Math.max(0.5, v)) * 60) });
-          }}
-        />
-        <span>${t("sceneDialog.minutes")}</span>
+      <div class="section">${t("sceneDialog.duration")}</div>
+      <div class="chips">
+        ${DURATION_PRESETS.map(
+          (m) => html`<button
+            class=${minutes === m ? "active" : ""}
+            @click=${() => this._setAnim({ duration: m * 60 })}
+          >
+            ${m} ${t("sceneDialog.minutes")}
+          </button>`
+        )}
+        <span class="custom">
+          ${t("sceneDialog.custom_duration")}
+          <input
+            type="number"
+            min="0.5"
+            max="360"
+            step="0.5"
+            .value=${preset ? "" : String(minutes)}
+            placeholder="—"
+            @change=${(e: Event) => {
+              const v = Number((e.target as HTMLInputElement).value);
+              if (v > 0)
+                this._setAnim({ duration: Math.round(Math.min(360, Math.max(0.5, v)) * 60) });
+            }}
+          />
+          ${t("sceneDialog.minutes")}
+        </span>
       </div>
     `;
   }

@@ -34,13 +34,19 @@ export interface Scene {
 export type SceneKind = "normal" | "dynamic";
 export type AnimationMode = "fade_out";
 
-/** A dynamic scene's animation. fade_out: the lights start at this colour and
- * brightness (%), then fade progressively to off over `duration` seconds. */
+/** A light of an animation and its starting state (colour, brightness %). */
+export interface AnimatedLight {
+  entity_id: string;
+  color: [number, number, number]; // rgb (with kelvin: its preview)
+  brightness: number;
+  kelvin?: number; // white temperature (2000-6500 K) instead of a colour
+}
+
+/** A dynamic scene's animation. fade_out: each light starts at its own colour
+ * and brightness, then all fade progressively to off over `duration` seconds. */
 export interface SceneAnimation {
   mode: AnimationMode;
-  lights: string[];
-  color: [number, number, number];
-  brightness: number;
+  lights: AnimatedLight[];
   duration: number;
 }
 

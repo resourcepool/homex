@@ -1,0 +1,33 @@
+/** Strings of components/homex-light-start-picker.ts. */
+export default {
+  en: {
+    no_lights: "This room has no light.",
+    count: "{n} of {total} lights",
+    all: "All",
+    none: "None",
+    color: "Colour",
+    brightness: "Brightness",
+    dim_only: "Brightness only (no colour)",
+    custom: "Custom colour",
+    copy_all: "Apply to every light",
+    adjust: "Adjust colour and brightness",
+    not_animated: "Not animated",
+    temperature: "White temperature",
+    colored: "Colour",
+  } as Record<string, string>,
+  fr: {
+    no_lights: "Cette pièce n’a aucune lumière.",
+    count: "{n} sur {total} lumières",
+    all: "Toutes",
+    none: "Aucune",
+    color: "Couleur",
+    brightness: "Intensité",
+    dim_only: "Intensité seule (pas de couleur)",
+    custom: "Couleur personnalisée",
+    copy_all: "Appliquer à toutes les lumières",
+    adjust: "Régler la couleur et l’intensité",
+    not_animated: "Non animée",
+    temperature: "Température de blanc",
+    colored: "Couleur",
+  } as Record<string, string>,
+};

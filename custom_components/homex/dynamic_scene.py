@@ -6,8 +6,14 @@ owned by Homex: the scene sets the animation's starting state, and once it has
 been applied Homex runs the animation.
 
 Animation modes:
-  * ``fade_out``: chosen lights start at a colour + brightness, then fade
-    progressively to off over ``duration`` seconds.
+  * ``fade_out``: each chosen light starts at its own colour + brightness,
+    then all fade progressively to off over ``duration`` seconds.
+
+Config: ``{mode, duration, lights: [{entity_id, color: [r,g,b], brightness: %,
+kelvin?}]}`` — ``kelvin`` set: the light starts at that white temperature
+(``color`` then only previews it).
+(Older configs with bare entity ids and a shared colour/brightness are read
+as that colour/brightness for every light.)
 
 The fade is stepped (one ``light.turn_on`` with a matching transition every few
 seconds) rather than one long transition: long transitions are capped or
@@ -37,6 +43,8 @@ MODES = (MODE_FADE_OUT,)
 DEFAULT_DURATION_S = 600  # 10 min
 DEFAULT_BRIGHTNESS_PCT = 100
 DEFAULT_COLOR = [255, 180, 107]  # warm white
+MIN_KELVIN = 2000
+MAX_KELVIN = 6500
 MIN_DURATION_S = 10
 MAX_DURATION_S = 6 * 3600
 
@@ -48,25 +56,55 @@ MIN_STEP_S = 2.0
 MAX_STEP_S = 30.0
 
 
+def _color(value, default) -> list[int]:
+    if not (
+        isinstance(value, (list, tuple))
+        and len(value) == 3
+        and all(isinstance(c, (int, float)) for c in value)
+    ):
+        value = default
+    return [max(0, min(255, int(c))) for c in value]
+
+
+def _pct(value, default: int) -> int:
+    try:
+        return max(1, min(100, int(value)))
+    except (TypeError, ValueError):
+        return default
+
+
 def normalize_animation(raw) -> dict:
     """A sanitized animation config (missing/invalid fields get defaults)."""
     raw = raw if isinstance(raw, dict) else {}
     mode = raw.get("mode") if raw.get("mode") in MODES else MODE_FADE_OUT
-    lights = [
-        e for e in (raw.get("lights") or []) if isinstance(e, str) and e.startswith("light.")
-    ]
-    color = raw.get("color")
-    if not (
-        isinstance(color, (list, tuple))
-        and len(color) == 3
-        and all(isinstance(c, (int, float)) for c in color)
-    ):
-        color = list(DEFAULT_COLOR)
-    color = [max(0, min(255, int(c))) for c in color]
-    try:
-        brightness = int(raw.get("brightness", DEFAULT_BRIGHTNESS_PCT))
-    except (TypeError, ValueError):
-        brightness = DEFAULT_BRIGHTNESS_PCT
+    # Legacy shared settings: the default of every light.
+    color = _color(raw.get("color"), DEFAULT_COLOR)
+    brightness = _pct(raw.get("brightness"), DEFAULT_BRIGHTNESS_PCT)
+    lights: list[dict] = []
+    seen: set[str] = set()
+    for item in raw.get("lights") or []:
+        if isinstance(item, str):
+            item = {"entity_id": item}
+        if not isinstance(item, dict):
+            continue
+        entity_id = item.get("entity_id")
+        if not (isinstance(entity_id, str) and entity_id.startswith("light.")):
+            continue
+        if entity_id in seen:
+            continue
+        seen.add(entity_id)
+        light = {
+            "entity_id": entity_id,
+            "color": _color(item.get("color"), color),
+            "brightness": _pct(item.get("brightness"), brightness),
+        }
+        try:
+            kelvin = int(item["kelvin"]) if item.get("kelvin") else None
+        except (TypeError, ValueError):
+            kelvin = None
+        if kelvin:
+            light["kelvin"] = max(MIN_KELVIN, min(MAX_KELVIN, kelvin))
+        lights.append(light)
     try:
         duration = int(raw.get("duration", DEFAULT_DURATION_S))
     except (TypeError, ValueError):
@@ -74,8 +112,6 @@ def normalize_animation(raw) -> dict:
     return {
         "mode": mode,
         "lights": lights,
-        "color": color,
-        "brightness": max(1, min(100, brightness)),
         "duration": max(MIN_DURATION_S, min(MAX_DURATION_S, duration)),
     }
 
@@ -87,16 +123,18 @@ def scene_entities(animation: dict, room_devices: list[str]) -> dict:
     member of the room off (the animation ends in darkness).
     """
     anim = normalize_animation(animation)
+    chosen = {light["entity_id"] for light in anim["lights"]}
     entities: dict = {}
     for entity_id in room_devices:
-        if entity_id not in anim["lights"]:
+        if entity_id not in chosen:
             entities[entity_id] = {"state": "off"}
-    for entity_id in anim["lights"]:
-        entities[entity_id] = {
-            "state": "on",
-            "brightness": round(anim["brightness"] * 255 / 100),
-            "rgb_color": list(anim["color"]),
-        }
+    for light in anim["lights"]:
+        start = {"state": "on", "brightness": round(light["brightness"] * 255 / 100)}
+        if light.get("kelvin"):
+            start["color_temp_kelvin"] = light["kelvin"]
+        else:
+            start["rgb_color"] = list(light["color"])
+        entities[light["entity_id"]] = start
     return entities
 
 
@@ -109,8 +147,11 @@ class FadeOut:
         self.hass = controller.hass
         self.key = key
         anim = normalize_animation(animation)
-        self._lights: list[str] = list(anim["lights"])
-        self._start = anim["brightness"] * 255 / 100
+        # entity_id -> starting brightness (0-255): each light fades from its own.
+        self._start: dict[str, float] = {
+            light["entity_id"]: light["brightness"] * 255 / 100 for light in anim["lights"]
+        }
+        self._lights: list[str] = list(self._start)
         self._duration = float(anim["duration"])
         self._step = max(MIN_STEP_S, min(MAX_STEP_S, self._duration / 100))
         self._t0 = 0.0
@@ -178,16 +219,22 @@ class FadeOut:
             )
             self._finish()
             return
-        target = max(1, round(self._start * (remaining - self._step) / self._duration))
-        self._call("turn_on", {"brightness": target, "transition": self._step})
+        ratio = (remaining - self._step) / self._duration
+        # Lights sharing a target level go in one call.
+        by_level: dict[int, list[str]] = {}
+        for entity_id in self._lights:
+            level = max(1, round(self._start[entity_id] * ratio))
+            by_level.setdefault(level, []).append(entity_id)
+        for level, ids in by_level.items():
+            self._call("turn_on", {"brightness": level, "transition": self._step}, ids)
         self._timer = async_call_later(self.hass, self._step, self._tick)
 
-    def _call(self, service: str, data: dict) -> None:
+    def _call(self, service: str, data: dict, ids: list[str] | None = None) -> None:
         self.hass.async_create_task(
             self.hass.services.async_call(
                 "light",
                 service,
-                {"entity_id": list(self._lights), **data},
+                {"entity_id": list(ids if ids is not None else self._lights), **data},
                 blocking=False,
                 context=self._controller.new_context(),
             )
