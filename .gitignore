@@ -39,3 +39,6 @@ config/blueprints/
 
 # Homex backups written by the dev instance (safety copies before a restore)
 config/homex_backups/
+
+# Dev HA: Animated pixel videos and samples
+config/homex/

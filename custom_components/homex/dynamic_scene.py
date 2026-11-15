@@ -63,6 +63,54 @@ MAX_FPS = 10.0
 # A sample this dark (brightness 0-255) turns the light off.
 PIXEL_OFF_BELOW = 3
 
+# Zigbee can't take a flood of commands: past a few per second the
+# coordinator / Zigbee2MQTT queue them (the lights lag further and further, a
+# stop only lands after the backlog) or even restart. Animations share one
+# command budget for the whole house, and each light gets at most one command
+# per LIGHT_MIN_GAP_S: in between, frames are skipped (never queued).
+COMMANDS_PER_S = 6.0
+LIGHT_MIN_GAP_S = 0.8
+# Changes smaller than this aren't worth a command (brightness / colour, 0-255).
+MIN_BRIGHTNESS_DELTA = 4
+MIN_COLOR_DELTA = 12
+BUDGET_KEY = "homex_animation_budget"
+
+
+class CommandBudget:
+    """Token bucket shared by every running animation (see COMMANDS_PER_S)."""
+
+    def __init__(self, rate: float = COMMANDS_PER_S) -> None:
+        self.rate = rate
+        self._tokens = rate
+        self._at = time.monotonic()
+
+    def take(self) -> bool:
+        now = time.monotonic()
+        self._tokens = min(self.rate, self._tokens + (now - self._at) * self.rate)
+        self._at = now
+        if self._tokens < 1:
+            return False
+        self._tokens -= 1
+        return True
+
+
+def command_budget(hass) -> CommandBudget:
+    budget = hass.data.get(BUDGET_KEY)
+    if budget is None:
+        budget = hass.data[BUDGET_KEY] = CommandBudget()
+    return budget
+
+
+def _worth_sending(previous: tuple | None, sample: tuple) -> bool:
+    """A visible change from what the light was last told."""
+    if previous is None or len(previous) != len(sample):
+        return True  # first command, or on ↔ off
+    if len(sample) == 1:
+        return False  # off → off
+    if abs(previous[3] - sample[3]) >= MIN_BRIGHTNESS_DELTA:
+        return True
+    return max(abs(a - b) for a, b in zip(previous[:3], sample[:3])) >= MIN_COLOR_DELTA
+
 DEFAULT_DURATION_S = 600  # 10 min
 DEFAULT_BRIGHTNESS_PCT = 100
 DEFAULT_COLOR = [255, 180, 107]  # warm white
@@ -286,8 +334,17 @@ class Fade:
 
     @callback
     def _on_light_changed(self, event: Event) -> None:
-        """Someone else touched a fading light: leave it alone from now on."""
-        if self._controller.is_self_context(event.context):
+        """Someone else touched a fading light: leave it alone from now on.
+
+        A light gone unavailable (e.g. Zigbee2MQTT restarting) is released
+        whatever the context: HA stamps state writes with the context of the
+        last service call for a few seconds, so it would otherwise pass for one
+        of our own changes — and the animation would resume on its own when the
+        light comes back.
+        """
+        new = event.data.get("new_state")
+        gone = new is None or new.state in ("unavailable", "unknown")
+        if not gone and self._controller.is_self_context(event.context):
             return
         entity_id = event.data.get("entity_id")
         if entity_id in self._lights:
@@ -388,7 +445,9 @@ class PixelPlayer(Fade):
         self._lights = list(anim["zones"])
         self._count = 0
         self._k = 0
-        self._sent: dict[str, tuple] = {}
+        self._sent: dict[str, tuple] = {}  # last command per light
+        self._sent_at: dict[str, float] = {}  # when (monotonic)
+        self._skipped = 0  # commands dropped for lack of budget
         self._color: set[str] = set()
 
     @property
@@ -468,24 +527,49 @@ class PixelPlayer(Fade):
             self._apply_end()
             self._finish()
             return
-        transition = {"transition": self._interval}
-        for entity_id in list(self._lights):
-            r, g, b, bri = self._frames[entity_id][index]
-            sample = (r, g, b, bri) if bri >= PIXEL_OFF_BELOW else ("off",)
-            if self._sent.get(entity_id) == sample:
-                continue
-            self._sent[entity_id] = sample
-            if bri < PIXEL_OFF_BELOW:
-                self._call("turn_off", transition, [entity_id])
-            else:
-                data = {"brightness": bri, **transition}
-                if entity_id in self._color:
-                    data["rgb_color"] = [r, g, b]
-                self._call("turn_on", data, [entity_id])
+        self._send_frame(index)
         self._k += 1
         # Scheduled against the start time, so the timing doesn't drift.
         delay = self._t0 + self._k * self._interval - time.monotonic()
         self._timer = async_call_later(self.hass, max(0.05, delay), self._tick)
+
+    def _send_frame(self, index: int) -> None:
+        """Bring the lights towards this frame, within the command budget.
+
+        Lights whose target changed visibly and whose last command is at least
+        LIGHT_MIN_GAP_S old are candidates; the longest-waiting go first, as
+        long as the shared budget allows. The others simply skip this frame.
+        Each command's transition spans the gap until the light's next one, so
+        the light glides instead of stepping.
+        """
+        now = time.monotonic()
+        budget = command_budget(self.hass)
+        gap = max(LIGHT_MIN_GAP_S, self._interval)
+        candidates = []
+        for entity_id in self._lights:
+            r, g, b, bri = self._frames[entity_id][index]
+            sample = (r, g, b, bri) if bri >= PIXEL_OFF_BELOW else ("off",)
+            if not _worth_sending(self._sent.get(entity_id), sample):
+                continue
+            last = self._sent_at.get(entity_id, 0.0)
+            if now - last < LIGHT_MIN_GAP_S:
+                continue
+            candidates.append((last, entity_id, sample))
+        candidates.sort()
+        for _last, entity_id, sample in candidates:
+            if not budget.take():
+                self._skipped += 1
+                continue
+            self._sent[entity_id] = sample
+            self._sent_at[entity_id] = now
+            if len(sample) == 1:
+                self._call("turn_off", {"transition": min(gap, 1.0)}, [entity_id])
+                continue
+            r, g, b, bri = sample
+            data = {"brightness": bri, "transition": gap}
+            if entity_id in self._color:
+                data["rgb_color"] = [r, g, b]
+            self._call("turn_on", data, [entity_id])
 
     def _apply_end(self) -> None:
         """`once` is over: the end state (chosen lights on, the rest off)."""

@@ -619,7 +619,7 @@ export class HomexSceneDialog extends LitElement {
               : ""}
           </div>`
         : ""}
-      ${fps > 2 ? html`<div class="hint">${t("pixel.fast_hint")}</div>` : ""}
+      ${fps > 1.25 ? html`<div class="hint">${t("pixel.fast_hint")}</div>` : ""}
 
       <div class="section">${t("pixel.loop")}</div>
       <homex-select
