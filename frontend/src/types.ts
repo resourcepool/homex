@@ -32,7 +32,12 @@ export interface Scene {
 }
 
 export type SceneKind = "normal" | "dynamic";
-export type AnimationMode = "fade_out";
+export type AnimationMode = "fade_out" | "fade_in" | "pixel";
+export type PixelLoop = "repeat" | "reverse" | "once";
+/** A light's zone on the video, normalized 0-1: [x, y, width, height]. */
+export type PixelZone = [number, number, number, number];
+/** One sample of a light: [r, g, b, brightness 0-255]. */
+export type PixelSample = [number, number, number, number];
 
 /** A light of an animation and its starting state (colour, brightness %). */
 export interface AnimatedLight {
@@ -42,12 +47,26 @@ export interface AnimatedLight {
   kelvin?: number; // white temperature (2000-6500 K) instead of a colour
 }
 
-/** A dynamic scene's animation. fade_out: each light starts at its own colour
+/** A dynamic scene's animation. fade_in: each light rises from 1 % to its own
+ * colour and brightness. fade_out: each light starts at its own colour
  * and brightness, then all fade progressively to off over `duration` seconds. */
 export interface SceneAnimation {
   mode: AnimationMode;
+  /** Fades: the animated lights. Pixel: the end state of a `once` loop. */
   lights: AnimatedLight[];
-  duration: number;
+  duration: number; // seconds (pixel: frame_count × interval, read-only)
+  // ---- pixel (animated pixel) ----
+  video_id?: string;
+  video_name?: string;
+  interval?: number; // seconds of video between two samples
+  fps?: number; // samples played per second on the lights (1/interval: real time)
+  loop?: PixelLoop;
+  zones?: Record<string, PixelZone>;
+  frames_id?: string;
+  frame_count?: number;
+  first?: Record<string, PixelSample>;
+  /** Freshly sampled frames (sent on save only). */
+  frames?: Record<string, PixelSample[]>;
 }
 
 export type SceneStrategy = "recall_first" | "recall_last";

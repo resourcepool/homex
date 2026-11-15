@@ -271,6 +271,29 @@ export const renameScene = (
     ...(animation ? { animation } : {}),
   });
 
+/** Upload an animated-pixel video (admin); resolves to its id. */
+export const uploadPixelVideo = async (
+  hass: HomeAssistant,
+  file: File
+): Promise<string> => {
+  const body = new FormData();
+  body.append("file", file, file.name);
+  const res: Response = await hass.fetchWithAuth("/api/homex/pixel/video", {
+    method: "POST",
+    body,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.message || `HTTP ${res.status}`);
+  return data.video_id;
+};
+
+/** An animated-pixel video, as an object URL (revoke it when done). */
+export const fetchPixelVideo = async (hass: HomeAssistant, videoId: string): Promise<string> => {
+  const res: Response = await hass.fetchWithAuth(`/api/homex/pixel/video/${videoId}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return URL.createObjectURL(await res.blob());
+};
+
 export const errorMessage = (err: any): string =>
   (err && (err.message || err.code)) || String(err);
 

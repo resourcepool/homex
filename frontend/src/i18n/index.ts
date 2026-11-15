@@ -29,6 +29,7 @@ import roomClimate from "./roomClimate";
 import roomDialog from "./roomDialog";
 import sceneDialog from "./sceneDialog";
 import lightStart from "./lightStart";
+import pixel from "./pixel";
 import select from "./select";
 import setupWizard from "./setupWizard";
 import shutterControlDialog from "./shutterControlDialog";
@@ -75,6 +76,7 @@ export const CATALOGS: Record<string, { en: Record<string, string>; fr: Record<s
   roomDialog,
   sceneDialog,
   lightStart,
+  pixel,
   select,
   setupWizard,
   shutterControlDialog,

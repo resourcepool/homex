@@ -69,7 +69,8 @@ from .heating import async_forget_room as async_forget_heating_room
 from .heating import async_rename_room as async_rename_heating_room
 from .heating_systems import WS_COMMANDS as HEATING_SYSTEM_WS_COMMANDS
 from .heating_zones import WS_COMMANDS as HEATING_ZONE_WS_COMMANDS
-from .dynamic_scene import KIND_DYNAMIC, KIND_NORMAL, normalize_animation
+from .dynamic_scene import KIND_DYNAMIC, KIND_NORMAL, MODE_PIXEL, normalize_animation
+from .pixel_media import async_save_frames, clean_frames, register_views as register_pixel_views
 from .room import (
     RoomController,
     default_name,
@@ -108,6 +109,8 @@ _STRINGS = {
         "name_required": "Name required",
         "unknown_scene": "Unknown scene",
         "animation_no_lights": "Pick at least one light to animate",
+        "animation_no_zones": "Map at least one light on the video",
+        "animation_no_frames": "The video has not been sampled",
         "unknown_model": "unknown model",
         "tap_single": "Single",
         "tap_double": "Double",
@@ -141,6 +144,8 @@ _STRINGS = {
         "name_required": "Nom requis",
         "unknown_scene": "Scène inconnue",
         "animation_no_lights": "Choisis au moins une lumière à animer",
+        "animation_no_zones": "Place au moins une lumière sur la vidéo",
+        "animation_no_frames": "La vidéo n’a pas été échantillonnée",
         "unknown_model": "modèle inconnu",
         "tap_single": "Simple",
         "tap_double": "Double",
@@ -153,7 +158,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "245"
+PANEL_VERSION = "246"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -326,6 +331,7 @@ async def async_register_homex_panel(hass: HomeAssistant) -> None:
             "and included in the HACS download).",
             panel_dir,
         )
+    register_pixel_views(hass)
     await hass.http.async_register_static_paths(
         [StaticPathConfig(STATIC_URL, panel_dir, False)]
     )
@@ -719,6 +725,39 @@ def _save_room(hass: HomeAssistant, hub: ConfigEntry, subentry, data: dict) -> N
         title=data.get(CONF_ROOM_NAME) or data.get(CONF_ROOM_ID),
         unique_id=data.get(CONF_ROOM_ID),
     )
+
+
+async def _prepare_animation(
+    hass: HomeAssistant, raw, previous: dict | None = None
+) -> tuple[dict, str | None]:
+    """Normalize an animation from the panel; (animation, error string key).
+
+    Pixel animations may carry their freshly sampled ``frames`` inline: they
+    are stored on disk and replaced by their id. Without frames, the frames of
+    the previous version of the scene are kept.
+    """
+    raw = dict(raw) if isinstance(raw, dict) else {}
+    if raw.get("mode") == MODE_PIXEL:
+        if "frames" in raw:
+            frames = clean_frames(raw.pop("frames"))
+            if not frames:
+                return {}, "animation_no_frames"
+            raw["frames_id"] = await async_save_frames(hass, frames)
+            raw["frame_count"] = len(next(iter(frames.values())))
+            raw["first"] = {entity_id: f[0] for entity_id, f in frames.items()}
+        elif not raw.get("frames_id") and isinstance(previous, dict):
+            for field in ("frames_id", "frame_count", "first"):
+                raw.setdefault(field, previous.get(field))
+        animation = normalize_animation(raw)
+        if not animation["zones"]:
+            return {}, "animation_no_zones"
+        if not animation["frames_id"] or not animation["frame_count"]:
+            return {}, "animation_no_frames"
+        return animation, None
+    animation = normalize_animation(raw)
+    if not animation["lights"]:
+        return {}, "animation_no_lights"
+    return animation, None
 
 
 def _room_scenes(controller: RoomController) -> list[dict]:
@@ -2285,9 +2324,9 @@ async def ws_scene_add(hass: HomeAssistant, connection, msg) -> None:
 
     scene = {"key": key, "name": name, "triggers": msg.get("triggers", [])}
     if msg.get("kind") == KIND_DYNAMIC and not attach:
-        animation = normalize_animation(msg.get("animation"))
-        if not animation["lights"]:
-            connection.send_error(msg["id"], "invalid_animation", tr(hass, _STRINGS, "animation_no_lights"))
+        animation, error = await _prepare_animation(hass, msg.get("animation"))
+        if error:
+            connection.send_error(msg["id"], "invalid_animation", tr(hass, _STRINGS, error))
             return
         scene["kind"] = KIND_DYNAMIC
         scene["animation"] = animation
@@ -2448,9 +2487,11 @@ async def ws_scene_rename(hass: HomeAssistant, connection, msg) -> None:
             if triggers is not None:
                 scene["triggers"] = triggers
             if msg.get("animation") is not None and scene.get("kind") == KIND_DYNAMIC:
-                animation = normalize_animation(msg["animation"])
-                if not animation["lights"]:
-                    connection.send_error(msg["id"], "invalid_animation", tr(hass, _STRINGS, "animation_no_lights"))
+                animation, error = await _prepare_animation(
+                    hass, msg["animation"], scene.get("animation")
+                )
+                if error:
+                    connection.send_error(msg["id"], "invalid_animation", tr(hass, _STRINGS, error))
                     return
                 scene["animation"] = animation
     room[CONF_SCENES] = _scenes_value(controller, order)

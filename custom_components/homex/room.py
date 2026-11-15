@@ -471,7 +471,7 @@ class RoomController:
         # changes WE cause are ignored (otherwise scene->device->trigger loops).
         self._ctx_ids: set[str] = set()
         self._ctx_order: deque[str] = deque(maxlen=256)
-        self._animation = None  # running dynamic-scene animation (FadeOut…)
+        self._animation = None  # running dynamic-scene animation (Fade…)
 
     # -- Self-action context tracking (loop prevention) ---------------------
 
@@ -949,11 +949,17 @@ class RoomController:
             self._write_switch_state()
 
     def animation_state(self) -> dict | None:
-        """The running animation (scene key + end time), for the room switch."""
+        """The running animation (scene key, mode, end time), for the room switch."""
         runner = self._animation
         if runner is None or not runner.running:
             return None
-        return {"scene": runner.key, "ends_at": round(runner.ends_at)}
+        ends_at = runner.ends_at
+        return {
+            "scene": runner.key,
+            "mode": runner.mode,
+            "loop": getattr(runner, "loop", None),
+            "ends_at": round(ends_at) if ends_at else None,
+        }
 
     def _write_switch_state(self) -> None:
         if self._room_switch is not None and self._room_switch.hass is not None:
@@ -1587,6 +1593,29 @@ class HomexHub:
     def subentry_id(self, room_id: str) -> str | None:
         return self._subentry_by_room.get(room_id)
 
+    def pixel_media_ids(self) -> set[str]:
+        """Videos and frames referenced by any room's animated-pixel scene."""
+        ids: set[str] = set()
+        for room in self.rooms:
+            for scene in room.get(CONF_SCENES, []) or []:
+                animation = (scene or {}).get("animation") or {}
+                for field in ("video_id", "frames_id"):
+                    if animation.get(field):
+                        ids.add(animation[field])
+        return ids
+
+    async def async_cleanup_pixel_media(self) -> None:
+        from .pixel_media import cleanup_unreferenced  # lazy
+
+        try:
+            removed = await self.hass.async_add_executor_job(
+                cleanup_unreferenced, self.hass, self.pixel_media_ids()
+            )
+            if removed:
+                _LOGGER.info("Homex: removed %d unused pixel media file(s)", removed)
+        except Exception:  # noqa: BLE001 - housekeeping only
+            _LOGGER.exception("Homex: pixel media clean-up failed")
+
     async def async_start(self) -> None:
         # Isolate failures: one room's bad trigger must not abort the whole hub.
         for room_id, controller in self.controllers.items():
@@ -1597,6 +1626,7 @@ class HomexHub:
         # Switch triggers depend on other integrations' device automations (e.g.
         # MQTT/Zigbee2MQTT), which may not be ready during our setup. Wire now if
         # HA is already running (config-entry reload), else once it has started.
+        self.hass.async_create_task(self.async_cleanup_pixel_media())
         if self.hass.is_running:
             await self._async_wire_switches()
             self.hass.async_create_task(self.async_sync_shutters())

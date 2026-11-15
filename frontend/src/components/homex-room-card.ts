@@ -631,15 +631,26 @@ export class HomexRoomCard extends LitElement {
     </button>`;
   }
 
-  /** "fading · until 23:40" while this dynamic scene's animation runs. */
+  /** "fading · off at 23:40" (or "rising · full at 07:10") while this
+   * dynamic scene's animation runs. */
   private _fadeLabel(sc: Scene): string | null {
     const anim = this.hass.states[this.room.switch]?.attributes?.animation;
-    if (!anim || anim.scene !== sc.key || !anim.ends_at) return null;
+    if (!anim || anim.scene !== sc.key) return null;
+    if (anim.mode === "pixel" && !anim.ends_at) return t("roomCard.pixel_loop");
+    if (!anim.ends_at) return null;
     const until = new Date(anim.ends_at * 1000).toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
     });
-    return t("roomCard.fading_until", { time: until });
+    const key =
+      anim.mode === "pixel"
+        ? "roomCard.pixel_until"
+        : anim.mode === "fade_in"
+          ? "roomCard.rising_until"
+          : "roomCard.fading_until";
+    return t(key, {
+      time: until,
+    });
   }
 
   private _sceneRow(sc: Scene, activeKey: string | null) {
