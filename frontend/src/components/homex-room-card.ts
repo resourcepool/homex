@@ -357,6 +357,16 @@ export class HomexRoomCard extends LitElement {
         flex: 1;
         font-size: 15px;
       }
+      .kind-tag {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        border-radius: 6px;
+        padding: 1px 6px;
+      }
       .active-tag {
         font-size: 10px;
         font-weight: 600;
@@ -621,6 +631,17 @@ export class HomexRoomCard extends LitElement {
     </button>`;
   }
 
+  /** "fading · until 23:40" while this dynamic scene's animation runs. */
+  private _fadeLabel(sc: Scene): string | null {
+    const anim = this.hass.states[this.room.switch]?.attributes?.animation;
+    if (!anim || anim.scene !== sc.key || !anim.ends_at) return null;
+    const until = new Date(anim.ends_at * 1000).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    return t("roomCard.fading_until", { time: until });
+  }
+
   private _sceneRow(sc: Scene, activeKey: string | null) {
     return html`
       <div class="scene-row">
@@ -632,14 +653,23 @@ export class HomexRoomCard extends LitElement {
               <svg viewBox="0 0 24 24"><path d=${mdiPin}></path></svg>
             </span>`}
         <span class="scene-name">${sc.name}</span>
+        ${sc.kind === "dynamic"
+          ? html`<span class="kind-tag" title=${t("roomCard.dynamic_hint")}
+              >${t("roomCard.dynamic")}</span
+            >`
+          : ""}
         ${sc.key === activeKey
-          ? html`<span class="active-tag">${t("roomCard.active")}</span>`
+          ? html`<span class="active-tag">${this._fadeLabel(sc) ?? t("roomCard.active")}</span>`
           : ""}
         <span class="btn-group">
           ${this._iconBtn(mdiOpenInNew, t("roomCard.open_in_ha"), (e) =>
             this._openHa(sc, e)
           )}
-          ${this._iconBtn(mdiPencil, t("common.rename"), () => (this._renameScene = sc))}
+          ${this._iconBtn(
+            mdiPencil,
+            sc.kind === "dynamic" ? t("common.edit") : t("common.rename"),
+            () => (this._renameScene = sc)
+          )}
           ${this._iconBtn(
             mdiDelete,
             sc.removable ? t("common.delete") : t("roomCard.default_scene"),

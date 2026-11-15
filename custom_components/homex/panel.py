@@ -69,6 +69,7 @@ from .heating import async_forget_room as async_forget_heating_room
 from .heating import async_rename_room as async_rename_heating_room
 from .heating_systems import WS_COMMANDS as HEATING_SYSTEM_WS_COMMANDS
 from .heating_zones import WS_COMMANDS as HEATING_ZONE_WS_COMMANDS
+from .dynamic_scene import KIND_DYNAMIC, KIND_NORMAL, normalize_animation
 from .room import (
     RoomController,
     default_name,
@@ -106,6 +107,7 @@ _STRINGS = {
         "order_mismatch": "Order keys mismatch",
         "name_required": "Name required",
         "unknown_scene": "Unknown scene",
+        "animation_no_lights": "Pick at least one light to animate",
         "unknown_model": "unknown model",
         "tap_single": "Single",
         "tap_double": "Double",
@@ -138,6 +140,7 @@ _STRINGS = {
         "order_mismatch": "L'ordre ne correspond pas aux scènes",
         "name_required": "Nom requis",
         "unknown_scene": "Scène inconnue",
+        "animation_no_lights": "Choisis au moins une lumière à animer",
         "unknown_model": "modèle inconnu",
         "tap_single": "Simple",
         "tap_double": "Double",
@@ -150,7 +153,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PANEL_URL_PATH = "homex"
 STATIC_URL = "/homex_static"
-PANEL_VERSION = "243"
+PANEL_VERSION = "244"
 PANEL_REGISTERED = "_panel_registered"
 
 ID_RE = re.compile(r"^[a-z0-9_]+$")
@@ -745,6 +748,12 @@ def _room_scenes(controller: RoomController) -> list[dict]:
                     "removable": True,
                     "orderable": True,
                     "triggers": controller.scene_trigger_specs_for(key),
+                    "kind": scene.get("kind") or KIND_NORMAL,
+                    **(
+                        {"animation": normalize_animation(scene.get("animation"))}
+                        if scene.get("kind") == KIND_DYNAMIC
+                        else {}
+                    ),
                 }
             )
     scenes.append(
@@ -2238,6 +2247,8 @@ async def ws_switch_delete(hass: HomeAssistant, connection, msg) -> None:
         vol.Required("name"): str,
         vol.Optional("attach"): str,  # config id of an existing scene to adopt
         vol.Optional("triggers"): list,  # per-scene triggers that activate it
+        vol.Optional("kind"): vol.In([KIND_NORMAL, KIND_DYNAMIC]),
+        vol.Optional("animation"): dict,  # dynamic scenes: the animation
     }
 )
 @websocket_api.require_admin
@@ -2272,7 +2283,15 @@ async def ws_scene_add(hass: HomeAssistant, connection, msg) -> None:
             connection.send_error(msg["id"], "scene_not_found", tr(hass, _STRINGS, "scene_not_found"))
             return
 
-    order.append({"key": key, "name": name, "triggers": msg.get("triggers", [])})
+    scene = {"key": key, "name": name, "triggers": msg.get("triggers", [])}
+    if msg.get("kind") == KIND_DYNAMIC and not attach:
+        animation = normalize_animation(msg.get("animation"))
+        if not animation["lights"]:
+            connection.send_error(msg["id"], "invalid_animation", tr(hass, _STRINGS, "animation_no_lights"))
+            return
+        scene["kind"] = KIND_DYNAMIC
+        scene["animation"] = animation
+    order.append(scene)
     room[CONF_SCENES] = _scenes_value(controller, order)
     _save_room(hass, hub, sub, room)
     connection.send_result(msg["id"], {"ok": True})
@@ -2390,6 +2409,7 @@ async def ws_scene_activate(hass: HomeAssistant, connection, msg) -> None:
         vol.Required("key"): str,
         vol.Required("name"): str,
         vol.Optional("triggers"): list,  # per-scene triggers (when editing)
+        vol.Optional("animation"): dict,  # dynamic scenes: new animation
     }
 )
 @websocket_api.require_admin
@@ -2427,6 +2447,12 @@ async def ws_scene_rename(hass: HomeAssistant, connection, msg) -> None:
             scene["name"] = name
             if triggers is not None:
                 scene["triggers"] = triggers
+            if msg.get("animation") is not None and scene.get("kind") == KIND_DYNAMIC:
+                animation = normalize_animation(msg["animation"])
+                if not animation["lights"]:
+                    connection.send_error(msg["id"], "invalid_animation", tr(hass, _STRINGS, "animation_no_lights"))
+                    return
+                scene["animation"] = animation
     room[CONF_SCENES] = _scenes_value(controller, order)
     _save_room(hass, hub, sub, room)
     # turn_on keeps its fixed label; extras embed their name.

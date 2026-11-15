@@ -31,13 +31,20 @@ from homeassistant.components.device_automation import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EVENT_HOMEASSISTANT_STARTED
-from homeassistant.core import Context, HomeAssistant, callback
+from homeassistant.core import Context, Event, HomeAssistant, callback
+from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.trigger import (
     async_initialize_triggers,
     async_validate_trigger_config,
 )
 from homeassistant.util.yaml import load_yaml, save_yaml
+
+from .dynamic_scene import (
+    KIND_DYNAMIC,
+    build_animation,
+    scene_entities as dynamic_scene_entities,
+)
 
 
 def normalize_trigger_specs(raw) -> list[dict]:
@@ -464,6 +471,7 @@ class RoomController:
         # changes WE cause are ignored (otherwise scene->device->trigger loops).
         self._ctx_ids: set[str] = set()
         self._ctx_order: deque[str] = deque(maxlen=256)
+        self._animation = None  # running dynamic-scene animation (FadeOut…)
 
     # -- Self-action context tracking (loop prevention) ---------------------
 
@@ -702,6 +710,16 @@ class RoomController:
                 return default_name(self.hass, "scene_off_default", scene.get("name"))
         return default_name(self.hass, "scene_off_default")
 
+    def scene_config(self, key: str) -> dict | None:
+        for scene in self.scene_order:
+            if scene.get("key") == key:
+                return scene
+        return None
+
+    def is_dynamic(self, key: str) -> bool:
+        scene = self.scene_config(key)
+        return bool(scene) and scene.get("kind") == KIND_DYNAMIC
+
     def extra_scene_id(self, key: str) -> str:
         return f"homex_{self.room_id}_turn_on_{key}"
 
@@ -773,6 +791,8 @@ class RoomController:
             await self._start_scene_triggers()
             # Dimmer triggers: brighten / dim the room's member lights.
             await self._start_dim_triggers()
+            # Dynamic scenes: run their animation once the scene is applied.
+            self._watch_scene_activations()
         # Shutters module (independent of lights): each group's triggers drive
         # its own covers (open / close / stop / toggle).
         if self.shutters_enabled:
@@ -796,6 +816,7 @@ class RoomController:
         )
 
     async def async_stop(self) -> None:
+        self.cancel_animation()
         while self._room_unsubs:
             self._room_unsubs.pop()()
         for unit in self._units or []:
@@ -871,7 +892,72 @@ class RoomController:
         )
 
     def on_toggled_off(self) -> None:
+        self.cancel_animation()
         self._update_active(None)
+
+    # -- Dynamic scenes (animations) -----------------------------------------
+
+    def _watch_scene_activations(self) -> None:
+        """Watch the room's scene entities: activating a dynamic one (from
+        anywhere — Homex, HA, a dashboard) starts its animation; activating any
+        other room scene stops a running one."""
+        if not any(s.get("kind") == KIND_DYNAMIC for s in self.scene_order):
+            return
+        keys = [s["key"] for s in self.scene_order]
+        by_entity = dict(zip(self.scene_entities(), keys))
+        by_entity[self.scene_entity_id(f"homex_{self.room_id}_turn_off")] = "turn_off"
+
+        @callback
+        def changed(event: Event) -> None:
+            old, new = event.data.get("old_state"), event.data.get("new_state")
+            # (Re)loads re-add the entity (old None) or restore it from
+            # unavailable: not an activation. unknown → timestamp is the first.
+            if old is None or new is None or old.state == "unavailable":
+                return
+            if new.state in ("unavailable", "unknown") or new.state == old.state:
+                return
+            self._on_scene_activated(by_entity.get(event.data["entity_id"]))
+
+        self._room_unsubs.append(
+            async_track_state_change_event(self.hass, list(by_entity), changed)
+        )
+
+    @callback
+    def _on_scene_activated(self, key: str | None) -> None:
+        self.cancel_animation()
+        scene = self.scene_config(key) if key else None
+        if not scene or scene.get("kind") != KIND_DYNAMIC:
+            return
+        runner = build_animation(self, key, scene.get("animation"))
+        if runner is None:
+            return
+        self._animation = runner
+        runner.start()
+        self._write_switch_state()
+
+    @callback
+    def cancel_animation(self) -> None:
+        runner, self._animation = self._animation, None
+        if runner is not None:
+            runner.cancel()
+            self._write_switch_state()
+
+    @callback
+    def on_animation_ended(self, runner) -> None:
+        if self._animation is runner:
+            self._animation = None
+            self._write_switch_state()
+
+    def animation_state(self) -> dict | None:
+        """The running animation (scene key + end time), for the room switch."""
+        runner = self._animation
+        if runner is None or not runner.running:
+            return None
+        return {"scene": runner.key, "ends_at": round(runner.ends_at)}
+
+    def _write_switch_state(self) -> None:
+        if self._room_switch is not None and self._room_switch.hass is not None:
+            self._room_switch.async_write_ha_state()
 
     def _room_is_on(self) -> bool:
         state = self.hass.states.get(self.room_switch_entity_id)
@@ -1330,7 +1416,7 @@ class RoomController:
         existing_ids = {s.get("id") for s in scenes if isinstance(s, dict)}
         changed = False
 
-        def add(scene_id: str, state: str, devices: list[str]) -> None:
+        def add(scene_id: str, state: str, devices: list[str], entities=None) -> None:
             nonlocal changed
             if scene_id in existing_ids:
                 return
@@ -1338,7 +1424,9 @@ class RoomController:
                 {
                     "id": scene_id,
                     "name": scene_id,  # technical name → technical entity_id
-                    "entities": {e: {"state": state} for e in devices},
+                    "entities": entities
+                    if entities is not None
+                    else {e: {"state": state} for e in devices},
                 }
             )
             changed = True
@@ -1351,6 +1439,20 @@ class RoomController:
         for key, state in (("turn_on", "on"), ("turn_off", "off")):
             add(f"homex_{self.room_id}_{key}", state, self.devices)
         for scene in self.extra_scenes:
+            if scene.get("kind") == KIND_DYNAMIC:
+                # Homex owns a dynamic scene's content: its starting state.
+                scene_id = self.extra_scene_id(scene["key"])
+                wanted = dynamic_scene_entities(scene.get("animation"), self.devices)
+                current = next(
+                    (s for s in scenes if isinstance(s, dict) and s.get("id") == scene_id),
+                    None,
+                )
+                if current is None:
+                    add(scene_id, "off", self.devices, wanted)
+                elif current.get("entities") != wanted:
+                    current["entities"] = wanted
+                    changed = True
+                continue
             add(self.extra_scene_id(scene["key"]), "off", self.devices)
 
         if changed:

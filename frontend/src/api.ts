@@ -9,6 +9,7 @@ import type {
   TankStatus,
   HeatingZone,
   HomeAssistant,
+  SceneAnimation,
   Room,
   RoomHeating,
   RoomMetrics,
@@ -232,7 +233,8 @@ export const addScene = (
   entry_id: string,
   name: string,
   attach?: string,
-  triggers?: TriggerSpec[]
+  triggers?: TriggerSpec[],
+  animation?: SceneAnimation
 ) =>
   hass.callWS({
     type: "homex/scene/add",
@@ -240,6 +242,7 @@ export const addScene = (
     name,
     ...(attach ? { attach } : {}),
     ...(triggers ? { triggers } : {}),
+    ...(animation ? { kind: "dynamic", animation } : {}),
   });
 
 export const deleteScene = (hass: HomeAssistant, entry_id: string, key: string) =>
@@ -256,7 +259,8 @@ export const renameScene = (
   entry_id: string,
   key: string,
   name: string,
-  triggers?: TriggerSpec[]
+  triggers?: TriggerSpec[],
+  animation?: SceneAnimation
 ) =>
   hass.callWS({
     type: "homex/scene/rename",
@@ -264,6 +268,7 @@ export const renameScene = (
     key,
     name,
     ...(triggers ? { triggers } : {}),
+    ...(animation ? { animation } : {}),
   });
 
 export const errorMessage = (err: any): string =>

@@ -27,6 +27,21 @@ export interface Scene {
   removable: boolean;
   orderable: boolean; // all scenes except the pinned "off" scene
   triggers: TriggerSpec[]; // triggers that activate this scene
+  kind?: SceneKind; // extras only: "normal" (HA scene) or "dynamic" (animated)
+  animation?: SceneAnimation; // dynamic scenes
+}
+
+export type SceneKind = "normal" | "dynamic";
+export type AnimationMode = "fade_out";
+
+/** A dynamic scene's animation. fade_out: the lights start at this colour and
+ * brightness (%), then fade progressively to off over `duration` seconds. */
+export interface SceneAnimation {
+  mode: AnimationMode;
+  lights: string[];
+  color: [number, number, number];
+  brightness: number;
+  duration: number;
 }
 
 export type SceneStrategy = "recall_first" | "recall_last";

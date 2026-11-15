@@ -193,6 +193,8 @@ class RoomSwitch(SwitchEntity, RestoreEntity):
             # Last used scene, persisted (RestoreEntity) so recall_last
             # survives a Home Assistant restart.
             attrs["last_scene"] = self._unit._controller.last_scene_key
+            # Running dynamic-scene animation ({scene, ends_at}) or None.
+            attrs["animation"] = self._unit._controller.animation_state()
             attrs.update(_climate_attrs(self.hass, self._unit._controller.room_id))
         return attrs
 
