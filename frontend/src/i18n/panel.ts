@@ -13,6 +13,7 @@ export default {
     switch_manager: "Switch Manager",
     shutter_manager: "Shutter Manager",
     climate_manager: "Climate Manager",
+    presence: "Presence Simulator",
   },
   fr: {
     tab_general: "Général",
@@ -27,5 +28,6 @@ export default {
     switch_manager: "Gestion des interrupteurs",
     shutter_manager: "Gestion des volets",
     climate_manager: "Gestion du climat",
+    presence: "Simulateur de présence",
   },
 };

@@ -45,6 +45,7 @@ import cardRoomTile from "./cardRoomTile";
 import cardRoomDetail from "./cardRoomDetail";
 import cardRoomTileEditor from "./cardRoomTileEditor";
 import lib from "./lib";
+import presence from "./presence";
 
 export const CATALOGS: Record<string, { en: Record<string, string>; fr: Record<string, string> }> = {
   common,
@@ -92,4 +93,5 @@ export const CATALOGS: Record<string, { en: Record<string, string>; fr: Record<s
   cardRoomDetail,
   cardRoomTileEditor,
   lib,
+  presence,
 };

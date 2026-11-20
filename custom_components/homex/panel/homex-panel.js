@@ -1,4 +1,4 @@
-import { A as e, B as t, C as n, D as r, E as i, F as a, G as o, H as s, I as c, J as l, K as u, L as d, M as f, N as p, O as m, P as h, R as g, S as _, T as ee, U as v, V as y, W as b, X as x, Y as S, _ as te, a as ne, b as re, c as ie, d as ae, f as oe, g as se, h as ce, i as le, j as ue, k as de, l as fe, m as pe, n as me, o as he, p as ge, q as C, r as _e, s as ve, t as ye, u as be, v as xe, w as Se, x as Ce, y as we, z as Te } from "./homex-plan-items-DkVqnla0.js";
+import { A as e, B as t, C as n, D as r, E as i, F as a, G as o, H as s, I as c, J as l, K as u, L as d, M as f, N as p, O as m, P as h, R as g, S as _, T as ee, U as v, V as y, W as b, X as x, Y as S, _ as te, a as ne, b as re, c as ie, d as ae, f as oe, g as se, h as ce, i as le, j as ue, k as de, l as fe, m as pe, n as me, o as he, p as ge, q as C, r as _e, s as ve, t as ye, u as be, v as xe, w as Se, x as Ce, y as we, z as Te } from "./homex-plan-items-CU_ZQTL9.js";
 // node_modules/@mdi/js/mdi.js
 var Ee = "M13 14H11V9H13M13 18H11V16H13M1 21H23L12 2L1 21Z", De = "M11,4H13V16L18.5,10.5L19.92,11.92L12,19.84L4.08,11.92L5.5,10.5L11,16V4Z", Oe = "M3,5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5M11,6V14.5L7.5,11L6.08,12.42L12,18.34L17.92,12.42L16.5,11L13,14.5V6H11Z", ke = "M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z", Ae = "M21,19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3H19C20.11,3 21,3.9 21,5V19M13,18V9.5L16.5,13L17.92,11.58L12,5.66L6.08,11.58L7.5,13L11,9.5V18H13Z", je = "M12,3A9,9 0 0,0 3,12H0L4,16L8,12H5A7,7 0 0,1 12,5A7,7 0 0,1 19,12A7,7 0 0,1 12,19C10.5,19 9.09,18.5 7.94,17.7L6.5,19.14C8.04,20.3 9.94,21 12,21A9,9 0 0,0 21,12A9,9 0 0,0 12,3M14,12A2,2 0 0,0 12,10A2,2 0 0,0 10,12A2,2 0 0,0 12,14A2,2 0 0,0 14,12Z", Me = "M12,18V6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,15.31L23.31,12L20,8.69V4H15.31L12,0.69L8.69,4H4V8.69L0.69,12L4,15.31V20H8.69L12,23.31L15.31,20H20V15.31Z", Ne = "M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z", Pe = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z", Fe = "M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z", Ie = "M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z", Le = "M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z", Re = "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z", ze = "M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z", Be = "M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z", Ve = "M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z", He = "M3 6H21V4H3C1.9 4 1 4.9 1 6V18C1 19.1 1.9 20 3 20H7V18H3V6M13 12H9V13.78C8.39 14.33 8 15.11 8 16C8 16.89 8.39 17.67 9 18.22V20H13V18.22C13.61 17.67 14 16.88 14 16S13.61 14.33 13 13.78V12M11 17.5C10.17 17.5 9.5 16.83 9.5 16S10.17 14.5 11 14.5 12.5 15.17 12.5 16 11.83 17.5 11 17.5M22 8H16C15.5 8 15 8.5 15 9V19C15 19.5 15.5 20 16 20H22C22.5 20 23 19.5 23 19V9C23 8.5 22.5 8 22 8M21 18H17V10H21V18Z", Ue = "M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z", We = "M7,19V17H9V19H7M11,19V17H13V19H11M15,19V17H17V19H15M7,15V13H9V15H7M11,15V13H13V15H11M15,15V13H17V15H15M7,11V9H9V11H7M11,11V9H13V11H11M15,11V9H17V11H15M7,7V5H9V7H7M11,7V5H13V7H11M15,7V5H17V7H15Z", Ge = "M17.66 11.2C17.43 10.9 17.15 10.64 16.89 10.38C16.22 9.78 15.46 9.35 14.82 8.72C13.33 7.26 13 4.85 13.95 3C13 3.23 12.17 3.75 11.46 4.32C8.87 6.4 7.85 10.07 9.07 13.22C9.11 13.32 9.15 13.42 9.15 13.55C9.15 13.77 9 13.97 8.8 14.05C8.57 14.15 8.33 14.09 8.14 13.93C8.08 13.88 8.04 13.83 8 13.76C6.87 12.33 6.69 10.28 7.45 8.64C5.78 10 4.87 12.3 5 14.47C5.06 14.97 5.12 15.47 5.29 15.97C5.43 16.57 5.7 17.17 6 17.7C7.08 19.43 8.95 20.67 10.96 20.92C13.1 21.19 15.39 20.8 17.03 19.32C18.86 17.66 19.5 15 18.56 12.72L18.43 12.46C18.22 12 17.66 11.2 17.66 11.2M14.5 17.5C14.22 17.74 13.76 18 13.4 18.1C12.28 18.5 11.16 17.94 10.5 17.28C11.69 17 12.4 16.12 12.61 15.23C12.78 14.43 12.46 13.77 12.33 13C12.21 12.26 12.23 11.63 12.5 10.94C12.69 11.32 12.89 11.7 13.13 12C13.9 13 15.11 13.44 15.37 14.8C15.41 14.94 15.43 15.08 15.43 15.23C15.46 16.05 15.1 16.95 14.5 17.5H14.5Z", Ke = "M22.11 21.46L2.39 1.73L1.11 3L7.09 9C5.66 10.36 4.88 12.47 5 14.47C5.06 14.97 5.12 15.47 5.29 15.97C5.43 16.57 5.7 17.17 6 17.7C7.08 19.43 8.95 20.67 10.96 20.92C13.1 21.19 15.39 20.8 17.03 19.32C17.1 19.26 17.15 19.18 17.22 19.11L20.84 22.73L22.11 21.46M8.8 14.05C8.57 14.15 8.33 14.09 8.14 13.93C8.08 13.88 8.04 13.83 8 13.76C7 12.47 6.74 10.69 7.26 9.15L8.58 10.47C8.58 11.4 8.73 12.33 9.07 13.22C9.11 13.32 9.15 13.42 9.15 13.55C9.15 13.77 9 13.97 8.8 14.05M14.5 17.5C14.22 17.74 13.76 18 13.4 18.1C12.28 18.5 11.16 17.94 10.5 17.28C11.69 17 12.4 16.12 12.61 15.23C12.66 15 12.66 14.76 12.64 14.53L15 16.88C14.85 17.11 14.69 17.33 14.5 17.5M18.92 15.72L9.65 6.46C10.12 5.65 10.72 4.92 11.46 4.32C12.17 3.75 13 3.23 13.95 3C13 4.85 13.33 7.26 14.82 8.72C15.46 9.35 16.22 9.78 16.89 10.38C17.15 10.64 17.43 10.9 17.66 11.2C17.66 11.2 18.22 12 18.43 12.46L18.56 12.72C18.96 13.69 19.06 14.72 18.92 15.72Z", qe = "M13 24C9.74 24 6.81 22 5.6 19L2.57 11.37C2.26 10.58 3 9.79 3.81 10.05L4.6 10.31C5.16 10.5 5.62 10.92 5.84 11.47L7.25 15H8V3.25C8 2.56 8.56 2 9.25 2S10.5 2.56 10.5 3.25V12H11.5V1.25C11.5 .56 12.06 0 12.75 0S14 .56 14 1.25V12H15V2.75C15 2.06 15.56 1.5 16.25 1.5C16.94 1.5 17.5 2.06 17.5 2.75V12H18.5V5.75C18.5 5.06 19.06 4.5 19.75 4.5S21 5.06 21 5.75V16C21 20.42 17.42 24 13 24Z", Je = "M15 13L11 17V14H2V12H11V9L15 13M5 20V16H7V18H17V10.19L12 5.69L7.21 10H4.22L12 3L22 12H19V20H5Z", Ye = "M17 14H19V17H22V19H19V22H17V19H14V17H17V14M5 20V12H2L12 3L22 12H17V10.19L12 5.69L7 10.19V18H12C12 18.7 12.12 19.37 12.34 20H5Z", Xe = "M19 8C20.11 8 21 8.9 21 10V16.76C21.61 17.31 22 18.11 22 19C22 20.66 20.66 22 19 22C17.34 22 16 20.66 16 19C16 18.11 16.39 17.31 17 16.76V10C17 8.9 17.9 8 19 8M19 9C18.45 9 18 9.45 18 10V11H20V10C20 9.45 19.55 9 19 9M5 20V12H2L12 3L16.4 6.96C15.54 7.69 15 8.78 15 10V16C14.37 16.83 14 17.87 14 19L14.1 20H5Z", Ze = "M12,2A7,7 0 0,0 5,9C5,11.38 6.19,13.47 8,14.74V17A1,1 0 0,0 9,18H15A1,1 0 0,0 16,17V14.74C17.81,13.47 19,11.38 19,9A7,7 0 0,0 12,2M9,21A1,1 0 0,0 10,22H14A1,1 0 0,0 15,21V20H9V21Z", Qe = "M10 2C13.9 2 17 5.1 17 9C17 11.4 15.8 13.5 14 14.7V17C14 17.6 13.6 18 13 18H7C6.4 18 6 17.6 6 17V14.7C4.2 13.5 3 11.4 3 9C3 5.1 6.1 2 10 2M7 21V20H13V21C13 21.6 12.6 22 12 22H8C7.4 22 7 21.6 7 21M10 4C7.2 4 5 6.2 5 9C5 11.1 6.2 12.8 8 13.6V16H12V13.6C13.8 12.8 15 11.1 15 9C15 6.2 12.8 4 10 4M19 12V7H21V13H19M19 17V15H21V17H19Z", $e = "M12,2C9.76,2 7.78,3.05 6.5,4.68L16.31,14.5C17.94,13.21 19,11.24 19,9A7,7 0 0,0 12,2M3.28,4L2,5.27L5.04,8.3C5,8.53 5,8.76 5,9C5,11.38 6.19,13.47 8,14.74V17A1,1 0 0,0 9,18H14.73L18.73,22L20,20.72L3.28,4M9,20V21A1,1 0 0,0 10,22H14A1,1 0 0,0 15,21V20H9Z", et = "M12,2C9.76,2 7.78,3.05 6.5,4.68L7.93,6.11C8.84,4.84 10.32,4 12,4A5,5 0 0,1 17,9C17,10.68 16.16,12.16 14.89,13.06L16.31,14.5C17.94,13.21 19,11.24 19,9A7,7 0 0,0 12,2M3.28,4L2,5.27L5.04,8.3C5,8.53 5,8.76 5,9C5,11.38 6.19,13.47 8,14.74V17A1,1 0 0,0 9,18H14.73L18.73,22L20,20.72L3.28,4M7.23,10.5L12.73,16H10V13.58C8.68,13 7.66,11.88 7.23,10.5M9,20V21A1,1 0 0,0 10,22H14A1,1 0 0,0 15,21V20H9Z", tt = "M12,6A6,6 0 0,1 18,12C18,14.22 16.79,16.16 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.21,16.16 6,14.22 6,12A6,6 0 0,1 12,6M14,21V22A1,1 0 0,1 13,23H11A1,1 0 0,1 10,22V21H14M20,11H23V13H20V11M1,11H4V13H1V11M13,1V4H11V1H13M4.92,3.5L7.05,5.64L5.63,7.05L3.5,4.93L4.92,3.5M16.95,5.63L19.07,3.5L20.5,4.93L18.37,7.05L16.95,5.63Z", nt = "M20,11H23V13H20V11M1,11H4V13H1V11M13,1V4H11V1H13M4.92,3.5L7.05,5.64L5.63,7.05L3.5,4.93L4.92,3.5M16.95,5.63L19.07,3.5L20.5,4.93L18.37,7.05L16.95,5.63M12,6A6,6 0 0,1 18,12C18,14.22 16.79,16.16 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.21,16.16 6,14.22 6,12A6,6 0 0,1 12,6M14,21V22A1,1 0 0,1 13,23H11A1,1 0 0,1 10,22V21H14M11,18H13V15.87C14.73,15.43 16,13.86 16,12A4,4 0 0,0 12,8A4,4 0 0,0 8,12C8,13.86 9.27,15.43 11,15.87V18Z", rt = "M12,2A7,7 0 0,1 19,9C19,11.38 17.81,13.47 16,14.74V17A1,1 0 0,1 15,18H9A1,1 0 0,1 8,17V14.74C6.19,13.47 5,11.38 5,9A7,7 0 0,1 12,2M9,21V20H15V21A1,1 0 0,1 14,22H10A1,1 0 0,1 9,21M12,4A5,5 0 0,0 7,9C7,11.05 8.23,12.81 10,13.58V16H14V13.58C15.77,12.81 17,11.05 17,9A5,5 0 0,0 12,4Z", it = "M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z", at = "M19,13H5V11H19V13Z", ot = "M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z", st = "M17.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,9A1.5,1.5 0 0,1 19,10.5A1.5,1.5 0 0,1 17.5,12M14.5,8A1.5,1.5 0 0,1 13,6.5A1.5,1.5 0 0,1 14.5,5A1.5,1.5 0 0,1 16,6.5A1.5,1.5 0 0,1 14.5,8M9.5,8A1.5,1.5 0 0,1 8,6.5A1.5,1.5 0 0,1 9.5,5A1.5,1.5 0 0,1 11,6.5A1.5,1.5 0 0,1 9.5,8M6.5,12A1.5,1.5 0 0,1 5,10.5A1.5,1.5 0 0,1 6.5,9A1.5,1.5 0 0,1 8,10.5A1.5,1.5 0 0,1 6.5,12M12,3A9,9 0 0,0 3,12A9,9 0 0,0 12,21A1.5,1.5 0 0,0 13.5,19.5C13.5,19.11 13.35,18.76 13.11,18.5C12.88,18.23 12.73,17.88 12.73,17.5A1.5,1.5 0 0,1 14.23,16H16A5,5 0 0,0 21,11C21,6.58 16.97,3 12,3Z", ct = "M14,19H18V5H14M6,19H10V5H6V19Z", lt = "M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z", ut = "M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z", dt = "M8,5.14V19.14L19,12.14L8,5.14Z", ft = "M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z", pt = "M2 21V15H3.5C3.18 14.06 3 13.05 3 12C3 7.03 7.03 3 12 3H22V9H20.5C20.82 9.94 21 10.95 21 12C21 16.97 16.97 21 12 21H2M5 12C5 13.28 5.34 14.47 5.94 15.5L9.4 13.5C9.15 13.06 9 12.55 9 12C9 11.35 9.21 10.75 9.56 10.26L6.3 7.93C5.5 9.08 5 10.5 5 12M12 19C14.59 19 16.85 17.59 18.06 15.5L14.6 13.5C14.08 14.4 13.11 15 12 15L11.71 15L11.33 18.97L12 19M12 9C13.21 9 14.26 9.72 14.73 10.76L18.37 9.1C17.27 6.68 14.83 5 12 5V9M12 11C11.45 11 11 11.45 11 12C11 12.55 11.45 13 12 13C12.55 13 13 12.55 13 12C13 11.45 12.55 11 12 11Z", mt = "M22.1 21.5L2.4 1.7L1.1 3L4.8 6.7C3.7 8.2 3 10 3 12C3 13 3.2 14.1 3.5 15H2V21H12C14 21 15.8 20.3 17.3 19.2L20.8 22.7L22.1 21.5M5.9 15.5C5.3 14.5 5 13.3 5 12C5 10.6 5.5 9.2 6.2 8.1L9.2 11.1C9.1 11.3 9 11.7 9 12C9 12.5 9.2 13.1 9.4 13.5L5.9 15.5M12 19H11.3L11.7 15H12C12.3 15 12.6 14.9 12.9 14.8L15.9 17.8C14.8 18.5 13.4 19 12 19M12 8.8L7.4 4.2C8.8 3.5 10.3 3 12 3H22V9H20.5C20.8 9.9 21 11 21 12C21 13.7 20.5 15.2 19.8 16.6L12.2 9C13.3 9.1 14.3 9.8 14.7 10.7L18.3 9C17.3 6.7 14.8 5 12 5V8.8Z", ht = "M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z", gt = "M20 19V3H4V19H2V21H22V19H20M6 19V13H11V14.8C10.6 15.1 10.2 15.6 10.2 16.2C10.2 17.2 11 18 12 18S13.8 17.2 13.8 16.2C13.8 15.6 13.5 15.1 13 14.8V13H18V19H6Z", _t = "M11,13.5V21.5H3V13.5H11M12,2L17.5,11H6.5L12,2M17.5,13C20,13 22,15 22,17.5C22,20 20,22 17.5,22C15,22 13,20 13,17.5C13,15 15,13 17.5,13Z", vt = "M12,16A3,3 0 0,1 9,13C9,11.88 9.61,10.9 10.5,10.39L20.21,4.77L14.68,14.35C14.18,15.33 13.17,16 12,16M12,3C13.81,3 15.5,3.5 16.97,4.32L14.87,5.53C14,5.19 13,5 12,5A8,8 0 0,0 4,13C4,15.21 4.89,17.21 6.34,18.65H6.35C6.74,19.04 6.74,19.67 6.35,20.06C5.96,20.45 5.32,20.45 4.93,20.07V20.07C3.12,18.26 2,15.76 2,13A10,10 0 0,1 12,3M22,13C22,15.76 20.88,18.26 19.07,20.07V20.07C18.68,20.45 18.05,20.45 17.66,20.06C17.27,19.67 17.27,19.04 17.66,18.65V18.65C19.11,17.2 20,15.21 20,13C20,12 19.81,11 19.46,10.1L20.67,8C21.5,9.5 22,11.18 22,13Z", yt = "M18,18H6V6H18V18Z", bt = "M7.5,2C5.71,3.15 4.5,5.18 4.5,7.5C4.5,9.82 5.71,11.85 7.53,13C4.46,13 2,10.54 2,7.5A5.5,5.5 0 0,1 7.5,2M19.07,3.5L20.5,4.93L4.93,20.5L3.5,19.07L19.07,3.5M12.89,5.93L11.41,5L9.97,6L10.39,4.3L9,3.24L10.75,3.12L11.33,1.47L12,3.1L13.73,3.13L12.38,4.26L12.89,5.93M9.59,9.54L8.43,8.81L7.31,9.59L7.65,8.27L6.56,7.44L7.92,7.35L8.37,6.06L8.88,7.33L10.24,7.36L9.19,8.23L9.59,9.54M19,13.5A5.5,5.5 0 0,1 13.5,19C12.28,19 11.15,18.6 10.24,17.93L17.93,10.24C18.6,11.15 19,12.28 19,13.5M14.6,20.08L17.37,18.93L17.13,22.28L14.6,20.08M18.93,17.38L20.08,14.61L22.28,17.15L18.93,17.38M20.08,12.42L18.94,9.64L22.28,9.88L20.08,12.42M9.63,18.93L12.4,20.08L9.87,22.27L9.63,18.93Z", xt = "M15 13V5A3 3 0 0 0 9 5V13A5 5 0 1 0 15 13M12 4A1 1 0 0 1 13 5V8H11V5A1 1 0 0 1 12 4Z", St = "M12.87,15.07L10.33,12.56L10.36,12.53C12.1,10.59 13.34,8.36 14.07,6H17V4H10V2H8V4H1V6H12.17C11.5,7.92 10.44,9.75 9,11.35C8.07,10.32 7.3,9.19 6.69,8H4.69C5.42,9.63 6.42,11.17 7.67,12.56L2.58,17.58L4,19L9,14L12.11,17.11L12.87,15.07M18.5,10H16.5L12,22H14L15.12,19H19.87L21,22H23L18.5,10M15.88,17L17.5,12.67L19.12,17H15.88Z", Ct = "M3 4H21V8H19V20H17V8H7V20H5V8H3V4M8 9H16V11H8V9M8 12H16V14H8V12M8 15H16V17H8V15M8 18H16V20H8V18Z", wt = "M2 4H20V8H18V20H16V8H6V20H4V8H2V4M7 9H15V11H7V9M7 12H15V14H7V12M20 19V17H22V19H20M20 15V10H22V15H20Z", Tt = "M3 4H21V8H19V20H17V8H7V20H5V8H3V4M8 9H16V11H8V9Z", w = (e) => (t, n) => {
 	n === void 0 ? customElements.define(e, t) : n.addInitializer(() => {
@@ -281,9 +281,15 @@ var Wt = "homex-changed", T = (e) => e.dispatchEvent(new CustomEvent(Wt, {
 }), Yn = async (e) => (await e.callWS({ type: "homex/plan/get" })).plan || { levels: [] }, Xn = (e, t) => e.callWS({
 	type: "homex/plan/save",
 	plan: t
-}), Zn = null, Qn = () => !!customElements.get("ha-entities-picker");
-function $n() {
-	return Qn() ? Promise.resolve(!0) : Zn || (Zn = (async () => {
+}), Zn = (e) => e.callWS({ type: "homex/presence" }), Qn = (e, t) => e.callWS({
+	type: "homex/presence/save",
+	config: t
+}), $n = (e, t) => e.callWS({
+	type: "homex/presence/enabled",
+	enabled: t
+}), er = null, tr = () => !!customElements.get("ha-entities-picker");
+function nr() {
+	return tr() ? Promise.resolve(!0) : er || (er = (async () => {
 		try {
 			let e = await window.loadCardHelpers?.();
 			if (e?.createCardElement) {
@@ -294,35 +300,35 @@ function $n() {
 				t?.getConfigElement && await t.getConfigElement();
 			}
 		} catch {}
-		return Qn();
-	})(), Zn);
+		return tr();
+	})(), er);
 }
 // src/lib/router.ts
-var er = (e = "") => e.split("/").filter(Boolean).map(decodeURIComponent), D = (e, ...t) => [e.replace(/\/+$/, ""), ...t.filter(Boolean).map(encodeURIComponent)].join("/");
+var rr = (e = "") => e.split("/").filter(Boolean).map(decodeURIComponent), D = (e, ...t) => [e.replace(/\/+$/, ""), ...t.filter(Boolean).map(encodeURIComponent)].join("/");
 function O(e, t = !1) {
 	t ? history.replaceState(history.state, "", e) : history.pushState({ homexFrom: location.pathname }, "", e), window.dispatchEvent(new CustomEvent("location-changed", { detail: { replace: t } }));
 }
-function tr(e) {
+function ir(e) {
 	history.state?.homexFrom === e ? history.back() : O(e, !0);
 }
-function nr(e, t) {
+function ar(e, t) {
 	t && (t.metaKey || t.ctrlKey || t.shiftKey || t.button === 1) ? window.open(e, "_blank", "noopener") : (t?.preventDefault(), O(e));
 }
 // src/lib/device.ts
-function rr(e, t) {
+function or(e, t) {
 	let n = (e.devices || {})[t];
 	return n ? `${n.manufacturer || ""}|${n.model || n.model_id || ""}` : "";
 }
-function ir(e, t) {
+function sr(e, t) {
 	let n = (e.devices || {})[t];
 	return n ? [n.manufacturer, n.model || n.model_id].filter(Boolean).join(" ") || y("lib.unknown_model") : "";
 }
-function ar(e, t, n) {
-	let r = rr(e, n);
+function cr(e, t, n) {
+	let r = or(e, n);
 	return r ? t.filter((e) => e.model === r) : [];
 }
-function or(e, t, n) {
-	let r = ar(e, t, n.device_id);
+function lr(e, t, n) {
+	let r = cr(e, t, n.device_id);
 	if (n.preset_id) {
 		let e = r.find((e) => e.id === n.preset_id);
 		if (e) return e;
@@ -330,33 +336,33 @@ function or(e, t, n) {
 	return r[0];
 }
 // src/lib/climate.ts
-function sr(e, t) {
+function ur(e, t) {
 	return Object.values(e.entities || {}).filter((e) => e.device_id === t && e.entity_id.startsWith("climate.")).map((e) => e.entity_id).sort((e, t) => e.length - t.length)[0];
 }
-var cr = .5;
-function lr(e) {
+var dr = .5;
+function fr(e) {
 	let t = e?.attributes ?? {}, n = Number(t.temperature), r = Number(t.current_temperature);
-	return t.hvac_action === "heating" && t.temperature != null && t.current_temperature != null && !Number.isNaN(n) && !Number.isNaN(r) && r >= n + cr;
+	return t.hvac_action === "heating" && t.temperature != null && t.current_temperature != null && !Number.isNaN(n) && !Number.isNaN(r) && r >= n + dr;
 }
-function ur(e, t) {
+function pr(e, t) {
 	return (t.heating?.radiators ?? []).flatMap((t) => {
-		let n = sr(e, t.device_id), r = n ? e.states[n] : void 0;
-		if (!lr(r)) return [];
+		let n = ur(e, t.device_id), r = n ? e.states[n] : void 0;
+		if (!fr(r)) return [];
 		let i = e.devices?.[t.device_id];
 		return [i?.name_by_user || i?.name || r.attributes?.friendly_name || n];
 	});
 }
-function dr(e, t) {
-	let n = ur(e, t);
+function mr(e, t) {
+	let n = pr(e, t);
 	return n.length ? y("lib.stuck_warning", { names: n.join(", ") }) : "";
 }
-function fr(e, t) {
+function hr(e, t) {
 	return (t.heating?.radiators ?? []).some((t) => {
-		let n = sr(e, t.device_id);
+		let n = ur(e, t.device_id);
 		return !!n && e.states[n]?.attributes?.hvac_action === "heating";
 	});
 }
-function pr(e, t) {
+function gr(e, t) {
 	let n = Object.values(e.states || {}).filter((e) => e.entity_id.startsWith("select.homex_heating_")), r = n.find((e) => (e.attributes?.rooms ?? []).includes(t.room_id)) ?? n.find((e) => e.attributes?.zone_id === "default");
 	if (!r || r.state === "unavailable" || r.state === "unknown") return;
 	let i = String(r.attributes?.zone_name ?? r.attributes?.zone_id ?? "");
@@ -371,30 +377,30 @@ function pr(e, t) {
 	};
 }
 // src/lib/shutter.ts
-var mr = {
+var _r = {
 	open: Tt,
 	closed: Ct,
 	partial: gt,
 	opening: Ae,
 	closing: Oe,
 	unavailable: wt
-}, hr = (e) => y(`lib.shutter_${e}`);
-function gr(e, t) {
+}, vr = (e) => y(`lib.shutter_${e}`);
+function yr(e, t) {
 	let n = e.states[t];
 	if (!n) return null;
 	let r = n.attributes?.current_position;
 	return typeof r == "number" ? r : n.state === "open" ? 100 : n.state === "closed" ? 0 : null;
 }
-function _r(e, t) {
-	let n = t.map((t) => e.states[t]).filter((e) => e && e.state !== "unavailable" && e.state !== "unknown"), r = n.map((t) => gr(e, t.entity_id)).filter((e) => e !== null), i = r.length ? Math.round(r.reduce((e, t) => e + t, 0) / r.length) : null, a = n.length ? n.some((e) => e.state === "opening") ? "opening" : n.some((e) => e.state === "closing") ? "closing" : r.every((e) => e === 0) ? "closed" : r.every((e) => e === 100) ? "open" : "partial" : "unavailable";
+function br(e, t) {
+	let n = t.map((t) => e.states[t]).filter((e) => e && e.state !== "unavailable" && e.state !== "unknown"), r = n.map((t) => yr(e, t.entity_id)).filter((e) => e !== null), i = r.length ? Math.round(r.reduce((e, t) => e + t, 0) / r.length) : null, a = n.length ? n.some((e) => e.state === "opening") ? "opening" : n.some((e) => e.state === "closing") ? "closing" : r.every((e) => e === 0) ? "closed" : r.every((e) => e === 100) ? "open" : "partial" : "unavailable";
 	return {
 		state: a,
 		position: i,
-		icon: mr[a],
-		label: hr(a)
+		icon: _r[a],
+		label: vr(a)
 	};
 }
-function vr(e) {
+function xr(e) {
 	let t = (e.shutter_groups ?? []).filter((e) => e.devices?.length);
 	return t.find((e) => !e.removable) ?? t[0];
 }
@@ -531,7 +537,7 @@ var k = x`
   details[open] summary {
     margin-bottom: 10px;
   }
-`, yr = class extends b {
+`, Sr = class extends b {
 	constructor(...e) {
 		super(...e), this.hideToggle = !1, this.hideId = !1, this.info = [];
 	}
@@ -581,7 +587,7 @@ var k = x`
       </div>
     `;
 	}
-}, br = (yr.styles = [k, x`
+}, Cr = (Sr.styles = [k, x`
       :host {
         display: block;
         min-width: 0;
@@ -669,8 +675,8 @@ var k = x`
         border-radius: 6px;
         padding: 1px 8px;
       }
-    `], yr);
-e([v({ attribute: !1 })], br.prototype, "hass", void 0), e([v({ attribute: !1 })], br.prototype, "unit", void 0), e([v({ attribute: !1 })], br.prototype, "areaIcon", void 0), e([v({ attribute: !1 })], br.prototype, "floorName", void 0), e([v({ attribute: !1 })], br.prototype, "activeScene", void 0), e([v({ type: Boolean })], br.prototype, "hideToggle", void 0), e([v({ type: Boolean })], br.prototype, "hideId", void 0), e([v({ attribute: !1 })], br.prototype, "info", void 0), br = e([w("homex-unit-controls")], br);
+    `], Sr);
+e([v({ attribute: !1 })], Cr.prototype, "hass", void 0), e([v({ attribute: !1 })], Cr.prototype, "unit", void 0), e([v({ attribute: !1 })], Cr.prototype, "areaIcon", void 0), e([v({ attribute: !1 })], Cr.prototype, "floorName", void 0), e([v({ attribute: !1 })], Cr.prototype, "activeScene", void 0), e([v({ type: Boolean })], Cr.prototype, "hideToggle", void 0), e([v({ type: Boolean })], Cr.prototype, "hideId", void 0), e([v({ attribute: !1 })], Cr.prototype, "info", void 0), Cr = e([w("homex-unit-controls")], Cr);
 // src/lib/fields.ts
 var A = (e, t, n, r = "") => C`<div class="field">
   <span>${e}</span>
@@ -687,7 +693,7 @@ var A = (e, t, n, r = "") => C`<div class="field">
     @change=${(e) => t(e.target.checked)}
   />
   <span class="knob"></span>
-</span>`, xr = /[̀-ͯ]/g, M = (e) => (e || "").normalize("NFD").replace(xr, "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, ""), Sr = class extends b {
+</span>`, wr = /[̀-ͯ]/g, M = (e) => (e || "").normalize("NFD").replace(wr, "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, ""), Tr = class extends b {
 	constructor(...e) {
 		super(...e), this.open = !1, this.heading = "", this.compact = !1;
 	}
@@ -713,7 +719,7 @@ var A = (e, t, n, r = "") => C`<div class="field">
       </div>
     ` : C``;
 	}
-}, Cr = (Sr.styles = x`
+}, Er = (Tr.styles = x`
     .backdrop {
       position: fixed;
       inset: 0;
@@ -783,17 +789,17 @@ var A = (e, t, n, r = "") => C`<div class="field">
         padding-right: 14px;
       }
     }
-  `, Sr);
-e([v({ type: Boolean })], Cr.prototype, "open", void 0), e([v()], Cr.prototype, "heading", void 0), e([v({
+  `, Tr);
+e([v({ type: Boolean })], Er.prototype, "open", void 0), e([v()], Er.prototype, "heading", void 0), e([v({
 	type: Boolean,
 	reflect: !0
-})], Cr.prototype, "compact", void 0), Cr = e([w("homex-dialog")], Cr);
+})], Er.prototype, "compact", void 0), Er = e([w("homex-dialog")], Er);
 // node_modules/lit-html/directives/repeat.js
-var wr = (e, t, n) => {
+var Dr = (e, t, n) => {
 	let r = /* @__PURE__ */ new Map();
 	for (let i = t; i <= n; i++) r.set(e[i], i);
 	return r;
-}, Tr = kt(class extends At {
+}, Or = kt(class extends At {
 	constructor(e) {
 		if (super(e), e.type !== Ot.CHILD) throw Error("repeat() can only be used in text expressions");
 	}
@@ -820,7 +826,7 @@ var wr = (e, t, n) => {
 		else if (s[p] === o[h]) c[h] = Ft(i[p], a[h]), p--, h--;
 		else if (s[f] === o[h]) c[h] = Ft(i[f], a[h]), Pt(e, c[h + 1], i[f]), f++, h--;
 		else if (s[p] === o[m]) c[m] = Ft(i[p], a[m]), Pt(e, i[f], i[p]), p--, m++;
-		else if (l === void 0 && (l = wr(o, m, h), d = wr(s, f, p)), l.has(s[f])) {
+		else if (l === void 0 && (l = Dr(o, m, h), d = Dr(s, f, p)), l.has(s[f])) {
 			if (l.has(s[p])) {
 				let t = d.get(o[m]), n = t === void 0 ? null : i[t];
 				if (n === null) {
@@ -840,7 +846,7 @@ var wr = (e, t, n) => {
 		}
 		return this.ut = o, Lt(e, c), u;
 	}
-}), Er = class extends b {
+}), kr = class extends b {
 	constructor(...e) {
 		super(...e), this.value = [], this._query = "", this._open = !1;
 	}
@@ -871,7 +877,7 @@ var wr = (e, t, n) => {
 	}
 	render() {
 		return customElements.get("ha-entity-picker") ? C`
-        ${Tr(this.value, (e) => e, (e, t) => this._nativePicker(e, this.value.filter((e, n) => n !== t), (e) => this._setAt(t, e)))}
+        ${Or(this.value, (e) => e, (e, t) => this._nativePicker(e, this.value.filter((e, n) => n !== t), (e) => this._setAt(t, e)))}
         ${Bt(this.value.length, this._nativePicker("", this.value, (e) => this._addNew(e)))}
       ` : this._renderFallback();
 	}
@@ -920,7 +926,7 @@ var wr = (e, t, n) => {
           </div>` : ""}
     `;
 	}
-}, Dr = (Er.styles = x`
+}, Ar = (kr.styles = x`
     :host {
       display: block;
       width: 100%;
@@ -1004,20 +1010,20 @@ var wr = (e, t, n) => {
       width: 100%;
       margin-bottom: 8px;
     }
-  `, Er);
-e([v({ attribute: !1 })], Dr.prototype, "hass", void 0), e([v({ type: Array })], Dr.prototype, "value", void 0), e([v({ attribute: !1 })], Dr.prototype, "includeDomains", void 0), e([v({ attribute: !1 })], Dr.prototype, "includeEntities", void 0), e([s()], Dr.prototype, "_query", void 0), e([s()], Dr.prototype, "_open", void 0), Dr = e([w("homex-entity-picker")], Dr);
+  `, kr);
+e([v({ attribute: !1 })], Ar.prototype, "hass", void 0), e([v({ type: Array })], Ar.prototype, "value", void 0), e([v({ attribute: !1 })], Ar.prototype, "includeDomains", void 0), e([v({ attribute: !1 })], Ar.prototype, "includeEntities", void 0), e([s()], Ar.prototype, "_query", void 0), e([s()], Ar.prototype, "_open", void 0), Ar = e([w("homex-entity-picker")], Ar);
 // src/lib/domains.ts
-var Or = [
+var jr = [
 	"light",
 	"switch",
 	"input_boolean"
-], kr = [
+], Mr = [
 	"binary_sensor",
 	"switch",
 	"input_boolean",
 	"person",
 	"device_tracker"
-], Ar = class extends b {
+], Nr = class extends b {
 	constructor(...e) {
 		super(...e), this.value = "", this._query = "", this._open = !1;
 	}
@@ -1065,7 +1071,7 @@ var Or = [
           </div>` : ""}
     `;
 	}
-}, jr = (Ar.styles = x`
+}, Pr = (Nr.styles = x`
     :host {
       display: block;
       width: 100%;
@@ -1129,10 +1135,10 @@ var Or = [
     .sugg:hover {
       background: var(--secondary-background-color, rgba(225, 225, 225, 0.08));
     }
-  `, Ar);
-e([v({ attribute: !1 })], jr.prototype, "hass", void 0), e([v()], jr.prototype, "value", void 0), e([s()], jr.prototype, "_query", void 0), e([s()], jr.prototype, "_open", void 0), jr = e([w("homex-device-field")], jr);
+  `, Nr);
+e([v({ attribute: !1 })], Pr.prototype, "hass", void 0), e([v()], Pr.prototype, "value", void 0), e([s()], Pr.prototype, "_query", void 0), e([s()], Pr.prototype, "_open", void 0), Pr = e([w("homex-device-field")], Pr);
 // src/components/homex-select.ts
-var Mr, Nr = 320, Pr = (Mr = class extends b {
+var Fr, Ir = 320, Lr = (Fr = class extends b {
 	constructor(...e) {
 		super(...e), this.value = "", this.label = "", this.placeholder = "", this.options = [], this.groups = [], this.disabled = !1, this._open = !1, this._active = -1, this._pos = {}, this._none = {
 			value: "",
@@ -1161,16 +1167,16 @@ var Mr, Nr = 320, Pr = (Mr = class extends b {
 	}
 	_openPanel() {
 		if (this.disabled || this._open) return;
-		let e = this.renderRoot.querySelector(".trigger").getBoundingClientRect(), t = window.innerHeight - e.bottom, n = t < Math.min(Nr, 220) && e.top > t;
+		let e = this.renderRoot.querySelector(".trigger").getBoundingClientRect(), t = window.innerHeight - e.bottom, n = t < Math.min(Ir, 220) && e.top > t;
 		this._pos = {
 			left: `${e.left}px`,
 			width: `${e.width}px`,
 			...n ? {
 				bottom: `${window.innerHeight - e.top + 6}px`,
-				maxHeight: `${Math.min(Nr, e.top - 12)}px`
+				maxHeight: `${Math.min(Ir, e.top - 12)}px`
 			} : {
 				top: `${e.bottom + 6}px`,
-				maxHeight: `${Math.min(Nr, t - 12)}px`
+				maxHeight: `${Math.min(Ir, t - 12)}px`
 			}
 		}, this._active = Math.max(0, this._flat.findIndex((e) => e.value === this.value)), this._open = !0, document.addEventListener("pointerdown", this._onOutside, !0), window.addEventListener("scroll", this._onViewport, !0), window.addEventListener("resize", this._onViewport), this.updateComplete.then(() => this._scrollActive());
 	}
@@ -1253,7 +1259,7 @@ var Mr, Nr = 320, Pr = (Mr = class extends b {
           </div>` : o}
     `;
 	}
-}, Mr.styles = x`
+}, Fr.styles = x`
     :host {
       display: block;
       min-width: 0;
@@ -1342,7 +1348,7 @@ var Mr, Nr = 320, Pr = (Mr = class extends b {
       position: fixed;
       z-index: 2000;
       box-sizing: border-box;
-      max-height: ${Nr}px;
+      max-height: ${Ir}px;
       overflow-y: auto;
       padding: 6px;
       background: var(--card-background-color, #1c1c1c);
@@ -1427,13 +1433,13 @@ var Mr, Nr = 320, Pr = (Mr = class extends b {
       font-size: 14px;
       color: var(--secondary-text-color);
     }
-  `, Mr);
-e([v()], Pr.prototype, "value", void 0), e([v()], Pr.prototype, "label", void 0), e([v()], Pr.prototype, "placeholder", void 0), e([v({ attribute: !1 })], Pr.prototype, "options", void 0), e([v({ attribute: !1 })], Pr.prototype, "groups", void 0), e([v({
+  `, Fr);
+e([v()], Lr.prototype, "value", void 0), e([v()], Lr.prototype, "label", void 0), e([v()], Lr.prototype, "placeholder", void 0), e([v({ attribute: !1 })], Lr.prototype, "options", void 0), e([v({ attribute: !1 })], Lr.prototype, "groups", void 0), e([v({
 	type: Boolean,
 	reflect: !0
-})], Pr.prototype, "disabled", void 0), e([s()], Pr.prototype, "_open", void 0), e([s()], Pr.prototype, "_active", void 0), e([s()], Pr.prototype, "_pos", void 0), Pr = e([w("homex-select")], Pr);
+})], Lr.prototype, "disabled", void 0), e([s()], Lr.prototype, "_open", void 0), e([s()], Lr.prototype, "_active", void 0), e([s()], Lr.prototype, "_pos", void 0), Lr = e([w("homex-select")], Lr);
 // src/components/homex-trigger-selector.ts
-var Fr = class extends b {
+var Rr = class extends b {
 	constructor(...e) {
 		super(...e), this.value = [], this._menuOpen = !1, this._devTriggers = {};
 	}
@@ -1527,13 +1533,13 @@ var Fr = class extends b {
 		if (customElements.get("ha-entity-picker")) return C`<ha-entity-picker
         .hass=${this.hass}
         .value=${n}
-        .includeDomains=${kr}
+        .includeDomains=${Mr}
         allow-custom-entity
         @value-changed=${(e) => {
 			e.stopPropagation(), r(e.detail.value || "");
 		}}
       ></ha-entity-picker>`;
-		let i = Object.keys(this.hass.states).filter((e) => kr.includes(e.split(".")[0])).sort();
+		let i = Object.keys(this.hass.states).filter((e) => Mr.includes(e.split(".")[0])).sort();
 		return C`<homex-select
       placeholder=${y("triggerSelector.select_entity")}
       .value=${n ?? ""}
@@ -1732,7 +1738,7 @@ var Fr = class extends b {
       </div>
     `;
 	}
-}, Ir = (Fr.styles = x`
+}, zr = (Rr.styles = x`
     :host {
       display: block;
       width: 100%;
@@ -1896,10 +1902,10 @@ var Fr = class extends b {
       inset: 0;
       z-index: 29;
     }
-  `, Fr);
-e([v({ attribute: !1 })], Ir.prototype, "hass", void 0), e([v({ attribute: !1 })], Ir.prototype, "value", void 0), e([s()], Ir.prototype, "_menuOpen", void 0), e([s()], Ir.prototype, "_devTriggers", void 0), Ir = e([w("homex-trigger-selector")], Ir);
+  `, Rr);
+e([v({ attribute: !1 })], zr.prototype, "hass", void 0), e([v({ attribute: !1 })], zr.prototype, "value", void 0), e([s()], zr.prototype, "_menuOpen", void 0), e([s()], zr.prototype, "_devTriggers", void 0), zr = e([w("homex-trigger-selector")], zr);
 // src/components/homex-managed-triggers.ts
-var Lr = class extends b {
+var Br = class extends b {
 	constructor(...e) {
 		super(...e), this.triggers = [];
 	}
@@ -1912,7 +1918,7 @@ var Lr = class extends b {
         </div>`)}
     </div>` : C``;
 	}
-}, Rr = (Lr.styles = x`
+}, Vr = (Br.styles = x`
     .list {
       margin: 6px 0 4px;
     }
@@ -1944,10 +1950,10 @@ var Lr = class extends b {
       padding: 2px 8px;
       white-space: nowrap;
     }
-  `, Lr);
-e([v({ attribute: !1 })], Rr.prototype, "triggers", void 0), Rr = e([w("homex-managed-triggers")], Rr);
+  `, Br);
+e([v({ attribute: !1 })], Vr.prototype, "triggers", void 0), Vr = e([w("homex-managed-triggers")], Vr);
 // src/components/homex-group-dialog.ts
-var zr = class extends b {
+var Hr = class extends b {
 	constructor(...e) {
 		super(...e), this.open = !1, this.group = null, this._name = "", this._id = "", this._devices = [], this._triggers = [], this._dim = !1, this._dimUp = [], this._dimDown = [], this._busy = !1, this._idEdited = !1;
 	}
@@ -2073,7 +2079,7 @@ var zr = class extends b {
       </homex-dialog>
     `;
 	}
-}, N = (zr.styles = [k, x`
+}, N = (Hr.styles = [k, x`
       .dim-toggle {
         display: flex;
         align-items: center;
@@ -2127,12 +2133,12 @@ var zr = class extends b {
         color: var(--secondary-text-color);
         margin: 0 0 8px;
       }
-    `], zr);
+    `], Hr);
 e([v({ attribute: !1 })], N.prototype, "hass", void 0), e([v({ type: Boolean })], N.prototype, "open", void 0), e([v({ attribute: !1 })], N.prototype, "room", void 0), e([v({ attribute: !1 })], N.prototype, "group", void 0), e([s()], N.prototype, "_name", void 0), e([s()], N.prototype, "_id", void 0), e([s()], N.prototype, "_devices", void 0), e([s()], N.prototype, "_triggers", void 0), e([s()], N.prototype, "_dim", void 0), e([s()], N.prototype, "_dimUp", void 0), e([s()], N.prototype, "_dimDown", void 0), e([s()], N.prototype, "_busy", void 0), N = e([w("homex-group-dialog")], N);
 // src/components/homex-group-row.ts
-var Br = class extends b {
+var Ur = class extends b {
 	constructor(...e) {
-		super(...e), this._open = !1, this._openScene = (e) => nr(e.currentTarget.getAttribute("href"), e);
+		super(...e), this._open = !1, this._openScene = (e) => ar(e.currentTarget.getAttribute("href"), e);
 	}
 	get _slug() {
 		return `${this.room.room_id}_${this.group.group_id}`;
@@ -2171,7 +2177,7 @@ var Br = class extends b {
       ></homex-group-dialog>
     `;
 	}
-}, Vr = (Br.styles = [k, x`
+}, Wr = (Ur.styles = [k, x`
       .row {
         display: flex;
         align-items: center;
@@ -2199,10 +2205,10 @@ var Br = class extends b {
         height: 20px;
         fill: currentColor;
       }
-    `], Br);
-e([v({ attribute: !1 })], Vr.prototype, "hass", void 0), e([v({ attribute: !1 })], Vr.prototype, "room", void 0), e([v({ attribute: !1 })], Vr.prototype, "group", void 0), e([s()], Vr.prototype, "_open", void 0), Vr = e([w("homex-group-row")], Vr);
+    `], Ur);
+e([v({ attribute: !1 })], Wr.prototype, "hass", void 0), e([v({ attribute: !1 })], Wr.prototype, "room", void 0), e([v({ attribute: !1 })], Wr.prototype, "group", void 0), e([s()], Wr.prototype, "_open", void 0), Wr = e([w("homex-group-row")], Wr);
 // src/lib/area-lights.ts
-function Hr(e) {
+function Gr(e) {
 	let t = e.devices ?? {}, n = /* @__PURE__ */ new Map();
 	for (let r of Object.values(e.entities ?? {})) {
 		if (!r.entity_id.startsWith("light.") || r.entity_id.startsWith("light.homex_") || r.hidden || r.entity_category) continue;
@@ -2212,11 +2218,11 @@ function Hr(e) {
 	for (let e of n.values()) e.sort();
 	return n;
 }
-function Ur(e, t) {
-	return Hr(e).get(t) ?? [];
+function Kr(e, t) {
+	return Gr(e).get(t) ?? [];
 }
 // src/components/homex-room-dialog.ts
-var Wr = class extends b {
+var qr = class extends b {
 	constructor(...e) {
 		super(...e), this.open = !1, this.room = null, this._name = "", this._id = "", this._areaId = "", this._modules = ["lights"], this._devices = [], this._strategy = "recall_first", this._busy = !1, this._importNote = "", this._zones = [], this._zoneId = "default", this._initialZone = "default", this._idEdited = !1;
 	}
@@ -2262,7 +2268,7 @@ var Wr = class extends b {
     `;
 	}
 	_importLights() {
-		let e = Ur(this.hass, this._areaId).filter((e) => !this._devices.includes(e));
+		let e = Kr(this.hass, this._areaId).filter((e) => !this._devices.includes(e));
 		this._devices = [...this._devices, ...e], this._importNote = e.length ? y("roomDialog.import_added", { count: e.length }) : y("roomDialog.import_none");
 	}
 	_onName(e) {
@@ -2346,7 +2352,7 @@ var Wr = class extends b {
               ${this._areaId ? "" : C`<p class="hint">${y("roomDialog.import_no_area")}</p>`}
               <homex-entity-picker
                 .hass=${this.hass}
-                .includeDomains=${Or}
+                .includeDomains=${jr}
                 .value=${this._devices}
                 @value-changed=${(e) => this._devices = e.detail.value}
               ></homex-entity-picker>
@@ -2392,7 +2398,7 @@ var Wr = class extends b {
       </homex-dialog>
     `;
 	}
-}, P = (Wr.styles = [k, x`
+}, P = (qr.styles = [k, x`
       .hint {
         font-size: 12px;
         color: var(--secondary-text-color);
@@ -2471,10 +2477,10 @@ var Wr = class extends b {
         font-size: 14px;
         font-weight: 600;
       }
-    `], Wr);
+    `], qr);
 e([v({ attribute: !1 })], P.prototype, "hass", void 0), e([v({ type: Boolean })], P.prototype, "open", void 0), e([v({ attribute: !1 })], P.prototype, "room", void 0), e([s()], P.prototype, "_name", void 0), e([s()], P.prototype, "_id", void 0), e([s()], P.prototype, "_areaId", void 0), e([s()], P.prototype, "_modules", void 0), e([s()], P.prototype, "_devices", void 0), e([s()], P.prototype, "_strategy", void 0), e([s()], P.prototype, "_busy", void 0), e([s()], P.prototype, "_importNote", void 0), e([s()], P.prototype, "_zones", void 0), e([s()], P.prototype, "_zoneId", void 0), P = e([w("homex-room-dialog")], P);
 // src/components/homex-triggers-dialog.ts
-var Gr = class extends b {
+var Jr = class extends b {
 	constructor(...e) {
 		super(...e), this.open = !1, this._toggle = [], this._scene = [], this._dimUp = [], this._dimDown = [], this._busy = !1;
 	}
@@ -2572,7 +2578,7 @@ var Gr = class extends b {
       </homex-dialog>
     `;
 	}
-}, Kr = (Gr.styles = [k, x`
+}, Yr = (Jr.styles = [k, x`
       .hint {
         font-size: 12px;
         color: var(--secondary-text-color);
@@ -2584,21 +2590,21 @@ var Gr = class extends b {
         padding: 12px 14px;
         margin-bottom: 14px;
       }
-    `], Gr);
-e([v({ attribute: !1 })], Kr.prototype, "hass", void 0), e([v({ type: Boolean })], Kr.prototype, "open", void 0), e([v({ attribute: !1 })], Kr.prototype, "room", void 0), e([s()], Kr.prototype, "_toggle", void 0), e([s()], Kr.prototype, "_scene", void 0), e([s()], Kr.prototype, "_dimUp", void 0), e([s()], Kr.prototype, "_dimDown", void 0), e([s()], Kr.prototype, "_busy", void 0), Kr = e([w("homex-triggers-dialog")], Kr);
+    `], Jr);
+e([v({ attribute: !1 })], Yr.prototype, "hass", void 0), e([v({ type: Boolean })], Yr.prototype, "open", void 0), e([v({ attribute: !1 })], Yr.prototype, "room", void 0), e([s()], Yr.prototype, "_toggle", void 0), e([s()], Yr.prototype, "_scene", void 0), e([s()], Yr.prototype, "_dimUp", void 0), e([s()], Yr.prototype, "_dimDown", void 0), e([s()], Yr.prototype, "_busy", void 0), Yr = e([w("homex-triggers-dialog")], Yr);
 // src/components/homex-light-start-picker.ts
-var qr, Jr, Yr, Xr = [
+var Xr, Zr, Qr, $r = [
 	255,
 	180,
 	107
-], Zr = 2e3, Qr = 6500, $r = [
+], ei = 2e3, ti = 6500, ni = [
 	"hs",
 	"xy",
 	"rgb",
 	"rgbw",
 	"rgbww"
-], ei = (e, t, n) => Math.min(n, Math.max(t, e)), F = (e) => "#" + e.map((e) => Math.round(e).toString(16).padStart(2, "0")).join(""), ti = (e, t) => `rgba(${e[0]}, ${e[1]}, ${e[2]}, ${t})`;
-function ni(e, t) {
+], ri = (e, t, n) => Math.min(n, Math.max(t, e)), F = (e) => "#" + e.map((e) => Math.round(e).toString(16).padStart(2, "0")).join(""), ii = (e, t) => `rgba(${e[0]}, ${e[1]}, ${e[2]}, ${t})`;
+function ai(e, t) {
 	let n = (n) => {
 		let r = (n + e / 60) % 6;
 		return 1 - t * Math.max(0, Math.min(r, 4 - r, 1));
@@ -2609,19 +2615,19 @@ function ni(e, t) {
 		Math.round(n(1) * 255)
 	];
 }
-function ri(e) {
+function oi(e) {
 	let [t, n, r] = e.map((e) => e / 255), i = Math.max(t, n, r), a = i - Math.min(t, n, r), o = 0;
 	return a && (o = i === t ? (n - r) / a % 6 : i === n ? (r - t) / a + 2 : (t - n) / a + 4), o = (o * 60 + 360) % 360, [o, i ? a / i : 0];
 }
-function ii(e) {
+function si(e) {
 	let t = e / 100;
 	return [
 		t <= 66 ? 255 : 329.698727446 * (t - 60) ** -.1332047592,
 		t <= 66 ? 99.4708025861 * Math.log(t) - 161.1195681661 : 288.1221695283 * (t - 60) ** -.0755148492,
 		t >= 66 ? 255 : t <= 19 ? 0 : 138.5177312231 * Math.log(t - 10) - 305.0447927307
-	].map((e) => Math.round(ei(e, 0, 255)));
+	].map((e) => Math.round(ri(e, 0, 255)));
 }
-var ai = [
+var ci = [
 	[
 		255,
 		70,
@@ -2657,26 +2663,26 @@ var ai = [
 		80,
 		160
 	]
-], oi = [
+], li = [
 	2200,
 	2700,
 	3500,
 	4500,
 	6e3
-], si = (qr = class extends b {
+], ui = (Xr = class extends b {
 	constructor(...e) {
 		super(...e), this.value = 50, this.min = 0, this.max = 100, this.track = "var(--secondary-background-color, rgba(127,127,127,0.2))", this.fill = "", this.label = "";
 	}
 	_frac() {
-		return ei((this.value - this.min) / (this.max - this.min), 0, 1);
+		return ri((this.value - this.min) / (this.max - this.min), 0, 1);
 	}
 	_set(e) {
-		let t = e.currentTarget.getBoundingClientRect(), n = ei(1 - (e.clientY - t.top) / t.height, 0, 1);
+		let t = e.currentTarget.getBoundingClientRect(), n = ri(1 - (e.clientY - t.top) / t.height, 0, 1);
 		this.value = Math.round(this.min + n * (this.max - this.min)), this.dispatchEvent(new CustomEvent("value-changed", { detail: { value: this.value } }));
 	}
 	_key(e) {
 		let t = (this.max - this.min) / 50, n = e.key === "ArrowUp" || e.key === "ArrowRight" ? t : e.key === "ArrowDown" || e.key === "ArrowLeft" ? -t : 0;
-		n && (e.preventDefault(), this.value = Math.round(ei(this.value + n, this.min, this.max)), this.dispatchEvent(new CustomEvent("value-changed", { detail: { value: this.value } })));
+		n && (e.preventDefault(), this.value = Math.round(ri(this.value + n, this.min, this.max)), this.dispatchEvent(new CustomEvent("value-changed", { detail: { value: this.value } })));
 	}
 	render() {
 		let e = this._frac() * 100;
@@ -2702,7 +2708,7 @@ var ai = [
           </div>` : C`<div class="thumb" style="bottom: ${e}%"></div>`}
     </div>`;
 	}
-}, qr.styles = x`
+}, Xr.styles = x`
     :host {
       display: block;
       width: 112px;
@@ -2745,9 +2751,9 @@ var ai = [
       background: rgba(255, 255, 255, 0.85);
       box-shadow: none;
     }
-  `, qr);
-e([v({ type: Number })], si.prototype, "value", void 0), e([v({ type: Number })], si.prototype, "min", void 0), e([v({ type: Number })], si.prototype, "max", void 0), e([v()], si.prototype, "track", void 0), e([v()], si.prototype, "fill", void 0), e([v()], si.prototype, "label", void 0), si = e([w("homex-pill-slider")], si);
-var ci = (Jr = class extends b {
+  `, Xr);
+e([v({ type: Number })], ui.prototype, "value", void 0), e([v({ type: Number })], ui.prototype, "min", void 0), e([v({ type: Number })], ui.prototype, "max", void 0), e([v()], ui.prototype, "track", void 0), e([v()], ui.prototype, "fill", void 0), e([v()], ui.prototype, "label", void 0), ui = e([w("homex-pill-slider")], ui);
+var di = (Zr = class extends b {
 	constructor(...e) {
 		super(...e), this.value = [
 			255,
@@ -2756,11 +2762,11 @@ var ci = (Jr = class extends b {
 		];
 	}
 	_set(e) {
-		let t = e.currentTarget.getBoundingClientRect(), n = t.width / 2, r = e.clientX - t.left - n, i = e.clientY - t.top - n, a = (Math.atan2(r, -i) * 180 / Math.PI + 360) % 360, o = ei(Math.hypot(r, i) / n, 0, 1);
-		this.value = ni(a, o), this.dispatchEvent(new CustomEvent("value-changed", { detail: { value: this.value } }));
+		let t = e.currentTarget.getBoundingClientRect(), n = t.width / 2, r = e.clientX - t.left - n, i = e.clientY - t.top - n, a = (Math.atan2(r, -i) * 180 / Math.PI + 360) % 360, o = ri(Math.hypot(r, i) / n, 0, 1);
+		this.value = ai(a, o), this.dispatchEvent(new CustomEvent("value-changed", { detail: { value: this.value } }));
 	}
 	render() {
-		let [e, t] = ri(this.value), n = e * Math.PI / 180, r = 50 + 50 * t * Math.sin(n), i = 50 - 50 * t * Math.cos(n);
+		let [e, t] = oi(this.value), n = e * Math.PI / 180, r = 50 + 50 * t * Math.sin(n), i = 50 - 50 * t * Math.cos(n);
 		return C`<div
       class="wheel"
       @pointerdown=${(e) => {
@@ -2772,11 +2778,11 @@ var ci = (Jr = class extends b {
     >
       <div
         class="marker"
-        style="left: ${r}%; top: ${i}%; background: ${F(ni(e, t))}"
+        style="left: ${r}%; top: ${i}%; background: ${F(ai(e, t))}"
       ></div>
     </div>`;
 	}
-}, Jr.styles = x`
+}, Zr.styles = x`
     :host {
       display: block;
       width: 260px;
@@ -2805,15 +2811,15 @@ var ci = (Jr = class extends b {
       box-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
       pointer-events: none;
     }
-  `, Jr);
-e([v({ attribute: !1 })], ci.prototype, "value", void 0), ci = e([w("homex-color-wheel")], ci);
-var li = (Yr = class extends b {
+  `, Zr);
+e([v({ attribute: !1 })], di.prototype, "value", void 0), di = e([w("homex-color-wheel")], di);
+var fi = (Qr = class extends b {
 	constructor(...e) {
 		super(...e), this.lights = [], this.value = [], this._editing = null, this._view = "brightness";
 	}
 	_caps(e) {
 		let t = this.hass.states[e]?.attributes?.supported_color_modes ?? [];
-		return t.some((e) => $r.includes(e)) ? "color" : t.includes("color_temp") ? "white" : "dim";
+		return t.some((e) => ni.includes(e)) ? "color" : t.includes("color_temp") ? "white" : "dim";
 	}
 	_name(e) {
 		return this.hass.states[e]?.attributes?.friendly_name ?? e;
@@ -2833,16 +2839,16 @@ var li = (Yr = class extends b {
 				entity_id: e,
 				brightness: n.brightness,
 				kelvin: 2700,
-				color: ii(2700)
+				color: si(2700)
 			};
 		}
 		return this._caps(e) === "dim" ? {
 			entity_id: e,
-			color: [...Xr],
+			color: [...$r],
 			brightness: 100
 		} : {
 			entity_id: e,
-			color: ii(2700),
+			color: si(2700),
 			brightness: 100,
 			kelvin: 2700
 		};
@@ -2889,10 +2895,10 @@ var li = (Yr = class extends b {
 	_vars(e, t) {
 		return [
 			`--light-color: ${F(e)}`,
-			`--light-accent: ${ti(e, .9)}`,
-			`--light-soft: ${ti(e, .18)}`,
-			`--light-tint: ${ti(e, .1 + .18 * t)}`,
-			`--light-glow: ${ti(e, .25 + .55 * t)}`
+			`--light-accent: ${ii(e, .9)}`,
+			`--light-soft: ${ii(e, .18)}`,
+			`--light-tint: ${ii(e, .1 + .18 * t)}`,
+			`--light-glow: ${ii(e, .25 + .55 * t)}`
 		].join(";");
 	}
 	render() {
@@ -2914,7 +2920,7 @@ var li = (Yr = class extends b {
     `;
 	}
 	_row(e) {
-		let t = this.value.find((t) => t.entity_id === e), n = t?.color ?? Xr;
+		let t = this.value.find((t) => t.entity_id === e), n = t?.color ?? $r;
 		return C`
       <div
         class="row ${t ? "on" : ""}"
@@ -2983,16 +2989,16 @@ var li = (Yr = class extends b {
                   label=${y("lightStart.brightness")}
                   @value-changed=${(e) => this._patch(t, { brightness: e.detail.value })}
                 ></homex-pill-slider>` : r === "temp" ? C`<homex-pill-slider
-                    .min=${Zr}
-                    .max=${Qr}
+                    .min=${ei}
+                    .max=${ti}
                     .value=${i}
-                    track="linear-gradient(to top, ${F(ii(Zr))}, ${F(ii(4e3))}, ${F(ii(Qr))})"
+                    track="linear-gradient(to top, ${F(si(ei))}, ${F(si(4e3))}, ${F(si(ti))})"
                     label=${y("lightStart.temperature")}
                     @value-changed=${(e) => {
 			let n = Math.round(e.detail.value / 50) * 50;
 			this._patch(t, {
 				kelvin: n,
-				color: ii(n)
+				color: si(n)
 			});
 		}}
                   ></homex-pill-slider>` : C`<homex-color-wheel
@@ -3030,8 +3036,8 @@ var li = (Yr = class extends b {
 	_favs(e, t) {
 		let n = e.entity_id;
 		return C`<div class="favs">
-      ${oi.map((t) => {
-			let r = ii(t);
+      ${li.map((t) => {
+			let r = si(t);
 			return C`<button
           class="fav ${e.kelvin === t ? "sel" : ""}"
           style="background: ${F(r)}"
@@ -3042,7 +3048,7 @@ var li = (Yr = class extends b {
 			})}
         ></button>`;
 		})}
-      ${t === "color" ? ai.map((t) => C`<button
+      ${t === "color" ? ci.map((t) => C`<button
               class="fav ${!e.kelvin && F(t) === F(e.color) ? "sel" : ""}"
               style="background: ${F(t)}"
               title=${F(t).toUpperCase()}
@@ -3053,7 +3059,7 @@ var li = (Yr = class extends b {
             ></button>`) : o}
     </div>`;
 	}
-}, Yr.styles = [k, x`
+}, Qr.styles = [k, x`
       :host {
         display: block;
       }
@@ -3343,11 +3349,11 @@ var li = (Yr = class extends b {
           height: 200px;
         }
       }
-    `], Yr);
-e([v({ attribute: !1 })], li.prototype, "hass", void 0), e([v({ attribute: !1 })], li.prototype, "lights", void 0), e([v({ attribute: !1 })], li.prototype, "value", void 0), e([s()], li.prototype, "_editing", void 0), e([s()], li.prototype, "_view", void 0), li = e([w("homex-light-start-picker")], li);
+    `], Qr);
+e([v({ attribute: !1 })], fi.prototype, "hass", void 0), e([v({ attribute: !1 })], fi.prototype, "lights", void 0), e([v({ attribute: !1 })], fi.prototype, "value", void 0), e([s()], fi.prototype, "_editing", void 0), e([s()], fi.prototype, "_view", void 0), fi = e([w("homex-light-start-picker")], fi);
 // src/components/homex-pixel-mapper.ts
-var ui, di = 96;
-function fi(e, t, n, r) {
+var pi, mi = 96;
+function hi(e, t, n, r) {
 	let i = e.getImageData(0, 0, t, n).data, a = {};
 	for (let [e, [o, s, c, l]] of Object.entries(r)) {
 		let r = Math.floor(o * t), u = Math.floor(s * n), d = Math.max(r + 1, Math.min(t, Math.ceil((o + c) * t))), f = Math.max(u + 1, Math.min(n, Math.ceil((s + l) * n))), p = 0, m = 0, h = 0, g = 0;
@@ -3371,16 +3377,16 @@ function fi(e, t, n, r) {
 	}
 	return a;
 }
-function pi(e) {
-	let t = di, n = Math.max(1, Math.round(di * (e.videoHeight || 9) / (e.videoWidth || 16))), r = document.createElement("canvas");
+function gi(e) {
+	let t = mi, n = Math.max(1, Math.round(mi * (e.videoHeight || 9) / (e.videoWidth || 16))), r = document.createElement("canvas");
 	return r.width = t, r.height = n, {
 		ctx: r.getContext("2d", { willReadFrequently: !0 }),
 		w: t,
 		h: n
 	};
 }
-var mi = 6e3, hi = (e, t) => e > 0 && t > 0 ? Math.max(1, Math.ceil(e / t - 1e-6)) : 0;
-function gi(e, t) {
+var _i = 6e3, vi = (e, t) => e > 0 && t > 0 ? Math.max(1, Math.ceil(e / t - 1e-6)) : 0;
+function yi(e, t) {
 	return new Promise((n) => {
 		let r = () => {
 			clearTimeout(i), e.removeEventListener("seeked", r), n();
@@ -3388,29 +3394,29 @@ function gi(e, t) {
 		e.addEventListener("seeked", r), e.currentTime = t;
 	});
 }
-async function _i(e) {
+async function bi(e) {
 	if (Number.isFinite(e.duration) && e.duration > 0) return e.duration;
 	let t = e.currentTime;
-	await gi(e, 1e7);
+	await yi(e, 1e7);
 	let n = Number.isFinite(e.duration) ? e.duration : e.currentTime;
-	return await gi(e, t), n > 0 ? n : 0;
+	return await yi(e, t), n > 0 ? n : 0;
 }
-async function vi(e, t, n, r) {
+async function xi(e, t, n, r) {
 	let i = document.createElement("video");
 	i.muted = !0, i.playsInline = !0, i.preload = "auto", i.src = e, await new Promise((e, t) => {
 		i.onloadeddata = () => e(), i.onerror = () => t(Error(y("pixel.unreadable")));
 	});
-	let a = await _i(i), o = Math.min(mi, hi(a, n)), { ctx: s, w: c, h: l } = pi(i), u = {};
+	let a = await bi(i), o = Math.min(_i, vi(a, n)), { ctx: s, w: c, h: l } = gi(i), u = {};
 	for (let e of Object.keys(t)) u[e] = [];
 	for (let e = 0; e < o; e++) {
-		await gi(i, Math.min(e * n, Math.max(0, a - .01))), s.drawImage(i, 0, 0, c, l);
-		let d = fi(s, c, l, t);
+		await yi(i, Math.min(e * n, Math.max(0, a - .01))), s.drawImage(i, 0, 0, c, l);
+		let d = hi(s, c, l, t);
 		for (let e of Object.keys(t)) u[e].push(d[e]);
 		r?.((e + 1) / o);
 	}
 	return i.removeAttribute("src"), i.load(), u;
 }
-var yi = (e, t, n) => Math.min(n, Math.max(t, e)), bi = .03, xi = [
+var Si = (e, t, n) => Math.min(n, Math.max(t, e)), Ci = .03, wi = [
 	"#03a9f4",
 	"#ff9800",
 	"#e91e63",
@@ -3419,7 +3425,7 @@ var yi = (e, t, n) => Math.min(n, Math.max(t, e)), bi = .03, xi = [
 	"#ffc107",
 	"#00bcd4",
 	"#f44336"
-], I = (ui = class extends b {
+], I = (pi = class extends b {
 	constructor(...e) {
 		super(...e), this.lights = [], this.src = "", this.value = {}, this._selected = "", this._time = 0, this._duration = 0, this._playing = !1, this._ratio = 16 / 9, this._live = {}, this._drag = null, this._canvas = null, this._raf = 0, this._loop = () => {
 			this._time = this._video.currentTime, this._sampleNow(), this._playing && (this._raf = requestAnimationFrame(this._loop));
@@ -3430,7 +3436,7 @@ var yi = (e, t, n) => Math.min(n, Math.max(t, e)), bi = .03, xi = [
 	}
 	_color(e) {
 		let t = this.lights.indexOf(e);
-		return xi[(t < 0 ? this.lights.length : t) % xi.length];
+		return wi[(t < 0 ? this.lights.length : t) % wi.length];
 	}
 	_name(e) {
 		return this.hass.states[e]?.attributes?.friendly_name ?? e;
@@ -3440,7 +3446,7 @@ var yi = (e, t, n) => Math.min(n, Math.max(t, e)), bi = .03, xi = [
 	}
 	async _onLoaded() {
 		let e = this._video;
-		this._duration = await _i(e), e.videoWidth && e.videoHeight && (this._ratio = e.videoWidth / e.videoHeight), this._canvas = pi(e), this.dispatchEvent(new CustomEvent("video-info", { detail: {
+		this._duration = await bi(e), e.videoWidth && e.videoHeight && (this._ratio = e.videoWidth / e.videoHeight), this._canvas = gi(e), this.dispatchEvent(new CustomEvent("video-info", { detail: {
 			duration: this._duration,
 			ratio: this._ratio
 		} })), this._sampleNow();
@@ -3450,7 +3456,7 @@ var yi = (e, t, n) => Math.min(n, Math.max(t, e)), bi = .03, xi = [
 		if (!e || !this._canvas || e.readyState < 2) return;
 		let { ctx: t, w: n, h: r } = this._canvas;
 		try {
-			t.drawImage(e, 0, 0, n, r), this._live = fi(t, n, r, this.value);
+			t.drawImage(e, 0, 0, n, r), this._live = hi(t, n, r, this.value);
 		} catch {}
 	}
 	_togglePlay() {
@@ -3462,7 +3468,7 @@ var yi = (e, t, n) => Math.min(n, Math.max(t, e)), bi = .03, xi = [
 	}
 	_point(e) {
 		let t = this._overlay.getBoundingClientRect();
-		return [yi((e.clientX - t.left) / t.width, 0, 1), yi((e.clientY - t.top) / t.height, 0, 1)];
+		return [Si((e.clientX - t.left) / t.width, 0, 1), Si((e.clientY - t.top) / t.height, 0, 1)];
 	}
 	_defaultZone() {
 		let e = Object.keys(this.value).length;
@@ -3499,8 +3505,8 @@ var yi = (e, t, n) => Math.min(n, Math.max(t, e)), bi = .03, xi = [
 			[r]: [
 				i,
 				a,
-				bi,
-				bi
+				Ci,
+				Ci
 			]
 		});
 	}
@@ -3509,20 +3515,20 @@ var yi = (e, t, n) => Math.min(n, Math.max(t, e)), bi = .03, xi = [
 		if (!t) return;
 		let [n, r] = this._point(e), [i, a, o, s] = t.start, c;
 		c = t.kind === "move" ? [
-			yi(i + n - t.x, 0, 1 - o),
-			yi(a + r - t.y, 0, 1 - s),
+			Si(i + n - t.x, 0, 1 - o),
+			Si(a + r - t.y, 0, 1 - s),
 			o,
 			s
 		] : t.kind === "resize" ? [
 			i,
 			a,
-			yi(n - i, bi, 1 - i),
-			yi(r - a, bi, 1 - a)
+			Si(n - i, Ci, 1 - i),
+			Si(r - a, Ci, 1 - a)
 		] : [
 			Math.min(t.x, n),
 			Math.min(t.y, r),
-			Math.max(bi, Math.abs(n - t.x)),
-			Math.max(bi, Math.abs(r - t.y))
+			Math.max(Ci, Math.abs(n - t.x)),
+			Math.max(Ci, Math.abs(r - t.y))
 		], this.value = {
 			...this.value,
 			[t.id]: c.map((e) => Math.round(e * 1e3) / 1e3)
@@ -3608,7 +3614,7 @@ var yi = (e, t, n) => Math.min(n, Math.max(t, e)), bi = .03, xi = [
       ${j(t, (t) => this._setMapped(e, t))}
     </div>`;
 	}
-}, ui.styles = [k, x`
+}, pi.styles = [k, x`
       :host {
         display: block;
       }
@@ -3773,33 +3779,33 @@ var yi = (e, t, n) => Math.min(n, Math.max(t, e)), bi = .03, xi = [
           max-width: 100%;
         }
       }
-    `], ui);
+    `], pi);
 e([v({ attribute: !1 })], I.prototype, "hass", void 0), e([v({ attribute: !1 })], I.prototype, "lights", void 0), e([v()], I.prototype, "src", void 0), e([v({ attribute: !1 })], I.prototype, "value", void 0), e([s()], I.prototype, "_selected", void 0), e([s()], I.prototype, "_time", void 0), e([s()], I.prototype, "_duration", void 0), e([s()], I.prototype, "_playing", void 0), e([s()], I.prototype, "_ratio", void 0), e([s()], I.prototype, "_live", void 0), e([Dt("video")], I.prototype, "_video", void 0), e([Dt(".overlay")], I.prototype, "_overlay", void 0), I = e([w("homex-pixel-mapper")], I);
 // src/components/homex-scene-dialog.ts
-var Si, Ci = 600, wi = [
+var Ti, Ei = 600, Di = [
 	5,
 	10,
 	15,
 	30,
 	60
-], Ti = [
+], Oi = [
 	.1,
 	.5,
 	1,
 	2,
 	5
-], Ei = [
+], ki = [
 	.5,
 	1,
 	2,
 	5,
 	10
-], Di = 10, Oi = 200, L = (Si = class extends b {
+], Ai = 10, ji = 200, L = (Ti = class extends b {
 	constructor(...e) {
 		super(...e), this.open = !1, this.scene = null, this._name = "", this._mode = "new", this._attachId = "", this._triggers = [], this._kind = "normal", this._anim = {
 			mode: "fade_out",
 			lights: [],
-			duration: Ci
+			duration: Ei
 		}, this._busy = !1, this._videoUrl = "", this._videoFile = null, this._videoDuration = 0, this._videoError = "", this._pixelDirty = !1, this._progress = null;
 	}
 	willUpdate(e) {
@@ -3814,12 +3820,12 @@ var Si, Ci = 600, wi = [
 				}))
 			} : {
 				mode: "fade_out",
-				duration: Ci,
+				duration: Ei,
 				lights: this._roomLights().map((e) => {
 					let t = (this.hass.states[e]?.attributes?.supported_color_modes ?? []).every((e) => e === "brightness" || e === "onoff");
 					return {
 						entity_id: e,
-						color: [...Xr],
+						color: [...$r],
 						brightness: 100,
 						...t ? {} : { kelvin: 2700 }
 					};
@@ -3842,17 +3848,17 @@ var Si, Ci = 600, wi = [
 		}
 	}
 	_pickVideo(e) {
-		e && (e.size > Oi * 1024 * 1024 ? this._videoError = y("pixel.too_big", { max: Oi }) : (this._videoUrl && URL.revokeObjectURL(this._videoUrl), this._videoError = "", this._videoFile = e, this._videoUrl = URL.createObjectURL(e), this._pixelDirty = !0, this._setAnim({ video_name: e.name })));
+		e && (e.size > ji * 1024 * 1024 ? this._videoError = y("pixel.too_big", { max: ji }) : (this._videoUrl && URL.revokeObjectURL(this._videoUrl), this._videoError = "", this._videoFile = e, this._videoUrl = URL.createObjectURL(e), this._pixelDirty = !0, this._setAnim({ video_name: e.name })));
 	}
 	get _pixelValid() {
 		let e = this._anim;
-		return (!!e.video_id || !!this._videoFile) && !!this._videoUrl && Object.keys(e.zones ?? {}).length > 0 && (!this._videoDuration || hi(this._videoDuration, e.interval ?? 1) <= 6e3);
+		return (!!e.video_id || !!this._videoFile) && !!this._videoUrl && Object.keys(e.zones ?? {}).length > 0 && (!this._videoDuration || vi(this._videoDuration, e.interval ?? 1) <= 6e3);
 	}
 	async _pixelAnimation() {
 		let e = { ...this._anim };
 		if (this._videoFile && (e.video_id = await kn(this.hass, this._videoFile), this._videoFile = null, this._setAnim({ video_id: e.video_id })), this._pixelDirty || !e.frames_id) {
 			this._progress = 0;
-			let t = await vi(this._videoUrl, e.zones ?? {}, e.interval ?? 1, (e) => this._progress = e), { frames_id: n, first: r, frame_count: i, ...a } = e;
+			let t = await xi(this._videoUrl, e.zones ?? {}, e.interval ?? 1, (e) => this._progress = e), { frames_id: n, first: r, frame_count: i, ...a } = e;
 			e = {
 				...a,
 				frames: t
@@ -4003,7 +4009,7 @@ var Si, Ci = 600, wi = [
 		}) : this._setAnim({ mode: e });
 	}
 	_renderPixel() {
-		let e = this._anim, t = e.interval ?? 1, n = this._videoDuration ? hi(this._videoDuration, t) : e.frame_count ?? 0, r = e.fps ?? 1 / t, i = Math.abs(r * t - 1) < .001, a = r * t, o = n / r, s = (e) => (Math.round(e * 10) / 10).toLocaleString(this.hass.locale?.language), c = (e) => {
+		let e = this._anim, t = e.interval ?? 1, n = this._videoDuration ? vi(this._videoDuration, t) : e.frame_count ?? 0, r = e.fps ?? 1 / t, i = Math.abs(r * t - 1) < .001, a = r * t, o = n / r, s = (e) => (Math.round(e * 10) / 10).toLocaleString(this.hass.locale?.language), c = (e) => {
 			let t = Math.round(e * 10) / 10;
 			if (t < 60) return `${s(t)} s`;
 			let n = Math.floor(t / 60), r = Math.round((t - n * 60) * 10) / 10;
@@ -4037,7 +4043,7 @@ var Si, Ci = 600, wi = [
 
       <div class="section">${y("pixel.sampling_every")}</div>
       <div class="chips">
-        ${Ti.map((e) => C`<button
+        ${Oi.map((e) => C`<button
             class=${t === e ? "active" : ""}
             @click=${() => this._setInterval(e, i)}
           >
@@ -4050,7 +4056,7 @@ var Si, Ci = 600, wi = [
             min="0.1"
             max="60"
             step="0.1"
-            .value=${Ti.includes(t) ? "" : String(t)}
+            .value=${Oi.includes(t) ? "" : String(t)}
             placeholder="—"
             @change=${(e) => {
 			let t = Number(e.target.value);
@@ -4062,7 +4068,7 @@ var Si, Ci = 600, wi = [
       </div>
       ${n > 6e3 ? C`<div class="err">${y("pixel.too_many", {
 			count: n,
-			max: mi
+			max: _i
 		})}</div>` : ""}
 
       <div class="section">${y("pixel.fps")}</div>
@@ -4070,11 +4076,11 @@ var Si, Ci = 600, wi = [
         <button
           class=${i ? "active" : ""}
           title=${y("pixel.realtime_hint", { fps: s(1 / t) })}
-          @click=${() => this._setAnim({ fps: Math.min(Di, 1 / t) })}
+          @click=${() => this._setAnim({ fps: Math.min(Ai, 1 / t) })}
         >
           ${y("pixel.realtime")}
         </button>
-        ${Ei.map((e) => C`<button
+        ${ki.map((e) => C`<button
             class=${!i && Math.abs(r - e) < .001 ? "active" : ""}
             @click=${() => this._setAnim({ fps: e })}
           >
@@ -4085,13 +4091,13 @@ var Si, Ci = 600, wi = [
           <input
             type="number"
             min="0.1"
-            max=${Di}
+            max=${Ai}
             step="0.1"
-            .value=${i || Ei.some((e) => Math.abs(r - e) < .001) ? "" : String(Math.round(r * 100) / 100)}
+            .value=${i || ki.some((e) => Math.abs(r - e) < .001) ? "" : String(Math.round(r * 100) / 100)}
             placeholder="—"
             @change=${(e) => {
 			let t = Number(e.target.value);
-			t > 0 && this._setAnim({ fps: Math.min(Di, Math.max(.1, t)) });
+			t > 0 && this._setAnim({ fps: Math.min(Ai, Math.max(.1, t)) });
 		}}
           />
           ${y("pixel.fps_unit")}
@@ -4144,11 +4150,11 @@ var Si, Ci = 600, wi = [
 	_setInterval(e, t) {
 		this._pixelDirty = !0, this._setAnim(t ? {
 			interval: e,
-			fps: Math.min(Di, 1 / e)
+			fps: Math.min(Ai, 1 / e)
 		} : { interval: e });
 	}
 	_renderFade() {
-		let e = this._anim, t = Math.round(e.duration / 60 * 10) / 10, n = wi.includes(t);
+		let e = this._anim, t = Math.round(e.duration / 60 * 10) / 10, n = Di.includes(t);
 		return C`
       <div class="section">
         ${e.mode === "fade_in" ? y("sceneDialog.lights_end") : y("sceneDialog.lights")}
@@ -4164,7 +4170,7 @@ var Si, Ci = 600, wi = [
         ${e.mode === "fade_in" ? y("sceneDialog.duration_in") : y("sceneDialog.duration")}
       </div>
       <div class="chips">
-        ${wi.map((e) => C`<button
+        ${Di.map((e) => C`<button
             class=${t === e ? "active" : ""}
             @click=${() => this._setAnim({ duration: e * 60 })}
           >
@@ -4220,7 +4226,7 @@ var Si, Ci = 600, wi = [
           `}
     `;
 	}
-}, Si.styles = [k, x`
+}, Ti.styles = [k, x`
       .modes {
         display: flex;
         gap: 8px;
@@ -4320,10 +4326,10 @@ var Si, Ci = 600, wi = [
         font-size: 12px;
         margin: -4px 0 8px;
       }
-    `], Si);
+    `], Ti);
 e([v({ attribute: !1 })], L.prototype, "hass", void 0), e([v({ type: Boolean })], L.prototype, "open", void 0), e([v({ attribute: !1 })], L.prototype, "room", void 0), e([v({ attribute: !1 })], L.prototype, "scene", void 0), e([s()], L.prototype, "_name", void 0), e([s()], L.prototype, "_mode", void 0), e([s()], L.prototype, "_attachId", void 0), e([s()], L.prototype, "_triggers", void 0), e([s()], L.prototype, "_kind", void 0), e([s()], L.prototype, "_anim", void 0), e([s()], L.prototype, "_busy", void 0), e([s()], L.prototype, "_videoUrl", void 0), e([s()], L.prototype, "_videoFile", void 0), e([s()], L.prototype, "_videoDuration", void 0), e([s()], L.prototype, "_videoError", void 0), e([s()], L.prototype, "_pixelDirty", void 0), e([s()], L.prototype, "_progress", void 0), L = e([w("homex-scene-dialog")], L);
 // src/components/homex-shutter-group-dialog.ts
-var ki = class extends b {
+var Mi = class extends b {
 	constructor(...e) {
 		super(...e), this.open = !1, this.group = null, this._name = "", this._devices = [], this._toggle = [], this._openT = [], this._close = [], this._stop = [], this._busy = !1;
 	}
@@ -4414,7 +4420,7 @@ var ki = class extends b {
       </homex-dialog>
     `;
 	}
-}, R = (ki.styles = [k, x`
+}, R = (Mi.styles = [k, x`
       .hint {
         font-size: 12px;
         color: var(--secondary-text-color);
@@ -4426,15 +4432,15 @@ var ki = class extends b {
         padding: 12px 14px;
         margin-bottom: 12px;
       }
-    `], ki);
+    `], Mi);
 e([v({ attribute: !1 })], R.prototype, "hass", void 0), e([v({ type: Boolean })], R.prototype, "open", void 0), e([v({ attribute: !1 })], R.prototype, "room", void 0), e([v({ attribute: !1 })], R.prototype, "group", void 0), e([s()], R.prototype, "_name", void 0), e([s()], R.prototype, "_devices", void 0), e([s()], R.prototype, "_toggle", void 0), e([s()], R.prototype, "_openT", void 0), e([s()], R.prototype, "_close", void 0), e([s()], R.prototype, "_stop", void 0), e([s()], R.prototype, "_busy", void 0), R = e([w("homex-shutter-group-dialog")], R);
 // src/components/homex-shutter-control-dialog.ts
-var Ai = class extends b {
+var Ni = class extends b {
 	constructor(...e) {
 		super(...e), this.open = !1, this._groupId = "", this._busy = !1;
 	}
 	willUpdate(e) {
-		e.has("open") && this.open && (this._groupId = vr(this.room)?.id ?? "");
+		e.has("open") && this.open && (this._groupId = xr(this.room)?.id ?? "");
 	}
 	get _groups() {
 		return (this.room.shutter_groups ?? []).filter((e) => e.devices?.length);
@@ -4461,7 +4467,7 @@ var Ai = class extends b {
 	}
 	render() {
 		if (!this.open) return C``;
-		let e = this._groups, t = e.find((e) => e.id === this._groupId) ?? e[0], n = t?.devices ?? [], r = _r(this.hass, n);
+		let e = this._groups, t = e.find((e) => e.id === this._groupId) ?? e[0], n = t?.devices ?? [], r = br(this.hass, n);
 		return C`
       <homex-dialog
         compact
@@ -4498,7 +4504,7 @@ var Ai = class extends b {
           </button>
         </div>
         ${n.map((e) => {
-			let t = _r(this.hass, [e]), r = gr(this.hass, e);
+			let t = br(this.hass, [e]), r = yr(this.hass, e);
 			return C`<div class="cover">
             <svg viewBox="0 0 24 24"><path d=${t.icon}></path></svg>
             <span class="name">
@@ -4522,7 +4528,7 @@ var Ai = class extends b {
       </homex-dialog>
     `;
 	}
-}, ji = (Ai.styles = [k, x`
+}, Pi = (Ni.styles = [k, x`
       .groups {
         display: flex;
         flex-wrap: wrap;
@@ -4627,28 +4633,28 @@ var Ai = class extends b {
           justify-content: flex-end;
         }
       }
-    `], Ai);
-e([v({ attribute: !1 })], ji.prototype, "hass", void 0), e([v({ type: Boolean })], ji.prototype, "open", void 0), e([v({ attribute: !1 })], ji.prototype, "room", void 0), e([s()], ji.prototype, "_groupId", void 0), e([s()], ji.prototype, "_busy", void 0), ji = e([w("homex-shutter-control-dialog")], ji);
+    `], Ni);
+e([v({ attribute: !1 })], Pi.prototype, "hass", void 0), e([v({ type: Boolean })], Pi.prototype, "open", void 0), e([v({ attribute: !1 })], Pi.prototype, "room", void 0), e([s()], Pi.prototype, "_groupId", void 0), e([s()], Pi.prototype, "_busy", void 0), Pi = e([w("homex-shutter-control-dialog")], Pi);
 // src/lib/area.ts
-function Mi(e, t) {
+function Fi(e, t) {
 	let n = e.entities?.[t];
 	return n?.area_id || n?.device_id && e.devices?.[n.device_id]?.area_id || void 0;
 }
-function Ni(e, t) {
+function Ii(e, t) {
 	return e.devices?.[t]?.area_id || void 0;
 }
-function Pi(e, t, n) {
+function Li(e, t, n) {
 	let r = new Set(n.filter(Boolean)), i = r.size ? e.filter((e) => r.has(t(e) ?? "")) : [];
 	return {
 		inArea: i,
 		others: e.filter((e) => !i.includes(e))
 	};
 }
-function Fi(e, t) {
+function Ri(e, t) {
 	return [...new Set(t.filter(Boolean))].map((t) => e.areas?.[t]?.name ?? t).join(", ");
 }
 // src/components/homex-radiator-dialog.ts
-var Ii = class extends b {
+var zi = class extends b {
 	constructor(...e) {
 		super(...e), this.open = !1, this.index = -1, this._rad = {
 			device_id: "",
@@ -4728,7 +4734,7 @@ var Ii = class extends b {
 		let e = (e) => this.hass.states[e]?.attributes?.friendly_name || e, t = (e) => {
 			let t = this.hass.states[e], n = t?.attributes?.unit_of_measurement ?? "";
 			return t && !["unknown", "unavailable"].includes(t.state) ? `${t.state} ${n}` : "—";
-		}, n = `sensor.homex_${this.room.room_id}_temperature`, r = !!this.room.metrics?.temperature?.sensors?.length, i = (this.room.metrics?.temperature?.sensors ?? []).map((e) => e.entity_id), { inArea: a, others: o } = Pi(Object.keys(this.hass.states).filter((e) => e.startsWith("sensor.") && e !== n && !i.includes(e) && this.hass.states[e]?.attributes?.device_class === "temperature").sort((t, n) => e(t).localeCompare(e(n))), (e) => Mi(this.hass, e), [this.room.area_id]), s = this._rad.external_sensor ?? "", c = (n, r = e(n)) => ({
+		}, n = `sensor.homex_${this.room.room_id}_temperature`, r = !!this.room.metrics?.temperature?.sensors?.length, i = (this.room.metrics?.temperature?.sensors ?? []).map((e) => e.entity_id), { inArea: a, others: o } = Li(Object.keys(this.hass.states).filter((e) => e.startsWith("sensor.") && e !== n && !i.includes(e) && this.hass.states[e]?.attributes?.device_class === "temperature").sort((t, n) => e(t).localeCompare(e(n))), (e) => Fi(this.hass, e), [this.room.area_id]), s = this._rad.external_sensor ?? "", c = (n, r = e(n)) => ({
 			value: n,
 			label: r,
 			secondary: n,
@@ -4750,7 +4756,7 @@ var Ii = class extends b {
 				options: i.map((e) => c(e))
 			}] : [],
 			...a.length ? [{
-				label: y("radiatorDialog.area", { area: Fi(this.hass, [this.room.area_id]) }),
+				label: y("radiatorDialog.area", { area: Ri(this.hass, [this.room.area_id]) }),
 				options: a.map((e) => c(e))
 			}] : [],
 			{
@@ -4768,7 +4774,7 @@ var Ii = class extends b {
 	}
 	render() {
 		if (!this.open) return C``;
-		let e = this.index >= 0, t = new Set((this.room.heating?.radiators ?? []).filter((e, t) => t !== this.index).map((e) => e.device_id)), n = this._otherRooms.find((e) => (e.heating?.radiators ?? []).some((e) => e.device_id === this._rad.device_id)), r = this._modelPresets, i = this.room.area_id || "", a = i ? this.hass.areas?.[i]?.name : void 0, { inArea: o, others: s } = Pi(this._thermostats, (e) => Ni(this.hass, e.device_id), [i]), c = (e) => ({
+		let e = this.index >= 0, t = new Set((this.room.heating?.radiators ?? []).filter((e, t) => t !== this.index).map((e) => e.device_id)), n = this._otherRooms.find((e) => (e.heating?.radiators ?? []).some((e) => e.device_id === this._rad.device_id)), r = this._modelPresets, i = this.room.area_id || "", a = i ? this.hass.areas?.[i]?.name : void 0, { inArea: o, others: s } = Li(this._thermostats, (e) => Ii(this.hass, e.device_id), [i]), c = (e) => ({
 			value: e.device_id,
 			label: e.name,
 			secondary: e.label,
@@ -4833,7 +4839,7 @@ var Ii = class extends b {
       </homex-dialog>
     `;
 	}
-}, Li = (Ii.styles = [k, x`
+}, Bi = (zi.styles = [k, x`
       .hint {
         font-size: 13px;
         color: var(--secondary-text-color);
@@ -4842,10 +4848,10 @@ var Ii = class extends b {
       .warn {
         color: var(--warning-color, #ff9800);
       }
-    `], Ii);
-e([v({ attribute: !1 })], Li.prototype, "hass", void 0), e([v({ type: Boolean })], Li.prototype, "open", void 0), e([v({ attribute: !1 })], Li.prototype, "room", void 0), e([v({ type: Number })], Li.prototype, "index", void 0), e([s()], Li.prototype, "_rad", void 0), e([s()], Li.prototype, "_models", void 0), e([s()], Li.prototype, "_presets", void 0), e([s()], Li.prototype, "_otherRooms", void 0), e([s()], Li.prototype, "_busy", void 0), Li = e([w("homex-radiator-dialog")], Li);
+    `], zi);
+e([v({ attribute: !1 })], Bi.prototype, "hass", void 0), e([v({ type: Boolean })], Bi.prototype, "open", void 0), e([v({ attribute: !1 })], Bi.prototype, "room", void 0), e([v({ type: Number })], Bi.prototype, "index", void 0), e([s()], Bi.prototype, "_rad", void 0), e([s()], Bi.prototype, "_models", void 0), e([s()], Bi.prototype, "_presets", void 0), e([s()], Bi.prototype, "_otherRooms", void 0), e([s()], Bi.prototype, "_busy", void 0), Bi = e([w("homex-radiator-dialog")], Bi);
 // src/components/homex-room-climate.ts
-var Ri, zi = [
+var Vi, Hi = [
 	{
 		key: "temperature",
 		icon: "🌡"
@@ -4866,18 +4872,18 @@ var Ri, zi = [
 		key: "co2",
 		icon: "🫧"
 	}
-], Bi = [
+], Ui = [
 	"mean",
 	"max",
 	"min"
-], Vi = (e) => Bi.includes(e) ? y(`roomClimate.rule_${e}`) : e, Hi = [
+], Wi = (e) => Ui.includes(e) ? y(`roomClimate.rule_${e}`) : e, Gi = [
 	"heating",
 	"idle",
 	"off",
 	"preheating",
 	"heat",
 	"auto"
-], Ui = (e) => Hi.includes(e) ? y(`roomClimate.action_${e}`) : e, Wi = (Ri = class extends b {
+], Ki = (e) => Gi.includes(e) ? y(`roomClimate.action_${e}`) : e, qi = (Vi = class extends b {
 	constructor(...e) {
 		super(...e), this._devicePresets = [], this._dialogIndex = null, this._switching = !1;
 	}
@@ -4898,7 +4904,7 @@ var Ri, zi = [
 		return n ? `${t.state} ${n}` : t.state;
 	}
 	_renderMetrics() {
-		let e = this.room, t = zi.filter((t) => e.metrics?.[t.key]?.sensors?.length);
+		let e = this.room, t = Hi.filter((t) => e.metrics?.[t.key]?.sensors?.length);
 		return C`
       <div class="section-row">
         <span class="section">${y("roomClimate.metrics")}</span>
@@ -4913,7 +4919,7 @@ var Ri, zi = [
                 <div class="muted">${t.icon} ${y(`roomClimate.metric_${t.key}`)}</div>
                 <div class="v">${this._state(`sensor.homex_${e.room_id}_${t.key}`)}</div>
                 <div class="muted">
-                  ${y("roomClimate.sensor_count", { count: n.sensors.length })} · ${Vi(n.rule)}
+                  ${y("roomClimate.sensor_count", { count: n.sensors.length })} · ${Wi(n.rule)}
                 </div>
               </div>`;
 		})}
@@ -4957,7 +4963,7 @@ var Ri, zi = [
 		}
 	}
 	_renderRadiator(e) {
-		let t = this.room.heating.radiators[e], n = this.hass.devices?.[t.device_id], r = sr(this.hass, t.device_id), i = r ? this.hass.states[r] : void 0, a = i?.attributes ?? {}, o = a.hvac_action ?? i?.state, s = this.hass.config?.unit_system?.temperature ?? "°C", c = (e) => e == null ? "—" : `${e} ${s}`, l = this._devicePresets.find((e) => e.id === t.preset_id), u = t.external_sensor ? this.hass.states[t.external_sensor]?.attributes?.friendly_name || t.external_sensor : "";
+		let t = this.room.heating.radiators[e], n = this.hass.devices?.[t.device_id], r = ur(this.hass, t.device_id), i = r ? this.hass.states[r] : void 0, a = i?.attributes ?? {}, o = a.hvac_action ?? i?.state, s = this.hass.config?.unit_system?.temperature ?? "°C", c = (e) => e == null ? "—" : `${e} ${s}`, l = this._devicePresets.find((e) => e.id === t.preset_id), u = t.external_sensor ? this.hass.states[t.external_sensor]?.attributes?.friendly_name || t.external_sensor : "";
 		return C`<div class="row">
       <div class="info">
         <div class="name">${n?.name_by_user || n?.name || t.device_id}</div>
@@ -4967,8 +4973,8 @@ var Ri, zi = [
         </div>
       </div>
       <span class=${o === "heating" ? "heating" : "muted"}>
-        ${!i || i.state === "unavailable" ? y("roomClimate.unavailable") : Ui(o)}
-        ${lr(i) ? C`<span
+        ${!i || i.state === "unavailable" ? y("roomClimate.unavailable") : Ki(o)}
+        ${fr(i) ? C`<span
               class="warning"
               title=${y("roomClimate.valve_stuck")}
               >⚠</span
@@ -5019,7 +5025,7 @@ var Ri, zi = [
       ></homex-radiator-dialog>
     `;
 	}
-}, Ri.styles = [k, x`
+}, Vi.styles = [k, x`
       .section-row {
         display: flex;
         align-items: center;
@@ -5145,18 +5151,18 @@ var Ri, zi = [
           margin-left: auto;
         }
       }
-    `], Ri);
-e([v({ attribute: !1 })], Wi.prototype, "hass", void 0), e([v({ attribute: !1 })], Wi.prototype, "room", void 0), e([s()], Wi.prototype, "_devicePresets", void 0), e([s()], Wi.prototype, "_dialogIndex", void 0), e([s()], Wi.prototype, "_switching", void 0), Wi = e([w("homex-room-climate")], Wi);
+    `], Vi);
+e([v({ attribute: !1 })], qi.prototype, "hass", void 0), e([v({ attribute: !1 })], qi.prototype, "room", void 0), e([s()], qi.prototype, "_devicePresets", void 0), e([s()], qi.prototype, "_dialogIndex", void 0), e([s()], qi.prototype, "_switching", void 0), qi = e([w("homex-room-climate")], qi);
 // src/components/homex-switch-mapping.ts
-var Gi, Ki = [
+var Ji, Yi = [
 	"lights",
 	"shutters",
 	"heating"
-], qi = (e) => Ki.includes(e) ? y(`switchMapping.module_${e}`) : e, Ji = (e) => y(`switchMapping.tap_${e}`);
-function Yi(e) {
+], Xi = (e) => Yi.includes(e) ? y(`switchMapping.module_${e}`) : e, Zi = (e) => y(`switchMapping.tap_${e}`);
+function Qi(e) {
 	return e.kind === "group" ? `group:${e.group_id}` : e.kind === "scene" ? `scene:${e.scene_key}` : e.kind.startsWith("shutter_") ? `${e.kind}:${e.group_id}` : e.kind === "heating_mode" ? `heating_mode:${e.mode_id}` : e.kind;
 }
-var z = (Gi = class extends b {
+var z = (Ji = class extends b {
 	constructor(...e) {
 		super(...e), this.open = !1, this.layout = null, this.taps = {}, this._rooms = [], this._heatingModes = [], this._mappings = {}, this._tapTab = "single", this._dragId = "", this._picked = "", this._dropBtn = null, this._busy = !1;
 	}
@@ -5181,7 +5187,7 @@ var z = (Gi = class extends b {
 	}
 	_actionsForRoom(e) {
 		let t = (t, n, r, i, a) => ({
-			id: `${e.room_id}::${Yi(a)}`,
+			id: `${e.room_id}::${Qi(a)}`,
 			room_id: e.room_id,
 			room_name: e.name,
 			module: t,
@@ -5238,11 +5244,11 @@ var z = (Gi = class extends b {
 		return this._allActions().find((t) => t.id === e);
 	}
 	_itemForValue(e) {
-		return this._itemById(`${e.room}::${Yi(e.action)}`);
+		return this._itemById(`${e.room}::${Qi(e.action)}`);
 	}
 	_usedIds() {
 		let e = /* @__PURE__ */ new Set();
-		for (let t of Object.values(this._mappings)) for (let n of Object.values(t)) e.add(`${n.room}::${Yi(n.action)}`);
+		for (let t of Object.values(this._mappings)) for (let n of Object.values(t)) e.add(`${n.room}::${Qi(n.action)}`);
 		return e;
 	}
 	_enabledModes() {
@@ -5386,7 +5392,7 @@ var z = (Gi = class extends b {
             ${this._rooms.length === 0 ? C`<p class="hint">${y("switchMapping.no_rooms")}</p>` : this._rooms.every((e) => !this._actionsByModule(e).length) ? C`<p class="hint">${y("switchMapping.no_actions")}</p>` : this._rooms.map((e) => [e, this._actionsByModule(e)]).filter(([, e]) => e.length > 0).map(([e, t]) => C`
                         ${this._multi ? C`<p class="room-head">🏠 ${e.name}</p>` : ""}
                         ${t.map(([e, t]) => C`
-                            <p class="mod-head">${qi(e)}</p>
+                            <p class="mod-head">${Xi(e)}</p>
                             ${t.map((e) => this._actionRow(e, n))}
                           `)}
                       `)}
@@ -5397,7 +5403,7 @@ var z = (Gi = class extends b {
                     ${e.map((e) => C`<span
                         class="tab ${e === t ? "active" : ""}"
                         @click=${() => this._tapTab = e}
-                        >${Ji(e)}</span
+                        >${Zi(e)}</span
                       >`)}
                   </div>
                   ${this._canvas(t)} ${this._invisibleTray(t)}` : C`<p class="hint">${y("switchMapping.no_tap_modes")}</p>`}
@@ -5412,7 +5418,7 @@ var z = (Gi = class extends b {
       </homex-dialog>
     `;
 	}
-}, Gi.styles = [k, x`
+}, Ji.styles = [k, x`
       .cols {
         display: flex;
         gap: 20px;
@@ -5651,10 +5657,10 @@ var z = (Gi = class extends b {
         background: var(--primary-color);
         color: var(--text-primary-color, #fff);
       }
-    `], Gi);
+    `], Ji);
 e([v({ attribute: !1 })], z.prototype, "hass", void 0), e([v({ type: Boolean })], z.prototype, "open", void 0), e([v({ attribute: !1 })], z.prototype, "sw", void 0), e([v({ attribute: !1 })], z.prototype, "layout", void 0), e([v({ attribute: !1 })], z.prototype, "taps", void 0), e([s()], z.prototype, "_rooms", void 0), e([s()], z.prototype, "_heatingModes", void 0), e([s()], z.prototype, "_mappings", void 0), e([s()], z.prototype, "_tapTab", void 0), e([s()], z.prototype, "_dragId", void 0), e([s()], z.prototype, "_picked", void 0), e([s()], z.prototype, "_dropBtn", void 0), e([s()], z.prototype, "_busy", void 0), z = e([w("homex-switch-mapping")], z);
 // src/components/homex-room-card.ts
-var Xi = class extends b {
+var $i = class extends b {
 	constructor(...e) {
 		super(...e), this.expanded = !1, this._dialog = "", this._menuOpen = !1, this._shutterCtlOpen = !1, this._renameScene = null, this._deleteScenes = !0, this._deleting = !1, this._syncing = !1, this._activeTab = "", this._gswitches = [], this._presets = [], this._layouts = [], this._mappingSwitch = null, this._shutterGroupOpen = !1, this._shutterGroupEdit = null, this._close = () => this._dialog = "", this._delete = () => {
 			this._menuOpen = !1, this._deleteScenes = !0, this._dialog = "delete";
@@ -5709,7 +5715,7 @@ var Xi = class extends b {
 		return this.hass.states[this.room.switch]?.state === "on";
 	}
 	_openHa(e, t) {
-		nr(`/config/scene/edit/${e.config_id}`, t);
+		ar(`/config/scene/edit/${e.config_id}`, t);
 	}
 	async _deleteScene(e) {
 		if (confirm(y("roomCard.confirm_delete_scene", { name: e.name }))) try {
@@ -5864,12 +5870,12 @@ var Xi = class extends b {
 		});
 	}
 	_climatePills(e) {
-		let t = pr(this.hass, e), n = dr(this.hass, e), r = (e, t, n, r = "") => C`<span class="stat icon-stat ${r}" title=${n}>
+		let t = gr(this.hass, e), n = mr(this.hass, e), r = (e, t, n, r = "") => C`<span class="stat icon-stat ${r}" title=${n}>
         <svg viewBox="0 0 24 24"><path d=${e}></path></svg>${t}
       </span>`;
 		return C`
       ${t ? r(Xe, t.mode, t.own ? y("roomCard.heating_disabled_room") : y("roomCard.zone_mode", { zone: t.zone })) : ""}
-      ${e.heating?.radiators?.length ? fr(this.hass, e) ? r(Ge, y("roomCard.heating"), y("roomCard.heating_hint"), "heating") : r(Ke, y("roomCard.idle"), y("roomCard.idle_hint")) : ""}
+      ${e.heating?.radiators?.length ? hr(this.hass, e) ? r(Ge, y("roomCard.heating"), y("roomCard.heating_hint"), "heating") : r(Ke, y("roomCard.idle"), y("roomCard.idle_hint")) : ""}
       ${n ? r(Ee, y("roomCard.valve_check"), n, "warning") : ""}
     `;
 	}
@@ -5986,7 +5992,7 @@ var Xi = class extends b {
 		return n;
 	}
 	_presetFor(e) {
-		return or(this.hass, this._presets, e);
+		return lr(this.hass, this._presets, e);
 	}
 	_layoutFor(e) {
 		return e ? this._layouts.find((t) => t.id === e.layout_id) : void 0;
@@ -6053,9 +6059,9 @@ var Xi = class extends b {
 		return (e.shutter_groups ?? []).reduce((e, t) => e + (t.devices?.length ?? 0), 0);
 	}
 	_renderShutterButton(e) {
-		let t = vr(e);
+		let t = xr(e);
 		if (!t) return "";
-		let n = _r(this.hass, t.devices);
+		let n = br(this.hass, t.devices);
 		return C`<button
       class="round shutter-btn ${n.state}"
       title=${`${y("roomCard.shutters_title", {
@@ -6170,7 +6176,7 @@ var Xi = class extends b {
       </div>
     `;
 	}
-}, B = (Xi.styles = [k, x`
+}, B = ($i.styles = [k, x`
       ha-card {
         position: relative;
         padding: 16px;
@@ -6600,22 +6606,22 @@ var Xi = class extends b {
         opacity: 0.6;
         cursor: default;
       }
-    `], Xi);
+    `], $i);
 e([v({ attribute: !1 })], B.prototype, "hass", void 0), e([v({ attribute: !1 })], B.prototype, "room", void 0), e([v({ type: Boolean })], B.prototype, "expanded", void 0), e([s()], B.prototype, "_dialog", void 0), e([s()], B.prototype, "_menuOpen", void 0), e([s()], B.prototype, "_shutterCtlOpen", void 0), e([s()], B.prototype, "_renameScene", void 0), e([s()], B.prototype, "_deleteScenes", void 0), e([s()], B.prototype, "_deleting", void 0), e([s()], B.prototype, "_syncing", void 0), e([s()], B.prototype, "_activeTab", void 0), e([s()], B.prototype, "_gswitches", void 0), e([s()], B.prototype, "_presets", void 0), e([s()], B.prototype, "_layouts", void 0), e([s()], B.prototype, "_mappingSwitch", void 0), e([s()], B.prototype, "_shutterGroupOpen", void 0), e([s()], B.prototype, "_shutterGroupEdit", void 0), B = e([w("homex-room-card")], B);
 // src/components/homex-export-dialog.ts
-var Zi, Qi = (e) => "\"" + String(e).replace(/\\/g, "\\\\").replace(/"/g, "\\\"") + "\"";
-function $i(e) {
+var ea, ta = (e) => "\"" + String(e).replace(/\\/g, "\\\\").replace(/"/g, "\\\"") + "\"";
+function na(e) {
 	let t = ["google_assistant:", "  entity_config:"];
 	e.length || (t[1] = "  entity_config: {}");
-	for (let n of e) t.push(`    ${n.switch}:`), t.push(`      name: ${Qi(n.name)}`), t.push("      expose: true"), t.push(`      room: ${Qi(n.name)}`);
+	for (let n of e) t.push(`    ${n.switch}:`), t.push(`      name: ${ta(n.name)}`), t.push("      expose: true"), t.push(`      room: ${ta(n.name)}`);
 	return t.join("\n") + "\n";
 }
-var ea = (Zi = class extends b {
+var ra = (ea = class extends b {
 	constructor(...e) {
 		super(...e), this.open = !1, this.rooms = [], this._copied = !1;
 	}
 	get _yaml() {
-		return $i(this.rooms);
+		return na(this.rooms);
 	}
 	_close() {
 		this.dispatchEvent(new CustomEvent("dialog-closed"));
@@ -6660,7 +6666,7 @@ var ea = (Zi = class extends b {
       </homex-dialog>
     `;
 	}
-}, Zi.styles = [k, x`
+}, ea.styles = [k, x`
       .hint {
         font-size: 13px;
         color: var(--secondary-text-color);
@@ -6684,10 +6690,10 @@ var ea = (Zi = class extends b {
         white-space: pre;
         resize: vertical;
       }
-    `], Zi);
-e([v({ type: Boolean })], ea.prototype, "open", void 0), e([v({ attribute: !1 })], ea.prototype, "rooms", void 0), e([s()], ea.prototype, "_copied", void 0), ea = e([w("homex-export-dialog")], ea);
+    `], ea);
+e([v({ type: Boolean })], ra.prototype, "open", void 0), e([v({ attribute: !1 })], ra.prototype, "rooms", void 0), e([s()], ra.prototype, "_copied", void 0), ra = e([w("homex-export-dialog")], ra);
 // src/components/homex-layout-editor.ts
-var ta, na = 20, ra = .5, V = (ta = class extends b {
+var ia, aa = 20, oa = .5, V = (ia = class extends b {
 	constructor(...e) {
 		super(...e), this.layout = null, this._name = "", this._id = "", this._buttons = 2, this._shape = "round", this._bounds = {
 			x: 5,
@@ -6765,7 +6771,7 @@ var ta, na = 20, ra = .5, V = (ta = class extends b {
 		};
 	}
 	_snap(e) {
-		return Math.min(na, Math.max(0, Math.round(e / ra) * ra));
+		return Math.min(aa, Math.max(0, Math.round(e / oa) * oa));
 	}
 	_resetDividers() {
 		let e = this._bounds, t = Math.max(1, this._columns), n = Math.max(1, this._rows);
@@ -6837,7 +6843,7 @@ var ta, na = 20, ra = .5, V = (ta = class extends b {
 		this._name = e, this._idEdited || (this._id = M(e));
 	}
 	_svgPoint(e, t = !0) {
-		let n = this.renderRoot.querySelector("svg").getBoundingClientRect(), r = (e.clientX - n.left) / n.width * na, i = (e.clientY - n.top) / n.height * na;
+		let n = this.renderRoot.querySelector("svg").getBoundingClientRect(), r = (e.clientX - n.left) / n.width * aa, i = (e.clientY - n.top) / n.height * aa;
 		return t ? {
 			x: this._snap(r),
 			y: this._snap(i)
@@ -6855,7 +6861,7 @@ var ta, na = 20, ra = .5, V = (ta = class extends b {
 	_hitTest(e, t) {
 		let n = this.renderRoot.querySelector("svg").getBoundingClientRect();
 		if (e >= n.left && e <= n.right && t >= n.top && t <= n.bottom) {
-			let r = (e - n.left) / n.width * na, i = (t - n.top) / n.height * na;
+			let r = (e - n.left) / n.width * aa, i = (t - n.top) / n.height * aa;
 			this._hoverCell = this._cellAt(r, i), this._overTray = !1;
 			return;
 		}
@@ -7060,7 +7066,7 @@ var ta, na = 20, ra = .5, V = (ta = class extends b {
       </div>
     `;
 	}
-}, ta.styles = [k, x`
+}, ia.styles = [k, x`
       .cols {
         display: flex;
         gap: 20px;
@@ -7268,10 +7274,10 @@ var ta, na = 20, ra = .5, V = (ta = class extends b {
         opacity: 0.5;
         cursor: default;
       }
-    `], ta);
+    `], ia);
 e([v({ attribute: !1 })], V.prototype, "hass", void 0), e([v({ attribute: !1 })], V.prototype, "layout", void 0), e([s()], V.prototype, "_name", void 0), e([s()], V.prototype, "_id", void 0), e([s()], V.prototype, "_buttons", void 0), e([s()], V.prototype, "_shape", void 0), e([s()], V.prototype, "_bounds", void 0), e([s()], V.prototype, "_columns", void 0), e([s()], V.prototype, "_rows", void 0), e([s()], V.prototype, "_colLines", void 0), e([s()], V.prototype, "_rowLines", void 0), e([s()], V.prototype, "_assignments", void 0), e([s()], V.prototype, "_busy", void 0), e([s()], V.prototype, "_dragClient", void 0), e([s()], V.prototype, "_hoverCell", void 0), e([s()], V.prototype, "_overTray", void 0), V = e([w("homex-layout-editor")], V);
 // src/components/homex-preset-editor.ts
-var ia = class extends b {
+var sa = class extends b {
 	constructor(...e) {
 		super(...e), this.preset = null, this.layouts = [], this.prefillDevice = "", this._name = "", this._nameTyped = !1, this._id = "", this._deviceId = "", this._modelKey = "", this._models = [], this._devices = [], this._layoutId = "", this._taps = {}, this._bindings = {}, this._actions = [], this._actionTab = "single", this._busy = !1, this._idEdited = !1;
 	}
@@ -7301,7 +7307,7 @@ var ia = class extends b {
 	willUpdate(e) {
 		if (e.has("preset")) {
 			let e = this.preset;
-			this._name = e?.name ?? "", this._nameTyped = !!e, this._id = e?.id ?? "", this._deviceId = e?.device_id ?? this.prefillDevice ?? "", this._modelKey = e?.model ?? (this._deviceId ? rr(this.hass, this._deviceId) : ""), this._layoutId = e?.layout_id ?? "", this._taps = JSON.parse(JSON.stringify(e?.taps ?? {})), this._bindings = JSON.parse(JSON.stringify(e?.bindings ?? {})), this._actions = [], this._idEdited = !!e, this._busy = !1, !e && this._deviceId && !this._name && (this._name = ir(this.hass, this._deviceId), this._id = M(this._name)), this._ensureTaps(), this._deviceId && this._loadActions();
+			this._name = e?.name ?? "", this._nameTyped = !!e, this._id = e?.id ?? "", this._deviceId = e?.device_id ?? this.prefillDevice ?? "", this._modelKey = e?.model ?? (this._deviceId ? or(this.hass, this._deviceId) : ""), this._layoutId = e?.layout_id ?? "", this._taps = JSON.parse(JSON.stringify(e?.taps ?? {})), this._bindings = JSON.parse(JSON.stringify(e?.bindings ?? {})), this._actions = [], this._idEdited = !!e, this._busy = !1, !e && this._deviceId && !this._name && (this._name = sr(this.hass, this._deviceId), this._id = M(this._name)), this._ensureTaps(), this._deviceId && this._loadActions();
 		}
 	}
 	_selectedLayout() {
@@ -7339,7 +7345,7 @@ var ia = class extends b {
 	}
 	_enabledModes() {
 		let e = /* @__PURE__ */ new Set();
-		return Object.values(this._taps).forEach((t) => t.forEach((t) => e.add(t))), aa.TAP_MODES.map((e) => e.mode).filter((t) => e.has(t));
+		return Object.values(this._taps).forEach((t) => t.forEach((t) => e.add(t))), ca.TAP_MODES.map((e) => e.mode).filter((t) => e.has(t));
 	}
 	_buttonsFor(e) {
 		return Object.entries(this._taps).filter(([, t]) => t.includes(e)).map(([e]) => Number(e)).sort((e, t) => e - t);
@@ -7378,8 +7384,8 @@ var ia = class extends b {
 				await $t(this.hass, {
 					id: t,
 					name: e,
-					model: rr(this.hass, this._deviceId),
-					model_label: ir(this.hass, this._deviceId),
+					model: or(this.hass, this._deviceId),
+					model_label: sr(this.hass, this._deviceId),
 					device_id: this._deviceId,
 					layout_id: this._layoutId,
 					taps: this._taps,
@@ -7405,7 +7411,7 @@ var ia = class extends b {
 		if (!this._actions.length) return C`<p class="hint">${y("presetEditor.no_actions")}</p>`;
 		let e = this._enabledModes();
 		if (!e.length) return "";
-		let t = e.includes(this._actionTab) ? this._actionTab : e[0], n = (e) => aa._tapLabel(e);
+		let t = e.includes(this._actionTab) ? this._actionTab : e[0], n = (e) => ca._tapLabel(e);
 		return C`
       <div class="section">${y("presetEditor.actions_per_button")}</div>
       <p class="hint">${y("presetEditor.actions_hint")}</p>
@@ -7482,10 +7488,10 @@ var ia = class extends b {
             ${Array.from({ length: this._selectedLayout().buttons }, (e, t) => t + 1).map((e) => C`<div class="btn-row">
                 <span class="btn-lbl">${y("presetEditor.button", { n: e })}</span>
                 <div class="chips">
-                  ${aa.TAP_MODES.map((t) => C`<span
+                  ${ca.TAP_MODES.map((t) => C`<span
                       class="tap ${(this._taps[e] ?? []).includes(t.mode) ? "on" : ""}"
                       @click=${() => this._toggleTap(e, t.mode)}
-                      >${aa._tapLabel(t.mode)}</span
+                      >${ca._tapLabel(t.mode)}</span
                     >`)}
                 </div>
               </div>`)}
@@ -7503,11 +7509,11 @@ var ia = class extends b {
       </div>
     `;
 	}
-}, aa = ia, H = (ia.TAP_MODES = [
+}, ca = sa, H = (sa.TAP_MODES = [
 	{ mode: "single" },
 	{ mode: "double" },
 	{ mode: "long" }
-], ia.styles = [k, x`
+], sa.styles = [k, x`
       .hint {
         font-size: 12px;
         color: var(--secondary-text-color);
@@ -7579,10 +7585,10 @@ var ia = class extends b {
         gap: 8px;
         margin-top: 16px;
       }
-    `], ia);
-e([v({ attribute: !1 })], H.prototype, "hass", void 0), e([v({ attribute: !1 })], H.prototype, "preset", void 0), e([v({ attribute: !1 })], H.prototype, "layouts", void 0), e([v({ attribute: !1 })], H.prototype, "prefillDevice", void 0), e([s()], H.prototype, "_name", void 0), e([s()], H.prototype, "_id", void 0), e([s()], H.prototype, "_deviceId", void 0), e([s()], H.prototype, "_modelKey", void 0), e([s()], H.prototype, "_models", void 0), e([s()], H.prototype, "_devices", void 0), e([s()], H.prototype, "_layoutId", void 0), e([s()], H.prototype, "_taps", void 0), e([s()], H.prototype, "_bindings", void 0), e([s()], H.prototype, "_actions", void 0), e([s()], H.prototype, "_actionTab", void 0), e([s()], H.prototype, "_busy", void 0), H = aa = e([w("homex-preset-editor")], H);
+    `], sa);
+e([v({ attribute: !1 })], H.prototype, "hass", void 0), e([v({ attribute: !1 })], H.prototype, "preset", void 0), e([v({ attribute: !1 })], H.prototype, "layouts", void 0), e([v({ attribute: !1 })], H.prototype, "prefillDevice", void 0), e([s()], H.prototype, "_name", void 0), e([s()], H.prototype, "_id", void 0), e([s()], H.prototype, "_deviceId", void 0), e([s()], H.prototype, "_modelKey", void 0), e([s()], H.prototype, "_models", void 0), e([s()], H.prototype, "_devices", void 0), e([s()], H.prototype, "_layoutId", void 0), e([s()], H.prototype, "_taps", void 0), e([s()], H.prototype, "_bindings", void 0), e([s()], H.prototype, "_actions", void 0), e([s()], H.prototype, "_actionTab", void 0), e([s()], H.prototype, "_busy", void 0), H = ca = e([w("homex-preset-editor")], H);
 // src/components/homex-gswitch-editor.ts
-var oa = class extends b {
+var la = class extends b {
 	constructor(...e) {
 		super(...e), this.sw = null, this.presets = [], this.initialRooms = [], this.draft = null, this._name = "", this._id = "", this._deviceId = "", this._presetId = "", this._devices = [], this._rooms = [], this._allRooms = [], this._busy = !1, this._idEdited = !1, this._closeRoomsOutside = (e) => {
 			let t = this._roomsDropdown();
@@ -7630,10 +7636,10 @@ var oa = class extends b {
 		}
 	}
 	_modelPresets() {
-		return this._deviceId ? ar(this.hass, this.presets, this._deviceId) : [];
+		return this._deviceId ? cr(this.hass, this.presets, this._deviceId) : [];
 	}
 	_preset() {
-		if (this._deviceId) return or(this.hass, this.presets, {
+		if (this._deviceId) return lr(this.hass, this.presets, {
 			device_id: this._deviceId,
 			preset_id: this._presetId
 		});
@@ -7695,7 +7701,7 @@ var oa = class extends b {
 		}
 	}
 	_renderPreset(e) {
-		let t = this._modelPresets(), n = ir(this.hass, this._deviceId);
+		let t = this._modelPresets(), n = sr(this.hass, this._deviceId);
 		if (!t.length) {
 			let [e, t] = y("gswitchEditor.no_preset_for_model").split("{model}");
 			return C`<div class="preset-box">
@@ -7742,7 +7748,7 @@ var oa = class extends b {
     </details>`;
 	}
 	render() {
-		let e = !!this.sw, t = this._preset(), n = this._allRooms.filter((e) => this._rooms.includes(e.room_id) && e.area_id).map((e) => e.area_id), { inArea: r, others: i } = Pi(this._devices, (e) => Ni(this.hass, e.device_id), n), a = (e) => ({
+		let e = !!this.sw, t = this._preset(), n = this._allRooms.filter((e) => this._rooms.includes(e.room_id) && e.area_id).map((e) => e.area_id), { inArea: r, others: i } = Li(this._devices, (e) => Ii(this.hass, e.device_id), n), a = (e) => ({
 			value: e.device_id,
 			label: e.name,
 			secondary: e.model_label
@@ -7757,7 +7763,7 @@ var oa = class extends b {
             .value=${this._deviceId}
             .options=${n.length ? [] : this._devices.map(a)}
             .groups=${n.length ? [...r.length ? [{
-			label: y("gswitchEditor.area", { names: Fi(this.hass, n) }),
+			label: y("gswitchEditor.area", { names: Ri(this.hass, n) }),
 			options: r.map(a)
 		}] : [], {
 			label: y("gswitchEditor.others"),
@@ -7782,7 +7788,7 @@ var oa = class extends b {
       </div>
     `;
 	}
-}, U = (oa.styles = [k, x`
+}, U = (la.styles = [k, x`
       details.multi {
         position: relative;
         margin: 6px 0;
@@ -7870,14 +7876,14 @@ var oa = class extends b {
         gap: 8px;
         margin-top: 16px;
       }
-    `], oa);
+    `], la);
 e([v({ attribute: !1 })], U.prototype, "hass", void 0), e([v({ attribute: !1 })], U.prototype, "sw", void 0), e([v({ attribute: !1 })], U.prototype, "presets", void 0), e([v({ attribute: !1 })], U.prototype, "initialRooms", void 0), e([v({ attribute: !1 })], U.prototype, "draft", void 0), e([s()], U.prototype, "_name", void 0), e([s()], U.prototype, "_id", void 0), e([s()], U.prototype, "_deviceId", void 0), e([s()], U.prototype, "_presetId", void 0), e([s()], U.prototype, "_devices", void 0), e([s()], U.prototype, "_rooms", void 0), e([s()], U.prototype, "_allRooms", void 0), e([s()], U.prototype, "_busy", void 0), U = e([w("homex-gswitch-editor")], U);
 // src/components/homex-switch-manager.ts
-var sa, ca = [
+var ua, da = [
 	"switches",
 	"presets",
 	"layouts"
-], W = (sa = class extends b {
+], W = (ua = class extends b {
 	constructor(...e) {
 		super(...e), this.base = "", this.subpath = "", this._addRooms = [], this._layouts = [], this._presets = [], this._gswitches = [], this._loaded = !1, this._prefillDevice = "", this._switchFlowFrom = null, this._switchDraft = null;
 	}
@@ -7885,9 +7891,9 @@ var sa, ca = [
 		super.connectedCallback(), this._load();
 	}
 	get _route() {
-		let [e, t, n] = er(this.subpath);
+		let [e, t, n] = rr(this.subpath);
 		return {
-			section: ca.includes(e) ? e : "switches",
+			section: da.includes(e) ? e : "switches",
 			editing: t === "new" || t === "edit" && !!n,
 			id: t === "edit" ? n : void 0
 		};
@@ -7926,7 +7932,7 @@ var sa, ca = [
 		this.dispatchEvent(new CustomEvent("close"));
 	}
 	_onLayoutClosed() {
-		this._load(), tr(this._url("layouts"));
+		this._load(), ir(this._url("layouts"));
 	}
 	_onPresetClosed(e) {
 		this._prefillDevice = "", this._load();
@@ -7936,11 +7942,11 @@ var sa, ca = [
 			n && this._switchDraft && (this._switchDraft = {
 				...this._switchDraft,
 				preset_id: n
-			}), this._switchFlowFrom = null, tr(t);
-		} else tr(this._url("presets"));
+			}), this._switchFlowFrom = null, ir(t);
+		} else ir(this._url("presets"));
 	}
 	_onSwitchClosed() {
-		this._switchDraft = null, this._load(), tr(this._url("switches"));
+		this._switchDraft = null, this._load(), ir(this._url("switches"));
 	}
 	_onCreatePreset(e) {
 		this._switchDraft = e.detail.draft ?? null, this._prefillDevice = e.detail.device_id || "", this._switchFlowFrom = location.pathname, this._openEditor("presets");
@@ -8089,7 +8095,7 @@ var sa, ca = [
 	_renderSwitches() {
 		return this._gswitches.length ? C`<div class="grid">
       ${this._gswitches.map((e) => {
-			let t = or(this.hass, this._presets, e), n = t ? this._layouts.find((e) => e.id === t.layout_id) : void 0;
+			let t = lr(this.hass, this._presets, e), n = t ? this._layouts.find((e) => e.id === t.layout_id) : void 0;
 			return C`<div
           class="card"
           @click=${() => this._openEditor("switches", e.id)}
@@ -8106,7 +8112,7 @@ var sa, ca = [
 		})}
     </div>` : C`<div class="msg">${y("switchManager.no_switches")}</div>`;
 	}
-}, sa.styles = [k, x`
+}, ua.styles = [k, x`
       .head {
         display: flex;
         align-items: center;
@@ -8222,10 +8228,10 @@ var sa, ca = [
         border-radius: 12px;
         padding: 16px;
       }
-    `], sa);
+    `], ua);
 e([v({ attribute: !1 })], W.prototype, "hass", void 0), e([v({ attribute: !1 })], W.prototype, "base", void 0), e([v({ attribute: !1 })], W.prototype, "subpath", void 0), e([s()], W.prototype, "_addRooms", void 0), e([s()], W.prototype, "_layouts", void 0), e([s()], W.prototype, "_presets", void 0), e([s()], W.prototype, "_gswitches", void 0), e([s()], W.prototype, "_loaded", void 0), e([s()], W.prototype, "_prefillDevice", void 0), e([s()], W.prototype, "_switchDraft", void 0), W = e([w("homex-switch-manager")], W);
 // src/components/homex-shutter-preset-editor.ts
-var la = class extends b {
+var fa = class extends b {
 	constructor(...e) {
 		super(...e), this.preset = null, this._name = "", this._nameTyped = !1, this._id = "", this._models = [], this._modelKey = "", this._deviceId = "", this._smart = !1, this._up = { ...G.EMPTY }, this._down = { ...G.EMPTY }, this._stopped = { ...G.EMPTY }, this._z2m = null, this._busy = !1, this._idEdited = !1;
 	}
@@ -8545,13 +8551,13 @@ var la = class extends b {
       </div>
     `;
 	}
-}, G = la, K = (la.EMPTY = {
+}, G = fa, K = (fa.EMPTY = {
 	source: "entity",
 	domain: "",
 	suffix: "",
 	field: "",
 	state: ""
-}, la.styles = [k, x`
+}, fa.styles = [k, x`
       .hint {
         font-size: 12px;
         color: var(--secondary-text-color);
@@ -8672,10 +8678,10 @@ var la = class extends b {
         gap: 8px;
         margin-top: 16px;
       }
-    `], la);
+    `], fa);
 e([v({ attribute: !1 })], K.prototype, "hass", void 0), e([v({ attribute: !1 })], K.prototype, "preset", void 0), e([s()], K.prototype, "_name", void 0), e([s()], K.prototype, "_id", void 0), e([s()], K.prototype, "_models", void 0), e([s()], K.prototype, "_modelKey", void 0), e([s()], K.prototype, "_deviceId", void 0), e([s()], K.prototype, "_smart", void 0), e([s()], K.prototype, "_up", void 0), e([s()], K.prototype, "_down", void 0), e([s()], K.prototype, "_stopped", void 0), e([s()], K.prototype, "_z2m", void 0), e([s()], K.prototype, "_busy", void 0), K = G = e([w("homex-shutter-preset-editor")], K);
 // src/components/homex-shutter-manager.ts
-var ua = class extends b {
+var pa = class extends b {
 	constructor(...e) {
 		super(...e), this._presets = [], this._loaded = !1, this.base = "", this.subpath = "";
 	}
@@ -8694,13 +8700,13 @@ var ua = class extends b {
 		this.dispatchEvent(new CustomEvent("close"));
 	}
 	_onClosed() {
-		this._load(), tr(this.base);
+		this._load(), ir(this.base);
 	}
 	_openEditor(e) {
 		O(D(this.base, ...e ? ["edit", e] : ["new"]));
 	}
 	render() {
-		let [e, t] = er(this.subpath);
+		let [e, t] = rr(this.subpath);
 		if (e === "new" || e === "edit" && t) {
 			let e = t ? this._presets.find((e) => e.id === t) : null;
 			return t && !e ? C`
@@ -8752,7 +8758,7 @@ var ua = class extends b {
             </div>` : C`<div class="msg">${y("shutterManager.no_presets")}</div>` : C`<div class="msg">${y("common.loading")}</div>`}
     `;
 	}
-}, da = (ua.styles = [k, x`
+}, ma = (pa.styles = [k, x`
       .head {
         display: flex;
         align-items: center;
@@ -8823,10 +8829,10 @@ var ua = class extends b {
         border-radius: 12px;
         padding: 16px;
       }
-    `], ua);
-e([v({ attribute: !1 })], da.prototype, "hass", void 0), e([s()], da.prototype, "_presets", void 0), e([s()], da.prototype, "_loaded", void 0), e([v({ attribute: !1 })], da.prototype, "base", void 0), e([v({ attribute: !1 })], da.prototype, "subpath", void 0), da = e([w("homex-shutter-manager")], da);
+    `], pa);
+e([v({ attribute: !1 })], ma.prototype, "hass", void 0), e([s()], ma.prototype, "_presets", void 0), e([s()], ma.prototype, "_loaded", void 0), e([v({ attribute: !1 })], ma.prototype, "base", void 0), e([v({ attribute: !1 })], ma.prototype, "subpath", void 0), ma = e([w("homex-shutter-manager")], ma);
 // src/components/homex-builder-level-dialog.ts
-var fa = class extends b {
+var ha = class extends b {
 	constructor(...e) {
 		super(...e), this.open = !1, this.level = null, this.floors = [], this.usedFloors = [], this.usedLevels = [], this.suggestedLevel = 0, this._floorId = "", this._level = 0;
 	}
@@ -8897,7 +8903,7 @@ var fa = class extends b {
       </button>
     </homex-dialog>`;
 	}
-}, pa = (fa.styles = [k, x`
+}, ga = (ha.styles = [k, x`
       .field {
         display: flex;
         flex-direction: column;
@@ -8932,16 +8938,16 @@ var fa = class extends b {
         color: var(--error-color, #db4437);
         margin-right: auto;
       }
-    `], fa);
-e([v({ type: Boolean })], pa.prototype, "open", void 0), e([v({ attribute: !1 })], pa.prototype, "level", void 0), e([v({ attribute: !1 })], pa.prototype, "floors", void 0), e([v({ attribute: !1 })], pa.prototype, "usedFloors", void 0), e([v({ attribute: !1 })], pa.prototype, "usedLevels", void 0), e([v({ type: Number })], pa.prototype, "suggestedLevel", void 0), e([s()], pa.prototype, "_floorId", void 0), e([s()], pa.prototype, "_level", void 0), pa = e([w("homex-builder-level-dialog")], pa);
+    `], ha);
+e([v({ type: Boolean })], ga.prototype, "open", void 0), e([v({ attribute: !1 })], ga.prototype, "level", void 0), e([v({ attribute: !1 })], ga.prototype, "floors", void 0), e([v({ attribute: !1 })], ga.prototype, "usedFloors", void 0), e([v({ attribute: !1 })], ga.prototype, "usedLevels", void 0), e([v({ type: Number })], ga.prototype, "suggestedLevel", void 0), e([s()], ga.prototype, "_floorId", void 0), e([s()], ga.prototype, "_level", void 0), ga = e([w("homex-builder-level-dialog")], ga);
 // src/components/homex-builder.ts
-var ma, ha = [
+var _a, va = [
 	"door",
 	"sliding_door",
 	"window",
 	"glass_door",
 	"opening"
-], ga = (e) => e === "door" || e === "sliding_door", _a = (e) => ha.includes(e), va = "homex-house", ya = [
+], ya = (e) => e === "door" || e === "sliding_door", ba = (e) => va.includes(e), xa = "homex-house", Sa = [
 	[
 		"door",
 		"🚪",
@@ -8972,37 +8978,37 @@ var ma, ha = [
 		"🪜",
 		"S"
 	]
-], ba = 12, xa = {
+], Ca = 12, wa = {
 	up: "↑",
 	down: "↓",
 	left: "←",
 	right: "→"
-}, Sa = 24, Ca = 40, wa = [
+}, Ta = 24, Ea = 40, Da = [
 	"window",
 	"glass_door",
 	"sliding_door"
-], Ta = .05, Ea = 4, Da = 60, Oa = [
+], Oa = .05, ka = 4, Aa = 60, ja = [
 	"#f4f4f4",
 	"#9e9e9e",
 	"#3c4045",
 	"#1d1d1d",
 	"#b8864e",
 	"#6b4423"
-], ka = [
+], Ma = [
 	"#d9b98a",
 	"#b8864e",
 	"#6b4423",
 	"#f4f4f4",
 	"#9e9e9e",
 	"#1d1d1d"
-], Aa = [
+], Na = [
 	"#f4f4f4",
 	"#1d1d1d",
 	"#c9a227",
 	"#b87333",
 	"#b8864e",
 	"#9e9e9e"
-], q = (ma = class extends b {
+], q = (_a = class extends b {
 	constructor(...e) {
 		super(...e), this.base = "/homex/builder", this.subpath = "", this._plan = null, this._rooms = [], this._error = "", this._levelId = null, this._dialog = null, this._tool = "select", this._selected = null, this._draft = [], this._hover = null, this._rect = null, this._view = {
 			tx: 0,
@@ -9074,8 +9080,8 @@ var ma, ha = [
 				n && n[0] === e.p[0] && n[1] === e.p[1] || (this._draft = [...this._draft, e.p]);
 				return;
 			}
-			if (_a(this._tool)) {
-				let e = this._tool, t = this._openingOpts[e], n = be(this._level, r, Sa / this._view.k, t.width);
+			if (ba(this._tool)) {
+				let e = this._tool, t = this._openingOpts[e], n = be(this._level, r, Ta / this._view.k, t.width);
 				if (!n) return;
 				let i = {
 					id: de("o"),
@@ -9084,7 +9090,7 @@ var ma, ha = [
 					edge: n.edge,
 					t: n.t,
 					width: t.width,
-					...ga(e) ? {
+					...ya(e) ? {
 						flip: t.flip,
 						out: t.out
 					} : {},
@@ -9221,8 +9227,8 @@ var ma, ha = [
 					n.l.lines[n.index] = [[n.orig[0][0] + t, n.orig[0][1] + r], [n.orig[1][0] + t, n.orig[1][1] + r]], this.requestUpdate();
 				}
 			} else if (!n) {
-				if (_a(this._tool)) {
-					this._hover = null, this._wallHover = be(this._level, t, Sa / this._view.k, this._openingOpts[this._tool].width);
+				if (ba(this._tool)) {
+					this._hover = null, this._wallHover = be(this._level, t, Ta / this._view.k, this._openingOpts[this._tool].width);
 					return;
 				}
 				this._hover = this._tool === "select" ? null : this._snap(t);
@@ -9234,7 +9240,7 @@ var ma, ha = [
 					t: e.t
 				}), this.requestUpdate();
 			} else if (n.mode === "radiator") {
-				let e = this._alt ? null : te(this._level, t, Ca / this._view.k, n.r.length);
+				let e = this._alt ? null : te(this._level, t, Ea / this._view.k, n.r.length);
 				e ? Object.assign(n.r, e) : Object.assign(n.r, {
 					x: i(t[0], 5),
 					y: i(t[1], 5)
@@ -9481,7 +9487,7 @@ var ma, ha = [
 		return !!e && !!this._level && e.level > this._level.level;
 	}
 	_snapshot() {
-		this._plan && (this._undo.push(JSON.stringify(this._plan)), this._undo.length > Da && this._undo.shift(), this._redo = []);
+		this._plan && (this._undo.push(JSON.stringify(this._plan)), this._undo.length > Aa && this._undo.shift(), this._redo = []);
 	}
 	_commit(e) {
 		this._plan && (this._snapshot(), e(this._plan), this._changed());
@@ -9589,7 +9595,7 @@ var ma, ha = [
 			vertices: t,
 			edges: n,
 			anchors: r,
-			tolerance: ba / this._view.k
+			tolerance: Ca / this._view.k
 		};
 	}
 	_snap(e, t) {
@@ -9608,7 +9614,7 @@ var ma, ha = [
 			};
 			return;
 		}
-		let i = Math.max(Ta, Math.min(Ea, Math.min((n - 120) / Math.max(t.maxX - t.minX, 200), (r - 120) / Math.max(t.maxY - t.minY, 200))));
+		let i = Math.max(Oa, Math.min(ka, Math.min((n - 120) / Math.max(t.maxX - t.minX, 200), (r - 120) / Math.max(t.maxY - t.minY, 200))));
 		this._view = {
 			k: i,
 			tx: n / 2 - (t.minX + t.maxX) / 2 * i,
@@ -9616,7 +9622,7 @@ var ma, ha = [
 		};
 	}
 	_zoom(e, t = this._size.w / 2, n = this._size.h / 2) {
-		let { tx: r, ty: i, k: a } = this._view, o = Math.max(Ta, Math.min(Ea, a * e));
+		let { tx: r, ty: i, k: a } = this._view, o = Math.max(Oa, Math.min(ka, a * e));
 		this._view = {
 			k: o,
 			tx: t - (t - r) * o / a,
@@ -9725,7 +9731,7 @@ var ma, ha = [
 		if (!n) return;
 		let r, i = t;
 		for (let t of n.openings ?? []) {
-			if (!wa.includes(t.type)) continue;
+			if (!Da.includes(t.type)) continue;
 			let a = ae(n, t);
 			if (!a) continue;
 			let o = ee(e, a.a, a.b), s = Math.hypot(e[0] - o[0], e[1] - o[1]);
@@ -9743,7 +9749,7 @@ var ma, ha = [
 		}
 	}
 	_setMode(e) {
-		e === "render" && import("./homex-homex-builder-render-C3nMqPJJ.js"), this._placing && this._stopPlacing(), this._armed = null, this._pub = null, this._setTool("select"), this._mode = e, this._selected = null;
+		e === "render" && import("./homex-homex-builder-render-tjrLzQkc.js"), this._placing && this._stopPlacing(), this._armed = null, this._pub = null, this._setTool("select"), this._mode = e, this._selected = null;
 	}
 	_levelRooms() {
 		let e = new Set((this._level?.rooms ?? []).map((e) => e.room_id).filter(Boolean));
@@ -9872,9 +9878,9 @@ var ma, ha = [
 			p: [Math.round(e[0]), Math.round(e[1])],
 			kind: "free"
 		};
-		let o = ba / this._view.k;
+		let o = Ca / this._view.k;
 		if (t === "wall") {
-			let t = null, n = Sa * 1.5 / this._view.k;
+			let t = null, n = Ta * 1.5 / this._view.k;
 			for (let r of a.rooms) for (let [a, o] of _(r.points)) {
 				let r = ee(e, a, o), s = Math.hypot(e[0] - r[0], e[1] - r[1]);
 				s <= n && (n = s, t = {
@@ -9985,7 +9991,7 @@ var ma, ha = [
         </g>
         <g class="openings">
           ${(e.openings ?? []).map((t) => this._opening(e, t))}
-          ${this._wallHover && _a(this._tool) ? this._opening(e, {
+          ${this._wallHover && ba(this._tool) ? this._opening(e, {
 			id: "preview",
 			type: this._tool,
 			shape: this._wallHover.shape,
@@ -10040,7 +10046,7 @@ var ma, ha = [
 	_opening(e, t, n = !1) {
 		let r = ae(e, t);
 		if (!r) return o;
-		let { a: i, b: a, c: s, n: c, u: l } = r, u = t.id === this._selected, d = this._mode === "fixtures", f = wa.includes(t.type), p = `op ${t.type} ${u ? "selected" : ""} ${n ? "preview" : ""} ${d && f && !t.cover ? "needs-cover" : ""} ${t.id === this._dropTarget ? "drop" : ""} ${d && !f ? "locked" : ""}`, m = (e, t) => [e[0] + c[0] * t, e[1] + c[1] * t], h = (e, t) => [e[0] + l[0] * t, e[1] + l[1] * t], g = (e, t, n = "") => S`<line class=${n} x1=${e[0]} y1=${e[1]} x2=${t[0]} y2=${t[1]}></line>`, _ = (e, t, n = "") => S`<polygon class=${t} style=${n} points=${e.map((e) => e.join(",")).join(" ")}></polygon>`, ee = (e, t, n) => {
+		let { a: i, b: a, c: s, n: c, u: l } = r, u = t.id === this._selected, d = this._mode === "fixtures", f = Da.includes(t.type), p = `op ${t.type} ${u ? "selected" : ""} ${n ? "preview" : ""} ${d && f && !t.cover ? "needs-cover" : ""} ${t.id === this._dropTarget ? "drop" : ""} ${d && !f ? "locked" : ""}`, m = (e, t) => [e[0] + c[0] * t, e[1] + c[1] * t], h = (e, t) => [e[0] + l[0] * t, e[1] + l[1] * t], g = (e, t, n = "") => S`<line class=${n} x1=${e[0]} y1=${e[1]} x2=${t[0]} y2=${t[1]}></line>`, _ = (e, t, n = "") => S`<polygon class=${t} style=${n} points=${e.map((e) => e.join(",")).join(" ")}></polygon>`, ee = (e, t, n) => {
 			let r = Math.hypot(t[0] - e[0], t[1] - e[1]), i = (t[0] - e[0]) * (n[1] - e[1]) - (t[1] - e[1]) * (n[0] - e[0]);
 			return S`<path class="swing" d="M ${t[0]} ${t[1]} A ${r} ${r} 0 0 ${+(i > 0)} ${n[0]} ${n[1]}"></path>`;
 		}, v = oe(t), y = Math.hypot(a[0] - i[0], a[1] - i[1]), b;
@@ -10265,7 +10271,7 @@ var ma, ha = [
 		if (this._tool === "draw") return this._draft.length >= 3 ? y("builder.hint_draw_close") : y("builder.hint_draw");
 		if (this._tool === "rect") return y("builder.hint_rect");
 		if (this._tool === "stairs") return y("builder.hint_stairs");
-		if (_a(this._tool)) return this._level?.rooms.length ? y("builder.hint_opening") : y("builder.hint_opening_no_wall");
+		if (ba(this._tool)) return this._level?.rooms.length ? y("builder.hint_opening") : y("builder.hint_opening_no_wall");
 		let e = this._selItem();
 		return e?.kind === "opening" ? y("builder.hint_opening_selected") : e?.kind === "stair" ? y("builder.hint_stair_selected") : e ? y("builder.hint_selected") : this._level?.rooms.length ? y("builder.hint_select") : y("builder.hint_empty");
 	}
@@ -10303,7 +10309,7 @@ var ma, ha = [
       <h3>${y("builder.objects")}</h3>
       <p class="hint">${y("builder.objects_hint")}</p>
       <div class="objects">
-        ${ya.map(([e, t, n]) => C`<button class="obj ${this._tool === e ? "active" : ""}" title="${y(`builder.tool_${e}`)} (${n})" @click=${() => this._setTool(e)}>
+        ${Sa.map(([e, t, n]) => C`<button class="obj ${this._tool === e ? "active" : ""}" title="${y(`builder.tool_${e}`)} (${n})" @click=${() => this._setTool(e)}>
             <span class="obj-icon">${t}</span>
             <span class="obj-name">${y(`builder.tool_${e}`)}</span>
             <kbd>${n}</kbd>
@@ -10394,7 +10400,7 @@ var ma, ha = [
 				item: e.item
 			} : null;
 		}
-		if (_a(this._tool)) return {
+		if (ba(this._tool)) return {
 			kind: "tool-opening",
 			type: this._tool
 		};
@@ -10417,7 +10423,7 @@ var ma, ha = [
 		switch (t.kind) {
 			case "tool-opening": {
 				let e = { ...this._openingOpts[t.type] };
-				n ? e.width = Math.max(30, e.width + n) : ga(t.type) && r(e), this._openingOpts = {
+				n ? e.width = Math.max(30, e.width + n) : ya(t.type) && r(e), this._openingOpts = {
 					...this._openingOpts,
 					[t.type]: e
 				};
@@ -10428,7 +10434,7 @@ var ma, ha = [
 				break;
 			case "opening": {
 				let e = t.item;
-				n ? this._commit(() => e.width = Math.max(30, e.width + n)) : ga(e.type) && this._commit(() => r(e));
+				n ? this._commit(() => e.width = Math.max(30, e.width + n)) : ya(e.type) && this._commit(() => r(e));
 				break;
 			}
 			case "radiator": {
@@ -10470,7 +10476,7 @@ var ma, ha = [
 			type: e,
 			style: t.style
 		}), `style_${e}`, (e) => n({ style: e }))}
-      ${e === "opening" ? o : this._colorControl(t.color, Oa, (e) => n({ color: e }))}`;
+      ${e === "opening" ? o : this._colorControl(t.color, ja, (e) => n({ color: e }))}`;
 	}
 	_fitWall(e) {
 		let t = this._level.rooms.find((t) => t.id === e.shape);
@@ -10487,7 +10493,7 @@ var ma, ha = [
 			turn: n === "straight" ? void 0 : e.turn ?? "right"
 		}))}
       ${n === "straight" ? o : this._choice(y("builder.stairs_side"), ["left", "right"], e.turn ?? "right", "stairs_side", (e) => t({ turn: e }))}
-      ${this._colorControl(e.color, ka, (e) => t({ color: e }))}`;
+      ${this._colorControl(e.color, Ma, (e) => t({ color: e }))}`;
 	}
 	_widthControl(e, t) {
 		return C`<div class="field">
@@ -10527,7 +10533,7 @@ var ma, ha = [
 					width: n
 				}
 			})}
-        ${ga(e.type) ? this._orientButtons(!1) : o}
+        ${ya(e.type) ? this._orientButtons(!1) : o}
         ${this._openingStyleControls(e.type, t, (t) => {
 				let n = {
 					...this._openingOpts[e.type],
@@ -10538,13 +10544,13 @@ var ma, ha = [
 					[e.type]: n
 				};
 			})}
-        <p class="keys">${ga(e.type) ? y("builder.keys_door") : y("builder.keys_width")}</p>
+        <p class="keys">${ya(e.type) ? y("builder.keys_door") : y("builder.keys_width")}</p>
       </div>`;
 		}
 		return e?.kind === "tool-stairs" ? C`<div class="selection">
         <div class="sel-head"><strong>${y("builder.tool_stairs")}</strong>${this._toolClose()}</div>
         ${this._goesControl(this._stairGoes)}
-        <p class="stats">${y("builder.stairs_climb")} <strong class="dir">${xa[this._stairDir]}</strong></p>
+        <p class="stats">${y("builder.stairs_climb")} <strong class="dir">${wa[this._stairDir]}</strong></p>
         ${this._orientButtons(!0)}
         ${this._stairStyleControls(this._stairStyle, (e) => {
 			this._stairStyle = {
@@ -10557,7 +10563,7 @@ var ma, ha = [
       </div>` : o;
 	}
 	_fixturesPanel() {
-		let e = this._levelRooms(), t = this._placedCovers(), n = this._placedRadiators(), r = this._selItem(), i = r?.kind === "opening" && wa.includes(r.item.type) ? r.item : null, a = e.map((e) => ({
+		let e = this._levelRooms(), t = this._placedCovers(), n = this._placedRadiators(), r = this._selItem(), i = r?.kind === "opening" && Da.includes(r.item.type) ? r.item : null, a = e.map((e) => ({
 			room: e,
 			items: this._roomCovers(e).filter((e) => !t.has(e))
 		})).filter((e) => e.items.length), s = e.map((e) => ({
@@ -10621,7 +10627,7 @@ var ma, ha = [
     </aside>`;
 	}
 	_coverPanel(e) {
-		if (!wa.includes(e.type)) return o;
+		if (!Da.includes(e.type)) return o;
 		let t = this._placedCovers(), n = this._levelRooms().flatMap((e) => this._roomCovers(e)).filter((n) => n === e.cover || !t.has(n)), r = e.cover ? this.hass.states[e.cover] : void 0;
 		return C`<div class="selection">
       ${this._panelHead(y(`builder.tool_${e.type}`))}
@@ -10637,7 +10643,7 @@ var ma, ha = [
             <strong>${r.attributes.current_position === void 0 ? r.state : `${r.attributes.current_position} %`}</strong>
           </p>` : o}
       ${e.cover ? C`${this._choice(y("builder.shutter_type"), ["roller", "hinged"], e.cover_type ?? "roller", "shutter_type", (t) => this._setStyle(e, { cover_type: t === "roller" ? void 0 : t }))}
-            ${this._colorControl(e.cover_color, Oa, (t) => this._setStyle(e, { cover_color: t }))}` : o}
+            ${this._colorControl(e.cover_color, ja, (t) => this._setStyle(e, { cover_color: t }))}` : o}
     </div>`;
 	}
 	_lightPanel(e) {
@@ -10653,7 +10659,7 @@ var ma, ha = [
       ${this._choice(y("builder.light_type"), ye[e.mount], r, "light_type", (e) => this._setLightOpt("type", e))}
       ${r === "led_strip" ? o : this._choice(y("builder.light_shape"), ["round", "square"], e.shape ?? "round", "light_shape", (t) => this._setStyle(e, { shape: t === "round" ? void 0 : t }))}
       ${he.includes(r) ? this._choice(y("builder.light_shade"), ["no", "yes"], e.shade ? "yes" : "no", "light_shade", (t) => this._setStyle(e, { shade: t === "yes" })) : o}
-      ${this._colorControl(e.color, Aa, (t) => this._setStyle(e, { color: t }), y("builder.light_color"))}
+      ${this._colorControl(e.color, Na, (t) => this._setStyle(e, { color: t }), y("builder.light_color"))}
       <p class="stats">
         ${y(e.kind === "point" ? "builder.light_points" : "builder.light_lines", { count: i })}
       </p>
@@ -10733,12 +10739,12 @@ var ma, ha = [
       ${this._panelHead(y(`builder.tool_${e.type}`))}
       ${this._widthControl(e.width, (t) => this._commit(() => e.width = t))}
       ${e.type === "opening" ? C`<div class="row"><button @click=${() => this._fitWall(e)}>↔ ${y("builder.opening_whole_wall")}</button></div>` : o}
-      ${ga(e.type) ? this._orientButtons(!1) : o}
+      ${ya(e.type) ? this._orientButtons(!1) : o}
       ${this._openingStyleControls(e.type, e, (t) => this._setStyle(e, {
 			...t,
 			...t.style === _e[e.type][0] ? { style: void 0 } : {}
 		}))}
-      <p class="keys">${ga(e.type) ? y("builder.keys_door") : y("builder.keys_width")}</p>
+      <p class="keys">${ya(e.type) ? y("builder.keys_door") : y("builder.keys_width")}</p>
       <button class="danger-link" @click=${() => this._deleteSelected()}>${y("builder.item_delete")}</button>
     </div>`;
 	}
@@ -10748,7 +10754,7 @@ var ma, ha = [
       ${this._goesControl(e.goes ?? "up")}
       ${this._cmInput(y("builder.width_cm"), e.w, (t) => e.w = t, 40)}
       ${this._cmInput(y("builder.length_cm"), e.h, (t) => e.h = t, 40)}
-      <p class="stats">${y("builder.stairs_climb")} <strong class="dir">${xa[e.dir]}</strong></p>
+      <p class="stats">${y("builder.stairs_climb")} <strong class="dir">${wa[e.dir]}</strong></p>
       ${this._orientButtons(!0)}
       ${this._stairStyleControls(e, (t) => this._setStyle(e, {
 			...t,
@@ -10855,7 +10861,7 @@ var ma, ha = [
 				title: this._pubTitle()
 			};
 			try {
-				let e = (await this.hass.callWS({ type: "lovelace/dashboards/list" })).find((e) => e.url_path === va);
+				let e = (await this.hass.callWS({ type: "lovelace/dashboards/list" })).find((e) => e.url_path === xa);
 				this._pub = {
 					busy: !1,
 					exists: !!e,
@@ -10887,7 +10893,7 @@ var ma, ha = [
 		try {
 			e.exists ? await this._renameDashboard(t) : await this.hass.callWS({
 				type: "lovelace/dashboards/create",
-				url_path: va,
+				url_path: xa,
 				title: t,
 				icon: "mdi:home-modern",
 				show_in_sidebar: !0,
@@ -10895,7 +10901,7 @@ var ma, ha = [
 				mode: "storage"
 			}), await this.hass.callWS({
 				type: "lovelace/config/save",
-				url_path: va,
+				url_path: xa,
 				config: {
 					title: t,
 					views: [{
@@ -10925,7 +10931,7 @@ var ma, ha = [
 		}
 	}
 	async _renameDashboard(e) {
-		let t = (await this.hass.callWS({ type: "lovelace/dashboards/list" })).find((e) => e.url_path === va);
+		let t = (await this.hass.callWS({ type: "lovelace/dashboards/list" })).find((e) => e.url_path === xa);
 		t && await this.hass.callWS({
 			type: "lovelace/dashboards/update",
 			dashboard_id: t.id,
@@ -10957,7 +10963,7 @@ var ma, ha = [
           <button class="primary" ?disabled=${t.busy} @click=${() => this._createDashboard()}>
             ${t.exists ? y("builder.pub_dashboard_update") : y("builder.pub_dashboard_create")}
           </button>
-          ${t.exists ? C`<button @click=${() => O(`/${va}/house`)}>↗ ${y("builder.pub_dashboard_open")}</button>` : o}
+          ${t.exists ? C`<button @click=${() => O(`/${xa}/house`)}>↗ ${y("builder.pub_dashboard_open")}</button>` : o}
         </div>
         ${t.done ? C`<p class="ok">✓ ${y("builder.pub_dashboard_done")}</p>` : o}
         ${t.error ? C`<p class="err">${t.error}</p>` : o}
@@ -10970,7 +10976,7 @@ var ma, ha = [
 	_setPublished(e) {
 		this._plan && (this._plan.published = e, this._changed());
 	}
-}, ma.styles = [k, x`
+}, _a.styles = [k, x`
       :host {
         display: flex;
         flex-direction: column;
@@ -11977,10 +11983,10 @@ var ma, ha = [
           display: none;
         }
       }
-    `], ma);
+    `], _a);
 e([v({ attribute: !1 })], q.prototype, "hass", void 0), e([v({ attribute: !1 })], q.prototype, "base", void 0), e([v({ attribute: !1 })], q.prototype, "subpath", void 0), e([s()], q.prototype, "_plan", void 0), e([s()], q.prototype, "_rooms", void 0), e([s()], q.prototype, "_error", void 0), e([s()], q.prototype, "_levelId", void 0), e([s()], q.prototype, "_dialog", void 0), e([s()], q.prototype, "_tool", void 0), e([s()], q.prototype, "_selected", void 0), e([s()], q.prototype, "_draft", void 0), e([s()], q.prototype, "_hover", void 0), e([s()], q.prototype, "_rect", void 0), e([s()], q.prototype, "_view", void 0), e([s()], q.prototype, "_size", void 0), e([s()], q.prototype, "_saving", void 0), e([s()], q.prototype, "_dropTarget", void 0), e([s()], q.prototype, "_armed", void 0), e([s()], q.prototype, "_pub", void 0), e([s()], q.prototype, "_radGhost", void 0), e([s()], q.prototype, "_dragOver", void 0), e([s()], q.prototype, "_wallHover", void 0), e([s()], q.prototype, "_openingOpts", void 0), e([s()], q.prototype, "_stairDir", void 0), e([s()], q.prototype, "_stairGoes", void 0), e([s()], q.prototype, "_stairStyle", void 0), e([s()], q.prototype, "_mode", void 0), e([s()], q.prototype, "_placing", void 0), e([s()], q.prototype, "_lineStart", void 0), e([s()], q.prototype, "_lightType", void 0), e([s()], q.prototype, "_lightMount", void 0), q = e([w("homex-builder")], q);
 // src/components/homex-heating-group-editor.ts
-var ja, Ma = "default", Na = 5, Pa = 30, Fa = .5, Ia = 12, La = (e) => Math.min(Pa, Math.max(Na, Math.round(e / Fa) * Fa)), J = (ja = class extends b {
+var Pa, Fa = "default", Ia = 5, La = 30, Ra = .5, za = 12, Ba = (e) => Math.min(La, Math.max(Ia, Math.round(e / Ra) * Ra)), J = (Pa = class extends b {
 	constructor(...e) {
 		super(...e), this.group = null, this.groups = [], this.presets = [], this.rooms = [], this._name = "", this._id = "", this._rooms = [], this._setpoints = {}, this._busy = !1, this._idEdited = !1;
 	}
@@ -11992,7 +11998,7 @@ var ja, Ma = "default", Na = 5, Pa = 30, Fa = .5, Ia = 12, La = (e) => Math.min(
 		}
 	}
 	get _isDefault() {
-		return this.group?.id === Ma;
+		return this.group?.id === Fa;
 	}
 	_onName(e) {
 		this._name = e, this._idEdited || (this._id = M(e));
@@ -12000,7 +12006,7 @@ var ja, Ma = "default", Na = 5, Pa = 30, Fa = .5, Ia = 12, La = (e) => Math.min(
 	_setTemp(e, t) {
 		Number.isNaN(t) || (this._setpoints = {
 			...this._setpoints,
-			[e]: La(t)
+			[e]: Ba(t)
 		});
 	}
 	_toggleRoom(e) {
@@ -12013,23 +12019,23 @@ var ja, Ma = "default", Na = 5, Pa = 30, Fa = .5, Ia = 12, La = (e) => Math.min(
 		return C`<div class="stepper">
       <button
         title=${y("heatingGroupEditor.minus")}
-        @click=${() => this._setTemp(e, (t ?? 20) - Fa)}
+        @click=${() => this._setTemp(e, (t ?? 20) - Ra)}
       >
         <svg viewBox="0 0 24 24"><path d=${at}></path></svg>
       </button>
       <input
         type="number"
         inputmode="decimal"
-        min=${Na}
-        max=${Pa}
-        step=${Fa}
+        min=${Ia}
+        max=${La}
+        step=${Ra}
         .value=${t == null ? "" : String(t)}
         placeholder="—"
         @change=${(t) => this._setTemp(e, parseFloat(t.target.value))}
       />
       <button
         title=${y("heatingGroupEditor.plus")}
-        @click=${() => this._setTemp(e, (t ?? 20) + Fa)}
+        @click=${() => this._setTemp(e, (t ?? 20) + Ra)}
       >
         <svg viewBox="0 0 24 24"><path d=${ft}></path></svg>
       </button>
@@ -12040,7 +12046,7 @@ var ja, Ma = "default", Na = 5, Pa = 30, Fa = .5, Ia = 12, La = (e) => Math.min(
 		let { [e]: n, ...r } = this._setpoints;
 		this._setpoints = t ? r : {
 			...r,
-			[e]: Ia
+			[e]: za
 		};
 	}
 	_close() {
@@ -12127,7 +12133,7 @@ var ja, Ma = "default", Na = 5, Pa = 30, Fa = .5, Ia = 12, La = (e) => Math.min(
       </div>
     `;
 	}
-}, ja.styles = [k, x`
+}, Pa.styles = [k, x`
       .hint {
         font-size: 13px;
         color: var(--secondary-text-color);
@@ -12204,10 +12210,10 @@ var ja, Ma = "default", Na = 5, Pa = 30, Fa = .5, Ia = 12, La = (e) => Math.min(
         font-size: 12px;
         color: var(--secondary-text-color);
       }
-    `], ja);
+    `], Pa);
 e([v({ attribute: !1 })], J.prototype, "hass", void 0), e([v({ attribute: !1 })], J.prototype, "group", void 0), e([v({ attribute: !1 })], J.prototype, "groups", void 0), e([v({ attribute: !1 })], J.prototype, "presets", void 0), e([v({ attribute: !1 })], J.prototype, "rooms", void 0), e([s()], J.prototype, "_name", void 0), e([s()], J.prototype, "_id", void 0), e([s()], J.prototype, "_rooms", void 0), e([s()], J.prototype, "_setpoints", void 0), e([s()], J.prototype, "_busy", void 0), J = e([w("homex-heating-group-editor")], J);
 // src/components/homex-heating-device-preset-editor.ts
-var Ra, za = [
+var Va, Ha = [
 	{
 		key: "tolerance",
 		label: () => y("heatingDevicePresetEditor.param_tolerance"),
@@ -12232,7 +12238,7 @@ var Ra, za = [
 		domains: ["select", "switch"],
 		guess: /sensor_select|temperature_sensor|capteur_de_temperature_externe|external.*sensor/
 	}
-], Ba = () => [["on", y("heatingDevicePresetEditor.switch_on")], ["off", y("heatingDevicePresetEditor.switch_off")]], Va = () => [["locked", y("heatingDevicePresetEditor.locked")], ["unlocked", y("heatingDevicePresetEditor.unlocked")]], Ha = (e) => za.find((t) => t.key === e)?.label() ?? e, Y = (Ra = class extends b {
+], Ua = () => [["on", y("heatingDevicePresetEditor.switch_on")], ["off", y("heatingDevicePresetEditor.switch_off")]], Wa = () => [["locked", y("heatingDevicePresetEditor.locked")], ["unlocked", y("heatingDevicePresetEditor.unlocked")]], Ga = (e) => Ha.find((t) => t.key === e)?.label() ?? e, Y = (Va = class extends b {
 	constructor(...e) {
 		super(...e), this.preset = null, this._models = [], this._name = "", this._id = "", this._modelKey = "", this._deviceId = "", this._params = this._emptyParams(), this._busy = !1, this._results = null, this._idEdited = !1, this._nameTyped = !1, this._extInput = "", this._created = !1;
 	}
@@ -12247,7 +12253,7 @@ var Ra, za = [
 		}
 	}
 	_emptyParams() {
-		return Object.fromEntries(za.map((e) => [e.key, {
+		return Object.fromEntries(Ha.map((e) => [e.key, {
 			enabled: !1,
 			entity: "",
 			value: ""
@@ -12258,7 +12264,7 @@ var Ra, za = [
 			let e = this.preset;
 			this._name = e?.name ?? "", this._nameTyped = !!e, this._id = e?.id ?? "", this._idEdited = !!e, this._modelKey = e?.model ?? "", this._deviceId = e?.device_id ?? "";
 			let t = this._emptyParams();
-			for (let n of za) {
+			for (let n of Ha) {
 				let r = e?.params?.[n.key];
 				r && (t[n.key] = {
 					enabled: !0,
@@ -12300,8 +12306,8 @@ var Ra, za = [
 			case "number": return null;
 			case "select": return (t.options ?? []).map((e) => [e, e]);
 			case "climate": return (t.hvac_modes ?? []).map((e) => [e, e]);
-			case "switch": return Ba();
-			case "lock": return Va();
+			case "switch": return Ua();
+			case "lock": return Wa();
 			default: return [];
 		}
 	}
@@ -12319,7 +12325,7 @@ var Ra, za = [
 	}
 	_suggestParams() {
 		let e = this._emptyParams();
-		for (let t of za) {
+		for (let t of Ha) {
 			let n = this._refEntities(t.domains).find((e) => t.guess.test(e.suffix));
 			n && (e[t.key] = {
 				enabled: !1,
@@ -12350,7 +12356,7 @@ var Ra, za = [
 	}
 	_buildPreset() {
 		let e = {};
-		for (let t of za) {
+		for (let t of Ha) {
 			let n = this._params[t.key];
 			if (!n.enabled || !n.entity || n.value === "") continue;
 			let [r, i] = n.entity.split("|");
@@ -12514,16 +12520,16 @@ var Ra, za = [
       ${e.map((e) => C`<div class="dev">
           ${e.failed.length ? C`<span class="ko">✗</span>` : C`<span class="ok">✓</span>`}
           ${e.name}
-          ${e.applied.length ? C` · ${e.applied.map((e) => Ha(e)).join(", ")}` : ""}
+          ${e.applied.length ? C` · ${e.applied.map((e) => Ga(e)).join(", ")}` : ""}
           ${e.failed.map((e) => C`<div class="ko">${y("heatingDevicePresetEditor.failed", {
-			param: Ha(e.param),
+			param: Ga(e.param),
 			error: e.error
 		})}</div>`)}
         </div>`)}
     </div>` : C`<div class="results">${y("heatingDevicePresetEditor.no_device")}</div>`;
 	}
 	render() {
-		let e = !!this.preset, t = this._model(), n = za.some((e) => {
+		let e = !!this.preset, t = this._model(), n = Ha.some((e) => {
 			let t = this._params[e.key];
 			return t.enabled && t.entity && t.value !== "";
 		});
@@ -12560,7 +12566,7 @@ var Ra, za = [
             ></homex-select>
 
             <div class="section">${y("heatingDevicePresetEditor.settings")}</div>
-            ${za.map((e) => this._renderParam(e))}
+            ${Ha.map((e) => this._renderParam(e))}
           ` : this._modelKey ? C`<p class="hint">${y("heatingDevicePresetEditor.model_not_found")}</p>` : ""}
 
       ${this._results ? this._renderResults() : ""}
@@ -12585,7 +12591,7 @@ var Ra, za = [
       </div>
     `;
 	}
-}, Ra.styles = [k, x`
+}, Va.styles = [k, x`
       .value input {
         width: 100%;
         box-sizing: border-box;
@@ -12682,10 +12688,10 @@ var Ra, za = [
       .ko {
         color: var(--error-color, #db4437);
       }
-    `], Ra);
+    `], Va);
 e([v({ attribute: !1 })], Y.prototype, "hass", void 0), e([v({ attribute: !1 })], Y.prototype, "preset", void 0), e([s()], Y.prototype, "_models", void 0), e([s()], Y.prototype, "_name", void 0), e([s()], Y.prototype, "_id", void 0), e([s()], Y.prototype, "_modelKey", void 0), e([s()], Y.prototype, "_deviceId", void 0), e([s()], Y.prototype, "_params", void 0), e([s()], Y.prototype, "_busy", void 0), e([s()], Y.prototype, "_results", void 0), e([s()], Y.prototype, "_extInput", void 0), Y = e([w("homex-heating-device-preset-editor")], Y);
 // src/components/homex-heating-zone-editor.ts
-var Ua, Wa = "default", Ga = (Ua = class extends b {
+var Ka, qa = "default", Ja = (Ka = class extends b {
 	constructor(...e) {
 		super(...e), this.zone = null, this.zones = [], this.modes = [], this.rooms = [], this._name = "", this._id = "", this._rooms = [], this._triggers = {}, this._busy = !1, this._idEdited = !1;
 	}
@@ -12696,7 +12702,7 @@ var Ua, Wa = "default", Ga = (Ua = class extends b {
 		}
 	}
 	get _isDefault() {
-		return this.zone?.id === Wa;
+		return this.zone?.id === qa;
 	}
 	_toggleRoom(e) {
 		this._rooms = this._rooms.includes(e) ? this._rooms.filter((t) => t !== e) : [...this._rooms, e];
@@ -12793,7 +12799,7 @@ var Ua, Wa = "default", Ga = (Ua = class extends b {
       </div>
     `;
 	}
-}, Ua.styles = [k, x`
+}, Ka.styles = [k, x`
       .hint {
         font-size: 13px;
         color: var(--secondary-text-color);
@@ -12832,15 +12838,15 @@ var Ua, Wa = "default", Ga = (Ua = class extends b {
         font-size: 12px;
         color: var(--secondary-text-color);
       }
-    `], Ua);
-e([v({ attribute: !1 })], Ga.prototype, "hass", void 0), e([v({ attribute: !1 })], Ga.prototype, "zone", void 0), e([v({ attribute: !1 })], Ga.prototype, "zones", void 0), e([v({ attribute: !1 })], Ga.prototype, "modes", void 0), e([v({ attribute: !1 })], Ga.prototype, "rooms", void 0), e([s()], Ga.prototype, "_name", void 0), e([s()], Ga.prototype, "_id", void 0), e([s()], Ga.prototype, "_rooms", void 0), e([s()], Ga.prototype, "_triggers", void 0), e([s()], Ga.prototype, "_busy", void 0), Ga = e([w("homex-heating-zone-editor")], Ga);
+    `], Ka);
+e([v({ attribute: !1 })], Ja.prototype, "hass", void 0), e([v({ attribute: !1 })], Ja.prototype, "zone", void 0), e([v({ attribute: !1 })], Ja.prototype, "zones", void 0), e([v({ attribute: !1 })], Ja.prototype, "modes", void 0), e([v({ attribute: !1 })], Ja.prototype, "rooms", void 0), e([s()], Ja.prototype, "_name", void 0), e([s()], Ja.prototype, "_id", void 0), e([s()], Ja.prototype, "_rooms", void 0), e([s()], Ja.prototype, "_triggers", void 0), e([s()], Ja.prototype, "_busy", void 0), Ja = e([w("homex-heating-zone-editor")], Ja);
 // src/components/homex-heating-system-editor.ts
-var Ka, qa = "global", Ja = ["switch", "input_boolean"], Ya = ["input_number", "number"], Xa = [
+var Ya, Xa = "global", Za = ["switch", "input_boolean"], Qa = ["input_number", "number"], $a = [
 	["setpoint_sensor", () => y("heatingSystemEditor.sensor_setpoint")],
 	["tank_sensor", () => y("heatingSystemEditor.sensor_tank")],
 	["flow_sensor", () => y("heatingSystemEditor.sensor_flow")],
 	["return_sensor", () => y("heatingSystemEditor.sensor_return")]
-], Za = {
+], eo = {
 	setpoint_tank: {
 		label: () => y("heatingSystemEditor.rule_setpoint_tank"),
 		add: () => y("heatingSystemEditor.add_rule_setpoint_tank"),
@@ -12857,9 +12863,9 @@ var Ka, qa = "global", Ja = ["switch", "input_boolean"], Ya = ["input_number", "
 		b: () => y("heatingSystemEditor.short_return"),
 		init: ["10", "5"]
 	}
-}, Qa = { delta: "setpoint_tank" }, $a = [["boiler", () => y("heatingSystemEditor.type_boiler")], ["buffer_tank", () => y("heatingSystemEditor.type_buffer_tank")]], X = (Ka = class extends b {
+}, to = { delta: "setpoint_tank" }, no = [["boiler", () => y("heatingSystemEditor.type_boiler")], ["buffer_tank", () => y("heatingSystemEditor.type_buffer_tank")]], X = (Ya = class extends b {
 	constructor(...e) {
-		super(...e), this.system = null, this.zones = [], this._sysName = "", this._id = "", this._type = "boiler", this._contact = "", this._zones = [qa], this._aggressive = !1, this._tank = {
+		super(...e), this.system = null, this.zones = [], this._sysName = "", this._id = "", this._type = "boiler", this._contact = "", this._zones = [Xa], this._aggressive = !1, this._tank = {
 			setpoint_sensor: "",
 			tank_sensor: "",
 			flow_sensor: "",
@@ -12869,13 +12875,13 @@ var Ka, qa = "global", Ja = ["switch", "input_boolean"], Ya = ["input_number", "
 	willUpdate(e) {
 		if (e.has("system")) {
 			let e = this.system;
-			this._sysName = e?.name ?? "", this._id = e?.id ?? "", this._type = e?.type ?? "boiler", this._contact = e?.contact ?? "", this._zones = [...e?.zones?.length ? e.zones : [qa]], this._aggressive = e?.aggressive ?? !1, this._tank = {
+			this._sysName = e?.name ?? "", this._id = e?.id ?? "", this._type = e?.type ?? "boiler", this._contact = e?.contact ?? "", this._zones = [...e?.zones?.length ? e.zones : [Xa]], this._aggressive = e?.aggressive ?? !1, this._tank = {
 				setpoint_sensor: e?.setpoint_sensor ?? "",
 				tank_sensor: e?.tank_sensor ?? "",
 				flow_sensor: e?.flow_sensor ?? "",
 				return_sensor: e?.return_sensor ?? ""
 			}, this._circulator = e?.circulator ?? "", this._minRuntime = String(e?.min_runtime ?? 5), this._rules = (e?.rules ?? []).map((e) => ({
-				type: Qa[e.type] ?? e.type,
+				type: to[e.type] ?? e.type,
 				delta: String(e.delta),
 				tolerance: String(e.tolerance)
 			})), this._idEdited = !!e, this._busy = !1;
@@ -12883,7 +12889,7 @@ var Ka, qa = "global", Ja = ["switch", "input_boolean"], Ya = ["input_number", "
 	}
 	get _contacts() {
 		let e = (e) => this.hass.states[e]?.attributes?.friendly_name || e;
-		return Object.keys(this.hass.states).filter((e) => Ja.includes(e.split(".")[0])).sort((t, n) => e(t).localeCompare(e(n)));
+		return Object.keys(this.hass.states).filter((e) => Za.includes(e.split(".")[0])).sort((t, n) => e(t).localeCompare(e(n)));
 	}
 	_name(e) {
 		return this.hass.states[e]?.attributes?.friendly_name || e;
@@ -12911,7 +12917,7 @@ var Ka, qa = "global", Ja = ["switch", "input_boolean"], Ya = ["input_number", "
 	_tempSensors(e) {
 		return Object.keys(this.hass.states).filter((t) => {
 			let n = t.split(".")[0], r = this.hass.states[t].attributes ?? {};
-			return e && Ya.includes(n) ? !0 : n === "sensor" && (r.device_class === "temperature" || ["°C", "°F"].includes(r.unit_of_measurement));
+			return e && Qa.includes(n) ? !0 : n === "sensor" && (r.device_class === "temperature" || ["°C", "°F"].includes(r.unit_of_measurement));
 		});
 	}
 	_value(e) {
@@ -12923,14 +12929,14 @@ var Ka, qa = "global", Ja = ["switch", "input_boolean"], Ya = ["input_number", "
 		return Number.isNaN(t) || Number.isNaN(n) ? y("heatingSystemEditor.rule_required") : t <= 0 || n < 0 || n >= t ? y("heatingSystemEditor.rule_invalid") : "";
 	}
 	get _required() {
-		return new Set(this._rules.flatMap((e) => Za[e.type].gap));
+		return new Set(this._rules.flatMap((e) => eo[e.type].gap));
 	}
 	get _tankValid() {
 		return [...this._required].every((e) => !!this._tank[e]) && !!this._circulator && !Number.isNaN(parseFloat(this._minRuntime)) && this._rules.every((e) => !this._ruleError(e));
 	}
 	_toggleZone(e) {
-		let t = this._zones.filter((e) => e !== qa), n = t.includes(e) ? t.filter((t) => t !== e) : [...t, e];
-		this._zones = n.length ? n : [qa];
+		let t = this._zones.filter((e) => e !== Xa), n = t.includes(e) ? t.filter((t) => t !== e) : [...t, e];
+		this._zones = n.length ? n : [Xa];
 	}
 	_close() {
 		this.dispatchEvent(new CustomEvent("heating-system-closed"));
@@ -12995,13 +13001,13 @@ var Ka, qa = "global", Ja = ["switch", "input_boolean"], Ya = ["input_number", "
     `;
 	}
 	_renderScope(e) {
-		let t = this._zones.includes(qa);
+		let t = this._zones.includes(Xa);
 		return C`
       <div class="section">${y("heatingSystemEditor.scope")}</div>
       <p class="hint">${y("heatingSystemEditor.scope_hint")}</p>
       <div class="checks">
         <label>
-          ${j(t, () => this._zones = [qa])}
+          ${j(t, () => this._zones = [Xa])}
           ${y("heatingSystemEditor.global_system")}
         </label>
         ${this.zones.map((e) => C`<label>
@@ -13040,7 +13046,7 @@ var Ka, qa = "global", Ja = ["switch", "input_boolean"], Ya = ["input_number", "
 	}
 	_addRule(e) {
 		if (this._rules.some((t) => t.type === e)) return;
-		let [t, n] = Za[e].init;
+		let [t, n] = eo[e].init;
 		this._rules = [...this._rules, {
 			type: e,
 			delta: t,
@@ -13048,7 +13054,7 @@ var Ka, qa = "global", Ja = ["switch", "input_boolean"], Ya = ["input_number", "
 		}];
 	}
 	_renderRule(e, t) {
-		let n = Za[e.type], r = this._ruleError(e), i = (e) => `${Math.round(e * 10) / 10} °C`, [a, o] = n.gap, s = this._value(this._tank[a]), c = this._value(this._tank[o]), l = r;
+		let n = eo[e.type], r = this._ruleError(e), i = (e) => `${Math.round(e * 10) / 10} °C`, [a, o] = n.gap, s = this._value(this._tank[a]), c = this._value(this._tank[o]), l = r;
 		if (!r && e.type === "setpoint_tank") {
 			let t = parseFloat(e.delta), n = parseFloat(e.tolerance);
 			l = s == null ? y("heatingSystemEditor.explain_setpoint_tank", {
@@ -13102,7 +13108,7 @@ var Ka, qa = "global", Ja = ["switch", "input_boolean"], Ya = ["input_number", "
 		return C`
       <div class="section">${y("heatingSystemEditor.sensors")}</div>
       <div class="tank-grid">
-        ${Xa.map(([n, r]) => C`<homex-select
+        ${$a.map(([n, r]) => C`<homex-select
             label=${this._required.has(n) ? y("heatingSystemEditor.required", { label: r() }) : r()}
             placeholder=${y("heatingSystemEditor.choose_sensor")}
             .value=${this._tank[n]}
@@ -13131,7 +13137,7 @@ var Ka, qa = "global", Ja = ["switch", "input_boolean"], Ya = ["input_number", "
       <p class="hint">${y("heatingSystemEditor.rules_hint")}</p>
       ${this._rules.map((e, t) => this._renderRule(e, t))}
       <div class="rule-add">
-        ${Object.keys(Za).filter((e) => !this._rules.some((t) => t.type === e)).map((e) => C`<button @click=${() => this._addRule(e)}>${Za[e].add()}</button>`)}
+        ${Object.keys(eo).filter((e) => !this._rules.some((t) => t.type === e)).map((e) => C`<button @click=${() => this._addRule(e)}>${eo[e].add()}</button>`)}
       </div>
     `;
 	}
@@ -13147,7 +13153,7 @@ var Ka, qa = "global", Ja = ["switch", "input_boolean"], Ya = ["input_number", "
 
       <div class="section">${y("heatingSystemEditor.type")}</div>
       <div class="btn-group">
-        ${$a.map(([e, t]) => C`<button
+        ${no.map(([e, t]) => C`<button
             class=${this._type === e ? "active" : ""}
             @click=${() => this._type = e}
           >
@@ -13172,7 +13178,7 @@ var Ka, qa = "global", Ja = ["switch", "input_boolean"], Ya = ["input_number", "
       </div>
     `;
 	}
-}, Ka.styles = [k, x`
+}, Ya.styles = [k, x`
       .hint {
         font-size: 13px;
         color: var(--secondary-text-color);
@@ -13265,21 +13271,21 @@ var Ka, qa = "global", Ja = ["switch", "input_boolean"], Ya = ["input_number", "
         font-size: 14px;
         cursor: pointer;
       }
-    `], Ka);
+    `], Ya);
 e([v({ attribute: !1 })], X.prototype, "hass", void 0), e([v({ attribute: !1 })], X.prototype, "system", void 0), e([v({ attribute: !1 })], X.prototype, "zones", void 0), e([s()], X.prototype, "_sysName", void 0), e([s()], X.prototype, "_id", void 0), e([s()], X.prototype, "_type", void 0), e([s()], X.prototype, "_contact", void 0), e([s()], X.prototype, "_zones", void 0), e([s()], X.prototype, "_aggressive", void 0), e([s()], X.prototype, "_tank", void 0), e([s()], X.prototype, "_circulator", void 0), e([s()], X.prototype, "_minRuntime", void 0), e([s()], X.prototype, "_rules", void 0), e([s()], X.prototype, "_busy", void 0), X = e([w("homex-heating-system-editor")], X);
 // src/components/homex-heating-manager.ts
-var eo, to = [
+var ro, io = [
 	"modes",
 	"setpoints",
 	"zones",
 	"devices",
 	"systems"
-], no = (e) => y(`heatingManager.section_${e}`), ro = (e) => y(`heatingManager.add_${e}`), io = [
+], ao = (e) => y(`heatingManager.section_${e}`), oo = (e) => y(`heatingManager.add_${e}`), so = [
 	"tolerance",
 	"mode",
 	"lock",
 	"sensor"
-], ao = (e) => io.includes(e) ? y(`heatingManager.param_${e}`) : e, oo = (e) => e == null ? "—" : `${e.toLocaleString(d())} °C`, Z = (eo = class extends b {
+], co = (e) => so.includes(e) ? y(`heatingManager.param_${e}`) : e, lo = (e) => e == null ? "—" : `${e.toLocaleString(d())} °C`, Z = (ro = class extends b {
 	constructor(...e) {
 		super(...e), this.base = "", this.subpath = "", this._presets = [], this._groups = [], this._devicePresets = [], this._zones = [], this._systems = [], this._enabledLocal = !0, this._switching = !1, this._rooms = [], this._loaded = !1, this._presetName = "", this._presetId = "", this._busy = !1, this._presetIdEdited = !1, this._formFor = null;
 	}
@@ -13307,9 +13313,9 @@ var eo, to = [
 		} else this._formFor = null;
 	}
 	get _route() {
-		let [e, t, n] = er(this.subpath);
+		let [e, t, n] = rr(this.subpath);
 		return {
-			section: to.includes(e) ? e : "modes",
+			section: io.includes(e) ? e : "modes",
 			editing: t === "new" || t === "edit" && !!n,
 			id: t === "edit" ? n : void 0
 		};
@@ -13321,7 +13327,7 @@ var eo, to = [
 		O(this._url(e, ...t ? ["edit", t] : ["new"]));
 	}
 	_closeEditor(e) {
-		this._load(), tr(this._url(e));
+		this._load(), ir(this._url(e));
 	}
 	async _setEnabled(e) {
 		this._switching = !0;
@@ -13365,7 +13371,7 @@ var eo, to = [
 		let t = () => this._closeEditor("modes");
 		return C`
       <div class="head">
-        <button @click=${t}>← ${no("modes")}</button>
+        <button @click=${t}>← ${ao("modes")}</button>
         <h2>${y(e ? "heatingManager.edit_mode" : "heatingManager.new_mode")}</h2>
       </div>
       <div class="editor">
@@ -13411,7 +13417,7 @@ var eo, to = [
         </div>`)}
     </div>`;
 	}
-	_roomNames(e, t = this._groups, n = Ma) {
+	_roomNames(e, t = this._groups, n = Fa) {
 		if (e.id === n) {
 			let e = new Set(t.flatMap((e) => e.rooms)), n = this._rooms.filter((t) => !e.has(t.room_id));
 			return n.length ? y("heatingManager.other_rooms", { rooms: n.map((e) => e.name).join(", ") }) : y("heatingManager.all_other_rooms");
@@ -13431,7 +13437,7 @@ var eo, to = [
           <div class="temps">
             ${this._presets.map((t) => C`<span class="temp"
                 >${t.name} ·
-                ${t.unheated && e.setpoints[t.id] == null ? y("heatingManager.off") : oo(e.setpoints[t.id])}</span
+                ${t.unheated && e.setpoints[t.id] == null ? y("heatingManager.off") : lo(e.setpoints[t.id])}</span
               >`)}
           </div>
         </div>`)}
@@ -13457,7 +13463,7 @@ var eo, to = [
             <div>
               <div class="name">${e.name}</div>
               <div class="meta">
-                ${this._roomNames(e, this._zones, Wa)}
+                ${this._roomNames(e, this._zones, qa)}
               </div>
             </div>
           </div>
@@ -13558,7 +13564,7 @@ var eo, to = [
           </div>
           <div class="temps">
             ${t.length ? t.map(([e, t]) => C`<span class="temp"
-                      >${ao(e)} ·
+                      >${co(e)} ·
                       ${String(t.value)}${t.value_agressive == null ? "" : ` / ${t.value_agressive}`}</span
                     >`) : C`<span class="meta">${y("heatingManager.no_settings")}</span>`}
           </div>
@@ -13570,7 +13576,7 @@ var eo, to = [
 		return C`
       <div class="head">
         <button @click=${() => this._closeEditor(e)}>
-          ← ${no(e)}
+          ← ${ao(e)}
         </button>
         <h2></h2>
       </div>
@@ -13587,7 +13593,7 @@ var eo, to = [
 			let t = n ? this._systems.find((e) => e.id === n) : null;
 			return n && !t ? this._notFound(e, n) : C`
         <div class="head">
-          <button @click=${() => this._closeEditor("systems")}>← ${no("systems")}</button>
+          <button @click=${() => this._closeEditor("systems")}>← ${ao("systems")}</button>
           <h2>${y(t ? "heatingManager.edit_system" : "heatingManager.new_system")}</h2>
         </div>
         <div class="editor">
@@ -13604,7 +13610,7 @@ var eo, to = [
 			let t = n ? this._zones.find((e) => e.id === n) : null;
 			return n && !t ? this._notFound(e, n) : C`
         <div class="head">
-          <button @click=${() => this._closeEditor("zones")}>← ${no("zones")}</button>
+          <button @click=${() => this._closeEditor("zones")}>← ${ao("zones")}</button>
           <h2>${y(t ? "heatingManager.edit_zone" : "heatingManager.new_zone")}</h2>
         </div>
         <div class="editor">
@@ -13623,7 +13629,7 @@ var eo, to = [
 			let t = n ? this._devicePresets.find((e) => e.id === n) : null;
 			return n && !t ? this._notFound(e, n) : C`
         <div class="head">
-          <button @click=${() => this._closeEditor("devices")}>← ${no("devices")}</button>
+          <button @click=${() => this._closeEditor("devices")}>← ${ao("devices")}</button>
           <h2>${y(t ? "heatingManager.edit_device_preset" : "heatingManager.new_device_preset")}</h2>
         </div>
         <div class="editor">
@@ -13639,7 +13645,7 @@ var eo, to = [
 			let t = n ? this._groups.find((e) => e.id === n) : null;
 			return n && !t ? this._notFound(e, n) : C`
         <div class="head">
-          <button @click=${() => this._closeEditor("setpoints")}>← ${no("setpoints")}</button>
+          <button @click=${() => this._closeEditor("setpoints")}>← ${ao("setpoints")}</button>
           <h2>${y(t ? "heatingManager.edit_setpoint" : "heatingManager.new_setpoint")}</h2>
         </div>
         <div class="editor">
@@ -13675,7 +13681,7 @@ var eo, to = [
         </label>
       </div>
       <div class="tabs">
-        ${to.map((e) => [e, no(e)]).map(([t, n]) => C`<span
+        ${io.map((e) => [e, ao(e)]).map(([t, n]) => C`<span
             class="tab ${e === t ? "active" : ""}"
             @click=${() => {
 			t !== e && O(this._url(t), !0);
@@ -13687,9 +13693,9 @@ var eo, to = [
       <homex-select
         class="tab-picker"
         .value=${e}
-        .options=${to.map((e) => ({
+        .options=${io.map((e) => ({
 			value: e,
-			label: no(e)
+			label: ao(e)
 		}))}
         @value-changed=${(t) => {
 			t.detail.value !== e && O(this._url(t.detail.value), !0);
@@ -13697,13 +13703,13 @@ var eo, to = [
       ></homex-select>
       <div class="tab-actions">
         <button class="primary" @click=${() => this._openEditor(e)}>
-          ${ro(e)}
+          ${oo(e)}
         </button>
       </div>
       ${this._loaded ? e === "modes" ? this._renderPresets() : e === "setpoints" ? this._renderGroups() : e === "zones" ? this._renderZones() : e === "systems" ? this._renderSystems() : this._renderDevicePresets() : C`<div class="msg">${y("common.loading")}</div>`}
     `;
 	}
-}, eo.styles = [k, x`
+}, ro.styles = [k, x`
       .head {
         display: flex;
         align-items: center;
@@ -13881,10 +13887,10 @@ var eo, to = [
           display: block;
         }
       }
-    `], eo);
+    `], ro);
 e([v({ attribute: !1 })], Z.prototype, "hass", void 0), e([v({ attribute: !1 })], Z.prototype, "base", void 0), e([v({ attribute: !1 })], Z.prototype, "subpath", void 0), e([s()], Z.prototype, "_presets", void 0), e([s()], Z.prototype, "_groups", void 0), e([s()], Z.prototype, "_devicePresets", void 0), e([s()], Z.prototype, "_zones", void 0), e([s()], Z.prototype, "_systems", void 0), e([s()], Z.prototype, "_enabledLocal", void 0), e([s()], Z.prototype, "_switching", void 0), e([s()], Z.prototype, "_rooms", void 0), e([s()], Z.prototype, "_loaded", void 0), e([s()], Z.prototype, "_presetName", void 0), e([s()], Z.prototype, "_presetId", void 0), e([s()], Z.prototype, "_busy", void 0), Z = e([w("homex-heating-manager")], Z);
 // src/components/homex-climate-metrics.ts
-var so, co = "heating", lo = [
+var uo, fo = "heating", po = [
 	{
 		key: "temperature",
 		label: () => y("climateMetrics.temperature"),
@@ -13920,19 +13926,19 @@ var so, co = "heating", lo = [
 		deviceClass: "carbon_dioxide",
 		section: () => "CO₂"
 	}
-], uo = [
+], mo = [
 	["mean", () => y("climateMetrics.rule_mean")],
 	["max", () => y("climateMetrics.rule_max")],
 	["min", () => y("climateMetrics.rule_min")]
 ];
-function fo(e, t) {
+function ho(e, t) {
 	if (!e.length) return null;
 	if (t === "max") return Math.max(...e.map(([e]) => e));
 	if (t === "min") return Math.min(...e.map(([e]) => e));
 	let n = e.reduce((e, [, t]) => e + t, 0);
 	return n <= 0 ? e.reduce((e, [t]) => e + t, 0) / e.length : e.reduce((e, [t, n]) => e + t * n, 0) / n;
 }
-var po = (so = class extends b {
+var go = (uo = class extends b {
 	constructor(...e) {
 		super(...e), this.base = "", this.subpath = "", this._rooms = [], this._loaded = !1, this._draft = {}, this._busy = !1, this._draftFor = null;
 	}
@@ -13948,14 +13954,14 @@ var po = (so = class extends b {
 		this._loaded = !0;
 	}
 	get _roomId() {
-		return er(this.subpath)[0] ?? null;
+		return rr(this.subpath)[0] ?? null;
 	}
 	willUpdate() {
 		let e = this._roomId ? this._rooms.find((e) => e.room_id === this._roomId) : null;
 		e ? this._draftFor !== e.room_id && (this._draftFor = e.room_id, this._draft = JSON.parse(JSON.stringify(e.metrics ?? {})), this._busy = !1) : this._draftFor = null;
 	}
 	_hasClimate(e) {
-		return (e.modules ?? []).includes(co);
+		return (e.modules ?? []).includes(fo);
 	}
 	async _openRoom(e) {
 		if (!this._hasClimate(e)) {
@@ -13963,7 +13969,7 @@ var po = (so = class extends b {
 			try {
 				await _n(this.hass, {
 					entry_id: e.entry_id,
-					modules: [...e.modules ?? [], co]
+					modules: [...e.modules ?? [], fo]
 				}), await this._load();
 			} catch (e) {
 				alert(y("common.error", { message: E(e) }));
@@ -13982,7 +13988,7 @@ var po = (so = class extends b {
 		return n ? `${t.state} ${n}` : t.state;
 	}
 	_candidates(e, t) {
-		let n = (e, t) => this._friendly(e).localeCompare(this._friendly(t)), r = Object.keys(this.hass.states).filter((t) => t.startsWith("sensor.") && !t.startsWith("sensor.homex_") && this.hass.states[t]?.attributes?.device_class === e.deviceClass), i = t.area_id ? r.filter((e) => Mi(this.hass, e) === t.area_id).sort(n) : [];
+		let n = (e, t) => this._friendly(e).localeCompare(this._friendly(t)), r = Object.keys(this.hass.states).filter((t) => t.startsWith("sensor.") && !t.startsWith("sensor.homex_") && this.hass.states[t]?.attributes?.device_class === e.deviceClass), i = t.area_id ? r.filter((e) => Fi(this.hass, e) === t.area_id).sort(n) : [];
 		return {
 			area: i,
 			others: r.filter((e) => !i.includes(e)).sort(n)
@@ -14017,7 +14023,7 @@ var po = (so = class extends b {
 			let t = this.hass.states[e.entity_id], i = parseFloat(t?.state);
 			Number.isNaN(i) || (n.push([i, e.weight]), r = r || t.attributes?.unit_of_measurement || "");
 		}
-		let i = fo(n, t.rule);
+		let i = ho(n, t.rule);
 		return i == null ? "—" : `${Math.round(i * 10) / 10}${r ? " " + r : ""}`;
 	}
 	async _save(e) {
@@ -14026,7 +14032,7 @@ var po = (so = class extends b {
 			await _n(this.hass, {
 				entry_id: e.entry_id,
 				metrics: this._draft
-			}), this._draftFor = null, await this._load(), tr(this.base);
+			}), this._draftFor = null, await this._load(), ir(this.base);
 		} catch (e) {
 			alert(y("common.error", { message: E(e) })), this._busy = !1;
 		}
@@ -14048,7 +14054,7 @@ var po = (so = class extends b {
             class="rule"
             label=${y("climateMetrics.rule_label")}
             .value=${n.rule}
-            .options=${uo.map(([e, t]) => ({
+            .options=${mo.map(([e, t]) => ({
 			value: e,
 			label: t()
 		}))}
@@ -14108,13 +14114,13 @@ var po = (so = class extends b {
 		let t = "";
 		return C`
       <div class="head">
-        <button @click=${() => tr(this.base)}>${y("climateMetrics.back_metrics")}</button>
+        <button @click=${() => ir(this.base)}>${y("climateMetrics.back_metrics")}</button>
         <h2>${e.name}</h2>
         <button class="primary" ?disabled=${this._busy} @click=${() => this._save(e)}>
           ${y("common.save")}
         </button>
       </div>
-      ${lo.map((n) => {
+      ${po.map((n) => {
 			let r = n.section(), i = r === t ? "" : r;
 			return t = r, C`${i ? C`<div class="section-title">${i}</div>` : ""}
           ${this._renderMetric(n, e)}`;
@@ -14122,7 +14128,7 @@ var po = (so = class extends b {
     `;
 	}
 	_roomValues(e) {
-		let t = lo.filter((t) => e.metrics?.[t.key]?.sensors?.length);
+		let t = po.filter((t) => e.metrics?.[t.key]?.sensors?.length);
 		return t.length ? C`<div class="values">
       ${t.map((t) => C`<span class="value">
           ${t.icon} ${this._current(`sensor.homex_${e.room_id}_${t.key}`)}
@@ -14135,7 +14141,7 @@ var po = (so = class extends b {
 		if (e) {
 			let t = this._rooms.find((t) => t.room_id === e);
 			return !t || !this._hasClimate(t) ? C`<div class="head">
-            <button @click=${() => tr(this.base)}>${y("climateMetrics.back_metrics")}</button>
+            <button @click=${() => ir(this.base)}>${y("climateMetrics.back_metrics")}</button>
             <h2></h2>
           </div>
           <div class="msg">
@@ -14162,7 +14168,7 @@ var po = (so = class extends b {
       </div>
     `;
 	}
-}, so.styles = [k, x`
+}, uo.styles = [k, x`
       .head {
         display: flex;
         align-items: center;
@@ -14312,10 +14318,10 @@ var po = (so = class extends b {
         color: var(--secondary-text-color);
         margin: 18px 0 8px;
       }
-    `], so);
-e([v({ attribute: !1 })], po.prototype, "hass", void 0), e([v({ attribute: !1 })], po.prototype, "base", void 0), e([v({ attribute: !1 })], po.prototype, "subpath", void 0), e([s()], po.prototype, "_rooms", void 0), e([s()], po.prototype, "_loaded", void 0), e([s()], po.prototype, "_draft", void 0), e([s()], po.prototype, "_busy", void 0), po = e([w("homex-climate-metrics")], po);
+    `], uo);
+e([v({ attribute: !1 })], go.prototype, "hass", void 0), e([v({ attribute: !1 })], go.prototype, "base", void 0), e([v({ attribute: !1 })], go.prototype, "subpath", void 0), e([s()], go.prototype, "_rooms", void 0), e([s()], go.prototype, "_loaded", void 0), e([s()], go.prototype, "_draft", void 0), e([s()], go.prototype, "_busy", void 0), go = e([w("homex-climate-metrics")], go);
 // src/components/homex-climate-manager.ts
-var mo, ho = [
+var _o, vo = [
 	{
 		key: "metrics",
 		icon: "📈",
@@ -14334,13 +14340,13 @@ var mo, ho = [
 		label: () => y("climateManager.ac"),
 		desc: () => y("climateManager.ac_desc")
 	}
-], go = (mo = class extends b {
+], yo = (_o = class extends b {
 	constructor(...e) {
-		super(...e), this.base = "", this.subpath = "", this._toLanding = () => tr(this.base);
+		super(...e), this.base = "", this.subpath = "", this._toLanding = () => ir(this.base);
 	}
 	get _page() {
-		let e = er(this.subpath)[0];
-		return ho.some((t) => t.key === e) ? e : null;
+		let e = rr(this.subpath)[0];
+		return vo.some((t) => t.key === e) ? e : null;
 	}
 	_placeholder(e, t) {
 		return C`
@@ -14356,12 +14362,12 @@ var mo, ho = [
 		return e === "heating" ? C`<homex-heating-manager
         .hass=${this.hass}
         .base=${D(this.base, "heating")}
-        .subpath=${er(this.subpath).slice(1).join("/")}
+        .subpath=${rr(this.subpath).slice(1).join("/")}
         @close=${this._toLanding}
       ></homex-heating-manager>` : e === "metrics" ? C`<homex-climate-metrics
         .hass=${this.hass}
         .base=${D(this.base, "metrics")}
-        .subpath=${er(this.subpath).slice(1).join("/")}
+        .subpath=${rr(this.subpath).slice(1).join("/")}
         @close=${this._toLanding}
       ></homex-climate-metrics>` : e === "ac" ? this._placeholder(y("climateManager.ac"), y("climateManager.ac_unavailable")) : C`
       <div class="head">
@@ -14369,7 +14375,7 @@ var mo, ho = [
         <h2>${y("climateManager.title")}</h2>
       </div>
       <div class="pages">
-        ${ho.map((e) => C`<div
+        ${vo.map((e) => C`<div
             class="page ${e.key === "ac" ? "soon" : ""}"
             @click=${() => O(D(this.base, e.key))}
           >
@@ -14382,7 +14388,7 @@ var mo, ho = [
       </div>
     `;
 	}
-}, mo.styles = [k, x`
+}, _o.styles = [k, x`
       .head {
         display: flex;
         align-items: center;
@@ -14444,19 +14450,19 @@ var mo, ho = [
         padding: 24px 4px;
         color: var(--secondary-text-color);
       }
-    `], mo);
-e([v({ attribute: !1 })], go.prototype, "hass", void 0), e([v({ attribute: !1 })], go.prototype, "base", void 0), e([v({ attribute: !1 })], go.prototype, "subpath", void 0), go = e([w("homex-climate-manager")], go);
+    `], _o);
+e([v({ attribute: !1 })], yo.prototype, "hass", void 0), e([v({ attribute: !1 })], yo.prototype, "base", void 0), e([v({ attribute: !1 })], yo.prototype, "subpath", void 0), yo = e([w("homex-climate-manager")], yo);
 // src/components/homex-heating-systems-card.ts
-var _o, vo = 7, yo = 3e5, bo = {
+var bo, xo = 7, So = 3e5, Co = {
 	setpoint_tank: [() => y("heatingSystemsCard.rule_setpoint_tank"), "setpoint_tank"],
 	flow_return: [() => y("heatingSystemsCard.rule_flow_return"), "flow_return"],
 	delta: [() => y("heatingSystemsCard.rule_setpoint_tank"), "setpoint_tank"]
-}, xo = (_o = class extends b {
+}, wo = (bo = class extends b {
 	constructor(...e) {
 		super(...e), this.systems = [], this.zones = [], this._days = {}, this._hover = null;
 	}
 	connectedCallback() {
-		super.connectedCallback(), this._timer = window.setInterval(() => this._loadHistory(), yo);
+		super.connectedCallback(), this._timer = window.setInterval(() => this._loadHistory(), So);
 	}
 	disconnectedCallback() {
 		window.clearInterval(this._timer), super.disconnectedCallback();
@@ -14488,7 +14494,7 @@ var _o, vo = 7, yo = 3e5, bo = {
 		}
 		let r = Date.now(), i = {};
 		for (let t of this.systems) {
-			let a = this._driven(t), o = Array.from({ length: vo }, (t, n) => {
+			let a = this._driven(t), o = Array.from({ length: xo }, (t, n) => {
 				let r = new Date(e);
 				return r.setDate(e.getDate() + n), {
 					date: r,
@@ -14530,7 +14536,7 @@ var _o, vo = 7, yo = 3e5, bo = {
 	_renderChart(e) {
 		let t = this._days[e.id];
 		if (!t) return o;
-		let n = 284 / vo, r = Math.max(60, ...t.map((e) => e.minutes)), i = t.reduce((e, t) => e + t.minutes, 0), a = this._hover?.sid === e.id ? t[this._hover.i] : void 0, s = (e) => e.toLocaleDateString(d(), {
+		let n = 284 / xo, r = Math.max(60, ...t.map((e) => e.minutes)), i = t.reduce((e, t) => e + t.minutes, 0), a = this._hover?.sid === e.id ? t[this._hover.i] : void 0, s = (e) => e.toLocaleDateString(d(), {
 			weekday: "short",
 			day: "numeric"
 		}), c = (e, t) => {
@@ -14540,14 +14546,14 @@ var _o, vo = 7, yo = 3e5, bo = {
 		};
 		return C`<div class="chart">
       <div class="chart-head">
-        <span>${y("heatingSystemsCard.runtime_days", { days: vo })}</span>
+        <span>${y("heatingSystemsCard.runtime_days", { days: xo })}</span>
         <span class="readout">
           ${a ? y("heatingSystemsCard.day_value", {
 			day: s(a.date),
 			value: this._dur(a.minutes)
 		}) : y("heatingSystemsCard.total", {
 			total: this._dur(i),
-			avg: this._dur(i / vo)
+			avg: this._dur(i / xo)
 		})}
         </span>
       </div>
@@ -14558,7 +14564,7 @@ var _o, vo = 7, yo = 3e5, bo = {
         role="img"
         aria-label=${y("heatingSystemsCard.chart_label", {
 			name: e.name,
-			days: vo
+			days: xo
 		})}
         @pointerleave=${() => this._hover = null}
       >
@@ -14633,7 +14639,7 @@ var _o, vo = 7, yo = 3e5, bo = {
       </div>
       ${(e.rules ?? []).length ? C`<div class="rules">
             ${(e.rules ?? []).map((t) => {
-			let [n, r] = bo[t.type] ?? [() => t.type, t.type], i = parseFloat(this._ent(e, "sensor", `gap_${r}`)?.state ?? ""), a = this._ent(e, "binary_sensor", `rule_${r}`)?.state === "on";
+			let [n, r] = Co[t.type] ?? [() => t.type, t.type], i = parseFloat(this._ent(e, "sensor", `gap_${r}`)?.state ?? ""), a = this._ent(e, "binary_sensor", `rule_${r}`)?.state === "on";
 			return C`<div class="rule">
                 <span class="dot ${a ? "on" : ""}"></span>
                 <span>${n()}</span>
@@ -14685,7 +14691,7 @@ var _o, vo = 7, yo = 3e5, bo = {
         </div>`)}
     </div>` : o;
 	}
-}, _o.styles = [k, x`
+}, bo.styles = [k, x`
       :host {
         display: block;
       }
@@ -14863,10 +14869,10 @@ var _o, vo = 7, yo = 3e5, bo = {
         font-size: 14px;
         color: var(--secondary-text-color);
       }
-    `], _o);
-e([v({ attribute: !1 })], xo.prototype, "hass", void 0), e([v({ attribute: !1 })], xo.prototype, "systems", void 0), e([v({ attribute: !1 })], xo.prototype, "zones", void 0), e([s()], xo.prototype, "_days", void 0), e([s()], xo.prototype, "_hover", void 0), xo = e([w("homex-heating-systems-card")], xo);
+    `], bo);
+e([v({ attribute: !1 })], wo.prototype, "hass", void 0), e([v({ attribute: !1 })], wo.prototype, "systems", void 0), e([v({ attribute: !1 })], wo.prototype, "zones", void 0), e([s()], wo.prototype, "_days", void 0), e([s()], wo.prototype, "_hover", void 0), wo = e([w("homex-heating-systems-card")], wo);
 // src/components/homex-climate-dashboard.ts
-var So, Co = "select.homex_climate_tolerance_mode", wo = (So = class extends b {
+var To, Eo = "select.homex_climate_tolerance_mode", Do = (To = class extends b {
 	constructor(...e) {
 		super(...e), this.rooms = [], this._zones = [], this._systems = [], this._enabledLocal = !0, this._loaded = !1, this._busy = !1, this._roomBusy = /* @__PURE__ */ new Set();
 	}
@@ -14930,8 +14936,8 @@ var So, Co = "select.homex_climate_tolerance_mode", wo = (So = class extends b {
 			option: e.detail.value
 		})}
       ></homex-select>
-      ${this.hass.states[`${Co}_${e.id}`] ? C`<span class="zone-tol" title=${y("climateDashboard.zone_tolerance")}>
-            ${this._btnGroup(`${Co}_${e.id}`)}
+      ${this.hass.states[`${Eo}_${e.id}`] ? C`<span class="zone-tol" title=${y("climateDashboard.zone_tolerance")}>
+            ${this._btnGroup(`${Eo}_${e.id}`)}
           </span>` : ""}
     </div>`;
 	}
@@ -14953,7 +14959,7 @@ var So, Co = "select.homex_climate_tolerance_mode", wo = (So = class extends b {
 	}
 	render() {
 		if (!this._loaded) return C`<div class="muted">${y("common.loading")}</div>`;
-		let e = this.hass.states[Co];
+		let e = this.hass.states[Eo];
 		return C`
       <div class="card">
         <div class="card-title">${y("climateDashboard.heating")}</div>
@@ -14969,9 +14975,9 @@ var So, Co = "select.homex_climate_tolerance_mode", wo = (So = class extends b {
           </button>
         </div>
         <div class="options">
-          ${e ? C`<div class="field-select" title=${Co}>
+          ${e ? C`<div class="field-select" title=${Eo}>
                 <span>${y("climateDashboard.tolerance")}</span>
-                ${this._btnGroup(Co)}
+                ${this._btnGroup(Eo)}
               </div>` : ""}
         </div>
       </div>
@@ -15000,7 +15006,7 @@ var So, Co = "select.homex_climate_tolerance_mode", wo = (So = class extends b {
 		return t === n ? `${r(t)} °C` : `${r(t)}–${r(n)} °C`;
 	}
 	_renderRoom(e) {
-		let t = e.heating?.radiators ?? [], n = e.heating?.enabled !== !1, r = t.map((e) => sr(this.hass, e.device_id)).map((e) => e ? this.hass.states[e] : void 0).filter((e) => e && !["unknown", "unavailable"].includes(e.state)), i = (e) => typeof e == "number" ? [e] : [], a = r.filter((e) => e.state !== "off").flatMap((e) => i(e.attributes.temperature)), o = r.length > 0 && r.every((e) => e.state === "off"), s = a.length ? this._fmt(a) : o ? y("climateDashboard.off") : "—", c = this.hass.states[`sensor.homex_${e.room_id}_temperature`], l = parseFloat(c?.state), u = Number.isNaN(l) ? this._fmt(r.flatMap((e) => i(e.attributes.current_temperature))) : `${l} °C`, d = pr(this.hass, e), f = fr(this.hass, e), p = dr(this.hass, e), m = this._roomBusy.has(e.room_id);
+		let t = e.heating?.radiators ?? [], n = e.heating?.enabled !== !1, r = t.map((e) => ur(this.hass, e.device_id)).map((e) => e ? this.hass.states[e] : void 0).filter((e) => e && !["unknown", "unavailable"].includes(e.state)), i = (e) => typeof e == "number" ? [e] : [], a = r.filter((e) => e.state !== "off").flatMap((e) => i(e.attributes.temperature)), o = r.length > 0 && r.every((e) => e.state === "off"), s = a.length ? this._fmt(a) : o ? y("climateDashboard.off") : "—", c = this.hass.states[`sensor.homex_${e.room_id}_temperature`], l = parseFloat(c?.state), u = Number.isNaN(l) ? this._fmt(r.flatMap((e) => i(e.attributes.current_temperature))) : `${l} °C`, d = gr(this.hass, e), f = hr(this.hass, e), p = mr(this.hass, e), m = this._roomBusy.has(e.room_id);
 		return C`<div class="room ${n ? "" : "off"}">
       <label class="room-switch" title=${t.length ? y("climateDashboard.room_heating") : y("climateDashboard.no_radiator")}>
         ${j(n, (t) => this._setRoomHeating(e, t), m || !t.length)}
@@ -15041,7 +15047,7 @@ var So, Co = "select.homex_climate_tolerance_mode", wo = (So = class extends b {
 			t.delete(e.room_id), this._roomBusy = t;
 		}
 	}
-}, So.styles = [k, x`
+}, To.styles = [k, x`
       .card {
         border: 1px solid var(--divider-color, #e0e0e0);
         border-radius: 12px;
@@ -15194,10 +15200,10 @@ var So, Co = "select.homex_climate_tolerance_mode", wo = (So = class extends b {
           width: 100%;
         }
       }
-    `], So);
-e([v({ attribute: !1 })], wo.prototype, "hass", void 0), e([v({ attribute: !1 })], wo.prototype, "rooms", void 0), e([s()], wo.prototype, "_zones", void 0), e([s()], wo.prototype, "_systems", void 0), e([s()], wo.prototype, "_enabledLocal", void 0), e([s()], wo.prototype, "_loaded", void 0), e([s()], wo.prototype, "_busy", void 0), e([s()], wo.prototype, "_roomBusy", void 0), wo = e([w("homex-climate-dashboard")], wo);
+    `], To);
+e([v({ attribute: !1 })], Do.prototype, "hass", void 0), e([v({ attribute: !1 })], Do.prototype, "rooms", void 0), e([s()], Do.prototype, "_zones", void 0), e([s()], Do.prototype, "_systems", void 0), e([s()], Do.prototype, "_enabledLocal", void 0), e([s()], Do.prototype, "_loaded", void 0), e([s()], Do.prototype, "_busy", void 0), e([s()], Do.prototype, "_roomBusy", void 0), Do = e([w("homex-climate-dashboard")], Do);
 // src/components/homex-setup-wizard.ts
-var To = class extends b {
+var Oo = class extends b {
 	constructor(...e) {
 		super(...e), this.rooms = [], this._step = "choose", this._importedAreas = [], this._switchPlan = null, this._createPresets = /* @__PURE__ */ new Set(), this._presetsCreated = 0, this._withLights = !0, this._withShutters = !0, this._covers = /* @__PURE__ */ new Set(), this._plan = [], this._smart = /* @__PURE__ */ new Set(), this._selected = /* @__PURE__ */ new Set(), this._busy = !1, this._created = 0;
 	}
@@ -15241,7 +15247,7 @@ var To = class extends b {
 		this._selected = n;
 	}
 	_lightsByArea() {
-		return Hr(this.hass);
+		return Gr(this.hass);
 	}
 	_coversByArea() {
 		let e = this.hass.devices ?? {}, t = /* @__PURE__ */ new Map();
@@ -15261,7 +15267,7 @@ var To = class extends b {
 	}
 	_goOptions() {
 		let e = this._coversByArea();
-		this._covers = new Set(this._selectedAreas().flatMap((t) => e.get(t.area_id) ?? []).filter((e) => !Eo.NOT_SHUTTERS.has(e.dc ?? "")).map((e) => e.entity_id)), this._step = "options";
+		this._covers = new Set(this._selectedAreas().flatMap((t) => e.get(t.area_id) ?? []).filter((e) => !ko.NOT_SHUTTERS.has(e.dc ?? "")).map((e) => e.entity_id)), this._step = "options";
 	}
 	_checkedCovers() {
 		if (!this._withShutters) return [];
@@ -15574,7 +15580,7 @@ var To = class extends b {
       ${a ? C`<div class="covers">
             ${n.map((e) => C`<div class="cover-room">${e.name}</div>
                 ${t.get(e.area_id).map((e) => {
-			let t = Eo.NOT_SHUTTERS.has(e.dc ?? "");
+			let t = ko.NOT_SHUTTERS.has(e.dc ?? "");
 			return C`<label class="cover">
                     <input
                       type="checkbox"
@@ -15677,14 +15683,14 @@ var To = class extends b {
       </div>
     `;
 	}
-}, Eo = To, Q = (To.NOT_SHUTTERS = /* @__PURE__ */ new Set([
+}, ko = Oo, Q = (Oo.NOT_SHUTTERS = /* @__PURE__ */ new Set([
 	"garage",
 	"gate",
 	"door",
 	"window",
 	"awning",
 	"damper"
-]), To.styles = x`
+]), Oo.styles = x`
     :host {
       display: block;
     }
@@ -16063,15 +16069,15 @@ var To = class extends b {
       width: 36px;
       height: 36px;
     }
-  `, To);
-e([v({ attribute: !1 })], Q.prototype, "hass", void 0), e([v({ attribute: !1 })], Q.prototype, "rooms", void 0), e([s()], Q.prototype, "_step", void 0), e([s()], Q.prototype, "_switchPlan", void 0), e([s()], Q.prototype, "_createPresets", void 0), e([s()], Q.prototype, "_presetsCreated", void 0), e([s()], Q.prototype, "_withLights", void 0), e([s()], Q.prototype, "_withShutters", void 0), e([s()], Q.prototype, "_covers", void 0), e([s()], Q.prototype, "_plan", void 0), e([s()], Q.prototype, "_smart", void 0), e([s()], Q.prototype, "_selected", void 0), e([s()], Q.prototype, "_busy", void 0), e([s()], Q.prototype, "_created", void 0), Q = Eo = e([w("homex-setup-wizard")], Q);
+  `, Oo);
+e([v({ attribute: !1 })], Q.prototype, "hass", void 0), e([v({ attribute: !1 })], Q.prototype, "rooms", void 0), e([s()], Q.prototype, "_step", void 0), e([s()], Q.prototype, "_switchPlan", void 0), e([s()], Q.prototype, "_createPresets", void 0), e([s()], Q.prototype, "_presetsCreated", void 0), e([s()], Q.prototype, "_withLights", void 0), e([s()], Q.prototype, "_withShutters", void 0), e([s()], Q.prototype, "_covers", void 0), e([s()], Q.prototype, "_plan", void 0), e([s()], Q.prototype, "_smart", void 0), e([s()], Q.prototype, "_selected", void 0), e([s()], Q.prototype, "_busy", void 0), e([s()], Q.prototype, "_created", void 0), Q = ko = e([w("homex-setup-wizard")], Q);
 // src/components/homex-backup-dialog.ts
-var Do;
-async function Oo(e) {
+var Ao;
+async function jo(e) {
 	let { backup: t } = await e.callWS({ type: "homex/backup/create" }), n = (/* @__PURE__ */ new Date()).toISOString().slice(0, 16).replace(/[-:]/g, "").replace("T", "-"), r = new Blob([JSON.stringify(t, null, 2)], { type: "application/json" }), i = URL.createObjectURL(r), a = document.createElement("a");
 	a.href = i, a.download = `homex-backup-${n}.json`, document.body.appendChild(a), a.click(), a.remove(), setTimeout(() => URL.revokeObjectURL(i), 1e3);
 }
-var ko = (Do = class extends b {
+var Mo = (Ao = class extends b {
 	constructor(...e) {
 		super(...e), this.open = !1, this._backup = null, this._summary = null, this._fileName = "", this._error = "", this._busy = !1, this._done = "";
 	}
@@ -16157,7 +16163,7 @@ var ko = (Do = class extends b {
             </button>`}
     </homex-dialog>`;
 	}
-}, Do.styles = x`
+}, Ao.styles = x`
     p {
       margin: 0 0 12px;
       line-height: 1.5;
@@ -16212,10 +16218,477 @@ var ko = (Do = class extends b {
     button.danger:disabled {
       opacity: 0.5;
     }
-  `, Do);
-e([v({ attribute: !1 })], ko.prototype, "hass", void 0), e([v({ type: Boolean })], ko.prototype, "open", void 0), e([s()], ko.prototype, "_backup", void 0), e([s()], ko.prototype, "_summary", void 0), e([s()], ko.prototype, "_fileName", void 0), e([s()], ko.prototype, "_error", void 0), e([s()], ko.prototype, "_busy", void 0), e([s()], ko.prototype, "_done", void 0), ko = e([w("homex-backup-dialog")], ko);
+  `, Ao);
+e([v({ attribute: !1 })], Mo.prototype, "hass", void 0), e([v({ type: Boolean })], Mo.prototype, "open", void 0), e([s()], Mo.prototype, "_backup", void 0), e([s()], Mo.prototype, "_summary", void 0), e([s()], Mo.prototype, "_fileName", void 0), e([s()], Mo.prototype, "_error", void 0), e([s()], Mo.prototype, "_busy", void 0), e([s()], Mo.prototype, "_done", void 0), Mo = e([w("homex-backup-dialog")], Mo);
+// src/components/homex-presence-manager.ts
+var No, Po = [
+	{
+		key: "morning",
+		icon: "🌅",
+		start: "07:00",
+		end: "08:30"
+	},
+	{
+		key: "lunch",
+		icon: "🍽",
+		start: "12:00",
+		end: "13:30"
+	},
+	{
+		key: "afternoon",
+		icon: "☀️",
+		start: "15:00",
+		end: "17:00"
+	},
+	{
+		key: "evening",
+		icon: "🌆",
+		start: "19:00",
+		end: "22:30"
+	},
+	{
+		key: "night",
+		icon: "🌙",
+		start: "23:00",
+		end: "00:30"
+	}
+], Fo = [
+	{
+		kind: "light",
+		icon: "💡"
+	},
+	{
+		kind: "blink",
+		icon: "✨"
+	},
+	{
+		kind: "off",
+		icon: "🌑"
+	},
+	{
+		kind: "shutter",
+		icon: "🪟"
+	}
+], Io = "switch.homex_presence_simulator", Lo = () => `a${Math.random().toString(16).slice(2, 10)}`, Ro = (e) => (e.modules ?? ["lights"]).includes("lights"), zo = (e) => (e.shutter_groups ?? []).filter((e) => e.devices.length), Bo = (No = class extends b {
+	constructor(...e) {
+		super(...e), this._state = null, this._rooms = [], this._dirty = !1, this._busy = !1, this._error = null, this._saved = !1;
+	}
+	connectedCallback() {
+		super.connectedCallback(), this._load();
+	}
+	async _load() {
+		try {
+			let [e, t] = await Promise.all([Zn(this.hass), ln(this.hass)]);
+			this._state = e, this._rooms = t, this._dirty = !1, this._error = null;
+		} catch (e) {
+			this._error = E(e);
+		}
+	}
+	get _enabled() {
+		let e = this.hass.states[Io];
+		return e ? e.state === "on" : !!this._state?.enabled;
+	}
+	async _setEnabled(e) {
+		this._busy = !0;
+		try {
+			let t = await $n(this.hass, e);
+			this._state = this._dirty ? {
+				...this._state,
+				enabled: t.enabled,
+				schedule: t.schedule
+			} : t;
+		} catch (e) {
+			alert(y("common.error", { message: E(e) }));
+		}
+		this._busy = !1;
+	}
+	_edit(e) {
+		let t = structuredClone(this._state);
+		e(t), this._state = t, this._dirty = !0, this._saved = !1;
+	}
+	_patch(e, t, n) {
+		this._edit((r) => {
+			let i = r.routines[e].actions.find((e) => e.id === t);
+			i && Object.assign(i, n);
+		});
+	}
+	_add(e, t) {
+		let n = Po.find((t) => t.key === e), r = {
+			id: Lo(),
+			kind: t,
+			room_id: "",
+			start: n.start
+		};
+		t === "light" && (r.end = n.end), t === "blink" && Object.assign(r, {
+			count: 3,
+			duration: 10
+		}), t === "off" && (r.start = n.end), t === "shutter" && Object.assign(r, {
+			group_id: "",
+			action: e === "evening" || e === "night" ? "close" : "open"
+		}), this._edit((t) => t.routines[e].actions.push(r));
+	}
+	_incomplete() {
+		return Object.values(this._state.routines).some((e) => e.actions.some((e) => !e.room_id || e.kind === "shutter" && !e.group_id));
+	}
+	async _save() {
+		if (this._incomplete()) this._error = y("presence.incomplete");
+		else {
+			this._busy = !0;
+			try {
+				this._state = await Qn(this.hass, {
+					jitter: this._state.jitter,
+					routines: this._state.routines
+				}), this._dirty = !1, this._saved = !0, this._error = null;
+			} catch (e) {
+				this._error = E(e);
+			}
+			this._busy = !1;
+		}
+	}
+	_roomSelect(e, t, n) {
+		return C`<select
+      class=${t ? "" : "missing"}
+      @change=${(e) => n(e.target.value)}
+    >
+      <option value="" ?selected=${!t}>${y("presence.pick_room")}</option>
+      ${e.map((e) => C`<option value=${e.room_id} ?selected=${e.room_id === t}>${e.name}</option>`)}
+      ${t && !e.some((e) => e.room_id === t) ? C`<option value=${t} selected>${t}</option>` : o}
+    </select>`;
+	}
+	_time(e, t) {
+		return C`<input
+      type="time"
+      .value=${e ?? ""}
+      @change=${(e) => {
+			let n = e.target.value;
+			n && t(n);
+		}}
+    />`;
+	}
+	_num(e, t, n, r) {
+		return C`<input
+      type="number"
+      min=${t}
+      max=${n}
+      .value=${String(e ?? t)}
+      @change=${(e) => {
+			let i = Math.round(Number(e.target.value));
+			Number.isFinite(i) && r(Math.max(t, Math.min(n, i)));
+		}}
+    />`;
+	}
+	_row(e, t) {
+		let n = (n) => this._patch(e, t.id, n), r = Fo.find((e) => e.kind === t.kind)?.icon ?? "", i = this._rooms.filter(Ro), a;
+		if (t.kind === "shutter") {
+			let e = this._rooms.filter((e) => zo(e).length), r = zo(this._rooms.find((e) => e.room_id === t.room_id) ?? {});
+			a = C`
+        ${this._roomSelect(e, t.room_id, (t) => {
+				let r = e.find((e) => e.room_id === t), i = r ? zo(r) : [];
+				n({
+					room_id: t,
+					group_id: i.length === 1 ? i[0].id : ""
+				});
+			})}
+        <select
+          class=${t.group_id ? "" : "missing"}
+          @change=${(e) => n({ group_id: e.target.value })}
+        >
+          <option value="" ?selected=${!t.group_id}>${y("presence.pick_group")}</option>
+          ${r.map((e) => C`<option value=${e.id} ?selected=${e.id === t.group_id}>${e.name}</option>`)}
+        </select>
+        <select @change=${(e) => n({ action: e.target.value })}>
+          <option value="open" ?selected=${t.action !== "close"}>${y("presence.open")}</option>
+          <option value="close" ?selected=${t.action === "close"}>${y("presence.close")}</option>
+        </select>
+        ${y("presence.at")} ${this._time(t.start, (e) => n({ start: e }))}
+      `;
+		} else a = t.kind === "light" ? C`
+        ${this._roomSelect(i, t.room_id, (e) => n({ room_id: e }))}
+        ${y("presence.from")} ${this._time(t.start, (e) => n({ start: e }))}
+        ${y("presence.to")} ${this._time(t.end, (e) => n({ end: e }))}
+        ${t.end && t.end < t.start ? C`<span class="hint">(${y("presence.next_day")})</span>` : o}
+      ` : t.kind === "blink" ? C`
+        ${this._roomSelect(i, t.room_id, (e) => n({ room_id: e }))}
+        ${this._num(t.count, 1, 20, (e) => n({ count: e }))} ${y("presence.times")}
+        ${this._num(t.duration, 1, 240, (e) => n({ duration: e }))} ${y("presence.minutes")}
+        ${y("presence.from")} ${this._time(t.start, (e) => n({ start: e }))}
+      ` : C`
+        ${this._roomSelect(i, t.room_id, (e) => n({ room_id: e }))}
+        ${y("presence.at")} ${this._time(t.start, (e) => n({ start: e }))}
+      `;
+		return C`<div class="row">
+      <span class="kind">${r} ${y(`presence.kind_${t.kind}`)}</span>
+      ${a}
+      <span class="grow"></span>
+      <button
+        class="rm"
+        title=${y("presence.remove")}
+        @click=${() => this._edit((n) => n.routines[e].actions = n.routines[e].actions.filter((e) => e.id !== t.id))}
+      >
+        ×
+      </button>
+    </div>`;
+	}
+	_routine(e, t) {
+		let n = this._state.routines[e];
+		return C`<div class="card ${n.enabled ? "" : "off"}">
+      <div class="card-head">
+        <span>${t}</span>
+        <h3>${y(`presence.routine_${e}`)}</h3>
+        <span class="toggle ${n.enabled ? "on" : ""}">
+          <input
+            type="checkbox"
+            .checked=${n.enabled}
+            @change=${(t) => this._edit((n) => n.routines[e].enabled = t.target.checked)}
+          />
+          <span class="knob"></span>
+        </span>
+      </div>
+      <div class="rows">
+        ${n.actions.length ? [...n.actions].sort((e, t) => e.start.localeCompare(t.start)).map((t) => this._row(e, t)) : C`<div class="msg">${y("presence.no_actions")}</div>`}
+      </div>
+      <div class="adds">
+        ${Fo.map((t) => C`<button @click=${() => this._add(e, t.kind)}>${y(`presence.add_${t.kind}`)}</button>`)}
+      </div>
+    </div>`;
+	}
+	_eventLabel(e) {
+		let t = this._rooms.find((t) => t.room_id === e.room_id), n = t?.name ?? e.room_id;
+		if (e.kind === "open" || e.kind === "close") {
+			let r = t?.shutter_groups?.find((t) => t.id === e.group_id);
+			return `${n}${r ? ` · ${r.name}` : ""} — ${y(`presence.ev_${e.kind}`)}`;
+		}
+		return `${n} — ${y(`presence.ev_${e.kind}`)}`;
+	}
+	_schedule() {
+		if (!this._enabled) return C`<div class="msg">${y("presence.schedule_off")}</div>`;
+		let e = this._state.schedule;
+		if (!e.length) return C`<div class="msg">${y("presence.schedule_empty")}</div>`;
+		let t = (/* @__PURE__ */ new Date()).toDateString();
+		return C`<div class="timeline">
+      ${e.map((e) => {
+			let n = new Date(e.at);
+			return C`<div class="ev ${e.done ? "done" : ""}">
+          <span class="time">${n.toLocaleTimeString([], {
+				hour: "2-digit",
+				minute: "2-digit"
+			})}</span>
+          <span>
+            ${this._eventLabel(e)}
+            <span class="tag">· ${y(`presence.routine_${e.routine}`)}${n.toDateString() === t ? "" : ` · ${y("presence.next_day")}`}</span>
+          </span>
+        </div>`;
+		})}
+    </div>`;
+	}
+	render() {
+		let e = this._enabled, t = C`<div class="head">
+      <button @click=${() => this.dispatchEvent(new CustomEvent("close"))}>← Homex</button>
+      <h2>${y("presence.title")}</h2>
+      <label
+        class="master ${e ? "on" : ""}"
+        title=${y(e ? "presence.disable_title" : "presence.enable_title")}
+      >
+        ${y(e ? "presence.enabled" : "presence.disabled")}
+        <span class="toggle ${e ? "on" : ""}">
+          <input
+            type="checkbox"
+            .checked=${e}
+            ?disabled=${this._busy || !this._state}
+            @change=${(e) => this._setEnabled(e.target.checked)}
+          />
+          <span class="knob"></span>
+        </span>
+      </label>
+    </div>`;
+		return this._state ? C`
+      ${t}
+      <div class="intro">${y("presence.intro")}</div>
+      ${this._rooms.some(Ro) ? o : C`<div class="msg">${y("presence.no_light_rooms")}</div>`}
+      <div class="card">
+        <div class="jitter">
+          ${y("presence.jitter")}
+          ${this._num(this._state.jitter, 0, 60, (e) => this._edit((t) => t.jitter = e))}
+        </div>
+        <div class="hint">${y("presence.jitter_hint")}</div>
+      </div>
+      ${Po.map((e) => this._routine(e.key, e.icon))}
+      <div class="savebar">
+        <span class="status ${this._error ? "err" : ""}">
+          ${this._error ?? (this._dirty ? y("presence.unsaved") : this._saved ? y("presence.saved") : "")}
+        </span>
+        <button class="primary" ?disabled=${!this._dirty || this._busy} @click=${this._save}>${y("presence.save")}</button>
+      </div>
+      <div class="section">${y("presence.schedule")}</div>
+      <div class="card">${this._schedule()}</div>
+    ` : C`${t}
+        <div class="msg">${this._error ? y("common.error", { message: this._error }) : y("common.loading")}</div>`;
+	}
+}, No.styles = [k, x`
+      .head {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .head h2 {
+        flex: 1;
+        margin: 0;
+        font-size: 20px;
+        font-weight: 500;
+      }
+      .head button {
+        min-height: 0;
+        padding: 8px 12px;
+        border-radius: 8px;
+      }
+      .master {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        color: var(--secondary-text-color);
+      }
+      .master.on {
+        color: var(--primary-color);
+        font-weight: 500;
+      }
+      .intro,
+      .hint,
+      .msg {
+        font-size: 13px;
+        color: var(--secondary-text-color);
+      }
+      .card {
+        border: 1px solid var(--divider-color, #e0e0e0);
+        border-radius: 12px;
+        padding: 12px 16px;
+        margin: 12px 0;
+        background: var(--card-background-color, #1c1c1c);
+      }
+      .card.off .rows {
+        opacity: 0.45;
+      }
+      .card-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .card-head h3 {
+        flex: 1;
+        margin: 0;
+        font-size: 16px;
+        font-weight: 500;
+      }
+      .rows {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 10px 0;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px 8px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: var(--secondary-background-color, rgba(225, 225, 225, 0.08));
+        font-size: 14px;
+      }
+      .row .kind {
+        min-width: 130px;
+        font-weight: 500;
+      }
+      .row .grow {
+        flex: 1;
+      }
+      select,
+      input[type="time"],
+      input[type="number"] {
+        padding: 6px 8px;
+        font-size: 14px;
+        border: 1px solid var(--divider-color, #ccc);
+        border-radius: 8px;
+        background: var(--card-background-color, #fff);
+        color: var(--primary-text-color);
+      }
+      input[type="number"] {
+        width: 64px;
+      }
+      select.missing {
+        border-color: var(--error-color, #db4437);
+      }
+      .row button.rm {
+        min-height: 0;
+        padding: 4px 10px;
+        background: transparent;
+        color: var(--secondary-text-color);
+        font-size: 18px;
+      }
+      .adds {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .adds button {
+        min-height: 0;
+        padding: 6px 12px;
+        font-size: 13px;
+      }
+      .jitter {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        font-size: 14px;
+      }
+      .savebar {
+        position: sticky;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+        background: var(--primary-background-color);
+      }
+      .savebar .status {
+        flex: 1;
+        font-size: 13px;
+        color: var(--secondary-text-color);
+      }
+      .savebar .status.err {
+        color: var(--error-color, #db4437);
+      }
+      .timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin-top: 8px;
+        font-size: 14px;
+      }
+      .ev {
+        display: flex;
+        gap: 12px;
+        padding: 4px 0;
+      }
+      .ev.done {
+        opacity: 0.45;
+      }
+      .ev .time {
+        width: 52px;
+        font-variant-numeric: tabular-nums;
+        font-weight: 500;
+      }
+      .ev .tag {
+        font-size: 11px;
+        color: var(--secondary-text-color);
+      }
+    `], No);
+e([v({ attribute: !1 })], Bo.prototype, "hass", void 0), e([s()], Bo.prototype, "_state", void 0), e([s()], Bo.prototype, "_rooms", void 0), e([s()], Bo.prototype, "_dirty", void 0), e([s()], Bo.prototype, "_busy", void 0), e([s()], Bo.prototype, "_error", void 0), e([s()], Bo.prototype, "_saved", void 0), Bo = e([w("homex-presence-manager")], Bo);
 // src/homex-panel.ts
-var Ao, jo = "247", $ = (Ao = class extends b {
+var Vo, Ho = "248", $ = (Vo = class extends b {
 	constructor(...e) {
 		super(...e), this.narrow = !1, this._rooms = null, this._error = null, this._createOpen = !1, this._exportOpen = !1, this._restoreOpen = !1, this._menuOpen = !1, this._dashTab = (() => {
 			try {
@@ -16233,7 +16706,7 @@ var Ao, jo = "247", $ = (Ao = class extends b {
 			} catch (e) {
 				this._error = E(e);
 			}
-		}, this._backToRooms = () => tr(this._prefix), this._onOpenSwitchAdd = (e) => {
+		}, this._backToRooms = () => ir(this._prefix), this._onOpenSwitchAdd = (e) => {
 			let t = e.detail?.room_id;
 			O(D(this._prefix, "switches", "switches", "new") + (t ? `?room=${encodeURIComponent(t)}` : ""));
 		};
@@ -16245,17 +16718,17 @@ var Ao, jo = "247", $ = (Ao = class extends b {
 		this._unlisten?.(), this.removeEventListener(Wt, this._reload), this.removeEventListener("homex-toggle-expand", this._onToggleExpand), super.disconnectedCallback();
 	}
 	get _segs() {
-		return er(this.route?.path);
+		return rr(this.route?.path);
 	}
 	get _view() {
 		let e = this._segs[0];
-		return e === "switches" || e === "shutters" || e === "climate" || e === "builder" ? e : "rooms";
+		return e === "switches" || e === "shutters" || e === "climate" || e === "builder" || e === "presence" ? e : "rooms";
 	}
 	get _prefix() {
 		return this.route?.prefix || "/homex";
 	}
 	updated(e) {
-		if (e.has("hass") && t(this.hass), e.has("hass") && this.hass && !this._loaded && (this._loaded = !0, c(this.hass).then(() => this.requestUpdate()), $n().then(() => this.requestUpdate()), this._reload()), this._segs[0] === "builder" && p() && !f("builder")) {
+		if (e.has("hass") && t(this.hass), e.has("hass") && this.hass && !this._loaded && (this._loaded = !0, c(this.hass).then(() => this.requestUpdate()), nr().then(() => this.requestUpdate()), this._reload()), this._segs[0] === "builder" && p() && !f("builder")) {
 			O(this._prefix, !0);
 			return;
 		}
@@ -16264,12 +16737,12 @@ var Ao, jo = "247", $ = (Ao = class extends b {
 			return;
 		}
 		let n = e.get("route");
-		n && this._loaded && this._view === "rooms" && er(n.path).length && this._reload();
+		n && this._loaded && this._view === "rooms" && rr(n.path).length && this._reload();
 	}
 	_renderDashboard(e) {
 		let t = (this._rooms ?? []).some((e) => (e.modules ?? []).includes("heating")), n = f("builder") && !!this._plan?.published && this._plan.levels.length > 0;
 		if (!t && !n) return e;
-		n && import("./homex-homex-builder-render-C3nMqPJJ.js");
+		n && import("./homex-homex-builder-render-tjrLzQkc.js");
 		let r = this._dashTab === "climate" && !t || this._dashTab === "house" && !n ? "general" : this._dashTab, i = (e) => {
 			this._dashTab = e;
 			try {
@@ -16390,6 +16863,10 @@ var Ao, jo = "247", $ = (Ao = class extends b {
                 @close=${this._backToRooms}
               ></homex-builder>` : o}
         </div>
+      ` : this._view === "presence" ? C`
+        <div class="wrap">
+          <homex-presence-manager .hass=${this.hass} @close=${this._backToRooms}></homex-presence-manager>
+        </div>
       ` : this._view === "shutters" ? C`
         <div class="wrap">
           <homex-shutter-manager
@@ -16410,7 +16887,7 @@ var Ao, jo = "247", $ = (Ao = class extends b {
                 >
                   <svg viewBox="0 0 24 24"><path d=${it}></path></svg>
                 </button>` : ""}
-            <h1>${Vt(28)} Homex <span class="ver">v${jo}</span></h1>
+            <h1>${Vt(28)} Homex <span class="ver">v${Ho}</span></h1>
           </div>
           <div class="header-actions">
             <button class="primary" @click=${() => this._createOpen = !0}>
@@ -16451,7 +16928,7 @@ var Ao, jo = "247", $ = (Ao = class extends b {
                         @click=${async () => {
 			this._menuOpen = !1;
 			try {
-				await Oo(this.hass);
+				await jo(this.hass);
 			} catch (e) {
 				alert(y("backup.backup_failed", { message: E(e) }));
 			}
@@ -16489,6 +16966,13 @@ var Ao, jo = "247", $ = (Ao = class extends b {
 		}}
                       >
                         🌡 ${y("panel.climate_manager")}
+                      </button>
+                      <button
+                        @click=${() => {
+			this._menuOpen = !1, O(D(this._prefix, "presence"));
+		}}
+                      >
+                        🏖 ${y("panel.presence")}
                       </button>
                       ${f("builder") ? C`<button
                             @click=${() => {
@@ -16533,7 +17017,7 @@ var Ao, jo = "247", $ = (Ao = class extends b {
       ></homex-export-dialog>
     `;
 	}
-}, Ao.styles = x`
+}, Vo.styles = x`
     .wrap {
       max-width: 1000px;
       margin: 0 auto;
@@ -16741,6 +17225,6 @@ var Ao, jo = "247", $ = (Ao = class extends b {
     a {
       color: var(--primary-color);
     }
-  `, Ao);
+  `, Vo);
 e([v({ attribute: !1 })], $.prototype, "hass", void 0), e([v({ attribute: !1 })], $.prototype, "narrow", void 0), e([v({ attribute: !1 })], $.prototype, "route", void 0), e([v({ attribute: !1 })], $.prototype, "panel", void 0), e([s()], $.prototype, "_rooms", void 0), e([s()], $.prototype, "_error", void 0), e([s()], $.prototype, "_createOpen", void 0), e([s()], $.prototype, "_exportOpen", void 0), e([s()], $.prototype, "_restoreOpen", void 0), e([s()], $.prototype, "_menuOpen", void 0), e([s()], $.prototype, "_dashTab", void 0), e([s()], $.prototype, "_plan", void 0), e([s()], $.prototype, "_expanded", void 0), $ = e([w("homex-panel")], $);
 export { $ as HomexPanel };

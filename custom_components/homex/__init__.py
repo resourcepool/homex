@@ -20,6 +20,7 @@ from .const import (
 from .heating import ENFORCER, RadiatorEnforcer
 from .heating_systems import systems_manager
 from .heating_zones import zones_manager
+from .presence import simulator as presence_simulator
 from .room import HomexHub
 from .shutter import ShutterMotion
 from .z2m import Z2MBridge
@@ -68,6 +69,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     systems.start()
     entry.async_on_unload(systems.stop)
     await systems.async_update()
+    # Presence simulator: lights and shutters as if someone were home.
+    presence = presence_simulator(hass)
+    await presence.async_start()
+    entry.async_on_unload(presence.stop)
 
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
     return True

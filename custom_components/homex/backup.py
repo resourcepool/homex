@@ -7,7 +7,7 @@ A backup is one JSON document:
 - ``stores``: Homex's storage documents (``homex_layouts``: layouts, switch
   and shutter presets, switches; ``homex_heating``: zones, systems, heating
   presets and groups, applied setpoints; ``homex_plan``: the 3D Builder
-  plan);
+  plan; ``homex_presence``: the presence simulator);
 - ``scenes``: Homex's native scenes from scenes.yaml (ids ``homex_*``), with
   their content as edited in the scene editor.
 
@@ -43,6 +43,7 @@ STORES = {
     "homex_layouts": "_switch_store_data",
     "homex_heating": "_heating_store_data",
     "homex_plan": "_plan_store_data",
+    "homex_presence": "_presence_store_data",
 }
 
 

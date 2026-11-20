@@ -1,5 +1,6 @@
 """switch.homex_{slug}_lights_toggle - on/off state of the room and each group;
 switch.homex_heating - the global heating switch (Climate module);
+switch.homex_presence_simulator - the presence simulator on / off;
 switch.homex_{slug}_heating - a room's own heating (off = Unheated), for each
 room with radiators.
 Room switches carry the room's Homex temperature / humidity as attributes."""
@@ -21,12 +22,13 @@ from .room import HomexHub, Unit
 from functools import partial
 
 from .heating_systems import systems_manager
+from .presence import PRESENCE_SWITCH, async_doc as presence_doc, async_set_presence_enabled, is_enabled as presence_enabled
 from .i18n import tr
 
 # User-facing strings (see i18n.py).
 _STRINGS = {
-    "en": {"global": "Global", "heating": "Heating"},
-    "fr": {"global": "Global", "heating": "Chauffage"},
+    "en": {"global": "Global", "heating": "Heating", "presence": "Presence simulator"},
+    "fr": {"global": "Global", "heating": "Chauffage", "presence": "Simulateur de présence"},
 }
 
 
@@ -46,6 +48,16 @@ async def async_setup_entry(
         hass.data[DOMAIN].pop(HEATING_SWITCH, None)
 
     entry.async_on_unload(_forget_switch)
+
+    await presence_doc(hass)  # the presence switch reads its document
+    presence = hass.data[DOMAIN][PRESENCE_SWITCH] = PresenceSimulatorSwitch()
+    async_add_entities([presence])
+
+    @callback
+    def _forget_presence() -> None:
+        hass.data[DOMAIN].pop(PRESENCE_SWITCH, None)
+
+    entry.async_on_unload(_forget_presence)
 
     systems = systems_manager(hass)
     await systems.async_setup_platform("switch", async_add_entities)
@@ -334,3 +346,31 @@ class HeatingEnabledSwitch(SwitchEntity):
 
     async def async_turn_off(self, **kwargs) -> None:
         await async_set_heating_enabled(self.hass, False)
+
+
+class PresenceSimulatorSwitch(SwitchEntity):
+    """switch.homex_presence_simulator: the presence simulator on / off — the
+    Presence page's toggle. Off turns off the rooms it lit."""
+
+    _attr_should_poll = False
+    _attr_icon = "mdi:home-account"
+    _attr_unique_id = "homex_presence_simulator"
+
+    def __init__(self) -> None:
+        self.entity_id = "switch.homex_presence_simulator"
+
+    @property
+    def name(self) -> str:
+        return hx_name(
+            "Presence", tr(self.hass, _STRINGS, "global"), tr(self.hass, _STRINGS, "presence")
+        )
+
+    @property
+    def is_on(self) -> bool:
+        return presence_enabled(self.hass)
+
+    async def async_turn_on(self, **kwargs) -> None:
+        await async_set_presence_enabled(self.hass, True)
+
+    async def async_turn_off(self, **kwargs) -> None:
+        await async_set_presence_enabled(self.hass, False)

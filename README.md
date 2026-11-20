@@ -59,6 +59,23 @@ Chaque déclencheur est soit une **entité** (changement d'état), soit un
 **device** (action native, ex. bouton). Les déclenchements provoqués par les
 propres actions de Homex sont ignorés (pas de boucle scène → device → trigger).
 
+### Simulateur de présence
+
+Menu ⋮ → **Simulateur de présence**, activable par le toggle de la page ou
+`switch.homex_presence_simulator`. Cinq routines (matin, midi, après-midi,
+soir, nuit), chacune avec ses étapes :
+
+- **plage allumée** — pièce allumée de `HH:MM` à `HH:MM` (une fin avant le
+  début = le lendemain) ;
+- **allumer / éteindre** — N allumages / extinctions en X minutes ;
+- **éteindre** — pièce éteinte à `HH:MM` ;
+- **volets** — groupe de volets ouvert / fermé à `HH:MM`.
+
+Chaque horaire est décalé aléatoirement de ± N minutes, différemment chaque
+jour (mais stable dans la journée). Une pièce n'est pas éteinte tant qu'une
+autre plage du simulateur la garde allumée. Au redémarrage, les plages en cours
+sont rallumées ; désactiver le simulateur éteint les pièces qu'il a allumées.
+
 ## Installation
 
 > Nécessite Home Assistant **≥ 2025.1** (config subentries) et

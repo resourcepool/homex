@@ -20,11 +20,12 @@ import "./components/homex-climate-manager";
 import "./components/homex-climate-dashboard";
 import "./components/homex-setup-wizard";
 import "./components/homex-backup-dialog";
+import "./components/homex-presence-manager";
 import { downloadBackup } from "./components/homex-backup-dialog";
 
 // Bump together with PANEL_VERSION in panel.py. Shown in the header so you can
 // confirm a full page reload picked up the latest build.
-const BUILD = "247";
+const BUILD = "248";
 
 /** Homex sidebar panel: lists rooms and orchestrates loading / reloading. */
 
@@ -296,9 +297,9 @@ export class HomexPanel extends LitElement {
   private get _segs(): string[] {
     return segments(this.route?.path);
   }
-  private get _view(): "rooms" | "switches" | "shutters" | "climate" | "builder" {
+  private get _view(): "rooms" | "switches" | "shutters" | "climate" | "builder" | "presence" {
     const first = this._segs[0];
-    return first === "switches" || first === "shutters" || first === "climate" || first === "builder"
+    return first === "switches" || first === "shutters" || first === "climate" || first === "builder" || first === "presence"
       ? first
       : "rooms";
   }
@@ -536,6 +537,13 @@ export class HomexPanel extends LitElement {
         </div>
       `;
     }
+    if (this._view === "presence") {
+      return html`
+        <div class="wrap">
+          <homex-presence-manager .hass=${this.hass} @close=${this._backToRooms}></homex-presence-manager>
+        </div>
+      `;
+    }
     if (this._view === "shutters") {
       return html`
         <div class="wrap">
@@ -647,6 +655,14 @@ export class HomexPanel extends LitElement {
                         }}
                       >
                         🌡 ${t("panel.climate_manager")}
+                      </button>
+                      <button
+                        @click=${() => {
+                          this._menuOpen = false;
+                          navigate(joinPath(this._prefix, "presence"));
+                        }}
+                      >
+                        🏖 ${t("panel.presence")}
                       </button>
                       ${featureEnabled("builder")
                         ? html`<button

@@ -533,3 +533,43 @@ export interface Plan {
   /** Shown in the Homex dashboard (its 3D tab) once published from the 3D view. */
   published?: boolean;
 }
+
+// -- Presence simulator -------------------------------------------------------
+
+export type PresenceRoutineKey = "morning" | "lunch" | "afternoon" | "evening" | "night";
+export type PresenceActionKind = "light" | "blink" | "off" | "shutter";
+
+/** One step of a presence routine (times "HH:MM"). */
+export interface PresenceAction {
+  id: string;
+  kind: PresenceActionKind;
+  room_id: string;
+  start: string;
+  end?: string; // light: off time (before start = the next day)
+  count?: number; // blink: on/off cycles
+  duration?: number; // blink: minutes
+  group_id?: string; // shutter: the room's shutter group
+  action?: "open" | "close"; // shutter
+}
+
+export interface PresenceRoutine {
+  enabled: boolean;
+  actions: PresenceAction[];
+}
+
+export interface PresenceEvent {
+  at: string; // ISO datetime
+  kind: "on" | "off" | "force_off" | "open" | "close";
+  room_id: string;
+  group_id: string | null;
+  routine: PresenceRoutineKey;
+  action_id: string;
+  done: boolean;
+}
+
+export interface PresenceState {
+  enabled: boolean;
+  jitter: number; // minutes
+  routines: Record<PresenceRoutineKey, PresenceRoutine>;
+  schedule: PresenceEvent[];
+}

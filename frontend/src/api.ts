@@ -412,3 +412,20 @@ export const fetchPlan = async (hass: HomeAssistant): Promise<import("./types").
 
 export const savePlan = (hass: HomeAssistant, plan: import("./types").Plan) =>
   hass.callWS({ type: "homex/plan/save", plan });
+
+// -- Presence simulator -------------------------------------------------------
+
+export const fetchPresence = (hass: HomeAssistant): Promise<import("./types").PresenceState> =>
+  hass.callWS({ type: "homex/presence" });
+
+export const savePresence = (
+  hass: HomeAssistant,
+  config: Pick<import("./types").PresenceState, "jitter" | "routines">
+): Promise<import("./types").PresenceState> =>
+  hass.callWS({ type: "homex/presence/save", config });
+
+export const setPresenceEnabled = (
+  hass: HomeAssistant,
+  enabled: boolean
+): Promise<import("./types").PresenceState> =>
+  hass.callWS({ type: "homex/presence/enabled", enabled });

@@ -24,6 +24,7 @@ module: editing them never reloads the integration. One document holds
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import re
 from datetime import timedelta
@@ -205,7 +206,8 @@ async def _doc(hass: HomeAssistant) -> dict:
             "systems": list(loaded.get("systems", [])),
             # Per radiator device: the {"mode", "setpoint"} last applied, so
             # a setpoint is only re-applied when its mode / value changes (a
-            # manual setpoint holds until then, across restarts too).
+            # manual setpoint holds until then; after a restart every valve
+            # gets its setpoint written again, see RadiatorEnforcer).
             "applied_setpoints": dict(loaded.get("applied_setpoints", {})),
         }
     return data[STORE_DATA]
@@ -573,12 +575,13 @@ def _param_matches(hass: HomeAssistant, entity_id: str, value) -> bool | None:
 
 
 async def async_enforce_device(
-    hass: HomeAssistant, device_id: str, preset: dict
+    hass: HomeAssistant, device_id: str, preset: dict, force: bool = False
 ) -> tuple[list[str], list[dict]]:
     """Re-apply a device preset's settings that drifted on one device.
 
     Returns (settings re-applied, failures). Settings already right, or whose
-    entity state is unknown (device offline), are left alone.
+    entity state is unknown (device offline), are left alone; with force,
+    settings already right are written again too (after a restart).
     """
     fixed, failed = [], []
     for key, param in _effective_params(hass, preset, device_id).items():
@@ -588,7 +591,8 @@ async def async_enforce_device(
         if entity_id is None:
             failed.append({"param": key, "error": tr(hass, _STRINGS, "entity_not_found")})
             continue
-        if _param_matches(hass, entity_id, param["value"]) is not False:
+        matches = _param_matches(hass, entity_id, param["value"])
+        if matches is None or (matches and not force):
             continue
         try:
             await _apply_param(hass, entity_id, param["value"])
@@ -601,6 +605,8 @@ async def async_enforce_device(
 ENFORCER = "_radiator_enforcer"
 ENFORCE_INTERVAL = timedelta(minutes=10)
 ENFORCE_FIRST_DELAY = 30  # s after load: let MQTT entities come up first
+ENFORCE_ONLINE_DELAY = 5  # s after a valve comes back online
+_OFFLINE = ("unknown", "unavailable")
 
 
 async def async_write_external_temperature(
@@ -640,12 +646,22 @@ class RadiatorEnforcer:
     Radiators whose preset uses an external sensor also get their source
     sensor's temperature written to the valve on every change of it (and on
     every tick, so the valve does not fall back to its internal sensor).
+
+    After a start (Home Assistant restart, integration load / reload) and
+    whenever a valve comes back online (Zigbee2MQTT / valve restart), each
+    valve gets its full state written again once, whatever it reports: its
+    device preset settings (hvac mode...), its room's setpoint, or off.
     """
 
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
         self.hass = hass
         self.entry = entry
         self._unsubs: list = []
+        # Devices whose full state was written since the start / since they
+        # came back online; the others are forced at the next pass.
+        self._forced: set[str] = set()
+        self._lock = asyncio.Lock()
+        self._online_unsub = None
 
     @callback
     def start(self) -> None:
@@ -657,6 +673,43 @@ class RadiatorEnforcer:
         delay = 2 if self.hass.is_running else ENFORCE_FIRST_DELAY
         self._unsubs.append(async_call_later(self.hass, delay, self._tick))
         self.hass.async_create_task(self._async_track_sources())
+        self._track_valves()
+
+    @callback
+    def _track_valves(self) -> None:
+        """A valve back online (from unavailable / unknown, e.g. Zigbee2MQTT
+        or the valve restarted) gets its full state written again."""
+        by_entity: dict[str, str] = {}
+        for _, radiator in self._radiators():
+            device_id = radiator.get("device_id") or ""
+            entity_id = _param_entity(
+                self.hass, device_id, {"domain": "climate", "suffix": ""}
+            )
+            if entity_id:
+                by_entity[entity_id] = device_id
+        if not by_entity:
+            return
+
+        @callback
+        def _on_change(event) -> None:
+            old, new = event.data.get("old_state"), event.data.get("new_state")
+            if new is None or new.state in _OFFLINE:
+                return
+            if old is not None and old.state not in _OFFLINE:
+                return
+            self._forced.discard(by_entity[event.data["entity_id"]])
+            if self._online_unsub is None:
+                self._online_unsub = async_call_later(
+                    self.hass, ENFORCE_ONLINE_DELAY, self._online_tick
+                )
+
+        self._unsubs.append(
+            async_track_state_change_event(self.hass, list(by_entity), _on_change)
+        )
+
+    async def _online_tick(self, _now=None) -> None:
+        self._online_unsub = None
+        await self._tick()
 
     async def _async_track_sources(self) -> None:
         """Follow each external source sensor: write it to its radiators."""
@@ -702,6 +755,9 @@ class RadiatorEnforcer:
     def stop(self) -> None:
         while self._unsubs:
             self._unsubs.pop()()
+        if self._online_unsub is not None:
+            self._online_unsub()
+            self._online_unsub = None
 
     async def _tick(self, _now=None) -> None:
         try:
@@ -731,23 +787,43 @@ class RadiatorEnforcer:
                 )
         return out
 
-    async def _async_keep_off(self, room_id: str, radiator: dict) -> None:
-        """An Unheated room: its valve stays off."""
+    def _valve_online(self, device_id: str) -> bool:
+        entity_id = _param_entity(
+            self.hass, device_id, {"domain": "climate", "suffix": ""}
+        )
+        st = self.hass.states.get(entity_id) if entity_id else None
+        return st is not None and st.state not in _OFFLINE
+
+    async def _async_keep_off(
+        self, room_id: str, radiator: dict, force: bool = False
+    ) -> bool:
+        """An Unheated room / heating disabled: its valve stays off. False
+        when it could not (offline, failure)."""
         entity_id = _param_entity(
             self.hass, radiator.get("device_id", ""), {"domain": "climate", "suffix": ""}
         )
-        if entity_id is None or _param_matches(self.hass, entity_id, "off") is not False:
-            return
+        if entity_id is None:
+            return False
+        matches = _param_matches(self.hass, entity_id, "off")
+        if matches is None:
+            return False  # offline: retried at the next pass
+        if matches and not force:
+            return True
         try:
             await _apply_param(self.hass, entity_id, "off")
-            _LOGGER.info("Homex heating: [%s] %s off (unheated)", room_id, entity_id)
+            _LOGGER.info("Homex heating: [%s] %s off", room_id, entity_id)
         except Exception as err:  # noqa: BLE001 - keep going with the others
             _LOGGER.warning("Homex heating: [%s] %s off failed: %s", room_id, entity_id, err)
+            return False
+        return True
 
-    async def _async_setpoint(self, room_id: str, radiator: dict) -> bool:
+    async def _async_setpoint(
+        self, room_id: str, radiator: dict, force: bool = False
+    ) -> bool:
         """Bring a valve to its room's setpoint: heating on (a cut / manual off
-        valve is turned back to heat) and its target temperature set. False
-        when it could not (offline, failure): retried at the next pass."""
+        valve is turned back to heat) and its target temperature set (with
+        force, even when the valve already reports it). False when it could
+        not (offline, failure): retried at the next pass."""
         entity_id = _param_entity(
             self.hass, radiator.get("device_id", ""), {"domain": "climate", "suffix": ""}
         )
@@ -765,7 +841,7 @@ class RadiatorEnforcer:
             if attrs.get("max_temp") is not None:
                 target = min(float(attrs["max_temp"]), target)
             current = attrs.get("temperature")
-            if current is not None and abs(float(current) - target) < 0.05:
+            if not force and current is not None and abs(float(current) - target) < 0.05:
                 return True
             await self.hass.services.async_call(
                 "climate",
@@ -789,6 +865,10 @@ class RadiatorEnforcer:
     async def async_all_off(self) -> None:
         """Heating disabled: turn every room radiator's valve off (their
         setpoints are re-applied when it is enabled again)."""
+        async with self._lock:
+            await self._async_all_off()
+
+    async def _async_all_off(self) -> None:
         doc = await _doc(self.hass)
         if doc.get("applied_setpoints"):
             doc["applied_setpoints"] = {}
@@ -809,39 +889,72 @@ class RadiatorEnforcer:
         presets re-applied where they drifted, Unheated valves kept off, and
         each valve's setpoint applied only when its room's mode or setpoint
         changed since it was last applied — a setpoint set by hand on the
-        valve holds until the next mode change."""
+        valve holds until the next mode change.
+
+        Valves not yet forced since the start (or since they came back
+        online) get everything written again: preset settings, setpoint (or
+        off), even when they already report them."""
+        async with self._lock:
+            await self._async_enforce_all()
+
+    async def _async_enforce_all(self) -> None:
         doc = await _doc(self.hass)
         if not doc.get("enabled", True):
-            return  # heating off: no preset (nor mode) re-applied
+            # Heating off: no preset (nor mode) re-applied, valves kept off.
+            for room_id, radiator in self._radiators():
+                device_id = radiator.get("device_id") or ""
+                if device_id and device_id not in self._forced:
+                    if await self._async_keep_off(room_id, radiator, force=True):
+                        self._forced.add(device_id)
+            return
         presets = {p["id"]: p for p in doc["device_presets"]}
         applied = doc.setdefault("applied_setpoints", {})
         changed = False
         for room_id, radiator in self._radiators():
             device_id = radiator.get("device_id") or ""
+            force = bool(device_id) and device_id not in self._forced
+            if force and not self._valve_online(device_id):
+                continue  # offline: forced once it is back
             if radiator["off"]:
-                await self._async_keep_off(room_id, radiator)
+                done = await self._async_keep_off(room_id, radiator, force=force)
+                if force and done:
+                    self._forced.add(device_id)
                 # Heated again later: its setpoint is applied then.
                 changed |= applied.pop(device_id, None) is not None
                 continue
             preset = presets.get(radiator.get("preset_id") or "")
             if preset is not None and device_id:
-                await self._async_enforce_preset(room_id, radiator, preset)
+                await self._async_enforce_preset(room_id, radiator, preset, force=force)
             # The setpoint last: the preset may have just set the valve's mode.
             if radiator["setpoint"] is None:
+                if force:
+                    self._forced.add(device_id)
                 continue
             wanted = {"mode": radiator["mode"], "setpoint": radiator["setpoint"]}
-            if applied.get(device_id) == wanted:
+            if not force and applied.get(device_id) == wanted:
                 continue  # already applied for this mode: manual changes hold
-            if await self._async_setpoint(room_id, radiator):
+            if await self._async_setpoint(room_id, radiator, force=force):
                 applied[device_id] = wanted
                 changed = True
+                if force:
+                    self._forced.add(device_id)
+                    _LOGGER.info(
+                        "Homex heating: [%s] %s state restored (%s, %s °C)",
+                        room_id,
+                        device_id,
+                        radiator["mode"],
+                        radiator["setpoint"],
+                    )
         if changed:
             await _save(self.hass)
 
-    async def _async_enforce_preset(self, room_id: str, radiator: dict, preset: dict) -> None:
-        """Re-apply a radiator's device preset settings that drifted."""
+    async def _async_enforce_preset(
+        self, room_id: str, radiator: dict, preset: dict, force: bool = False
+    ) -> None:
+        """Re-apply a radiator's device preset settings that drifted (all of
+        them with force)."""
         fixed, failed = await async_enforce_device(
-            self.hass, radiator["device_id"], preset
+            self.hass, radiator["device_id"], preset, force=force
         )
         if preset.get("external_input") and radiator.get("external_sensor"):
             await self._async_write(
