@@ -130,3 +130,7 @@ la version chargée (rechargement dur : Cmd/Ctrl+Shift+R).
 Avant publication, renseigner dans `custom_components/homex/manifest.json` les
 champs `documentation`, `issue_tracker` et `codeowners` avec la vraie URL du
 dépôt et le compte GitHub.
+
+## Licence
+
+[MIT](LICENSE) © 2026 Loïc Ortola
